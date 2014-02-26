@@ -1,4 +1,4 @@
-interactive-maps
+Interactive Maps
 ================
 
-interactive-maps
+Service that allows creating, storing and serving interactive maps
