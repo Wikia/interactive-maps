@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Map",
+    "description": "Map object from Wikia Interactive Maps",
+    "type": "object",
+    "properties": {
+        "id": {
+            "description": "The unique identifier for a map",
+            "type": "integer"
+        },
+        "name": {
+            "description": "Map name",
+            "type": "string"
+        },
+        "description": {
+            "description": "Map description",
+            "type": "string"
+        },
+        "tiles": {
+            "description": "The unique identifier for tiles",
+            "type": "integer"
+        },
+        "center": {
+            "description": "Object with coordinates for default center point",
+            "type": "object",
+            "properties": {
+                "latitude": { "type": "number" },
+                "longitude": { "type": "number" }
+            }
+        },
+        "zoom": {
+            "description": "Default zoom level for this map",
+            "type": "integer"
+        },
+        "pois": {
+            "description": "Array with unique identifiers for POI on this map",
+            "type": "array",
+            "items": {
+                "type": "integer"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "metadata": {
+            "description": "Metadata for this map",
+            "type": "object",
+            "properties": {
+                "created": {
+                    "description": "creation date",
+                    "type": "string"
+                },
+                "edited": {
+                    "description": "last edition date",
+                    "type": "string"
+                },
+                "creator": {
+                    "description": "creator user name",
+                    "type": "string"
+                },
+                "editor": {
+                    "description": "last editor user name",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "required": ["id", "name", "metadata"]
+}
+
