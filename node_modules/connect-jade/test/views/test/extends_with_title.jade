@@ -1,0 +1,9 @@
+extends ../_layouts/with_title
+
+block meta
+  meta(name="description", content="meta description")
+  meta(name="keywords", content="block keywords")
+
+block content
+  h1= data._id
+  p #{data.name}
