@@ -13,7 +13,8 @@
   "dependencies": {
     "percolator": ">=1.4.3",
     "mysql": ">=2.1.0",
-    "connect": ">=2.13.0"
+    "connect": ">=2.13.0",
+    "connect-jade": "0.0.4"
   },
   "devDependencies": {
     "gulp": ">=3.5.2",
