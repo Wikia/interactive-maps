@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Tiles",
+    "description": "Empty custom tiles map for Wikia interactive Maps",
+    "type": "object",
+    "properties": {
+        "id": {
+            "description": "The unique identifier for a custom tiles map",
+            "type": "integer"
+        },
+        "name": {
+            "description": "Custom tiles map name",
+            "type": "string"
+        },
+        "description": {
+            "description": "Custom tiles map description",
+            "type": "string"
+        },
+        "path": {
+            "description": "Path to custom tiles",
+            "type": "string"
+        },
+        "maxZoom": {
+            "description": "Maximum zoom level",
+            "type": "integer"
+        },
+        "minZoom": {
+            "description": "Minimum zoom level",
+            "type": "integer",
+            "minimum": 0
+        },
+        "metadata": {
+            "description": "Metadata for this custom tiles map",
+            "type": "object",
+            "properties": {
+                "created": {
+                    "description": "creation date",
+                    "type": "string"
+                },
+                "creator": {
+                    "description": "creator user name",
+                    "type": "string"
+                },
+            }
+        }
+    },
+    "required": ["id", "name", "path", "maxZoom", "minZoom", "metadata"]
+}
+

@@ -1,0 +1,63 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "POI",
+    "description": "Point of interest object for Wikia interactive Maps",
+    "type": "object",
+    "properties": {
+        "id": {
+            "description": "The unique identifier for a custom tiles map",
+            "type": "integer"
+        },
+        "name": {
+            "description": "Name of POI",
+            "type": "string"
+        },
+        "description": {
+            "description": "POI description",
+            "type": "string"
+        },
+        "category": {
+            "description": "POI category",
+            "type": "string"
+        },
+        "coordinates": {
+            "description": "Object with POI coordinates",
+            "type": "object",
+            "properties": {
+                "latitude": { "type": "number" },
+                "longitude": { "type": "number" }
+            }
+        },
+        "link": {
+            "description": "Url to the article, photo, video etc. connected with this POI",
+            "type": "string"
+        },
+        "photo": {
+            "description": "Url to the photo connected with this POI",
+            "type": "string"
+        },
+        "metadata": {
+            "description": "Metadata for this POI",
+            "type": "object",
+            "properties": {
+                "created": {
+                    "description": "creation date",
+                    "type": "string"
+                },
+                "edited": {
+                    "description": "last edition date",
+                    "type": "string"
+                },
+                "creator": {
+                    "description": "creator user name",
+                    "type": "string"
+                },
+                "editor": {
+                    "description": "last editor user name",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "required": ["id", "name", "category", "coordinates", "metadata"]
+}
