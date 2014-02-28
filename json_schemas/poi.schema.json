@@ -24,8 +24,8 @@
             "description": "Object with POI coordinates",
             "type": "object",
             "properties": {
-                "latitude": { "type": "number" },
-                "longitude": { "type": "number" }
+                "lat": { "type": "number" },
+                "long": { "type": "number" }
             }
         },
         "link": {

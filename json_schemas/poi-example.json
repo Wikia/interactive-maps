@@ -4,8 +4,8 @@
     "description": "Lorem ipsum dolor",
     "category": "Location",
     "coordinates": {
-        "latitude": 123,
-        "longitude": 123
+        "lat": 123,
+        "long": 123
     },
     "link": "http://www.wikia.com",
     "photo": "path/to/photo",
