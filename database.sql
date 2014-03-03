@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS interactive_maps;
+-- DROP DATABASE IF EXISTS interactive_maps;
 CREATE DATABASE IF NOT EXISTS interactive_maps;
 
 USE interactive_maps;
@@ -30,6 +30,7 @@ CREATE TABLE map_instance (
 CREATE TABLE poi_category (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
+  marker VARCHAR(255),
   parent_poi_category_id INT UNSIGNED  REFERENCES poi_category(id),
   city_id INT NOT NULL
 );
