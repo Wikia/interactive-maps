@@ -13,7 +13,9 @@
   "dependencies": {
     "percolator": ">=1.4.3",
     "mysql": ">=2.1.0",
-    "connect": ">=2.13.0"
+    "connect": ">=2.13.0",
+    "kue": "^0.7.5",
+    "image-size": "^0.2.1"
   },
   "devDependencies": {
     "gulp": ">=3.5.2",
