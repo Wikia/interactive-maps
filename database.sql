@@ -3,6 +3,8 @@ CREATE DATABASE IF NOT EXISTS interactive_maps;
 
 USE interactive_maps;
 
+-- TODO: make sure column names map somewhat to APIs
+
 CREATE TABLE map (
   map_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   name VARCHAR(511) NOT NULL ,
@@ -47,6 +49,7 @@ CREATE TABLE poi (
   foreign KEY (category) REFERENCES poi_category(poi_category_id)
 );
 
+-- TODO: figure out proper indexes
 CREATE INDEX map ON map ( map_id );
 CREATE INDEX map_city_id ON map_instance ( city_id );
 CREATE INDEX poi_map ON poi ( map_instance_id );
