@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS interactive_maps;
+-- DROP DATABASE IF EXISTS interactive_maps;
 CREATE DATABASE IF NOT EXISTS interactive_maps;
 
 USE interactive_maps;
