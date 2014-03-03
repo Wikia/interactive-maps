@@ -1,4 +1,4 @@
--- DROP DATABASE IF EXISTS interactive_maps;
+DROP DATABASE IF EXISTS interactive_maps;
 CREATE DATABASE IF NOT EXISTS interactive_maps;
 
 USE interactive_maps;
@@ -22,7 +22,7 @@ CREATE TABLE map_instance (
   city_id INT UNSIGNED NOT NULL,
   map_id INT NOT NULL REFERENCES map(id),
   title VARCHAR(255) NOT NULL,
-  locked TINYINT DEFAULT 0 NOT NULL,
+  locked BOOLEAN DEFAULT FALSE NOT NULL,
   created_on DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
   created_by VARCHAR(255) NOT NULL
 );
