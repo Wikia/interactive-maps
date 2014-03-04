@@ -1,0 +1,53 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Map instance",
+    "description": "Map instance created from custom tile map or open street maps",
+    "type": "object",
+    "properties": {
+        "id": {
+            "description": "The unique identifier for a map instance",
+            "type": "integer"
+        },
+        "name": {
+            "description": "Map instance name",
+            "type": "string"
+        },
+        "description": {
+            "description": "Map instance description",
+            "type": "string"
+        },
+        "map": {
+            "description": "API path to custom tile map",
+            "type": "string"
+        },
+        "pois": {
+            "description": "API path to POIs for this map instance",
+            "type": "string"
+        },
+        "metadata": {
+            "description": "Metadata for this map instance",
+            "type": "object",
+            "properties": {
+                "created": {
+                    "description": "creation date",
+                    "type": "string"
+                },
+                "edited": {
+                    "description": "last edition date",
+                    "type": "string"
+                },
+                "creator": {
+                    "description": "creator user name",
+                    "type": "string"
+                },
+                "editor": {
+                    "description": "last editor user name",
+                    "type": "string"
+                }
+            },
+            "required": ["created", "edited", "creator", "editor"]
+        }
+    },
+    "required": ["id", "name", "map", "metadata"]
+}
+

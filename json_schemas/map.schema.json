@@ -1,69 +1,50 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Map",
-    "description": "Map object from Wikia Interactive Maps",
+    "description": "Map created from custom tiles",
     "type": "object",
     "properties": {
         "id": {
-            "description": "The unique identifier for a map",
+            "description": "The unique identifier for custom tile map",
             "type": "integer"
         },
         "name": {
-            "description": "Map name",
+            "description": "Name of a custom tile map",
             "type": "string"
         },
         "description": {
-            "description": "Map description",
+            "description": "Description for custom tile map",
             "type": "string"
         },
-        "tiles": {
-            "description": "The unique identifier for tiles",
+        "path": {
+            "description": "path_to_tiles",
+            "type": "string"
+        },
+        "maxZoom": {
+            "description": "Maximum zoom level",
             "type": "integer"
         },
-        "center": {
-            "description": "Object with coordinates for default center point",
-            "type": "object",
-            "properties": {
-                "latitude": { "type": "number" },
-                "longitude": { "type": "number" }
-            }
-        },
-        "zoom": {
-            "description": "Default zoom level for this map",
-            "type": "integer"
-        },
-        "pois": {
-            "description": "Array with unique identifiers for POI on this map",
-            "type": "array",
-            "items": {
-                "type": "integer"
-            },
-            "minItems": 1,
-            "uniqueItems": true
+        "minZoom": {
+            "description": "Minimum zoom level",
+            "type": "integer",
+            "minimum": 0
         },
         "metadata": {
-            "description": "Metadata for this map",
+            "description": "Metadata for this custom tile map",
             "type": "object",
             "properties": {
                 "created": {
                     "description": "creation date",
                     "type": "string"
                 },
-                "edited": {
-                    "description": "last edition date",
-                    "type": "string"
-                },
                 "creator": {
                     "description": "creator user name",
                     "type": "string"
-                },
-                "editor": {
-                    "description": "last editor user name",
-                    "type": "string"
                 }
-            }
+            },
+            "required": ["created", "creator"]
         }
     },
-    "required": ["id", "name", "metadata"]
+    "required": ["id", "name", "path", "maxZoom", "minZoom", "metadata"]
 }
 
