@@ -3,7 +3,6 @@
     "name": "Lorem ipsum",
     "description": "Lorem ipsum dolor",
     "category": "/category/12345",
-    "map": "/map_instance/12345",
     "coordinates": {
         "lat": 123,
         "long": 123
