@@ -20,6 +20,10 @@
             "description": "API path to custom tile map",
             "type": "string"
         },
+        "cityId": {
+            "description": "ID of the Wikia this map instance belongs to",
+            "type": "integer"
+        },
         "pois": {
             "description": "API path to POIs for this map instance",
             "type": "string"
@@ -48,7 +52,7 @@
             "required": ["created", "edited", "creator", "editor"]
         }
     },
-    "required": ["id", "name", "map", "metadata"]
+    "required": ["id", "name", "map", "cityId", "pois", "metadata"]
 }
 
 
