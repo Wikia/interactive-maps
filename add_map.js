@@ -1,65 +1,96 @@
+/**
+ * Module that takes care of:
+ * - uploading a file to temp dir
+ * - creating all necessary queue tasks to generate all necessary tiles
+ * - updating database
+ * - sending tiles to DFS
+ *
+ * Downloading and cutting first 0-2 zoom levels has highest priority
+ * so users don't have to wait long for next steps of creating maps
+ */
+
 'use strict';
 
 var sys = require('sys'),
+	os = require('os'),
 	exec = require('child_process').exec,
 	fs = require('fs'),
 	path = require('path'),
+	mysql = require('mysql'),
 	sizeOf = require('image-size'),
-	kue = require('kue'),
-	jobs = kue.createQueue();
+	fetchFile = require('./fetchImage'),
+	dfs = require('./dfs'),
+	//kue = require('kue'),
+	//jobs = kue.createQueue(),
+	MIN_ZOOM = 0,
+	MAX_ZOOM = 2;
 
-var tmpDir = '/tmp',
-	workDir = '/maps',
-	RATIO_LIMIT = 0.01,
-	IMAGE_FORMAT = 'png';
+//TODO: Move to config
+var connection = mysql.createConnection({
+	host     : 'localhost',
+	user     : 'root',
+	password : ''
+});
 
-function process( imageFile, outputDir ) {
-	var originalImageName = path.basename( imageFile );
-	//imageFile = fs.realpath(imageFile)
+var tmpDir = os.tmpdir() + 'int_map/',
+	mapsDir = tmpDir + 'maps/',
+	tilesDir = tmpDir + 'tiles/';
 
-	var dimensions = sizeOf(imageFile);
-
-	console.log('Original size: ', dimensions.width, dimensions.height);
-
-//	var newSize = calculateNewImageSize( dimensions.width, dimensions.height),
-//		newWidth = newSize[0],
-//		newHeight = newSize[1];
-//
-//	console.log('New size: ', newWidth, newHeight);
-//
-//	if ( dimensions.width !== newWidth || dimensions.height !== newHeight ) {
-//		console.log(imageFile + '   asd')
-//		imageFile = resizeImage( imageFile, newWidth, newHeight );
-//	}
-
-	var maxZoomLevel = getMaxZoomLevel( Math.max( dimensions.width, dimensions.height ));
-	console.log('Max zoom level', maxZoomLevel);
-
-	var tempTilesDir = generateTiles( imageFile, 0, maxZoomLevel),
-		mapId = insertMap({
-			name: 'Map from ' +  originalImageName,
-			min_zoom: 0,
-			max_zoom: maxZoomLevel,
-			width: dimensions.width,
-			height: dimensions.height
-		});
-
-	return 'done';
-	//return moveTiles( tempTilesDir, mapId );
+//setup folders
+if ( !fs.existsSync( tmpDir ) ) {
+	fs.mkdirSync( tmpDir );
 }
 
-function getImageSize( imageFile ) {
-	return getimagesize( imageFile );
+if ( !fs.existsSync( mapsDir ) ) {
+	fs.mkdirSync( mapsDir );
 }
 
-function getMaxZoomLevel( size ) {
-	return 2;//~~Math.log( size, 2 );
+if ( !fs.existsSync( tilesDir ) ) {
+	fs.mkdirSync( tilesDir );
 }
 
-function generateTiles( imageFile, minZoomLevel, maxZoomLevel ) {
-	var workingDir = __dirname + '/' + workDir + '/',
-		tempDir = tempname( workingDir, 'DIR_' ),
-		cmd = 'gdal2tiles.py -p raster -z ' + minZoomLevel + '-' + maxZoomLevel + ' -w none '+imageFile+' ' + tempDir;
+function process( fileUrl, outputDir ) {
+	fetchFile(fileUrl, mapsDir, function(imageFile ,fileName ){
+		var originalImageName = path.basename( imageFile ),
+			dimensions = sizeOf( imageFile );
+
+		console.log('Original size: ', dimensions.width, dimensions.height);
+
+		var maxZoomLevel = getMaxZoomLevel( dimensions.width, dimensions.height, MAX_ZOOM );
+
+		console.log('Max zoom level', maxZoomLevel);
+
+		var tempTilesDir = generateTiles( imageFile, fileName, MIN_ZOOM, maxZoomLevel),
+			mapId = insertMap({
+				name: 'Map from ' +  originalImageName,
+				min_zoom: MIN_ZOOM,
+				max_zoom: maxZoomLevel,
+				width: dimensions.width,
+				height: dimensions.height
+			});
+
+		return 'done';
+		//return moveTiles( tempTilesDir, mapId );
+	})
+}
+
+function getMaxZoomLevel( width, height, max ) {
+	var size = Math.max( width, height );
+	max = max || 14;
+
+	return Math.min( ~~Math.log( size, 2 ), max );
+}
+
+function generateTiles( imageFile, fileName, minZoomLevel, maxZoomLevel ) {
+	var tempDir = tempname( 'TILES_', fileName ),
+		cmd = 'gdal2tiles.py -p raster -z ' +
+			minZoomLevel +
+			'-' +
+			maxZoomLevel +
+			' -w none ' +
+			imageFile +
+			' ' +
+			tempDir;
 
 	console.log(cmd);
 
@@ -75,17 +106,24 @@ function generateTiles( imageFile, minZoomLevel, maxZoomLevel ) {
 	return tempDir;
 }
 
-function tempname( dir, prefix, suffix ){
-	console.log(dir + 'asd')
-	prefix = prefix || '';
-	suffix = suffix || '';
-	return fs.realpathSync( dir )  + '/' +  prefix + (+new Date()) + suffix;
+function tempname( prefix, fileName ){
+	return mapsDir + prefix + fileName + '_' + (+new Date()) ;
 }
 
 function insertMap( mapData ) {
-	var sql = "INSERT INTO map (name, min_zoom, max_zoom, width, height, map_type) VALUES(:name, :min_zoom, :max_zoom, :width, :height, :map_type);";
-	exec(sql);
-	return 0;// last id;
+//	connection.connect();
+//
+//	connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
+//		if (err) throw err;
+//
+//		console.log('The solution is: ', rows[0].solution);
+//	});
+//
+//	connection.end();
+//
+//	var sql = "INSERT INTO map (name, min_zoom, max_zoom, width, height, map_type) VALUES(:name, :min_zoom, :max_zoom, :width, :height, :map_type);";
+//	exec(sql);
+//	return 0;// last id;
 }
 
 function moveTiles( tempTilesDir, mapId ) {
@@ -97,36 +135,8 @@ function moveTiles( tempTilesDir, mapId ) {
 	return rename( tempTilesDir, destinationDir );
 }
 
-function resizeImage( imageFile, width, height ) {
-	var out_dir = __dirname + workDir + '/',
-		newName = tempname( out_dir, 'map_', '.' + IMAGE_FORMAT),
-		cmd = 'gdal_translate -of ' + IMAGE_FORMAT + ' -outsize ' + width + ' ' + height + ' ' + imageFile + ' ' + newName;
-
-	console.log(cmd);
-
-	exec(cmd, function (error, stdout, stderr) {
-		console.log('stdout: ' + stdout);
-		console.log('stderr: ' + stderr);
-
-		if (error !== null) {
-			console.log('exec error: ' + error);
-		}
-	});
-}
-
-function calculateNewImageSize( width, height ) {
-	var ratio = width / height,
-		newWidth = Math.pow( 2, Math.ceil( Math.log( width, 2 ) )),
-		newHeight = Math.pow( 2, Math.ceil( Math.log( height, 2 ) ) ),
-		newRatio = (newWidth / newHeight);
-
-	console.log('Old ratio "' + ratio + '", new ratio "' + newRatio + '"');
-
-	if ( Math.abs( ratio - newRatio) > RATIO_LIMIT ) {
-		newHeight = height * ( newWidth / width );
-	}
-
-	return [ newWidth, newHeight ];
+function cleanup(dir, zoomLevel){
+	//remove tiles
 }
 
 exports.process = process;
