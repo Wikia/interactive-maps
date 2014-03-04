@@ -20,10 +20,6 @@
             "description": "API path to category",
             "type": "string"
         },
-        "map": {
-            "description": "API path to map instance",
-            "type": "string"
-        },
         "coordinates": {
             "description": "Coordinates of POI object",
             "type": "object",
