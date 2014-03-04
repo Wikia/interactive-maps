@@ -48,3 +48,4 @@
     "required": ["id", "name", "path", "maxZoom", "minZoom", "metadata"]
 }
 
+
