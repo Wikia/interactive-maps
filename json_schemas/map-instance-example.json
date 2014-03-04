@@ -3,6 +3,7 @@
     "name": "Lorem ipsum",
     "description": "Lorem ipsum dolor",
     "map": "/map/12345/",
+    "cityId": 123456,
     "pois": "/map_instance_pois/12345/",
     "metadata": {
         "created": "some time format",
