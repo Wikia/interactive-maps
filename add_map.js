@@ -20,8 +20,8 @@ var sys = require('sys'),
 	sizeOf = require('image-size'),
 	fetchFile = require('./fetchImage'),
 	dfs = require('./dfs'),
-	//kue = require('kue'),
-	//jobs = kue.createQueue(),
+	kue = require('kue'),
+	jobs = kue.createQueue(),
 	MIN_ZOOM = 0,
 	MAX_ZOOM = 2;
 
@@ -49,29 +49,65 @@ if ( !fs.existsSync( tilesDir ) ) {
 	fs.mkdirSync( tilesDir );
 }
 
-function process( fileUrl, outputDir ) {
-	fetchFile(fileUrl, mapsDir, function(imageFile ,fileName ){
+jobs.process('sendTiles', function(){
+
+});
+
+jobs.process('cutTiles', function(job, done){
+	var file = job.data.file,
+		fileName = job.data.fileName,
+		minZoom = job.data.minZoom,
+		maxZoom = job.data.maxZoom;
+
+	generateTiles( file, fileName, minZoom, maxZoom, done );
+
+//	insertMap({
+//		name: 'Map from ' +  originalImageName,
+//		min_zoom: MIN_ZOOM,
+//		max_zoom: maxZoomLevel,
+//		width: dimensions.width,
+//		height: dimensions.height
+//	});
+});
+
+jobs.process('fetchFile', function(job, done){
+	fetchFile(job.data.fileUrl, job.data.to, function cut( imageFile ,fileName ){
 		var originalImageName = path.basename( imageFile ),
 			dimensions = sizeOf( imageFile );
 
 		console.log('Original size: ', dimensions.width, dimensions.height);
 
-		var maxZoomLevel = getMaxZoomLevel( dimensions.width, dimensions.height, MAX_ZOOM );
+		var maxZoomLevel = 9;//getMaxZoomLevel( dimensions.width, dimensions.height, MAX_ZOOM );
 
 		console.log('Max zoom level', maxZoomLevel);
 
-		var tempTilesDir = generateTiles( imageFile, fileName, MIN_ZOOM, maxZoomLevel),
-			mapId = insertMap({
-				name: 'Map from ' +  originalImageName,
-				min_zoom: MIN_ZOOM,
-				max_zoom: maxZoomLevel,
-				width: dimensions.width,
-				height: dimensions.height
-			});
+		jobs.create('cutTiles', {
+			file: imageFile,
+			fileName: fileName,
+			minZoom: 0,
+			maxZoom: 0
+		}).priority('high').save();
 
-		return 'done';
-		//return moveTiles( tempTilesDir, mapId );
+		for(var i = 1; i <= maxZoomLevel; i++) {
+			jobs.create('cutTiles', {
+				file: imageFile,
+				fileName: fileName,
+				minZoom: i,
+				maxZoom: i
+			}).priority('low').save();
+		}
+
+		done();
+	});
+});
+
+function process( fileUrl ) {
+	jobs.create('fetchFile', {
+		fileUrl: fileUrl,
+		to: mapsDir
 	})
+	.priority('high')
+	.save();
 }
 
 function getMaxZoomLevel( width, height, max ) {
@@ -81,7 +117,7 @@ function getMaxZoomLevel( width, height, max ) {
 	return Math.min( ~~Math.log( size, 2 ), max );
 }
 
-function generateTiles( imageFile, fileName, minZoomLevel, maxZoomLevel ) {
+function generateTiles( imageFile, fileName, minZoomLevel, maxZoomLevel, done ) {
 	var tempDir = tempname( 'TILES_', fileName ),
 		cmd = 'gdal2tiles.py -p raster -z ' +
 			minZoomLevel +
@@ -97,6 +133,8 @@ function generateTiles( imageFile, fileName, minZoomLevel, maxZoomLevel ) {
 	exec(cmd, function (error, stdout, stderr) {
 		console.log('stdout: ' + stdout);
 		console.log('stderr: ' + stderr);
+
+		done();
 
 		if (error !== null) {
 			console.log('exec error: ' + error);
@@ -138,5 +176,8 @@ function moveTiles( tempTilesDir, mapId ) {
 function cleanup(dir, zoomLevel){
 	//remove tiles
 }
+
+kue.app.set('Interactive Maps', 'Wikia');
+kue.app.listen(3000);
 
 exports.process = process;
