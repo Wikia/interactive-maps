@@ -1,11 +1,11 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "POI",
-    "description": "Point of interest object for Wikia interactive Maps",
+    "description": "Point of interest",
     "type": "object",
     "properties": {
         "id": {
-            "description": "The unique identifier for a custom tiles map",
+            "description": "The unique identifier for this POI",
             "type": "integer"
         },
         "name": {
@@ -17,16 +17,27 @@
             "type": "string"
         },
         "category": {
-            "description": "POI category",
+            "description": "API path to category",
+            "type": "string"
+        },
+        "map": {
+            "description": "API path to map instance",
             "type": "string"
         },
         "coordinates": {
-            "description": "Object with POI coordinates",
+            "description": "Coordinates of POI object",
             "type": "object",
             "properties": {
-                "lat": { "type": "number" },
-                "long": { "type": "number" }
-            }
+                "lat": {
+                    "description": "Latitude of POI object",
+                    "type": "integer"
+                },
+                "long": {
+                    "description": "Longitude of POI object",
+                    "type": "integer"
+                }
+            },
+            "required": ["lat", "long"]
         },
         "link": {
             "description": "Url to the article, photo, video etc. connected with this POI",
@@ -56,8 +67,9 @@
                     "description": "last editor user name",
                     "type": "string"
                 }
-            }
+            },
+            "required": ["created", "edited", "creator", "editor"]
         }
     },
-    "required": ["id", "name", "category", "coordinates", "metadata"]
+    "required": ["id", "name", "category", "map", "coordinates", "metadata"]
 }

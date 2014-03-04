@@ -1,0 +1,34 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Maps list",
+    "description": "List of Maps",
+    "type": "object",
+    "properties": {
+        "page": {
+            "description": "Number of current page",
+            "type": "integer"
+        },
+        "pages": {
+            "description": "Total number of pages",
+            "type": "integer"
+        },
+        "perPage": {
+            "description": "Items per page",
+            "type": "integer"
+        },
+        "total": {
+            "description": "Total number of items",
+            "type": "integer"
+        },
+        "maps": {
+            "description": "Array of maps",
+            "type": "array",
+            "items": {
+                "description": "API path to custom tile map",
+                "type": "string"
+            },
+            "uniqueItems": true
+        }
+    },
+    "required": ["page", "pages", "perPage", "total", "maps"]
+}

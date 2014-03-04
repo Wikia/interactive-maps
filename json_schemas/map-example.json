@@ -2,17 +2,11 @@
     "id": 12345,
     "name": "Lorem ipsum",
     "description": "Lorem ipsum dolor",
-    "tiles": 12345,
-    "center": {
-        "latitude": 123,
-        "longitude": 123
-    },
-    "zoom": 2,
-    "pois": [1, 2, 3, 4],
+    "path": "path_to_tiles",
+    "maxZoom": 5,
+    "minZoom": 0,
     "metadata": {
         "created": "some time format",
-        "edited": "some time format",
-        "creator": "User name",
-        "editor": "User name"
+        "creator": "User name"
     }
 }
