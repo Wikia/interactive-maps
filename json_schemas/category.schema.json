@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Category",
+    "description": "POIs Category",
+    "type": "object",
+    "properties": {
+        "id": {
+            "description": "Unique identifier for this category",
+            "type": "integer"
+        },
+        "name": {
+            "description": "Name of this category",
+            "type": "string"
+        },
+        "parent": {
+            "description": "API path to parent category",
+            "type": "string"
+        },
+        "marker": {
+            "description": "Path to marker icon for this category",
+            "type": "string"
+        }
+    },
+    "required": ["id", "name"]
+}

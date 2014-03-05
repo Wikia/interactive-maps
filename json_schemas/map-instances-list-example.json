@@ -1,0 +1,12 @@
+{
+    "page": 2,
+    "pages": 100,
+    "perPage": 4,
+    "total": 400,
+    "maps": [
+        "/map_instance/12345",
+        "/map_instance/12345",
+        "/map_instance/12345",
+        "/map_instance/12345"
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "POI list",
+    "description": "List of POIs for map instance",
+    "type": "object",
+    "properties": {
+        "total": {
+            "description": "Number of items in list",
+            "type": "integer"
+        },
+        "pois": {
+            "description": "Array with pois",
+            "type": "array",
+            "items": {
+                "description": "API path for a POI",
+                "type": "string"
+            },
+            "uniqueItems": true
+        }
+    },
+    "required": ["mapId", "total", "pois"]
+}
