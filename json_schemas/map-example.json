@@ -2,7 +2,7 @@
     "id": 12345,
     "name": "Lorem ipsum",
     "description": "Lorem ipsum dolor",
-    "path": "path_to_tiles",
+    "mapURL": "path_to_tiles",
     "maxZoom": 5,
     "minZoom": 0,
     "metadata": {
