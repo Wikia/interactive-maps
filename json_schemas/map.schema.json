@@ -16,7 +16,7 @@
             "description": "Description for custom tile map",
             "type": "string"
         },
-        "path": {
+        "mapURL": {
             "description": "path_to_tiles",
             "type": "string"
         },
@@ -45,7 +45,7 @@
             "required": ["created", "creator"]
         }
     },
-    "required": ["id", "name", "path", "maxZoom", "minZoom", "metadata"]
+    "required": ["id", "name", "mapURL", "maxZoom", "minZoom", "metadata"]
 }
 
 
