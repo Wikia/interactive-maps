@@ -11,8 +11,26 @@
 
 'use strict';
 
-var sys = require('sys'),
+//TODO: Move to config
+var config = {
+		db: {
+			host: 'localhost',
+			user: 'root',
+			auth: ''
+		},
+		maxCutTilesJobs: 1,
+		maxFetchImagesJobs: 1,
+		minZoom: 1,
+		maxZoom: 2,
+		redis: {
+			port: 6379,
+			host: 'localhost',
+			password: ''
+		}
+	},
+	sys = require('sys'),
 	os = require('os'),
+	Q = require('q'),
 	exec = require('child_process').exec,
 	fs = require('fs'),
 	path = require('path'),
@@ -20,21 +38,10 @@ var sys = require('sys'),
 	sizeOf = require('image-size'),
 	fetchFile = require('./fetchImage'),
 	dfs = require('./dfs'),
-	kue = require('kue'),
-	jobs = kue.createQueue(),
-	MIN_ZOOM = 0,
-	MAX_ZOOM = 2;
-
-//TODO: Move to config
-var connection = mysql.createConnection({
-	host     : 'localhost',
-	user     : 'root',
-	password : ''
-});
-
-var tmpDir = os.tmpdir() + 'int_map/',
-	mapsDir = tmpDir + 'maps/',
-	tilesDir = tmpDir + 'tiles/';
+	jobs = require('kue').createQueue(config),
+	connection = mysql.createConnection(config.db),
+	tmpDir = os.tmpdir() + 'int_map/',
+	mapsDir = tmpDir + 'maps/';
 
 //setup folders
 if ( !fs.existsSync( tmpDir ) ) {
@@ -45,21 +52,29 @@ if ( !fs.existsSync( mapsDir ) ) {
 	fs.mkdirSync( mapsDir );
 }
 
-if ( !fs.existsSync( tilesDir ) ) {
-	fs.mkdirSync( tilesDir );
-}
-
 jobs.process('sendTiles', function(){
 
 });
 
-jobs.process('cutTiles', function(job, done){
+jobs.process('cutTiles', config.maxCutTilesJobs, function(job, done){
 	var file = job.data.file,
-		fileName = job.data.fileName,
+		dir = job.data.dir,
 		minZoom = job.data.minZoom,
 		maxZoom = job.data.maxZoom;
 
-	generateTiles( file, fileName, minZoom, maxZoom, done );
+	generateTiles( file, dir, minZoom, maxZoom )
+		.then(optimzeTiles)
+		.then(uploadTiles)
+		.then(cleanUpTiles)
+		.then(insertMap)
+		.then(function () {
+			done()
+		})
+		.catch(function (error) {
+			done(error)
+		})
+		.done();
+
 
 //	insertMap({
 //		name: 'Map from ' +  originalImageName,
@@ -70,31 +85,34 @@ jobs.process('cutTiles', function(job, done){
 //	});
 });
 
-jobs.process('fetchFile', function(job, done){
-	fetchFile(job.data.fileUrl, job.data.to, function cut( imageFile ,fileName ){
-		var originalImageName = path.basename( imageFile ),
-			dimensions = sizeOf( imageFile );
+jobs.process('fetchFile', config.maxFetchImagesJobs, function(job, done){
+	fetchFile(job.data.fileUrl, job.data.to).then(function cut( imageFile, fileName ){
+		var dimensions = sizeOf( imageFile ),
+			maxZoomLevel = getMaxZoomLevel( dimensions.width, dimensions.height),
+			dir = tempName( 'TILES_', fileName ),
+			firstMaxZoomLevel = Math.min(config.minZoom + 4, maxZoomLevel);
 
 		console.log('Original size: ', dimensions.width, dimensions.height);
-
-		var maxZoomLevel = 9;//getMaxZoomLevel( dimensions.width, dimensions.height, MAX_ZOOM );
-
 		console.log('Max zoom level', maxZoomLevel);
 
 		jobs.create('cutTiles', {
 			file: imageFile,
-			fileName: fileName,
-			minZoom: 0,
-			maxZoom: 0
-		}).priority('high').save();
+			dir: dir,
+			minZoom: config.minZoom,
+			maxZoom: firstMaxZoomLevel
+		})
+		.priority( 'high' )
+		.save();
 
-		for(var i = 1; i <= maxZoomLevel; i++) {
+		for(var i = firstMaxZoomLevel+1; i <= maxZoomLevel; i++) {
 			jobs.create('cutTiles', {
 				file: imageFile,
-				fileName: fileName,
+				dir: dir,
 				minZoom: i,
 				maxZoom: i
-			}).priority('low').save();
+			})
+			.priority( 'low' )
+			.save();
 		}
 
 		done();
@@ -110,45 +128,56 @@ function process( fileUrl ) {
 	.save();
 }
 
-function getMaxZoomLevel( width, height, max ) {
+function getMaxZoomLevel( width, height ) {
 	var size = Math.max( width, height );
-	max = max || 14;
 
-	return Math.min( ~~Math.log( size, 2 ), max );
+	return Math.min( ~~Math.log( size, 2 ), config.maxZoom );
 }
 
-function generateTiles( imageFile, fileName, minZoomLevel, maxZoomLevel, done ) {
-	var tempDir = tempname( 'TILES_', fileName ),
+function generateTiles( imageFile, tempDir, minZoom, maxZoom ) {
+	var deferred = Q.defer(),
 		cmd = 'gdal2tiles.py -p raster -z ' +
-			minZoomLevel +
-			'-' +
-			maxZoomLevel +
+			minZoom + '-' + maxZoom +
 			' -w none ' +
-			imageFile +
-			' ' +
-			tempDir;
+			imageFile + ' ' + tempDir;
 
-	console.log(cmd);
+	console.log('Running:' + cmd);
 
 	exec(cmd, function (error, stdout, stderr) {
-		console.log('stdout: ' + stdout);
-		console.log('stderr: ' + stderr);
+		var dirs = [];
 
-		done();
+		console.log('stdout: ' + stdout);
 
 		if (error !== null) {
+			//callback( tempDir +  '/', error );
+			deferred.reject(error);
 			console.log('exec error: ' + error);
+		} else {
+			while ( minZoom <= maxZoom  ) {
+				dirs.push(tempDir +  '/' + minZoom + '/');
+				minZoom += 1;
+			}
+
+			deferred.resolve(dirs);
+			console.log('Tiles generated into: ' + tempDir +  '/')
 		}
 	});
 
-	return tempDir;
+	return deferred;
 }
 
-function tempname( prefix, fileName ){
+function tempName( prefix, fileName ){
 	return mapsDir + prefix + fileName + '_' + (+new Date()) ;
 }
 
 function insertMap( mapData ) {
+	var deferred = Q.defer();
+	//create bucket
+	//upload images
+	console.log('Updating DB for:');
+	deferred.resolve();
+
+	return deferred;
 //	connection.connect();
 //
 //	connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
@@ -173,8 +202,38 @@ function moveTiles( tempTilesDir, mapId ) {
 	return rename( tempTilesDir, destinationDir );
 }
 
+function optimizeTiles( dirs, done ) {
+	var deferred = Q.defer();
+
+	console.log('Optimizing tiles in folder: ' + dirs);
+//	exec('imageOptim -d ' + dir, function(error, stdout, stderr){
+//		console.log(stdout);
+//		done();
+//	})
+
+	deferred.resolve();
+
+	return deferred;
+}
+
+function uploadTiles( bucket, done ) {
+	var deferred = Q.defer();
+	//create bucket
+	//upload images
+	console.log('Uploading tiles for bucket:');
+	deferred.resolve();
+
+	return deferred;
+}
+
 function cleanup(dir, zoomLevel){
-	//remove tiles
+	var deferred = Q.defer();
+	//remove local files
+	console.log('Removing tiles in: ' + dir);
+
+	deferred.resolve();
+
+	return deferred;
 }
 
 kue.app.set('Interactive Maps', 'Wikia');
