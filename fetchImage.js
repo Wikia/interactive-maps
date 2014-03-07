@@ -9,17 +9,19 @@ var http = require('http'),
 	path = require('path'),
 	Q = require('q');
 
-module.exports = function getFile( file_url, destination, callback ){
+module.exports = function getFile( fileUrl, destination ){
 	var deferred = Q.defer(),
-		file_name = url.parse(file_url).pathname.split('/').pop(),
+		file_name = url.parse(fileUrl).pathname.split('/').pop(),
 		file = fs.createWriteStream(destination + file_name);
 
-	http.get(file_url, function(res) {
+	console.log('Fetching file: ', fileUrl);
+
+	http.get(fileUrl, function(res) {
 		res.on('data', function(data) {
 			file.write(data);
 		}).on('end', function() {
 			file.end();
-			console.log(file_name + ' downloaded to ' + destination);
+			console.log('File downloaded to ' + destination);
 
 			deferred.resolve(destination + file_name, file_name);
 		});
@@ -28,5 +30,5 @@ module.exports = function getFile( file_url, destination, callback ){
 		deferred.reject(e)
 	});
 
-	return deferred;
+	return deferred.promise;
 };
