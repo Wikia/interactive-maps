@@ -4,24 +4,24 @@
   "main": "server",
   "homepage": "http://wikia.com",
   "engines": {
-    "node": ">= 0.10.0"
+    "node": "0.10.x"
   },
   "repository": {
     "type": "git",
     "url": "http://github.com/Wikia/interactive-maps.git"
   },
   "dependencies": {
-    "percolator": ">= 1.4.3",
-    "mysql": ">= 2.1.0",
-    "connect": ">= 2.13.0",
-    "kue": ">= 0.7.5",
-    "image-size": ">= 0.2.1",
-    "q": ">= 1.0.0"
+    "percolator": "1.4.x",
+    "mysql": "2.1.x",
+    "connect": "2.13.x",
+    "kue": "0.7.x",
+    "image-size": "0.2.x",
+    "q": "1.0.x"
   },
   "devDependencies": {
-    "gulp": ">= 3.5.2",
-    "gulp-changed": ">= 0.2.1",
-    "gulp-nodemon": ">= 1.0.0"
+    "gulp": "3.5.x",
+    "gulp-changed": "0.2.x",
+    "gulp-nodemon": "1.0.x"
   },
   "private": true
 }
