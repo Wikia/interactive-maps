@@ -2,25 +2,39 @@ var CURDCollection = require('percolator').CRUDCollection,
 	mocks = {
 		list: [
 			{
-				id: '/map_instance/12345/'
+				id: '/map_instance/12345/',
+				name: 'Lorem ipsum',
+				thumbnail: 'path_to_thumbnail',
+				cityId: 123456
 
 			},
 			{
-				id: '/map_instance/12345/'
+				id: '/map_instance/12345/',
+				name: 'Lorem ipsum',
+				thumbnail: 'path_to_thumbnail',
+				cityId: 123456
 			},
 			{
-				id: '/map_instance/12345/'
+				id: '/map_instance/12345/',
+				name: 'Lorem ipsum',
+				thumbnail: 'path_to_thumbnail',
+				cityId: 123456
 			},
 			{
-				id: '/map_instance/12345/'
+				id: '/map_instance/12345/',
+				name: 'Lorem ipsum',
+				thumbnail: 'path_to_thumbnail',
+				cityId: 123456
 			}
 		],
 		item: {
-			id: 12345,
-			name: "Lorem ipsum",
-			article: "path_to_article",
-			category: "/category/12345",
-			coordinates: [123, 123],
+			id: null,
+			name: 'Lorem ipsum',
+			description: 'Lorem ipsum dolor',
+			map: '/map/12345/',
+			cityId: 123456,
+			thumbnail: 'path_to_thumbnail',
+			pois: '/poi?mapId=',
 			metadata: {
 				created: 'some time format',
 				edited: 'some time format',
@@ -30,48 +44,33 @@ var CURDCollection = require('percolator').CRUDCollection,
 		}
 	},
 	schema = {
-		description: "Point of interest",
-		type: "Object",
+		description: "Map instance created from custom tile map or open street maps",
+		type: "object",
 		properties: {
 			name: {
-				description: "POI name",
+				description: "Map instance name",
 				type: "string",
 				minLength: 2,
 				required: true
 			},
-			article: {
-				description: "path to article connected with this POI",
+			description: {
+				description: "Map instance description",
+				type: "string"
+			},
+			map: {
+				description: "API path to custom tile map",
 				type: "string",
 				pattern: '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/',
 				format: 'uri',
 				required: true
 			},
-			category: {
-				description: "path to category",
-				type: "string",
-				pattern: '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/',
-				format: 'uri',
-				required: true
-			},
-			coordinates: {
-				description: "Object containing POI coordinates",
-				type: "object",
-				properties: {
-					latitude: {
-						description: "POI latitude",
-						type: "number",
-						required: true
-					},
-					longitude: {
-						description: "POI longitude",
-						type: "number",
-						required: true
-					}
-				},
+			cityId: {
+				description: "ID of the Wikia this map instance belongs to",
+				type: "integer",
 				required: true
 			},
 			metadata: {
-				description: "Metadata for this POI",
+				description: "Metadata for this map instance",
 				type: "object",
 				properties: {
 					created: {
@@ -113,6 +112,7 @@ var CURDCollection = require('percolator').CRUDCollection,
 		},
 		fetch: function(req, res, cb) {
 			mocks.item.id = req.uri.child();
+			mocks.item.pois += req.uri.child();
 			cb(null, mocks.item);
 		},
 		list: function(req, res, cb) {
