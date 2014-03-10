@@ -2,25 +2,25 @@ var CURDCollection = require('percolator').CRUDCollection,
 	mocks = {
 		list: [
 			{
-				id: '/map_instance/12345/'
+				id: '/category/12345/'
 
 			},
 			{
-				id: '/map_instance/12345/'
+				id: '/category/12345/'
 			},
 			{
-				id: '/map_instance/12345/'
+				id: '/category/12345/'
 			},
 			{
-				id: '/map_instance/12345/'
+				id: '/category/12345/'
 			}
 		],
 		item: {
 			id: 12345,
-			name: "Lorem ipsum",
-			article: "path_to_article",
-			category: "/category/12345",
-			coordinates: [123, 123],
+			name: 'Lorem ipsum',
+			parent: '/category/12345',
+			cityId: 12345,
+			marker: 'path/to/marker',
 			metadata: {
 				created: 'some time format',
 				edited: 'some time format',
@@ -30,48 +30,36 @@ var CURDCollection = require('percolator').CRUDCollection,
 		}
 	},
 	schema = {
-		description: "Point of interest",
+		description: "Point of interest category",
 		type: "Object",
 		properties: {
 			name: {
-				description: "POI name",
+				description: "Category name",
 				type: "string",
 				minLength: 2,
 				required: true
 			},
-			article: {
-				description: "path to article connected with this POI",
+			parent: {
+				description: "API path to parent category",
 				type: "string",
 				pattern: '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/',
 				format: 'uri',
 				required: true
 			},
-			category: {
-				description: "path to category",
+			marker: {
+				description: "Path to marker icon",
 				type: "string",
 				pattern: '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/',
 				format: 'uri',
 				required: true
 			},
-			coordinates: {
-				description: "Object containing POI coordinates",
-				type: "object",
-				properties: {
-					latitude: {
-						description: "POI latitude",
-						type: "number",
-						required: true
-					},
-					longitude: {
-						description: "POI longitude",
-						type: "number",
-						required: true
-					}
-				},
+			cityId: {
+				description: "Unique identifier of Wikia that this category belongs to",
+				type: "integer",
 				required: true
 			},
 			metadata: {
-				description: "Metadata for this POI",
+				description: "Metadata for this category",
 				type: "object",
 				properties: {
 					created: {
