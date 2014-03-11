@@ -16,7 +16,8 @@
     "connect": "2.13.x",
     "kue": "0.7.x",
     "image-size": "0.2.x",
-    "q": "1.0.x"
+    "q": "1.0.x",
+    "knex": "^0.5.8"
   },
   "devDependencies": {
     "gulp": "3.5.x",
