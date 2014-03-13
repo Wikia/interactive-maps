@@ -1,12 +1,13 @@
 module.exports = {
-	createSchema : {
-		description: "Map instance created from custom tile map or open street maps",
+	dbTable: 'map_instance',
+	dbColumns: ['id', 'title', 'map_id', 'city_id', 'created_by', 'created_on', 'locked'],
+	createSchema: {
+		description: "Schema for creating map instance",
 		type: "object",
 		properties: {
 			title: {
 				description: "Map instance name",
 				type: "string",
-				minLength: 2,
 				required: true
 			},
 			map_id: {
@@ -22,13 +23,14 @@ module.exports = {
 			created_by: {
 				description: "creator user name",
 				type: "string",
-				minLength: 2,
 				required: true
 			}
-		}
+		},
+		maxProperties: 4,
+		additionalProperties: false
 	},
 	updateSchema: {
-		description: "Map instance created from custom tile map or open street maps",
+		description: "Schema for updating map instance",
 		type: "object",
 		properties: {
 			title: {
@@ -40,6 +42,8 @@ module.exports = {
 				description: "Unique identifier for a map",
 				type: "integer"
 			}
-		}
+		},
+		maxProperties: 2,
+		additionalProperties: false
 	}
 }
