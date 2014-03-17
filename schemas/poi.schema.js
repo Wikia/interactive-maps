@@ -1,7 +1,12 @@
 module.exports = {
+	// name of table in DB
 	dbTable: 'poi',
+
+	// table columns used for SELECT query
 	dbColumns: ['id', 'name', 'poi_category_id', 'description', 'link', 'photo', 'lat', 'lon', 'created_on',
 		'created_by', 'updated_on', 'updated_by', 'map_instance_id'],
+
+	// Schema used for validation JSON for POST requests
 	createSchema: {
 		description: "Schema for creating POI",
 		type: "Object",
@@ -59,6 +64,8 @@ module.exports = {
 		maxProperties: 10,
 		additionalProperties: false
 	},
+
+	// Schema used for validation JSON for PUT requests
 	updateSchema: {
 		description: "Schema for updating POI",
 		type: "Object",
@@ -100,8 +107,8 @@ module.exports = {
 				type: "string",
 				required: true
 			}
-		}
-	},
-	maxProperties: 8,
-	additionalProperties: false
+		},
+		maxProperties: 8,
+		additionalProperties: false
+	}
 }

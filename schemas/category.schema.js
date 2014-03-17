@@ -1,6 +1,11 @@
 module.exports = {
+	// name of table in DB
 	dbTable: 'poi_category',
+
+	// table columns used for SELECT query
 	dbColumns: ['id', 'name', 'marker', 'parent_poi_category_id', 'city_id', 'created_on', 'created_by'],
+
+	// Schema used for validation JSON for POST requests
 	createSchema: {
 		description: "Schema for creating a category",
 		type: "object",
@@ -28,6 +33,8 @@ module.exports = {
 		maxProperties: 4,
 		additionalProperties: false
 	},
+
+	// Schema used for validation JSON for PUT requests
 	updateSchema: {
 		description: "Schema for updating a category",
 		type: "object",

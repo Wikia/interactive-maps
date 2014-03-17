@@ -1,6 +1,11 @@
 module.exports = {
+	// name of table in DB
 	dbTable: 'map_instance',
+
+	// table columns used for SELECT query
 	dbColumns: ['id', 'title', 'map_id', 'city_id', 'created_by', 'created_on', 'locked'],
+
+	// Schema used for validation JSON for POST requests
 	createSchema: {
 		description: "Schema for creating map instance",
 		type: "object",
@@ -29,6 +34,8 @@ module.exports = {
 		maxProperties: 4,
 		additionalProperties: false
 	},
+
+	// Schema used for validation JSON for PUT requests
 	updateSchema: {
 		description: "Schema for updating map instance",
 		type: "object",
