@@ -36,5 +36,13 @@ module.exports = {
 		},
 		maxProperties: 3,
 		additionalProperties: false
+	},
+
+	// Schema used to add API URLs to JSON object sent to the client
+	responseSchema: {
+		id: {
+			entryPoint: '/map/',
+			paramName: 'map_url'
+		}
 	}
 }

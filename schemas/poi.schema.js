@@ -110,5 +110,21 @@ module.exports = {
 		},
 		maxProperties: 8,
 		additionalProperties: false
+	},
+
+	// Schema used to add API URLs to JSON object sent to the client
+	responseSchema: {
+		id: {
+			entryPoint: '/poi/',
+			paramName: 'poi_url'
+		},
+		map_instance_id: {
+			entryPoint: '/map_instance/',
+			paramName: 'map_instance_url'
+		},
+		poi_category_id: {
+			entryPoint: '/poi_category/',
+			paramName: 'poi_category_url'
+		}
 	}
 }

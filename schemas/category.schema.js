@@ -51,5 +51,17 @@ module.exports = {
 		},
 		maxProperties: 2,
 		additionalProperties: false
+	},
+
+	// Schema used to add API URLs to JSON object sent to the client
+	responseSchema: {
+		id: {
+			entryPoint: '/category/',
+			paramName: 'category_url'
+		},
+		parent_poi_category_id: {
+			entryPoint: '/category/',
+			paramName: 'parent_category_url'
+		}
 	}
 }
