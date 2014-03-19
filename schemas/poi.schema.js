@@ -4,7 +4,8 @@ module.exports = {
 
 	// table columns used for SELECT query
 	dbColumns: ['id', 'name', 'poi_category_id', 'description', 'link', 'photo', 'lat', 'lon', 'created_on',
-		'created_by', 'updated_on', 'updated_by', 'map_instance_id'],
+		'created_by', 'updated_on', 'updated_by', 'map_instance_id'
+	],
 
 	// Schema used for validation JSON for POST requests
 	createSchema: {

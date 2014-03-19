@@ -7,7 +7,7 @@ module.exports = {
 
 	// overwrite default CURD actions
 	customMethods: {
-		create: require('./../lib/add_map' ),
+		create: require('./../lib/add_map'),
 		destroy: false,
 		update: false
 	},
