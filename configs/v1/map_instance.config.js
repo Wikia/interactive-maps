@@ -5,6 +5,16 @@ module.exports = {
 	// table columns used for SELECT query
 	dbColumns: ['id', 'title', 'map_id', 'city_id', 'created_by', 'created_on', 'locked'],
 
+	// curd collection custom response objects
+	customResObjects: {
+		create: {
+			message: 'Map instance successfully created!'
+		},
+		update: {
+			message: 'Map instance successfully updated!'
+		}
+	},
+
 	// Schema used for validation JSON for POST requests
 	createSchema: {
 		description: "Schema for creating map instance",

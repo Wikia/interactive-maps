@@ -5,6 +5,16 @@ module.exports = {
 	// table columns used for SELECT query
 	dbColumns: ['id', 'name', 'marker', 'parent_poi_category_id', 'city_id', 'created_on', 'created_by'],
 
+	// curd collection custom response objects
+	customResObjects: {
+		create: {
+			message: 'Category successfully created!'
+		},
+		update: {
+			message: 'Category successfully updated!'
+		}
+	},
+
 	// Schema used for validation JSON for POST requests
 	createSchema: {
 		description: "Schema for creating a category",

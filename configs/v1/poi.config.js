@@ -7,6 +7,16 @@ module.exports = {
 		'created_by', 'updated_on', 'updated_by', 'map_instance_id'
 	],
 
+	// curd collection custom response objects
+	customResObjects: {
+		create: {
+			message: 'POI successfully created!'
+		},
+		update: {
+			message: 'POI successfully updated!'
+		}
+	},
+
 	// Schema used for validation JSON for POST requests
 	createSchema: {
 		description: "Schema for creating POI",
