@@ -6,19 +6,32 @@ var Percolator = require('percolator').Percolator,
 
 var logger = require( './lib/logger.js' );
 
-logger.init( { toFile : 4 } );
+logger.init(
+	{
+		toFile : logger.severity.DEBUG,
+		toConsole : logger.severity.DEBUG,
+		toSyslog : logger.severity.WARNING,
+		//raw : true
+	}
+);
 
 logger.notice( 'noticing' );
 
+logger.debug('debugging');
+
+logger.alert('alerting');
+
+logger.warning('warning', {something: 'something'});
+
 server.connectMiddleware(connect.logger({ format: 'dev'}));
 
-logger.alert( 'alerting' );
+logger.info( 'infoing' );
 
 logger.close();
 
 server.routeDirectory(__dirname + '/resources', '/api', function (err) {
-	if (!!err) {
-		console.log(err);
+	if ( !!err ) {
+		console.log( err );
 	}
 	server.listen(function () {
 		console.log('server is listening on port ', server.port)
