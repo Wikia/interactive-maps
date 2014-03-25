@@ -5,11 +5,22 @@ module.exports = {
 	// table columns used for SELECT query
 	dbColumns: ['id', 'name', 'type', 'width', 'height', 'min_zoom', 'max_zoom', 'created_by', 'created_on'],
 
-	// overwrite default CURD actions
+	// block CURD methods
+	blockedMethods: {
+		DELETE: false,
+		PUT: false
+	},
+
+	// overwrite default CURD methods
 	customMethods: {
-		create: require('./../lib/add_map'),
-		destroy: false,
-		update: false
+		insert: require('./../lib/add_map')
+	},
+
+	// curd collection custom response objects
+	customResObjects: {
+		create: {
+			message: 'Map successfully added to processing queue!'
+		}
 	},
 
 	// Schema used for validation JSON for POST requests
