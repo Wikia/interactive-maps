@@ -50,7 +50,7 @@ CREATE TABLE poi (
   created_by VARCHAR(255) NOT NULL,
   updated_on DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
   updated_by VARCHAR(255) NOT NULL,
-  map_instance_id INT UNSIGNED NOT NULL REFERENCES map_instance(id)
+  map_instance_id INT UNSIGNED NOT NULL REFERENCES map_instance(id) ON DELETE CASCADE
 );
 
 -- TODO: figure out proper indexes
