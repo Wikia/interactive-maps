@@ -1,5 +1,5 @@
 var curd = require('./../../lib/curd'),
-	schema = require('./../../schemas/map_instance.schema.js'),
+	schema = require('./../../configs/v1/map_instance.config.js'),
 	collection = curd.createCollection(schema);
 
 exports.handler = collection.handler;
