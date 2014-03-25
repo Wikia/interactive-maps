@@ -1,5 +1,5 @@
 var curd = require('./../../lib/curd'),
-	schema = require('./../../schemas/poi.schema.js'),
+	schema = require('./../../configs/v1/poi.config.js'),
 	collection = curd.createCollection(schema);
 
 exports.handler = collection.handler;
