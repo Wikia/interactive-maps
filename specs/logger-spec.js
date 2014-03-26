@@ -1,14 +1,14 @@
-describe ( 'Tests suite for logger', function() {
+describe ( 'Tests suite for logger', function () {
 	var logger = require( './../lib/logger.js'),
 		counter = 0;
 
 	console.log = function () { counter++; }
 
-	it( 'should exist', function() {
+	it( 'should exist', function () {
 		expect( logger ).toBeDefined();
 	} );
 
-	it( 'should have all the methods defined', function() {
+	it( 'should have all the methods defined', function () {
 		expect( typeof logger.debug ).toBe( 'function' );
 		expect( typeof logger.info ).toBe( 'function' );
 		expect( typeof logger.notice ).toBe( 'function' );
@@ -21,7 +21,7 @@ describe ( 'Tests suite for logger', function() {
 		expect( typeof logger.close ).toBe( 'function' );
 	} );
 
-	it( 'should export severity levels', function() {
+	it( 'should export severity levels', function () {
 		expect( typeof logger.severity.DEBUG ).toBe( 'number' );
 		expect( typeof logger.severity.INFO ).toBe( 'number' );
 		expect( typeof logger.severity.NOTICE ).toBe( 'number' );
@@ -32,10 +32,9 @@ describe ( 'Tests suite for logger', function() {
 		expect( typeof logger.severity.EMERGENCY ).toBe( 'number' );
 	} );
 
-	it( 'Should use console.log when it has console transport set', function() {
+	it( 'Should use console.log when it has console transport set', function () {
 		counter = 0;
 
-		console.log = function () { counter++; }
 		logger.init( { toConsole : logger.severity.DEBUG } );
 		logger.debug( 'Console test' );
 		logger.info( 'Console test');
@@ -45,11 +44,12 @@ describe ( 'Tests suite for logger', function() {
 		logger.critical( 'Console test');
 		logger.alert( 'Console test' );
 		logger.emergency( 'Console test');
+		logger.close();
 
 		expect( counter ).toEqual( 8 );
 	} );
 
-	it( 'Should filter unwanted severity levels', function() {
+	it( 'Should filter unwanted severity levels', function () {
 		counter = 0;
 
 		logger.init( { toConsole : logger.severity.WARNING } );
@@ -61,8 +61,20 @@ describe ( 'Tests suite for logger', function() {
 		logger.critical( 'Console test');
 		logger.alert( 'Console test' );
 		logger.emergency( 'Console test');
+		logger.close();
 
 		expect( counter ).toEqual( 5 );
+	} );
+
+	it( 'Should add proper heading to the log', function () {
+		var out = '';
+		console.log = function ( msg ) { out += msg; };
+
+		logger.init( { toConsole : logger.severity.WARNING } );
+		logger.warning( 'Console test');
+		logger.close();
+
+		expect( !!out.match('[Warning]') ).toEqual( true );
 	} );
 
 } );
