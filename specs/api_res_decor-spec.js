@@ -29,8 +29,10 @@ describe('decorator', function() {
 
 	it('works with valid schema type', function() {
 		var schema = {
-				test2: {
-					paramName: 'test2'
+				responseSchema: {
+					test2: {
+						paramName: 'test2'
+					}
 				}
 			};
 		expect(decorator(data, schema)).not.toEqual(data);
@@ -38,9 +40,11 @@ describe('decorator', function() {
 
 	it('adds the base url', function() {
 		var schema = {
-				id : {
-					paramName: 'url',
-					entryPoint: '123/'
+				responseSchema: {
+					id : {
+						paramName: 'url',
+						entryPoint: '123/'
+					}
 				}
 			},
 			expected = [

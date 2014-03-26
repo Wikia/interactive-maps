@@ -18,7 +18,7 @@ describe('crud', function(){
 			function() {
 				curd.createCollection()
 			})
-			.toThrow(new Error('Config should be an object!'));
+			.toThrow(new Error('Config must be an object!'));
 	});
 
 	it('throws an exteption when config.dbTable is not set', function(){
