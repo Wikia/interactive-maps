@@ -11,7 +11,7 @@ server.routeDirectory(__dirname + '/resources', '/api', function (err) {
 		console.log(err);
 	}
 	server.listen(function () {
-		console.log('server is listening on port ', server.port)
+		console.log('server is listening on port ', server.port);
 	});
 });
 
