@@ -18,7 +18,9 @@
     "image-size": "0.2.x",
     "q": "1.0.x",
     "glob": "3.2.x",
-    "knex": "0.5.x"
+    "knex": "0.5.x",
+    "cluster": "0.7.x",
+    "js-yaml": "^3.0.2"
   },
   "devDependencies": {
     "gulp": "3.5.x",
