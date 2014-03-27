@@ -8,8 +8,7 @@ gulp.task('dev', function () {
 		script: 'app.js',
 		ext: 'js',
 		env: {
-			'NODE_ENV': 'devbox',
-			'CONFIG_PATH': '/Users/jolek/WIKIA/devbox/config/'
+			'NODE_ENV': 'devbox'
 		}
 	});
 });
