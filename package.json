@@ -1,28 +1,30 @@
 {
-	"name": "imap",
-	"version": "0.0.1",
-	"main": "server",
-	"homepage": "http://wikia.com",
-	"engines": {
-		"node": "0.10.x"
-	},
-	"repository": {
-		"type": "git",
-		"url": "http://github.com/Wikia/interactive-maps.git"
-	},
-	"dependencies": {
-		"percolator": "1.4.x",
-		"mysql": "2.1.x",
-		"connect": "2.13.x",
-		"kue": "0.7.x",
-		"image-size": "0.2.x",
-		"q": "1.0.x",
-		"node-syslog": "1.1.x"
-	},
-	"devDependencies": {
-		"gulp": "3.5.x",
-		"gulp-changed": "0.2.x",
-		"gulp-nodemon": "1.0.x"
-	},
-	"private": true
+  "name": "imap",
+  "version": "0.0.1",
+  "main": "server",
+  "homepage": "http://wikia.com",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/Wikia/interactive-maps.git"
+  },
+  "dependencies": {
+    "percolator": "1.4.x",
+    "mysql": "2.1.x",
+    "connect": "2.13.x",
+    "kue": "0.7.x",
+    "image-size": "0.2.x",
+    "q": "1.0.x",
+    "glob": "3.2.x",
+    "knex": "0.5.x",
+	"node-syslog": "1.1.x"
+  },
+  "devDependencies": {
+    "gulp": "3.5.x",
+    "gulp-changed": "0.2.x",
+    "gulp-nodemon": "1.0.x"
+  },
+  "private": true
 }
