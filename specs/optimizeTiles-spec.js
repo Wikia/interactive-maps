@@ -1,4 +1,5 @@
-var proxyquire = require('proxyquire').noCallThru();
+var proxyquire = require('proxyquire').noCallThru(),
+	stubs = require('./stubs')
 
 describe('Optimize tiles', function() {
 
@@ -8,8 +9,8 @@ describe('Optimize tiles', function() {
 	});
 
 	it('executes the tile optimization process', function() {
-		var streamStub = new createSpyObj('stream', ['trim'])
-			collector = new createSpyObj('exec', ['run']),
+		var streamStub = new createSpyObj('stream', ['trim'] ),
+			collector = stubs.newCollector(['run']),
 			childProcessMock = {
 				exec: function(cmd, cb) {
 					collector.run(cmd),
@@ -18,7 +19,7 @@ describe('Optimize tiles', function() {
 			},
 			optimizeTiles = proxyquire('../lib/optimizeTiles', {
 				child_process: childProcessMock,
-				config: {
+				'./config': {
 					optimize: true
 				}
 			}),
@@ -27,5 +28,6 @@ describe('Optimize tiles', function() {
 			};
 		optimizeTiles(data);
 		expect(collector.run.callCount).toEqual(3);
+		expect(streamStub.trim ).toHaveBeenCalled();
 	});
 })
