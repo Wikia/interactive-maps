@@ -1,5 +1,5 @@
 var proxyquire = require('proxyquire').noCallThru(),
-	stubs = require('./stubs');
+    stubs = require('./stubs');
 
 describe('Generate tiles', function() {
 
