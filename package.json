@@ -17,7 +17,8 @@
     "kue": "0.7.x",
     "image-size": "0.2.x",
     "q": "1.0.x",
-    "glob": "3.2.x"
+    "glob": "3.2.x",
+    "knex": "0.5.x"
   },
   "devDependencies": {
     "gulp": "3.5.x",

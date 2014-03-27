@@ -31,3 +31,4 @@ intermediate
 publish
 .idea
 tmp
+node_modules
