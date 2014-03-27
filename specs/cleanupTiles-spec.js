@@ -1,25 +1,20 @@
-var proxyquire = require('proxyquire').noCallThru();
+var proxyquire = require('proxyquire').noCallThru(),
+	stubs = require('./stubs')
 
 describe('Clean tiles', function() {
 
-    var defer,
-        QStub,
+    var qStub,
         childProcessMock;
 
 
     beforeEach(function() {
-        defer = createSpyObj('defer', ['resolve', 'reject', 'promise']);
-        QStub = {
-            defer: function() {
-                return defer
-            }
-        };
+		qStub = stubs.newQStub();
         childProcessMock = createSpyObj('child_process', ['exec'])
     });
 
     it('does not run, if cleanup is disabled by config', function() {
         var cleanupTilesDisabled = proxyquire('../lib/cleanupTiles', {
-            q: QStub,
+            q: qStub.q,
             child_process: childProcessMock,
             './config': {
                 cleanup: false
@@ -30,13 +25,13 @@ describe('Clean tiles', function() {
             };
         cleanupTilesDisabled(data);
         expect(childProcessMock.exec).not.toHaveBeenCalled();
-        expect(defer.resolve).toHaveBeenCalledWith(data);
-        expect(defer.resolve.callCount).toEqual(1);
+        expect(qStub.defer.resolve).toHaveBeenCalledWith(data);
+        expect(qStub.defer.resolve.callCount).toEqual(1);
     })
 
     it('executes rm with correct parameters', function() {
         var cleanupTilesDisabled = proxyquire('../lib/cleanupTiles', {
-            q: QStub,
+            q: qStub.q,
             child_process: childProcessMock,
             './config': {
                 cleanup: true

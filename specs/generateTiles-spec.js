@@ -1,4 +1,5 @@
-var proxyquire = require('proxyquire').noCallThru();
+var proxyquire = require('proxyquire').noCallThru(),
+	stubs = require('./stubs');
 
 describe('Generate tiles', function() {
 
@@ -8,13 +9,8 @@ describe('Generate tiles', function() {
     });
 
     it('executes the tile generating process', function() {
-        var defer = createSpyObj('defer', ['resolve', 'reject', 'promise']),
-            QStub = {
-                defer: function() {
-                    return defer
-                }
-            },
-            collector = createSpyObj('collector', ['script', 'args']),
+        var qStub = stubs.newQStub(),
+            collector = stubs.newCollector(['script', 'args']),
             childProcessStub = {
                 spawn: function(script, args) {
                     collector.script(script);
@@ -28,7 +24,7 @@ describe('Generate tiles', function() {
                 }
             },
             generateTiles = proxyquire('../lib/generateTiles', {
-                q: QStub,
+                q: qStub.q,
                 child_process: childProcessStub
             }),
             data = {

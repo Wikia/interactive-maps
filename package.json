@@ -23,7 +23,8 @@
   "devDependencies": {
     "gulp": "3.5.x",
     "gulp-changed": "0.2.x",
-    "gulp-nodemon": "1.0.x"
+    "gulp-nodemon": "1.0.x",
+	"proxyquire": "0.5.x"
   },
   "private": true
 }
