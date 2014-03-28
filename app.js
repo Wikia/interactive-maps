@@ -1,5 +1,8 @@
 var cluster = require('cluster'),
-	numCPUs = require('os').cpus().length;
+	numCPUs = require('os').cpus().length,
+	fs = require('fs'),
+	config = require('./lib/config'),
+	tmp = process.cwd() + config.tmp;
 
 if (cluster.isMaster) {
 	// Fork workers.
@@ -7,8 +10,14 @@ if (cluster.isMaster) {
 		cluster.fork();
 	}
 
+	//setup folders
+	if (!fs.existsSync(tmp)) {
+		fs.mkdirSync(tmp);
+	}
+
 	require('./kueServer');
-} else {
 	require('./apiServer');
+} else {
+	require('./lib/jobProcessors');
 }
 
