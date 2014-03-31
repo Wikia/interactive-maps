@@ -7,7 +7,7 @@ gulp.task('dev', function () {
 	nodemon({
 		script: 'app.js',
 		ext: 'js',
-		ignore: ['./tmp/**', './node_modules/**'],
+		ignore: ['tmp/**', 'node_modules/**'],
 		env: {
 			'NODE_ENV': 'devbox'
 		}
