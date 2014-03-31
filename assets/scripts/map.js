@@ -1,12 +1,24 @@
 (function($, L){
 	'use strict';
 
-	var apiBaseDirectory = 'api',
+	//TODO: Figure out base url
+	var apiHost = 'http://localhost:3000',
+		apiBaseDirectory = 'api',
 		apiVersion = 'v1',
-		mapContainerId = 'map';
+		mapContainerId = 'map',
+
+		// TODO: remove this once we return all required info from the API
+		defaultMapConfig = {
+			initLat: 0,
+			initLon: 0,
+			initZoom: 0,
+			pathTemplate: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+			mapSetup: {}
+		};
 
 	function createUrl(request) {
 		return [
+			apiHost,
 			apiBaseDirectory,
 			apiVersion,
 			request
@@ -29,9 +41,14 @@
 	}
 
 	function createMap(config) {
-		// TODO: Initialize map once we have the data
-		var map = L.map(mapContainerId).setView([0, 0], 1);
-		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {}).addTo(map);
+		var map;
+
+		config = $.extend(true, config, defaultMapConfig);
+		map = L.map(mapContainerId)
+			.setView([config.initLat, config.initLon], config.initZoom);
+
+		L.tileLayer(config.pathTemplate, config.mapSetup).addTo(map);
+
 		createPoints(config);
 	}
 
