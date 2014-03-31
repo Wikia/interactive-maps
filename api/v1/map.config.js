@@ -38,7 +38,7 @@ module.exports = {
 			url: {
 				description: "Url image from which tiles wil be created",
 				type: "string",
-				pattern: 'https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,}',
+				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})',
 				required: true
 			},
 			created_by: {
