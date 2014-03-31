@@ -18,7 +18,8 @@
     "glob": "3.2.x",
     "knex": "0.5.x",
     "express": "^3.5.1",
-    "JSV": "^4.0.2"
+    "JSV": "^4.0.2",
+    "detour": "^1.0.1"
   },
   "devDependencies": {
     "gulp": "3.5.x",
