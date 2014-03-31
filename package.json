@@ -18,7 +18,8 @@
     "image-size": "0.2.x",
     "q": "1.0.x",
     "glob": "3.2.x",
-    "knex": "0.5.x"
+    "knex": "0.5.x",
+	"node-syslog": "1.1.x"
   },
   "devDependencies": {
     "gulp": "3.5.x",
