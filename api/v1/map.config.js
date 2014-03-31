@@ -7,13 +7,15 @@ module.exports = {
 
 	// block CURD methods
 	blockedMethods: {
-		DELETE: false,
-		PUT: false
+		wildcard: {
+			DELETE: false,
+			PUT: false
+		}
 	},
 
 	// overwrite default CURD methods
 	customMethods: {
-		insert: require('./../../lib/add_map')
+		insert: require('./../../lib/addMap')
 	},
 
 	// curd collection custom response objects
@@ -45,14 +47,13 @@ module.exports = {
 				required: true
 			}
 		},
-		maxProperties: 3,
 		additionalProperties: false
 	},
 
 	// Schema used to add API URLs to JSON object sent to the client
 	responseSchema: {
 		id: {
-			entryPoint: '/map/',
+			apiMethod: 'map',
 			paramName: 'map_url'
 		}
 	}
