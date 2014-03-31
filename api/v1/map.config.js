@@ -7,13 +7,15 @@ module.exports = {
 
 	// block CURD methods
 	blockedMethods: {
-		DELETE: false,
-		PUT: false
+		wildcard: {
+			DELETE: false,
+			PUT: false
+		}
 	},
 
 	// overwrite default CURD methods
 	customMethods: {
-		insert: require('./../../lib/add_map')
+		insert: require('./../../lib/addMap')
 	},
 
 	// curd collection custom response objects
@@ -36,7 +38,7 @@ module.exports = {
 			url: {
 				description: "Url image from which tiles wil be created",
 				type: "string",
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})',
+				pattern: 'https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,}',
 				required: true
 			},
 			created_by: {
@@ -45,14 +47,13 @@ module.exports = {
 				required: true
 			}
 		},
-		maxProperties: 3,
 		additionalProperties: false
 	},
 
 	// Schema used to add API URLs to JSON object sent to the client
 	responseSchema: {
 		id: {
-			entryPoint: '/map/',
+			apiMethod: 'map',
 			paramName: 'map_url'
 		}
 	}
