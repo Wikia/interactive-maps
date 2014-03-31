@@ -1,6 +1,7 @@
 describe ( 'Tests suite for logger', function () {
 	var logger = require( './../lib/logger.js'),
-		counter = 0;
+		counter = 0,
+		consoleLog = console.log;
 
 	console.log = function () { counter++; }
 
@@ -18,6 +19,8 @@ describe ( 'Tests suite for logger', function () {
 		expect( typeof logger.alert ).toBe( 'function' );
 		expect( typeof logger.emergency ).toBe( 'function' );
 		expect( typeof logger.init ).toBe( 'function' );
+		expect( typeof logger.reset ).toBe( 'function' );
+		expect( typeof logger.set ).toBe( 'function' );
 		expect( typeof logger.close ).toBe( 'function' );
 	} );
 
@@ -52,7 +55,7 @@ describe ( 'Tests suite for logger', function () {
 	it( 'Should filter unwanted severity levels', function () {
 		counter = 0;
 
-		logger.init( { toConsole : logger.severity.WARNING } );
+		logger.set( { toConsole : logger.severity.WARNING } );
 		logger.debug( 'Console test' );
 		logger.info( 'Console test');
 		logger.notice( 'Console test' );
@@ -66,15 +69,18 @@ describe ( 'Tests suite for logger', function () {
 		expect( counter ).toEqual( 5 );
 	} );
 
-	it( 'Should add proper heading to the log', function () {
-		var out = '';
-		console.log = function ( msg ) { out += msg; };
+	it( 'Should open write stream when logging to a local file', function () {
+		counter = 0;
+		function createWriteStream (file) {
+			counter++;
+		}
+		var	fs = proxyquire('fs', {createWriteStream : createWriteStream});
+		logger.set( { toFile : { enabled: true, level: logger.severity.DEBUG } } );
+		logger.debug('Testing');
 
-		logger.init( { toConsole : logger.severity.WARNING } );
-		logger.warning( 'Console test');
-		logger.close();
-
-		expect( !!out.match('[Warning]') ).toEqual( true );
+		expect(counter).toEqual(1);
 	} );
+
+	console.log = consoleLog;
 
 } );

@@ -2,23 +2,9 @@
 
 var Percolator = require('percolator').Percolator,
 	connect = require('connect'),
-	server = new Percolator({autoLink: false}),
-	logger = require( './lib/logger.js' );
+	server = new Percolator({autoLink: false});
 
-logger.init({file:{enable: true, level: 7, raw: true}});
-
-//logger.debug( 'hello' );
-logger.set({syslog:{enable: true, level: 7, tag: 'hejka'}});
-
-logger.notice('noticing');
-
-logger.set({syslog:{enable: false}});
-
-logger.error('erroring');
-
-logger.close();
-
-/*server.connectMiddleware(connect.logger({ format: 'dev'}));
+server.connectMiddleware(connect.logger({ format: 'dev'}));
 
 var Syslog = require('node-syslog');
 
@@ -37,7 +23,5 @@ server.routeDirectory(__dirname + '/resources', '/api', function (err) {
 		console.log('server is listening on port ', server.port);
 	});
 });
-
-*/
 
 
