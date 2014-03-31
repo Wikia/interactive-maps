@@ -1,4 +1,4 @@
-var addMap = require('./lib/add_map');
+var addMap = require('./lib/addMap');
 	//upload = require('./lib/uploadTiles');
 
 //addMap('http://upload.wikimedia.org/wikipedia/commons/4/4f/Big%26Small_edit_1.jpg')
