@@ -13,13 +13,14 @@ module.exports = {
 
 	// overwrite default CURD methods
 	customMethods: {
-		insert: require('./../../lib/add_map')
+		insert: require(process.cwd() + '/lib/addMap')
 	},
 
 	// curd collection custom response objects
 	customResObjects: {
 		create: {
-			message: 'Map successfully added to processing queue!'
+			message: 'Map successfully added to processing queue!',
+			id: 1
 		}
 	},
 

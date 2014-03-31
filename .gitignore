@@ -32,3 +32,5 @@ publish
 .idea
 tmp
 node_modules
+
+settings.js
