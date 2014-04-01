@@ -74,7 +74,7 @@ describe('Logger module', function () {
 		expect(console.log).toHaveBeenCalledWith('[DEBUG] Console test');
 	});
 
-	it('Should filter unwanted level levels', function () {
+	it('Should filter unwanted severity levels', function () {
 		spyOn(console, 'log');
 		logger.set({
 			console: {
@@ -87,7 +87,7 @@ describe('Logger module', function () {
 		expect(console.log).not.toHaveBeenCalled();
 	});
 
-	it('Should open write stream when logging to a local file', function () {
+	it('Should open and write to stream (2 ops) when logging to a local file', function () {
 		counter = 0;
 
 		logger.set({
@@ -103,7 +103,7 @@ describe('Logger module', function () {
 		expect(counter).toEqual(2);
 	});
 
-	it('Should make an attempt to open syslog connection when syslog enabled', function () {
+	it('Should open syslog connection and write to it (2 ops) when syslog enabled', function () {
 		counter = 0;
 
 		logger.set({
