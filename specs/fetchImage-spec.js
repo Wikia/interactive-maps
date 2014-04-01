@@ -1,4 +1,5 @@
-var proxyquire = require('proxyquire').noCallThru();
+var proxyquire = require('proxyquire').noCallThru(),
+    stubs = require('./stubs');
 
 describe('Fetch image', function() {
 
@@ -21,19 +22,14 @@ describe('Fetch image', function() {
                     }
                 }
             },
-            defer = createSpyObj('defer', ['resolve', 'reject', 'promise']),
+            qStub = stubs.newQStub(),
             fsStub = createSpyObj('fs', ['createWriteStream']),
-            QStub = {
-                defer: function() {
-                    return defer
-                }
-            },
             fetchImage = proxyquire('../lib/fetchImage', {
                 http: http,
                 url: require('url'),
                 fs: fsStub,
                 path: {},
-                q: QStub
+                q: qStub.q
             }),
             data = {
                 fileUrl: 'http:/example.com/image.jpg'

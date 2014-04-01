@@ -40,7 +40,6 @@ module.exports = {
 				required: true
 			}
 		},
-		maxProperties: 4,
 		additionalProperties: false
 	},
 
@@ -59,18 +58,17 @@ module.exports = {
 				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
 			}
 		},
-		maxProperties: 2,
 		additionalProperties: false
 	},
 
 	// Schema used to add API URLs to JSON object sent to the client
 	responseSchema: {
 		id: {
-			entryPoint: '/category/',
+			apiMethod: 'category',
 			paramName: 'category_url'
 		},
 		parent_poi_category_id: {
-			entryPoint: '/category/',
+			apiMethod: 'category',
 			paramName: 'parent_category_url'
 		}
 	}
