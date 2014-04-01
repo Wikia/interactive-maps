@@ -17,12 +17,14 @@
     "q": "1.0.x",
     "glob": "3.2.x",
     "knex": "0.5.x",
-    "express": "^3.5.1",
-    "JSV": "^4.0.2",
-    "detour": "^1.0.1"
+    "express": "3.5.x",
+    "JSV": "4.0.x",
+    "detour": "1.0.x",
+    "cluster": "0.7.x",
+    "js-yaml": "3.0.x"
   },
   "devDependencies": {
-    "gulp": "3.5.x",
+    "gulp": "3.6.x",
     "gulp-changed": "0.2.x",
     "gulp-nodemon": "1.0.x",
     "proxyquire": "0.5.x"
