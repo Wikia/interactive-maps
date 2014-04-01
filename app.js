@@ -4,7 +4,10 @@ var cluster = require('cluster'),
 	config = require('./lib/config'),
 	tmp = process.cwd() + config.tmp;
 
-if (cluster.isMaster) {
+config.setRoot(__dirname);
+
+if(cluster.isMaster) {
+
 	// Fork workers.
 	for (var i = 0; i < numCPUs; i++) {
 		cluster.fork();
