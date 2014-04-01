@@ -1,8 +1,7 @@
 var cluster = require('cluster'),
 	numCPUs = require('os').cpus().length,
 	fs = require('fs'),
-	config = require('./lib/config'),
-	tmp = process.cwd() + config.tmp;
+	config = require('./lib/config');
 
 config.setRoot(__dirname);
 
@@ -14,8 +13,8 @@ if(cluster.isMaster) {
 	}
 
 	//setup folders
-	if (!fs.existsSync(tmp)) {
-		fs.mkdirSync(tmp);
+	if (!fs.existsSync(config.tmp)) {
+		fs.mkdirSync(config.tmp);
 	}
 
 	require('./apiServer');

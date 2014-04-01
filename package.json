@@ -23,7 +23,7 @@
     "js-yaml": "3.0.x"
   },
   "devDependencies": {
-    "gulp": "3.5.x",
+    "gulp": "3.6.x",
     "gulp-changed": "0.2.x",
     "gulp-nodemon": "1.0.x"
   },
