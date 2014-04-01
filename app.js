@@ -15,7 +15,6 @@ if (cluster.isMaster) {
 		fs.mkdirSync(tmp);
 	}
 
-	require('./kueServer');
 	require('./apiServer');
 } else {
 	require('./lib/jobProcessors');
