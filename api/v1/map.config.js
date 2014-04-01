@@ -7,8 +7,10 @@ module.exports = {
 
 	// block CURD methods
 	blockedMethods: {
-		DELETE: false,
-		PUT: false
+		wildcard: {
+			DELETE: false,
+			PUT: false
+		}
 	},
 
 	// overwrite default CURD methods
@@ -45,14 +47,13 @@ module.exports = {
 				required: true
 			}
 		},
-		maxProperties: 3,
 		additionalProperties: false
 	},
 
 	// Schema used to add API URLs to JSON object sent to the client
 	responseSchema: {
 		id: {
-			entryPoint: '/map/',
+			apiMethod: 'map',
 			paramName: 'map_url'
 		}
 	}
