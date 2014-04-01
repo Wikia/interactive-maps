@@ -24,6 +24,11 @@ routeBuilder(router, configsV1, apiEntryPointUrlV1);
 app.use(express.logger());
 app.use(rawBody);
 app.use(router.middleware);
+app.use(router.middleware);
+
+// TODO: Probably we won't serve the map directly from the API server,
+// but this can be used for debugging right now
+app.use(express.static(__dirname + '/assets'));
 
 app.listen(port);
 console.log('server is listening on port: ' + port);
