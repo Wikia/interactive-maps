@@ -1,4 +1,4 @@
-(function($, L){
+(function(window, L){
 	'use strict';
 
 	//TODO: Figure out base url
@@ -7,24 +7,7 @@
 		apiVersion = 'v1',
 		mapContainerId = 'map',
 		imagePath = '/images',
-		map,
-
-		// TODO: remove this once we return all required info from the API
-		defaultMapConfig = {
-			initLat: 0,
-			initLon: 0,
-			initZoom: 0,
-			pathTemplate: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-			mapSetup: {},
-			points: [
-				{
-					title: 'test name',
-					description: 'test description',
-					lat: 42.676845,
-					lon: 23.283205
-				}
-			]
-		};
+		map;
 
 	function createUrl(request) {
 		return [
@@ -33,21 +16,6 @@
 			apiVersion,
 			request
 		].join('/');
-	}
-
-	function message(text, messageType) {
-		messageType = messageType || 'error';
-		$('<div></div>' )
-			.addClass('message ' + messageType)
-			.html(text)
-			.bind('click', function(){
-				$(this).remove();
-			})
-			.appendTo('body');
-	}
-
-	function createPoints(pointsOfInterest) {
-		// TODO: Add points to the map
 	}
 
 	function addPointOnMap(point) {
@@ -61,7 +29,6 @@
 	}
 
 	function createMap(config) {
-		config = $.extend(true, config, defaultMapConfig);
 		L.Icon.Default.imagePath = imagePath;
 		map = L.map(mapContainerId)
 			.setView([config.initLat, config.initLon], config.initZoom);
@@ -74,14 +41,10 @@
 
 	}
 
-	function init(){
-		$.get(createUrl('map/1'), function(data) {
-			createMap(data);
-		}, 'json')
-			.fail(function(jqXHR, textStatus, errorThrown){
-				message(errorThrown);
-			});
+	function init(mapConfig){
+		createMap(mapConfig);
 	}
 
-	init();
-})(window.jQuery, window.L);
+	init(window.mapConfig);
+
+})(window, window.L);
