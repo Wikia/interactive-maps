@@ -12,7 +12,7 @@ describe('Logger module', function () {
 					counter++;
 				}
 			}
-		}),
+		}).getInstance(),
 		counter = 0,
 		consoleLog = console.log;
 
