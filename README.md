@@ -10,6 +10,7 @@ Service that allows creating, storing and serving interactive maps
 npm install
 mv settings.example.js settings.js
 vim settings.js
+gulp
 ```
 
 # What is it ?
