@@ -1,7 +1,7 @@
 (function(window, L){
 	'use strict';
 
-	//TODO: Figure out base url
+	//TODO: Change the default images url when it's final
 	var imagePath = '/images',
 		map;
 
