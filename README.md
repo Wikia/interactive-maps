@@ -6,11 +6,17 @@ Service that allows creating, storing and serving interactive maps
 
 # Installation
 
-```
+```Shell
 npm install
-mv settings.example.js settings.js
-vim settings.js
+```
+and then
+```Shell
+export WIKIA_DOCROOT="Path/To/ConfigFile"
 gulp
+```
+or
+```Shell
+WIKIA_DOCROOT="Path/To/ConfigFile" gulp
 ```
 
 # What is it ?
