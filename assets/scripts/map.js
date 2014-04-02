@@ -2,21 +2,8 @@
 	'use strict';
 
 	//TODO: Figure out base url
-	var apiHost = 'http://localhost:3000',
-		apiBaseDirectory = 'api',
-		apiVersion = 'v1',
-		mapContainerId = 'map',
-		imagePath = '/images',
+	var imagePath = '/images',
 		map;
-
-	function createUrl(request) {
-		return [
-			apiHost,
-			apiBaseDirectory,
-			apiVersion,
-			request
-		].join('/');
-	}
 
 	function addPointOnMap(point) {
 		var popupHtml = '<h3>' + point.title + '</h3>' +
