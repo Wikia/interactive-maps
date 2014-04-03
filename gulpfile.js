@@ -10,7 +10,7 @@ gulp.task('dev', function () {
 		ext: 'js',
 		ignore: ['tmp/**', 'node_modules/**'],
 		env: {
-			'NODE_ENV': 'devbox'
+			'NODE_ENV': 'devbox' //'production'
 		}
 	});
 

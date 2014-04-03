@@ -6,12 +6,26 @@ Service that allows creating, storing and serving interactive maps
 
 # Installation
 
-```
+```Shell
 npm install
-mv settings.example.js settings.js
-vim settings.js
+```
+then export some env variables
+```Shell
+export WIKIA_CONFIG_ROOT="Path/To/ConfigFile"
+export WIKIA_SWIFT_YML="Path/To/SwiftConfigFile"
+export WIKIA_PROD_DATACENTER="datacenter"
+export NODE_ENV="devbox|production"
+```
+then you can run it
+```Shell
 gulp
 ```
+or
+```Shell
+node app.js
+```
+
+
 
 # What is it ?
 
