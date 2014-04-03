@@ -11,13 +11,27 @@ npm install
 ```
 and then
 ```Shell
-export WIKIA_DOCROOT="Path/To/ConfigFile"
+export WIKIA_CONFIG_ROOT="Path/To/ConfigFile"
+export WIKIA_CONFIG_ROOT="Path/To/ConfigFile"
 gulp
 ```
-or
-```Shell
-WIKIA_DOCROOT="Path/To/ConfigFile" gulp
-```
+
+
++if (!process.env.WIKIA_CONFIG_ROOT) {
+ +	throw 'WIKIA_CONFIG_ROOT seems to be not set';
+ +}
+ +
+ +if (!process.env.WIKIA_SWIFT_YML) {
+ +	throw 'WIKIA_SWIFT_YML seems to be not set';
+ +}
+ +
+ +if (!process.env.WIKIA_PROD_DATACENTER) {
+ +	throw 'WIKIA_PROD_DATACENTER seems to be not set';
+ +}
+ +
+ +if (!process.env.NODE_ENV) {
+ +	throw 'NODE_ENV seems to be not set';
+ +}
 
 # What is it ?
 
