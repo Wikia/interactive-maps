@@ -33,4 +33,4 @@ publish
 tmp
 node_modules
 
-settings.js
+newrelic_agent.log

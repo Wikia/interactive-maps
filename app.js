@@ -1,3 +1,9 @@
+'use strict';
+
+if (process.env.NODE_ENV === 'production') {
+	require('newrelic');
+}
+
 var cluster = require('cluster'),
 	numCPUs = require('os').cpus().length,
 	fs = require('fs'),
@@ -5,7 +11,7 @@ var cluster = require('cluster'),
 
 config.setRoot(__dirname);
 
-if(cluster.isMaster) {
+if (cluster.isMaster) {
 
 	// Fork workers.
 	for (var i = 0; i < numCPUs; i++) {
@@ -21,4 +27,3 @@ if(cluster.isMaster) {
 } else {
 	require('./lib/jobProcessors');
 }
-
