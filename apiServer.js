@@ -8,7 +8,7 @@ var express = require('express'),
 	rawBody = require('./lib/rawBody'),
 	getCurdConfigs = require('./lib/getCurdConfigs'),
 	routeBuilder = require('./lib/routeBuilder'),
-	logger = require('./lib/logger').getInstance(),
+	logger = require('./lib/logger'),
 
 	port = require('./lib/config').api.port,
 
