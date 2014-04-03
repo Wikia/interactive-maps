@@ -19,7 +19,7 @@ var express = require('express'),
 	configsV1 = getCurdConfigs('/api/v1/'),
 	apiEntryPointUrlV1 = '/api/v1/';
 
-//set up the logger with basic console transport
+//set up the logger with console transport
 logger.set({console: {enabled: true, level: logger.level.DEBUG, raw: true}});
 
 //build routes for Version 1
@@ -29,4 +29,4 @@ app.use(rawBody);
 app.use(router.middleware);
 
 app.listen(port);
-console.log('server is listening on port: ' + port);
+logger.info('server is listening on port: ' + port);
