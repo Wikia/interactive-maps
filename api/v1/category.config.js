@@ -8,35 +8,35 @@ module.exports = {
 	// curd collection custom response objects
 	customResObjects: {
 		create: {
-			message: 'Category successfully created!'
+			message: 'Category successfully created'
 		},
 		update: {
-			message: 'Category successfully updated!'
+			message: 'Category successfully updated'
 		}
 	},
 
 	// Schema used for validation JSON for POST requests
 	createSchema: {
-		description: "Schema for creating a category",
-		type: "object",
+		description: 'Schema for creating a category',
+		type: 'object',
 		properties: {
 			name: {
-				description: "Name of a category",
-				type: "string",
+				description: 'Name of a category',
+				type: 'string',
 				required: true
 			},
 			marker: {
-				description: "Url to custom marker icon",
-				type: "string",
+				description: 'Url to custom marker icon',
+				type: 'string',
 				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
 			},
 			parent_poi_category_id: {
-				description: "Unique identifier for parent category",
-				type: "integer"
+				description: 'Unique identifier for parent category',
+				type: 'integer'
 			},
 			created_by: {
-				description: "creator user name",
-				type: "string",
+				description: 'creator user name',
+				type: 'string',
 				required: true
 			}
 		},
@@ -45,16 +45,16 @@ module.exports = {
 
 	// Schema used for validation JSON for PUT requests
 	updateSchema: {
-		description: "Schema for updating a category",
-		type: "object",
+		description: 'Schema for updating a category',
+		type: 'object',
 		properties: {
 			name: {
-				description: "Name of a category",
-				type: "string"
+				description: 'Name of a category',
+				type: 'string'
 			},
 			marker: {
-				description: "Url to custom marker icon",
-				type: "string",
+				description: 'Url to custom marker icon',
+				type: 'string',
 				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
 			}
 		},

@@ -21,4 +21,3 @@ if(cluster.isMaster) {
 } else {
 	require('./lib/jobProcessors');
 }
-
