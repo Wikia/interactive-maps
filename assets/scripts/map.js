@@ -1,9 +1,7 @@
 (function(window, L){
 	'use strict';
 
-	//TODO: Change the default images url when it's final
-	var imagePath = '/images',
-		mapContainerId = 'map',
+	var mapContainerId = 'map',
 		map;
 
 	function addPointOnMap(point) {
@@ -17,7 +15,9 @@
 	}
 
 	function createMap(config) {
-		L.Icon.Default.imagePath = imagePath;
+		if (config.imagesPath) {
+			L.Icon.Default.imagePath = config.imagePath;
+		}
 		map = L.map(mapContainerId)
 			.setView([config.latitude, config.longitude], config.zoom);
 

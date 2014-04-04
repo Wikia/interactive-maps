@@ -34,8 +34,7 @@ app.engine('html', hoganExpress);
 
 app.get(apiEntryPointUrlV1 + 'render/:id/:lat/:lon/:zoom', renderMap.middleware);
 
-// TODO: Probably we won't serve the map directly from the API server,
-// but this can be used for debugging right now
+// FIXME: Probably we won't serve the assets the API server, but this can be used for debugging right now
 app.use(express.static(__dirname + '/assets'));
 
 app.listen(port);
