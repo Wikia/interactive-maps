@@ -29,10 +29,6 @@
 
 	}
 
-	function init(mapSetup){
-		createMap(mapSetup);
-	}
-
-	init(window.mapSetup);
+	createMap(window.mapSetup);
 
 })(window, window.L);

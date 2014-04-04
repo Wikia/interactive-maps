@@ -3,7 +3,7 @@
     <head>
         <title>Map</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <link rel="stylesheet" href="../styles/leaflet.css">
+        <link rel="stylesheet" href="/styles/leaflet.css">
         <style>
             body {
                 margin: 0;
@@ -14,25 +14,7 @@
             }
         </style>
         <script>
-            // TODO: remove this once we return all required info from the API
             window.mapSetup = {{{ mapSetup }}}
-/*
-            window.mapConfig = {
-                initLat: 0,
-                initLon: 0,
-                initZoom: 0,
-                pathTemplate: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-                mapSetup: {},
-                points: [
-                    {
-                        title: 'test name',
-                        description: 'test description',
-                        lat: 42.676845,
-                        lon: 23.283205
-                    }
-                ]
-            };
-*/
         </script>
     </head>
     <body>
