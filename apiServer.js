@@ -3,11 +3,13 @@
 // third party modules
 var express = require('express'),
 	detour = require('detour'),
+	hoganExpress = require('hogan-express'),
 
 	// local modules
 	rawBody = require('./lib/rawBody'),
 	getCurdConfigs = require('./lib/getCurdConfigs'),
 	routeBuilder = require('./lib/routeBuilder'),
+	renderMap = require('./lib/renderMap'),
 
 	port = require('./lib/config').api.port,
 
@@ -24,7 +26,13 @@ routeBuilder(router, configsV1, apiEntryPointUrlV1);
 app.use(express.logger());
 app.use(rawBody);
 app.use(router.middleware);
-app.use(router.middleware);
+
+// setup hogan as template engine
+app.set('view engine', 'html');
+app.enable('view cache');
+app.engine('html', hoganExpress);
+
+app.get(apiEntryPointUrlV1 + 'render/:id/:lat/:lon/:zoom', renderMap.middleware);
 
 // TODO: Probably we won't serve the map directly from the API server,
 // but this can be used for debugging right now

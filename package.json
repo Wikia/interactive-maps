@@ -18,6 +18,7 @@
     "glob": "3.2.x",
     "knex": "0.5.x",
     "express": "3.5.x",
+    "hogan-express": "0.5.*",
     "JSV": "4.0.x",
     "detour": "1.0.x",
     "cluster": "0.7.x",

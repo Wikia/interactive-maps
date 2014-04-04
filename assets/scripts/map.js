@@ -3,6 +3,7 @@
 
 	//TODO: Change the default images url when it's final
 	var imagePath = '/images',
+		mapContainerId = 'map',
 		map;
 
 	function addPointOnMap(point) {
@@ -18,7 +19,7 @@
 	function createMap(config) {
 		L.Icon.Default.imagePath = imagePath;
 		map = L.map(mapContainerId)
-			.setView([config.initLat, config.initLon], config.initZoom);
+			.setView([config.latitude, config.longitude], config.zoom);
 
 		L.tileLayer(config.pathTemplate, config.mapSetup).addTo(map);
 
@@ -28,10 +29,10 @@
 
 	}
 
-	function init(mapConfig){
-		createMap(mapConfig);
+	function init(mapSetup){
+		createMap(mapSetup);
 	}
 
-	init(window.mapConfig);
+	init(window.mapSetup);
 
 })(window, window.L);
