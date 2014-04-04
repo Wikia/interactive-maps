@@ -8,6 +8,8 @@ var express = require('express'),
 	rawBody = require('./lib/rawBody'),
 	getCurdConfigs = require('./lib/getCurdConfigs'),
 	routeBuilder = require('./lib/routeBuilder'),
+	guard = require('./lib/guard'),
+	errorHandler = require('./lib/errorHandler'),
 
 	port = require('./lib/config').api.port,
 
@@ -21,9 +23,11 @@ var express = require('express'),
 // build routes for Version 1
 routeBuilder(router, configsV1, apiEntryPointUrlV1);
 
+app.use(guard);
 app.use(express.logger());
 app.use(rawBody);
 app.use(router.middleware);
+app.use(errorHandler);
 
 app.listen(port);
 console.log('server is listening on port: ' + port);
