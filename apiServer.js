@@ -8,6 +8,7 @@ var express = require('express'),
 	rawBody = require('./lib/rawBody'),
 	getCurdConfigs = require('./lib/getCurdConfigs'),
 	routeBuilder = require('./lib/routeBuilder'),
+	logger = require('./lib/logger'),
 	guard = require('./lib/guard'),
 	errorHandler = require('./lib/errorHandler'),
 
@@ -20,7 +21,10 @@ var express = require('express'),
 	configsV1 = getCurdConfigs('/api/v1/'),
 	apiEntryPointUrlV1 = '/api/v1/';
 
-// build routes for Version 1
+//set up the logger with console transport
+logger.set({console: {enabled: true, level: logger.level.DEBUG, raw: true}});
+
+//build routes for Version 1
 routeBuilder(router, configsV1, apiEntryPointUrlV1);
 
 app.use(guard);
@@ -30,4 +34,4 @@ app.use(router.middleware);
 app.use(errorHandler);
 
 app.listen(port);
-console.log('server is listening on port: ' + port);
+logger.info('server is listening on port: ' + port);
