@@ -4,6 +4,10 @@ describe('Validate Crud config', function () {
 
 	var vcc = require('../lib/validateCurdConfig');
 
+	it('Expects validateCurdConfig to be module', function () {
+		expect(vcc).not.toBe(undefined);
+	});
+
 	it('Throws error if config is not an object', function () {
 		var testCases = [
 			1,
