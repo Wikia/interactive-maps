@@ -4,6 +4,11 @@
 	var mapContainerId = 'map',
 		map;
 
+	/**
+	 * @desc Add point to the map
+	 * @param point {object}
+	 * @returns {object} Leaflet Marker
+	 */
 	function addPointOnMap(point) {
 		var popupHtml = '<h3>' + point.title + '</h3>' +
 			'<p>' +point.description + '</p>';
@@ -14,6 +19,10 @@
 			.addTo(map);
 	}
 
+	/**
+	 * @desc Create new map and add points to it
+	 * @param config {object}
+	 */
 	function createMap(config) {
 		if (config.imagesPath) {
 			L.Icon.Default.imagePath = config.imagePath;
