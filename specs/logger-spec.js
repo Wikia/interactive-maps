@@ -47,6 +47,7 @@ describe('Logger module', function () {
 		expect(typeof logger.reset).toBe('function');
 		expect(typeof logger.set).toBe('function');
 		expect(typeof logger.close).toBe('function');
+		expect(typeof logger.middleware).toBe('function');
 	});
 
 	it('should export severity levels', function () {
@@ -119,5 +120,35 @@ describe('Logger module', function () {
 	});
 
 	console.log = consoleLog;
+
+	it('Should log middleware req/res details', function () {
+		spyOn(console, 'log');
+		function done () {}
+		var req = {
+				ip: '127.0.0.1',
+				hostname: 'hostname',
+				method: 'GET',
+				path: '/'
+			},
+			res = {
+				statusCode: 200,
+				on: function (event, method) {
+					//to call the method once, not twice
+					if(event !== 'close') {
+						method();
+					}
+				}
+			};
+
+		logger.set({
+			console: {
+				enabled: true,
+				level: logger.level.DEBUG
+			}
+		});
+		logger.middleware(req, res, done);
+		expect(console.log).toHaveBeenCalled();
+		logger.close();
+	});
 
 });
