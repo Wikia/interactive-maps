@@ -2,25 +2,31 @@
 
 // third party modules
 var express = require('express'),
-	detour = require('detour'),
+    detour = require('detour'),
 
-	// local modules
-	rawBody = require('./lib/rawBody'),
-	getCurdConfigs = require('./lib/getCurdConfigs'),
-	routeBuilder = require('./lib/routeBuilder'),
-	logger = require('./lib/logger'),
+    // local modules
+    rawBody = require('./lib/rawBody'),
+    getCurdConfigs = require('./lib/getCurdConfigs'),
+    routeBuilder = require('./lib/routeBuilder'),
+    logger = require('./lib/logger'),
 
-	port = require('./lib/config').api.port,
+    port = require('./lib/config').api.port,
 
-	app = express(),
-	router = detour(),
+    app = express(),
+    router = detour(),
 
-	// Interactive Maps API Version 1
-	configsV1 = getCurdConfigs('/api/v1/'),
-	apiEntryPointUrlV1 = '/api/v1/';
+    // Interactive Maps API Version 1
+    configsV1 = getCurdConfigs('/api/v1/'),
+    apiEntryPointUrlV1 = '/api/v1/';
 
 //set up the logger with console transport
-logger.set({console: {enabled: true, level: logger.level.DEBUG, raw: true}});
+logger.set({
+    console: {
+        enabled: true,
+        level: logger.level.DEBUG,
+        raw: true
+    }
+});
 
 //build routes for Version 1
 routeBuilder(router, configsV1, apiEntryPointUrlV1);
