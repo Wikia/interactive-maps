@@ -3,7 +3,6 @@
 // third party modules
 var express = require('express'),
 	detour = require('detour'),
-	hoganExpress = require('hogan-express'),
 
 	// local modules
 	rawBody = require('./lib/rawBody'),
@@ -17,8 +16,10 @@ var express = require('express'),
 	router = detour(),
 
 	// Interactive Maps API Version 1
-	configsV1 = getCurdConfigs('/api/v1/'),
-	apiEntryPointUrlV1 = '/api/v1/';
+	apiConfigUrl = '/api/v1/',
+	configsV1 = getCurdConfigs(apiConfigUrl),
+	apiEntryPointUrlV1 = '/api/v1/',
+	apiAbsolutePath = __dirname + apiConfigUrl;
 
 // build routes for Version 1
 routeBuilder(router, configsV1, apiEntryPointUrlV1);
@@ -27,14 +28,7 @@ app.use(express.logger());
 app.use(rawBody);
 app.use(router.middleware);
 
-// setup hogan as template engine
-app.set('view engine', 'html');
-app.enable('view cache');
-app.engine('html', hoganExpress);
-
-app.get(apiEntryPointUrlV1 + 'render/:id', renderMap.middleware);
-app.get(apiEntryPointUrlV1 + 'render/:id/:zoom', renderMap.middleware);
-app.get(apiEntryPointUrlV1 + 'render/:id/:zoom/:lat/:lon', renderMap.middleware);
+renderMap(app, apiEntryPointUrlV1, apiAbsolutePath);
 
 // FIXME: Probably we won't serve the assets the API server, but this can be used for debugging right now
 app.use(express.static(__dirname + '/assets'));
