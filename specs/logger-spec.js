@@ -71,7 +71,7 @@ describe('Logger module', function () {
 		});
 		logger.debug('Console test');
 		logger.close();
-		expect(console.log).toHaveBeenCalledWith('[DEBUG] Console test');
+		expect(console.log).toHaveBeenCalledWith('[DEBUG] "Console test"');
 	});
 
 	it('Should filter unwanted severity levels', function () {
@@ -116,6 +116,58 @@ describe('Logger module', function () {
 		logger.close();
 
 		expect(counter).toEqual(2);
+	});
+
+	it('should expose getContext method', function () {
+		expect(logger.getContext).toBeDefined();
+		expect(typeof logger.getContext).toBe('function');
+	});
+
+	it('getContext should return context', function () {
+		expect(logger.getContext(200, {
+			url: 'url',
+			method: 'GET'
+		})).toEqual({
+			response: 200,
+			url: 'url',
+			method: 'GET'
+		});
+
+		expect(logger.getContext(200, {
+			url: 'url',
+			method: 'POST'
+		})).toEqual({
+			response: 200,
+			url: 'url',
+			method: 'POST'
+		});
+
+		expect(logger.getContext(200, {
+			url: 'url2',
+			method: 'GET'
+		})).toEqual({
+			response: 200,
+			url: 'url2',
+			method: 'GET'
+		});
+
+		expect(logger.getContext(400, {
+			url: 'url3',
+			method: 'POST'
+		})).toEqual({
+			response: 400,
+			url: 'url3',
+			method: 'POST'
+		});
+
+		expect(logger.getContext(600, {
+			url: 'url4',
+			method: 'PUT'
+		})).toEqual({
+			response: 600,
+			url: 'url4',
+			method: 'PUT'
+		});
 	});
 
 	console.log = consoleLog;
