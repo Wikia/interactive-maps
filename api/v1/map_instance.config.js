@@ -17,27 +17,27 @@ module.exports = {
 
 	// Schema used for validation JSON for POST requests
 	createSchema: {
-		description: "Schema for creating map instance",
-		type: "object",
+		description: 'Schema for creating map instance',
+		type: 'object',
 		properties: {
 			title: {
-				description: "Map instance name",
-				type: "string",
+				description: 'Map instance name',
+				type: 'string',
 				required: true
 			},
 			map_id: {
-				description: "Unique identifier for a map",
-				type: "integer",
+				description: 'Unique identifier for a map',
+				type: 'integer',
 				required: true
 			},
 			city_id: {
-				description: "ID of the Wikia this map instance belongs to",
-				type: "integer",
+				description: 'ID of the Wikia this map instance belongs to',
+				type: 'integer',
 				required: true
 			},
 			created_by: {
-				description: "creator user name",
-				type: "string",
+				description: 'creator user name',
+				type: 'string',
 				required: true
 			}
 		},
@@ -46,17 +46,17 @@ module.exports = {
 
 	// Schema used for validation JSON for PUT requests
 	updateSchema: {
-		description: "Schema for updating map instance",
-		type: "object",
+		description: 'Schema for updating map instance',
+		type: 'object',
 		properties: {
 			title: {
-				description: "Map instance name",
-				type: "string",
+				description: 'Map instance name',
+				type: 'string',
 				minLength: 2
 			},
 			map_id: {
-				description: "Unique identifier for a map",
-				type: "integer"
+				description: 'Unique identifier for a map',
+				type: 'integer'
 			}
 		},
 		additionalProperties: false
