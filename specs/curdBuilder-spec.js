@@ -1,6 +1,6 @@
 'use strict';
 
-var proxyquire = require('proxyquire'),
+var proxyquire = require('proxyquire').noCallThru(),
 
 	// db emulation mock
 	dbMock = {
