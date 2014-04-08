@@ -1,8 +1,18 @@
 'use strict';
 
+process.env = {
+	WIKIA_CONFIG_ROOT: 'test',
+	WIKIA_SWIFT_YML: 'test',
+	WIKIA_PROD_DATACENTER: 'test',
+	NODE_ENV: 'test'
+};
+
 var proxyquire = require('proxyquire').noCallThru(),
 	configuration = {
-		tmp: '/tmp/'
+		tmp: '/tmp/',
+		wgFSSwiftConfig: {
+			test: ''
+		}
 	},
 	config = proxyquire('../lib/config', {
 		'js-yaml': {
@@ -15,12 +25,15 @@ var proxyquire = require('proxyquire').noCallThru(),
 				return configuration;
 			}
 		},
-		'./../settings': {
-			configPath: 'path'
+		'./logger': {
+			debug: function(){
+
+			}
 		}
 	});
 
 describe('config', function () {
+
 	it('should throw an error on read failure', function () {
 		expect( function(){
 			proxyquire('../lib/config', {
@@ -33,9 +46,6 @@ describe('config', function () {
 					readFileSync: function(){
 						throw 'test';
 					}
-				},
-				'./../settings': {
-					configPath: 'path'
 				}
 			});
 		}).toThrow('Problem with config: test');

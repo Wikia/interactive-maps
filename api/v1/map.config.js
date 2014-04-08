@@ -21,30 +21,29 @@ module.exports = {
 	// curd collection custom response objects
 	customResObjects: {
 		create: {
-			message: 'Map successfully added to processing queue!',
-			id: 1
+			message: 'Map successfully added to processing queue!'
 		}
 	},
 
 	// Schema used for validation JSON for POST requests
 	createSchema: {
-		description: "Schema for creating map",
-		type: "Object",
+		description: 'Schema for creating map',
+		type: 'Object',
 		properties: {
 			name: {
-				description: "Map name",
-				type: "string",
+				description: 'Map name',
+				type: 'string',
 				required: true
 			},
 			url: {
-				description: "Url image from which tiles wil be created",
-				type: "string",
+				description: 'Url image from which tiles wil be created',
+				type: 'string',
 				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})',
 				required: true
 			},
 			created_by: {
-				description: "creator user name",
-				type: "string",
+				description: 'creator user name',
+				type: 'string',
 				required: true
 			}
 		},
