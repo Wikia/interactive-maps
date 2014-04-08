@@ -8,6 +8,7 @@ var express = require('express'),
 	rawBody = require('./lib/rawBody'),
 	getCurdConfigs = require('./lib/getCurdConfigs'),
 	routeBuilder = require('./lib/routeBuilder'),
+	logger = require('./lib/logger'),
 	renderMap = require('./lib/renderMap'),
 
 	port = require('./lib/config').api.port,
@@ -21,10 +22,18 @@ var express = require('express'),
 	apiEntryPointUrlV1 = '/api/v1/',
 	apiAbsolutePath = __dirname + apiConfigUrl;
 
-// build routes for Version 1
-routeBuilder(router, configsV1, apiEntryPointUrlV1);
+//set up the logger with console transport
+logger.set({
+	console: {
+		enabled: true,
+		level: logger.level.DEBUG,
+		raw: true
+	}
+});
 
-app.use(express.logger());
+//build routes for Version 1
+routeBuilder(router, configsV1, apiEntryPointUrlV1);
+app.use(logger.middleware);
 app.use(rawBody);
 app.use(router.middleware);
 
@@ -34,4 +43,4 @@ renderMap(app, apiEntryPointUrlV1, apiAbsolutePath);
 app.use(express.static(__dirname + '/assets'));
 
 app.listen(port);
-console.log('server is listening on port: ' + port);
+logger.info('server is listening on port: ' + port);

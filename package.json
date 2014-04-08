@@ -21,13 +21,16 @@
     "JSV": "4.0.x",
     "detour": "1.0.x",
     "cluster": "0.7.x",
-    "js-yaml": "3.0.x"
+    "js-yaml": "3.0.x",
+    "node-syslog": "1.1.x"
   },
   "devDependencies": {
     "gulp": "3.6.x",
     "gulp-changed": "0.2.x",
     "gulp-nodemon": "1.0.x",
-    "proxyquire": "0.5.x"
+    "proxyquire": "0.5.x",
+    "gulp-jasmine": "0.2.x",
+	"jasmine-node": "1.14.x"
   },
   "private": true
 }
