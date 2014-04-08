@@ -10,19 +10,19 @@ var proxyquire = require('proxyquire').noCallThru(),
 	},
 
 	// helper function for mocking DB connector
-	mockDbCon = function() {
+	mockDbCon = function () {
 		var methods = {
-				destroy: false,
-				insert: 'id',
-				select: 'result',
-				update: 'id'
-			},
+			destroy: false,
+			insert: 'id',
+			select: 'result',
+			update: 'id'
+		},
 			dbCon = {};
 
-		Object.keys(methods).forEach(function(value) {
-			dbCon[value] = function() {
+		Object.keys(methods).forEach(function (value) {
+			dbCon[value] = function () {
 				return {
-					then: function(cb, errCb) {
+					then: function (cb, errCb) {
 						return !dbMock.dbError ? cb(dbMock[methods[value]]) : errCb(dbMock.dbError);
 					}
 				};
@@ -34,11 +34,11 @@ var proxyquire = require('proxyquire').noCallThru(),
 
 	curdBuilder = proxyquire('../lib/curdBuilder', {
 		'./db_connector': mockDbCon(),
-		'./requestBodyParser': function(reqBody) {
+		'./requestBodyParser': function (reqBody) {
 			return reqBody;
 		},
-		'./validateCurdConfig': function() {},
-		'./jsonValidator': function(reqBody, schema) {
+		'./validateCurdConfig': function () {},
+		'./jsonValidator': function (reqBody, schema) {
 			var errors = [];
 
 			if (!schema) {
@@ -47,7 +47,7 @@ var proxyquire = require('proxyquire').noCallThru(),
 
 			return errors;
 		},
-		'./api_res_decor': function(data) {
+		'./api_res_decor': function (data) {
 			if (!Array.isArray(data)) {
 				data = [data];
 			}
@@ -60,11 +60,11 @@ var proxyquire = require('proxyquire').noCallThru(),
 describe('Curd Builder module', function () {
 	// mocks
 	var config = {
-			dbTable: 'test',
-			dbColumns: ['test'],
-			createSchema: {},
-			updateSchema: {}
-		},
+		dbTable: 'test',
+		dbColumns: ['test'],
+		createSchema: {},
+		updateSchema: {}
+	},
 		curdUrlPath = '/test/path/',
 		req = {
 			protocol: 'http',
@@ -75,7 +75,7 @@ describe('Curd Builder module', function () {
 				id: '1'
 			}
 		},
-		stubRes = function(){
+		stubRes = function () {
 			return {
 				statusCode: null,
 				data: '',
@@ -83,16 +83,16 @@ describe('Curd Builder module', function () {
 					a: '',
 					b: ''
 				},
-				end: function(data) {
-					if(data) {
+				end: function (data) {
+					if (data) {
 						this.data = data;
 					}
 				},
-				send: function(status, data){
+				send: function (status, data) {
 					this.statusCode = status;
 					this.data = data;
 				},
-				setHeader: function(a, b) {
+				setHeader: function (a, b) {
 					this.header.a = a;
 					this.header.b = b;
 				}
@@ -103,7 +103,7 @@ describe('Curd Builder module', function () {
 		expect(curdBuilder).toBeDefined();
 	});
 
-	it('create curd Collection object', function() {
+	it('create curd Collection object', function () {
 		var curd = curdBuilder(config, curdUrlPath);
 
 		expect(typeof curd).toBe('object');
@@ -111,14 +111,14 @@ describe('Curd Builder module', function () {
 		expect(typeof curd.wildcard).toBe('object');
 	});
 
-	it('curd collection handler has POST and GET methods', function() {
+	it('curd collection handler has POST and GET methods', function () {
 		var curd = curdBuilder(config, curdUrlPath);
 
 		expect(typeof curd.handler.GET).toBe('function');
 		expect(typeof curd.handler.POST).toBe('function');
 	});
 
-	it('curd collection wildcard has DELETE, GET and UPDATE methods', function() {
+	it('curd collection wildcard has DELETE, GET and UPDATE methods', function () {
 		var curd = curdBuilder(config, curdUrlPath);
 
 		expect(typeof curd.wildcard.GET).toBe('function');
@@ -126,7 +126,7 @@ describe('Curd Builder module', function () {
 		expect(typeof curd.wildcard.PUT).toBe('function');
 	});
 
-	it('curd collection blocking methods functionality works', function() {
+	it('curd collection blocking methods functionality works', function () {
 		var curd;
 
 		// extend mocks
@@ -142,7 +142,7 @@ describe('Curd Builder module', function () {
 		delete config.blockedMethods;
 	});
 
-	it('curd collection overwriting methods functionality works', function() {
+	it('curd collection overwriting methods functionality works', function () {
 		var curd,
 			result,
 			res = stubRes();
@@ -151,9 +151,9 @@ describe('Curd Builder module', function () {
 
 		// extend mocks
 		config.customMethods = {
-			list: function() {
+			list: function () {
 				return {
-					then: function(cb) {
+					then: function (cb) {
 						return cb('test test');
 					}
 				};
@@ -164,13 +164,13 @@ describe('Curd Builder module', function () {
 		curd.handler.GET(req, res);
 		result = res.data;
 
-		expect(result).toEqual([ 'test test' ]);
+		expect(result).toEqual(['test test']);
 
 		// reset mocks
 		delete config.customMethods;
 	});
 
-	it('curd collection handler GET returns 200', function() {
+	it('curd collection handler GET returns 200', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
@@ -179,12 +179,12 @@ describe('Curd Builder module', function () {
 		expect(res.statusCode).toBe(200);
 	});
 
-	it('curd collection handler GET returns 500', function() {
+	it('curd collection handler GET returns 500', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = true;
-		curd.handler.GET(req, res, function(err){
+		curd.handler.GET(req, res, function (err) {
 			expect(err.status).toBe(500);
 		});
 
@@ -192,7 +192,7 @@ describe('Curd Builder module', function () {
 		dbMock.dbError = false;
 	});
 
-	it('curd collection handler POST 201', function() {
+	it('curd collection handler POST 201', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
@@ -202,12 +202,12 @@ describe('Curd Builder module', function () {
 		expect(res.statusCode).toBe(201);
 	});
 
-	it('curd collection handler POST returns 500', function() {
+	it('curd collection handler POST returns 500', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = true;
-		curd.handler.POST(req, res, function(err){
+		curd.handler.POST(req, res, function (err) {
 			expect(err.status).toBe(500);
 		});
 
@@ -215,7 +215,7 @@ describe('Curd Builder module', function () {
 		dbMock.dbError = false;
 	});
 
-	it('curd collection wildcard GET 200', function() {
+	it('curd collection wildcard GET 200', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
@@ -225,25 +225,25 @@ describe('Curd Builder module', function () {
 		expect(res.statusCode).toBe(200);
 	});
 
-	it('curd collection wildcard GET returns 404', function() {
+	it('curd collection wildcard GET returns 404', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = false;
 		dbMock.result = [];
-		curd.wildcard.GET(req, res, function(err){
+		curd.wildcard.GET(req, res, function (err) {
 			expect(err.status).toBe(404);
 		});
 
 		dbMock.result = ['test'];
 	});
 
-	it('curd collection wildcard GET returns 500', function() {
+	it('curd collection wildcard GET returns 500', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = true;
-		curd.wildcard.GET(req, res, function(err){
+		curd.wildcard.GET(req, res, function (err) {
 			expect(err.status).toBe(500);
 		});
 
@@ -251,7 +251,7 @@ describe('Curd Builder module', function () {
 		dbMock.dbError = false;
 	});
 
-	it('curd collection wildcard PUT 303', function() {
+	it('curd collection wildcard PUT 303', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
@@ -260,12 +260,12 @@ describe('Curd Builder module', function () {
 		expect(res.statusCode).toBe(303);
 	});
 
-	it('curd collection wildcard PUT 500', function() {
+	it('curd collection wildcard PUT 500', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = true;
-		curd.wildcard.PUT(req, res, function(err){
+		curd.wildcard.PUT(req, res, function (err) {
 			expect(err.status).toBe(500);
 		});
 
@@ -273,7 +273,7 @@ describe('Curd Builder module', function () {
 		dbMock.dbError = false;
 	});
 
-	it('curd collection wildcard DELETE returns 204', function() {
+	it('curd collection wildcard DELETE returns 204', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
@@ -283,12 +283,12 @@ describe('Curd Builder module', function () {
 		expect(res.statusCode).toBe(204);
 	});
 
-	it('curd collection wildcard DELETE returns 500', function() {
+	it('curd collection wildcard DELETE returns 500', function () {
 		var res = stubRes(),
 			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = true;
-		curd.wildcard.DELETE(req, res, function(err){
+		curd.wildcard.DELETE(req, res, function (err) {
 			expect(err.status).toEqual(500);
 		});
 
@@ -296,7 +296,7 @@ describe('Curd Builder module', function () {
 		dbMock.dbError = false;
 	});
 
-	it('builds custom response data', function() {
+	it('builds custom response data', function () {
 		var res = stubRes(),
 			curd;
 
@@ -312,12 +312,12 @@ describe('Curd Builder module', function () {
 
 		curd = curdBuilder(config, curdUrlPath);
 
-		curd.handler.POST(req, res, function(err){
+		curd.handler.POST(req, res, function (err) {
 			expect(err.status).toEqual(500);
 			expect(err.message).toBe('Internal server error');
 		});
 
-		curd.wildcard.PUT(req, res, function(err){
+		curd.wildcard.PUT(req, res, function (err) {
 			expect(err.status).toEqual(500);
 			expect(err.message).toBe('Internal server error');
 		});
