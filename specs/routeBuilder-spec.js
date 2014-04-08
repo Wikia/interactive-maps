@@ -1,16 +1,15 @@
 'use strict';
 
-var proxyquire = require('proxyquire' ),
-	routeBuilder = proxyquire('./../lib/routeBuilder', {
-		'./curdBuilder': function() {
-			return {};
-		}
-	});
-
 describe('Route Builder', function () {
 
 	// mocks
-	var router = {
+	var proxyquire = require('proxyquire' ),
+		routeBuilder = proxyquire('./../lib/routeBuilder', {
+			'./curdBuilder': function() {
+				return {};
+			}
+		}),
+		router = {
 			routes: [],
 			route: function(path, handler) {
 				this.routes.push({
