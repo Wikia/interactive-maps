@@ -23,18 +23,16 @@ var proxyquire = require('proxyquire').noCallThru(),
 			dbCon[value] = function() {
 				return {
 					then: function(cb, errCb) {
-						return (!dbMock.dbError) ? cb(dbMock[methods[value]]) : errCb(dbMock.dbError);
+						return !dbMock.dbError ? cb(dbMock[methods[value]]) : errCb(dbMock.dbError);
 					}
 				};
-			}
+			};
 		});
 
 		return dbCon;
 	},
 
-	// require module
-	crudBuilder = proxyquire('../lib/curdBuilder', {
-		// mock dependencies
+	curdBuilder = proxyquire('../lib/curdBuilder', {
 		'./db_connector': mockDbCon(),
 		'./requestBodyParser': function(reqBody) {
 			return reqBody;
@@ -59,7 +57,7 @@ var proxyquire = require('proxyquire').noCallThru(),
 	});
 
 
-describe('CRUD Builder', function () {
+describe('Curd Builder module', function () {
 	// mocks
 	var config = {
 			dbTable: 'test',
@@ -67,7 +65,7 @@ describe('CRUD Builder', function () {
 			createSchema: {},
 			updateSchema: {}
 		},
-		crudUrlPath = '/test/path/',
+		curdUrlPath = '/test/path/',
 		req = {
 			protocol: 'http',
 			headers: {
@@ -77,209 +75,230 @@ describe('CRUD Builder', function () {
 				id: '1'
 			}
 		},
-		res = {
-			statusCode: null,
-			data: '',
-			header: {
-				a: '',
-				b: ''
-			},
-			end: function(data) {
-				this.data = data;
-			},
-			setHeader: function(a, b) {
-				this.header.a = a;
-				this.header.b = b;
-			}
+		stubRes = function(){
+			return {
+				statusCode: null,
+				data: '',
+				header: {
+					a: '',
+					b: ''
+				},
+				end: function(data) {
+					if(data) {
+						this.data = data;
+					}
+				},
+				send: function(status, data){
+					this.statusCode = status;
+					this.data = data;
+				},
+				setHeader: function(a, b) {
+					this.header.a = a;
+					this.header.b = b;
+				}
+			};
 		};
 
-	// tests
-
 	it('should exist', function () {
-		expect(crudBuilder).toBeDefined();
+		expect(curdBuilder).toBeDefined();
 	});
 
-	it('create CRUD Collection object', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('create curd Collection object', function() {
+		var curd = curdBuilder(config, curdUrlPath);
 
-		expect(typeof crud).toBe('object');
-		expect(typeof crud.handler).toBe('object');
-		expect(typeof crud.wildcard).toBe('object');
+		expect(typeof curd).toBe('object');
+		expect(typeof curd.handler).toBe('object');
+		expect(typeof curd.wildcard).toBe('object');
 	});
 
-	it('CRUD collection handler has POST and GET methods', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection handler has POST and GET methods', function() {
+		var curd = curdBuilder(config, curdUrlPath);
 
-		expect(typeof crud.handler.GET).toBe('function');
-		expect(typeof crud.handler.POST).toBe('function');
+		expect(typeof curd.handler.GET).toBe('function');
+		expect(typeof curd.handler.POST).toBe('function');
 	});
 
-	it('CRUD collection wildcard has DELETE, GET and UPDATE methods', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection wildcard has DELETE, GET and UPDATE methods', function() {
+		var curd = curdBuilder(config, curdUrlPath);
 
-		expect(typeof crud.wildcard.GET).toBe('function');
-		expect(typeof crud.wildcard.DELETE).toBe('function');
-		expect(typeof crud.wildcard.PUT).toBe('function');
+		expect(typeof curd.wildcard.GET).toBe('function');
+		expect(typeof curd.wildcard.DELETE).toBe('function');
+		expect(typeof curd.wildcard.PUT).toBe('function');
 	});
 
-	it('CRUD collection blocking methods functionality works', function() {
-		var crud;
+	it('curd collection blocking methods functionality works', function() {
+		var curd;
 
 		// extend mocks
 		config.blockedMethods = {
-			wildcard: {
-				DELETE: false
-			}
+			DELETE: false
 		};
 
-		crud = crudBuilder(config, crudUrlPath);
+		curd = curdBuilder(config, curdUrlPath);
 
-		expect(crud.wildcard.DELETE).toBe(false);
+		expect(curd.wildcard.DELETE).toBe(false);
 
 		// reset mocks
 		delete config.blockedMethods;
 	});
 
-	it('CRUD collection overwriting methods functionality works', function() {
-		var crud,
-			result;
+	it('curd collection overwriting methods functionality works', function() {
+		var curd,
+			result,
+			res = stubRes();
+
+		dbMock.dbError = false;
 
 		// extend mocks
 		config.customMethods = {
 			list: function() {
 				return {
 					then: function(cb) {
-						return cb('laughing pink unicorn');
+						return cb('test test');
 					}
-				}
+				};
 			}
 		};
 
-		crud = crudBuilder(config, crudUrlPath);
-		crud.handler.GET(req, res);
+		curd = curdBuilder(config, curdUrlPath);
+		curd.handler.GET(req, res);
 		result = res.data;
 
-		expect(result).toBe('["laughing pink unicorn"]');
+		expect(result).toEqual([ 'test test' ]);
 
 		// reset mocks
 		delete config.customMethods;
 	});
 
-	it('CRUD collection handler GET returns 200', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection handler GET returns 200', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
-		crud.handler.GET(req, res);
+		curd.handler.GET(req, res);
 
 		expect(res.statusCode).toBe(200);
 	});
 
-	it('CRUD collection handler GET returns 500', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection handler GET returns 500', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = true;
-		crud.handler.GET(req, res);
-
-		expect(res.statusCode).toBe(500);
+		curd.handler.GET(req, res, function(err){
+			expect(err.status).toBe(500);
+		});
 
 		// reset mocks
 		dbMock.dbError = false;
 	});
 
-	it('CRUD collection handler POST 201', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection handler POST 201', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
-		crud.handler.POST(req, res);
+		dbMock.dbError = false;
+		curd.handler.POST(req, res);
 
 		expect(res.statusCode).toBe(201);
 	});
 
-	it('CRUD collection handler POST returns 500', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection handler POST returns 500', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = true;
-		crud.handler.POST(req, res);
-
-		expect(res.statusCode).toBe(500);
+		curd.handler.POST(req, res, function(err){
+			expect(err.status).toBe(500);
+		});
 
 		// reset mocks
 		dbMock.dbError = false;
 	});
 
-	it('CRUD collection wildcard GET 200', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection wildcard GET 200', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
-		crud.wildcard.GET(req, res);
+		dbMock.dbError = false;
+		curd.wildcard.GET(req, res);
 
 		expect(res.statusCode).toBe(200);
 	});
 
-	it('CRUD collection wildcard GET returns 404', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection wildcard GET returns 404', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
+		dbMock.dbError = false;
 		dbMock.result = [];
-		crud.wildcard.GET(req, res);
-
-		expect(res.statusCode).toBe(404);
+		curd.wildcard.GET(req, res, function(err){
+			expect(err.status).toBe(404);
+		});
 
 		dbMock.result = ['test'];
 	});
 
-	it('CRUD collection wildcard GET returns 500', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection wildcard GET returns 500', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = true;
-		crud.wildcard.GET(req, res);
-
-		expect(res.statusCode).toBe(500);
+		curd.wildcard.GET(req, res, function(err){
+			expect(err.status).toBe(500);
+		});
 
 		// reset mocks
 		dbMock.dbError = false;
 	});
 
-	it('CRUD collection wildcard PUT 303', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection wildcard PUT 303', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
-		crud.wildcard.PUT(req, res);
+		curd.wildcard.PUT(req, res);
 
 		expect(res.statusCode).toBe(303);
 	});
 
-	it('CRUD collection wildcard PUT 500', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection wildcard PUT 500', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = true;
-		crud.wildcard.PUT(req, res);
-
-		expect(res.statusCode).toBe(500);
+		curd.wildcard.PUT(req, res, function(err){
+			expect(err.status).toBe(500);
+		});
 
 		// reset mocks
 		dbMock.dbError = false;
 	});
 
-	it('CRUD collection wildcard DELETE returns 204', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection wildcard DELETE returns 204', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
-		crud.wildcard.DELETE(req, res);
+		dbMock.dbError = false;
+		curd.wildcard.DELETE(req, res);
 
 		expect(res.statusCode).toBe(204);
 	});
 
-	it('CRUD collection wildcard DELETE returns 500', function() {
-		var crud = crudBuilder(config, crudUrlPath);
+	it('curd collection wildcard DELETE returns 500', function() {
+		var res = stubRes(),
+			curd = curdBuilder(config, curdUrlPath);
 
 		dbMock.dbError = true;
-		crud.wildcard.DELETE(req, res);
-
-		expect(res.statusCode).toBe(500);
+		curd.wildcard.DELETE(req, res, function(err){
+			expect(err.status).toEqual(500);
+		});
 
 		// reset mocks
 		dbMock.dbError = false;
 	});
 
 	it('builds custom response data', function() {
-		var crud,
-			postData,
-			putData;
+		var res = stubRes(),
+			curd;
 
 		// extend
 		config.customResObjects = {
@@ -291,18 +310,17 @@ describe('CRUD Builder', function () {
 			}
 		};
 
-		crud = crudBuilder(config, crudUrlPath);
+		curd = curdBuilder(config, curdUrlPath);
 
-		crud.handler.POST(req, res);
-		postData = JSON.parse(res.data);
+		curd.handler.POST(req, res, function(err){
+			expect(err.status).toEqual(500);
+			expect(err.message).toBe('Internal server error');
+		});
 
-		crud.wildcard.PUT(req, res);
-		putData = JSON.parse(res.data);
-
-		expect(postData.message).toBe('Pink unicorns flying!');
-		expect(postData.id).toBe(1);
-		expect(putData.message).toBe('Blue unicorns flying!');
-		expect(putData.id).toBe(1);
+		curd.wildcard.PUT(req, res, function(err){
+			expect(err.status).toEqual(500);
+			expect(err.message).toBe('Internal server error');
+		});
 
 		// reset mocks
 		delete config.customResObjects;
