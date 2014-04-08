@@ -17,7 +17,7 @@ describe('Request Body Parser', function () {
 		});
 	});
 
-	it('fails to parse raw request body to JSON', function() {
+	it('return raw body if JSON.parse() throws error', function() {
 		var rawBody = '{"message: "Pink unicorns flying!"}';
 
 		expect(typeof requestBodyParser(rawBody) === 'string').toBeTruthy();
