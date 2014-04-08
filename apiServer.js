@@ -21,9 +21,6 @@ var express = require('express'),
 	configsV1 = getCurdConfigs('/api/v1/'),
 	apiEntryPointUrlV1 = '/api/v1/';
 
-//set up the logger with console transport
-logger.set({console: {enabled: true, level: logger.level.DEBUG, raw: true}});
-
 //build routes for Version 1
 routeBuilder(router, configsV1, apiEntryPointUrlV1);
 
