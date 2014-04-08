@@ -13,7 +13,6 @@ describe('Request Body Parser', function () {
 		];
 
 		testCases.forEach(function(value) {
-			console.log(value, typeof value, JSON.parse(value));
 			expect(typeof requestBodyParser(value) !== 'string').toBeTruthy();
 		});
 	});
