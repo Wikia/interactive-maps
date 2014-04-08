@@ -3,14 +3,14 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	errorHandler = proxyquire('../lib/errorHandler', {
 		'./logger': {
-			error: function(){
-				
+			error: function () {
+
 			},
-			getContext: function(status, req){
+			getContext: function (status, req) {
 				return {
 					status: status,
 					req: req
-				}
+				};
 			}
 		}
 	}),
@@ -19,25 +19,25 @@ var proxyquire = require('proxyquire').noCallThru(),
 	},
 	stubRes = function (status, message) {
 		return {
-			status: function(resStatus){
+			status: function (resStatus) {
 				expect(status).toEqual(resStatus);
 			},
-			send: function(resMessage){
+			send: function (resMessage) {
 				expect(message).toEqual(resMessage);
 			},
-			end: function(){
+			end: function () {
 
 			}
 		};
 	},
-	stubErr = function(status, message){
+	stubErr = function (status, message) {
 		return {
 			status: status,
 			message: message
 		};
 	};
 
-describe('errorHandler module', function(){
+describe('errorHandler module', function () {
 	it('should response with appropriate status end message', function () {
 		errorHandler(
 			stubErr(400, 'error'),
@@ -71,7 +71,7 @@ describe('errorHandler module', function(){
 			errorHandler = proxyquire('../lib/errorHandler', {
 				'./logger': {
 					error: error,
-					getContext: function(status, req){
+					getContext: function (status, req) {
 						return {
 							status: status,
 							req: req
@@ -88,7 +88,10 @@ describe('errorHandler module', function(){
 
 		expect(error).toHaveBeenCalled();
 		expect(error.calls.count()).toEqual(1);
-		expect(error).toHaveBeenCalledWith('I\'m a teapot', { status : 418, req : {  } });
+		expect(error).toHaveBeenCalledWith('I\'m a teapot', {
+			status: 418,
+			req: {}
+		});
 
 		errorHandler(
 			stubErr(404, 'Not found'),
@@ -97,6 +100,9 @@ describe('errorHandler module', function(){
 		);
 
 		expect(error.calls.count()).toEqual(2);
-		expect(error).toHaveBeenCalledWith('Not found', { status : 404, req : {  } });
+		expect(error).toHaveBeenCalledWith('Not found', {
+			status: 404,
+			req: {}
+		});
 	});
 });
