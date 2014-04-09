@@ -1,11 +1,28 @@
-var cluster = require('cluster'),
+'use strict';
+
+if (process.env.NODE_ENV === 'production') {
+	require('newrelic');
+}
+
+var logger = require('./lib/logger'),
+	cluster = require('cluster'),
 	numCPUs = require('os').cpus().length,
 	fs = require('fs'),
-	config = require('./lib/config');
+	config;
+
+logger.set({
+	console: {
+		enabled: true,
+		level: logger.level.DEBUG,
+		raw: true
+	}
+});
+
+config = require('./lib/config');
 
 config.setRoot(__dirname);
 
-if(cluster.isMaster) {
+if (cluster.isMaster) {
 
 	// Fork workers.
 	for (var i = 0; i < numCPUs; i++) {
@@ -21,4 +38,3 @@ if(cluster.isMaster) {
 } else {
 	require('./lib/jobProcessors');
 }
-

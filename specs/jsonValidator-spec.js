@@ -34,7 +34,7 @@ describe('json validator', function() {
 
 			expect(Array.isArray(errors)).toBeTruthy();
 			expect(errors.length).toBe(1);
-			expect(errors[0].message).toBe('Incorrect JSON format!');
+			expect(errors[0]).toBe('Incorrect JSON format');
 		});
 	});
 
