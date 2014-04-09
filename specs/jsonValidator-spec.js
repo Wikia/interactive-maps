@@ -18,7 +18,7 @@ describe('json validator', function() {
 			}
 		});
 
-	it('returns "Incorrect JSON format!" error', function() {
+	it('returns "Incorrect JSON format" error', function() {
 		var testCases = [
 			'bla bla bla',
 			1,
