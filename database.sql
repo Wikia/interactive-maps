@@ -8,11 +8,11 @@ USE interactive_maps;
 
 -- TODO: make sure column names map somewhat to APIs
 
-
 CREATE TABLE map (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
   type VARCHAR(255) NOT NULL,
+  url VARCHAR(255) UNIQUE NOT NULL,
   width MEDIUMINT UNSIGNED NOT NULL,
   height MEDIUMINT UNSIGNED NOT NULL,
   min_zoom TINYINT UNSIGNED NOT NULL,
