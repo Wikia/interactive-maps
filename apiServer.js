@@ -6,7 +6,7 @@ var express = require('express'),
 
 	// local modules
 	rawBody = require('./lib/rawBody'),
-	getCurdConfigs = require('./lib/getCurdConfigs'),
+	crudConfigs = require('./lib/getCurdConfigs'),
 	routeBuilder = require('./lib/routeBuilder'),
 	logger = require('./lib/logger'),
 	renderMap = require('./lib/renderMap'),
@@ -20,9 +20,11 @@ var express = require('express'),
 
 	// Interactive Maps API Version 1
 	apiConfigUrl = '/api/v1/',
-	configsV1 = getCurdConfigs(apiConfigUrl),
+	configsV1 = crudConfigs.requireConfigs(crudConfigs.getConfigs(apiConfigUrl)),
 	apiEntryPointUrlV1 = '/api/v1/',
 	apiAbsolutePath = __dirname + apiConfigUrl;
+
+
 
 //set up the logger with console transport
 logger.set({
