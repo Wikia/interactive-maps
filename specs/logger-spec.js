@@ -175,18 +175,19 @@ describe('Logger module', function () {
 
 	it('Should log middleware req/res details', function () {
 		spyOn(console, 'log');
-		function done () {}
+
+		function done() {}
 		var req = {
-				ip: '127.0.0.1',
-				hostname: 'hostname',
-				method: 'GET',
-				path: '/'
-			},
+			ip: '127.0.0.1',
+			hostname: 'hostname',
+			method: 'GET',
+			path: '/'
+		},
 			res = {
 				statusCode: 200,
 				on: function (event, method) {
 					//to call the method once, not twice
-					if(event !== 'close') {
+					if (event !== 'close') {
 						method();
 					}
 				}
