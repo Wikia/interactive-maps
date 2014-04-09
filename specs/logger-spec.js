@@ -127,47 +127,73 @@ describe('Logger module', function () {
 	it('getContext should return context', function () {
 		expect(logger.getContext({
 			url: 'url',
-			method: 'GET'
-		}, 200)).toEqual({
-			response: 200,
+			method: 'GET',
+			ip: '127.0.0.1',
+			hostname: 'test.com',
+
+		}, 200, 4)).toEqual({
+			clientip: '127.0.0.1',
+			hostname: 'test.com',
+			verb: 'GET',
 			url: 'url',
-			verb: 'GET'
+			response: 200,
+			processTime: 4
 		});
 
 		expect(logger.getContext({
 			url: 'url',
-			method: 'POST'
-		}, 200)).toEqual({
-			response: 200,
+			method: 'POST',
+			ip: '127.0.0.1',
+			hostname: 'test.com',
+		}, 200, 4)).toEqual({
+			clientip: '127.0.0.1',
+			hostname: 'test.com',
+			verb: 'POST',
 			url: 'url',
-			verb: 'POST'
+			response: 200,
+			processTime: 4
 		});
 
 		expect(logger.getContext({
 			url: 'url2',
-			method: 'GET'
-		}, 200)).toEqual({
-			response: 200,
+			method: 'GET',
+			ip: '127.0.0.1',
+			hostname: 'test.com',
+		}, 200, 4)).toEqual({
+			clientip: '127.0.0.1',
+			hostname: 'test.com',
+			verb: 'GET',
 			url: 'url2',
-			verb: 'GET'
+			response: 200,
+			processTime: 4
 		});
 
 		expect(logger.getContext({
 			url: 'url3',
-			method: 'POST'
-		}, 400)).toEqual({
+			method: 'POST',
+			ip: '127.0.0.1',
+			hostname: 'test.com',
+		}, 400, 4)).toEqual({
+			clientip: '127.0.0.1',
+			hostname: 'test.com',
+			verb: 'POST',
+			url: 'url3',
 			response: 400,
-			url: 'url3',
-			verb: 'POST'
+			processTime: 4
 		});
 
 		expect(logger.getContext({
 			url: 'url4',
-			method: 'PUT'
-		}, 600)).toEqual({
-			response: 600,
+			method: 'DELETE',
+			ip: '127.0.0.1',
+			hostname: 'test.com',
+		}, 600, 45)).toEqual({
+			clientip: '127.0.0.1',
+			hostname: 'test.com',
+			verb: 'DELETE',
 			url: 'url4',
-			verb: 'PUT'
+			response: 600,
+			processTime: 45
 		});
 	});
 
