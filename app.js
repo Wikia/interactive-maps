@@ -1,3 +1,9 @@
+'use strict';
+
+if (process.env.NODE_ENV === 'production') {
+	require('newrelic');
+}
+
 var logger = require('./lib/logger'),
 	cluster = require('cluster'),
 	numCPUs = require('os').cpus().length,
