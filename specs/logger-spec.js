@@ -129,8 +129,7 @@ describe('Logger module', function () {
 			url: 'url',
 			method: 'GET',
 			ip: '127.0.0.1',
-			hostname: 'test.com',
-
+			hostname: 'test.com'
 		}, 200, 4)).toEqual({
 			clientip: '127.0.0.1',
 			hostname: 'test.com',
@@ -144,7 +143,7 @@ describe('Logger module', function () {
 			url: 'url',
 			method: 'POST',
 			ip: '127.0.0.1',
-			hostname: 'test.com',
+			hostname: 'test.com'
 		}, 200, 4)).toEqual({
 			clientip: '127.0.0.1',
 			hostname: 'test.com',
@@ -158,7 +157,7 @@ describe('Logger module', function () {
 			url: 'url2',
 			method: 'GET',
 			ip: '127.0.0.1',
-			hostname: 'test.com',
+			hostname: 'test.com'
 		}, 200, 4)).toEqual({
 			clientip: '127.0.0.1',
 			hostname: 'test.com',
@@ -172,7 +171,7 @@ describe('Logger module', function () {
 			url: 'url3',
 			method: 'POST',
 			ip: '127.0.0.1',
-			hostname: 'test.com',
+			hostname: 'test.com'
 		}, 400, 4)).toEqual({
 			clientip: '127.0.0.1',
 			hostname: 'test.com',
@@ -186,7 +185,7 @@ describe('Logger module', function () {
 			url: 'url4',
 			method: 'DELETE',
 			ip: '127.0.0.1',
-			hostname: 'test.com',
+			hostname: 'test.com'
 		}, 600, 45)).toEqual({
 			clientip: '127.0.0.1',
 			hostname: 'test.com',
