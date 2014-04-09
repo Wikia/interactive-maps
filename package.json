@@ -22,7 +22,8 @@
     "detour": "1.0.x",
     "cluster": "0.7.x",
     "js-yaml": "3.0.x",
-    "node-syslog": "1.1.x"
+    "node-syslog": "1.1.x",
+    "colors": "0.6.x"
   },
   "devDependencies": {
     "gulp": "3.6.x",

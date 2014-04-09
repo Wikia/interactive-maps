@@ -72,7 +72,7 @@ describe('Logger module', function () {
 		});
 		logger.debug('Console test');
 		logger.close();
-		expect(console.log).toHaveBeenCalledWith('[DEBUG] Console test');
+		expect(console.log).toHaveBeenCalled();
 	});
 
 	it('Should filter unwanted severity levels', function () {
