@@ -38,7 +38,7 @@ describe('json validator', function() {
 		});
 	});
 
-	it('validates proper JSON against given schema', function() {
+	it('passes correct JSON object to validation module', function() {
 		var testCases = [
 			{
 				test: 1
