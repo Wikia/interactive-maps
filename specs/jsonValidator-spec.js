@@ -38,7 +38,7 @@ describe('json validator', function() {
 		});
 	});
 
-	it('validate proper JSON against given schema', function() {
+	it('validates proper JSON against given schema', function() {
 		var testCases = [
 			{
 				test: 1
