@@ -72,7 +72,7 @@ describe('Logger module', function () {
 		});
 		logger.debug('Console test');
 		logger.close();
-		expect(console.log).toHaveBeenCalledWith('[DEBUG] "Console test"');
+		expect(console.log).toHaveBeenCalledWith('[DEBUG] Console test');
 	});
 
 	it('Should filter unwanted severity levels', function () {
@@ -125,49 +125,49 @@ describe('Logger module', function () {
 	});
 
 	it('getContext should return context', function () {
-		expect(logger.getContext(200, {
+		expect(logger.getContext({
 			url: 'url',
 			method: 'GET'
-		})).toEqual({
+		}, 200)).toEqual({
 			response: 200,
 			url: 'url',
-			method: 'GET'
+			verb: 'GET'
 		});
 
-		expect(logger.getContext(200, {
+		expect(logger.getContext({
 			url: 'url',
 			method: 'POST'
-		})).toEqual({
+		}, 200)).toEqual({
 			response: 200,
 			url: 'url',
-			method: 'POST'
+			verb: 'POST'
 		});
 
-		expect(logger.getContext(200, {
+		expect(logger.getContext({
 			url: 'url2',
 			method: 'GET'
-		})).toEqual({
+		}, 200)).toEqual({
 			response: 200,
 			url: 'url2',
-			method: 'GET'
+			verb: 'GET'
 		});
 
-		expect(logger.getContext(400, {
+		expect(logger.getContext({
 			url: 'url3',
 			method: 'POST'
-		})).toEqual({
+		}, 400)).toEqual({
 			response: 400,
 			url: 'url3',
-			method: 'POST'
+			verb: 'POST'
 		});
 
-		expect(logger.getContext(600, {
+		expect(logger.getContext({
 			url: 'url4',
 			method: 'PUT'
-		})).toEqual({
+		}, 600)).toEqual({
 			response: 600,
 			url: 'url4',
-			method: 'PUT'
+			verb: 'PUT'
 		});
 	});
 
