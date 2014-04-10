@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 
 var healthCheck = require(__dirname + '/../lib/healthCheck'),
