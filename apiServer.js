@@ -24,8 +24,6 @@ var express = require('express'),
 	apiAbsolutePath = __dirname + apiConfigUrl,
 	configsV1 = crudConfigs.requireConfigs(crudConfigs.getConfigs(apiAbsolutePath));
 
-console.log(__dirname);
-
 //set up the logger with console transport
 logger.set({
 	console: {
