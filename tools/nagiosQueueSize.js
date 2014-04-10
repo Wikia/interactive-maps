@@ -12,5 +12,12 @@ function printResult(result) {
 	console.log(result.message);
 	process.exit(result.code);
 }
-
-healthCheck.getQueueSize(inactiveThresholds, printResult);
+try {
+	healthCheck.getQueueSize(inactiveThresholds, printResult);
+}
+catch (e) {
+	printResult({
+		code: healthCheck.exitCodes.CRITICAL,
+		message: e.message
+	});
+}
