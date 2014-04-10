@@ -13,4 +13,4 @@ function printResult(result) {
 	process.exit(result.code);
 }
 
-healthCheck.getQueueSize( inactiveThresholds, printResult );
+healthCheck.getQueueSize(inactiveThresholds, printResult);
