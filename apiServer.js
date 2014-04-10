@@ -20,11 +20,11 @@ var express = require('express'),
 
 	// Interactive Maps API Version 1
 	apiConfigUrl = '/api/v1/',
-	configsV1 = crudConfigs.requireConfigs(crudConfigs.getConfigs(apiConfigUrl)),
 	apiEntryPointUrlV1 = '/api/v1/',
-	apiAbsolutePath = __dirname + apiConfigUrl;
+	apiAbsolutePath = __dirname + apiConfigUrl,
+	configsV1 = crudConfigs.requireConfigs(crudConfigs.getConfigs(apiAbsolutePath));
 
-
+console.log(__dirname);
 
 //set up the logger with console transport
 logger.set({
