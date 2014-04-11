@@ -71,10 +71,10 @@ describe('errorHandler module', function () {
 			errorHandler = proxyquire('../lib/errorHandler', {
 				'./logger': {
 					error: error,
-					getContext: function (status, req) {
+					getContext: function (data) {
 						return {
-							status: status,
-							req: req
+							response: data.response,
+							req: data.req
 						};
 					}
 				}
@@ -87,9 +87,9 @@ describe('errorHandler module', function () {
 		);
 
 		expect(error).toHaveBeenCalled();
-		expect(error.calls.count()).toEqual(1);
+		expect(error.callCount).toEqual(1);
 		expect(error).toHaveBeenCalledWith('I\'m a teapot', {
-			status: 418,
+			response: 418,
 			req: {}
 		});
 
@@ -99,9 +99,9 @@ describe('errorHandler module', function () {
 			stubRes(404, 'Not found')
 		);
 
-		expect(error.calls.count()).toEqual(2);
+		expect(error.callCount).toEqual(2);
 		expect(error).toHaveBeenCalledWith('Not found', {
-			status: 404,
+			response: 404,
 			req: {}
 		});
 	});
