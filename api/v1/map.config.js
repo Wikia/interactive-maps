@@ -1,9 +1,17 @@
+'use strict';
+
+var utils = require('../../lib/utils');
+
 module.exports = {
 	// name of table in DB
 	dbTable: 'map',
 
 	// table columns used for SELECT query
 	dbColumns: ['id', 'name', 'type', 'width', 'height', 'min_zoom', 'max_zoom', 'created_by', 'created_on'],
+
+	transforms: {
+		'max_zoom': utils.binToMaxZoomLevel
+	},
 
 	// block CURD methods
 	blockedMethods: {

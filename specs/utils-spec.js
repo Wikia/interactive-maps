@@ -89,45 +89,81 @@ describe('utils', function () {
 
 	it('converts bin to max zoom level', function () {
 		var testSet = [{
-			zoomLevel: 0,
+			minZoom: 0,
+			maxZoom: 0,
 			expect: 0
 		},{
-			zoomLevel: 1,
+			minZoom: 1,
+			maxZoom: 1,
 			expect: 1
 		},{
-			zoomLevel: 2,
+			minZoom: 2,
+			maxZoom: 2,
 			expect: 2
 		},{
-			zoomLevel: 3,
+			minZoom: 3,
+			maxZoom: 3,
 			expect: 4
 		},{
-			zoomLevel: 4,
+			minZoom: 4,
+			maxZoom: 4,
 			expect: 8
 		},{
-			zoomLevel: 5,
+			minZoom: 5,
+			maxZoom: 5,
 			expect: 16
 		},{
-			zoomLevel: 6,
+			minZoom: 6,
+			maxZoom: 6,
 			expect: 32
 		},{
-			zoomLevel: 7,
+			minZoom: 7,
+			maxZoom: 7,
 			expect: 64
 		},{
-			zoomLevel: 8,
+			minZoom: 8,
+			maxZoom: 8,
 			expect: 128
 		},{
-			zoomLevel: 9,
+			minZoom: 9,
+			maxZoom: 9,
 			expect: 256
 		},{
-			zoomLevel: 11,
+			minZoom: 11,
+			maxZoom: 11,
 			expect: 1024
 		},{
-			zoomLevel: 16,
-			expect: 32768
+			minZoom: 0,
+			maxZoom: 1,
+			expect: 1
+		},{
+			minZoom: 0,
+			maxZoom: 2,
+			expect: 3
+		},{
+			minZoom: 0,
+			maxZoom: 3,
+			expect: 7
+		},{
+			minZoom: 0,
+			maxZoom: 4,
+			expect: 15
+		},{
+			minZoom: 2,
+			maxZoom: 4,
+			expect: 14
+		},{
+			minZoom: 2,
+			maxZoom: 5,
+			expect: 30
+		},{
+			minZoom: 3,
+			maxZoom: 4,
+			expect: 12
 		}];
 
 		testSet.forEach(function (testCase) {
-			expect(utils.zoomLevelsToBin(testCase.zoomLevel)).toBe(testCase.expect);
+			expect(utils.zoomLevelsToBin(testCase.minZoom, testCase.maxZoom)).toBe(testCase.expect);
 		});
 	});
 
