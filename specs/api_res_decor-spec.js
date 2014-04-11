@@ -56,5 +56,4 @@ describe('decorator', function () {
 		expect(JSON.stringify(decorator(data, schema, baseUrl)))
 			.toEqual(JSON.stringify(expected));
 	});
-
 });
