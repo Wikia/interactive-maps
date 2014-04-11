@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS interactive_maps;
+-- DROP DATABASE IF EXISTS interactive_maps;
 
 START TRANSACTION;
 
