@@ -32,6 +32,7 @@ jobs = kue.createQueue(config);
 function shutdown(){
 	jobs.shutdown(function () {
 		logger.debug('Jobs cleaned up and set to delayed states');
+		logger.close();
 		process.exit(0);
 	}, 1000);
 }
