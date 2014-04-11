@@ -80,6 +80,11 @@ if (cluster.isMaster) {
 	process.on('SIGINT', onDie);
 	process.on('SIGTERM', onDie);
 
+	//jobs are added with delayed status
+	// we need to check if something should get promoted
+	//by default it happens every 5000ms
+	jobs.promote();
+
 	require('./apiServer');
 } else {
 	require('./lib/jobProcessors');
