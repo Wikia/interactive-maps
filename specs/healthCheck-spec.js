@@ -6,7 +6,11 @@ describe('Health Check', function () {
 		error = null,
 		queueSize = 20,
 		healthCheck = proxyquire('./../lib/healthCheck', {
-			'./config': {},
+			'./config': {
+				api: {
+					port: 1
+				}
+			},
 			'kue': {
 				createQueue: function () {
 					return {
@@ -15,18 +19,37 @@ describe('Health Check', function () {
 						}
 					};
 				}
+			},
+			http: {
+				get: function(url, ok, error) {
+					var timeout = function(ms, callback){
+						callback();
+					};
+					ok({
+						statusCode: 200
+					});
+					return {
+						on: function(){
+							return {
+								setTimeout: timeout
+							};
+						},
+						setTimeout: timeout
+					};
+				}
 			}
 		});
 
 	it('is module', function () {
 		expect(typeof healthCheck).toBe('object');
+		expect(healthCheck).toBeDefined();
 	});
 
 	it('exports exit codes', function () {
 		expect(typeof healthCheck.exitCodes).toBe('object');
 	});
 
-	it('returns proper result code depending on the thresholds', function () {
+	it('returns proper queue result code depending on the thresholds', function () {
 		var testCases = [{
 			thresholds: {
 				20: healthCheck.exitCodes.OK
@@ -56,8 +79,8 @@ describe('Health Check', function () {
 		});
 	});
 
-	if ('returns unknown status and proper message if error arises', function () {
-		var error = {
+	it('returns unknown status and proper message if error arises in queue', function () {
+		error = {
 			message: 'You shall not pass'
 		};
 		healthCheck.getQueueSize({},
@@ -66,5 +89,24 @@ describe('Health Check', function () {
 				expect(result.message).toBe(error.message);
 			}
 		);
+	});
+
+	it('it returns the correct heartbeat response', function() {
+		var res = createSpyObj('res', ['send']);
+		healthCheck.heartBeatHandler({}, res);
+		expect(res.send).toHaveBeenCalledWith('OK');
+	});
+
+	it('returns normal heartbeat result', function() {
+		var callback = createSpy('callback'),
+			thresholds = {
+				20: healthCheck.exitCodes.OK
+			};
+		healthCheck.getApiHeartbeat(thresholds, callback);
+		expect(callback).toHaveBeenCalledWith({
+			code : 0,
+			message : '0 ms response time'
+		});
+		expect(callback.calls.length).toEqual(1);
 	});
 });
