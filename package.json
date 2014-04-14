@@ -23,14 +23,14 @@
     "cluster": "0.7.x",
     "js-yaml": "3.0.x",
     "node-syslog": "1.1.x",
-    "newrelic": "1.4.x",
+    "newrelic": "1.5.x",
     "colors": "0.6.x"
   },
   "devDependencies": {
     "gulp": "3.6.x",
-    "gulp-changed": "0.2.x",
+    "gulp-changed": "0.3.x",
     "gulp-nodemon": "1.0.x",
-    "proxyquire": "0.5.x",
+    "proxyquire": "0.6.x",
     "gulp-jasmine": "0.2.x",
     "jasmine-node": "1.14.x"
   },
