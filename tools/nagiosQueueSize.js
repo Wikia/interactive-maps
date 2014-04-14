@@ -9,15 +9,11 @@ var healthCheck = require(__dirname + '/../lib/healthCheck'),
 		60: healthCheck.exitCodes.CRITICAL
 	};
 
-function printResult(result) {
-	console.log(result.message);
-	process.exit(result.code);
-}
 try {
-	healthCheck.getQueueSize(inactiveThresholds, printResult);
+	healthCheck.getQueueSize(inactiveThresholds, healthCheck.printResult);
 }
 catch (e) {
-	printResult({
+	healthCheck.printResult({
 		code: healthCheck.exitCodes.CRITICAL,
 		message: e.message
 	});

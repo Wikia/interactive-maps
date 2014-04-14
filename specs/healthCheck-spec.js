@@ -102,10 +102,10 @@ describe('Health Check', function () {
 			thresholds = {
 				20: healthCheck.exitCodes.OK
 			};
-		healthCheck.getApiHeartbeat(thresholds, callback);
+		healthCheck.getApiHeartbeat('localhost', thresholds, callback);
 		expect(callback).toHaveBeenCalledWith({
 			code : 0,
-			message : '0 ms response time'
+			message : '1 ms response time'
 		});
 		expect(callback.calls.length).toEqual(1);
 	});

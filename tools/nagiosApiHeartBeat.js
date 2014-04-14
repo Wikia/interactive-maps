@@ -7,17 +7,14 @@ var healthCheck = require(__dirname + '/../lib/healthCheck'),
 		1000: healthCheck.exitCodes.OK,
 		2000: healthCheck.exitCodes.WARNING,
 		5000: healthCheck.exitCodes.CRITICAL
-	};
+	},
+	hostnameToCheck = 'localhost';
 
-function printResult(result) {
-	console.log(result.message);
-	process.exit(result.code);
-}
 try {
-	healthCheck.getApiHeartbeat(responseTimeThresholds, printResult);
+	healthCheck.getApiHeartbeat(hostnameToCheck, responseTimeThresholds, healthCheck.printResult);
 }
 catch (e) {
-	printResult({
+	healthCheck.printResult({
 		code: healthCheck.exitCodes.CRITICAL,
 		message: e.message
 	});
