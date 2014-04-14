@@ -5,13 +5,6 @@ var proxyquire = require('proxyquire').noCallThru(),
 
 describe('Upload Tiles', function () {
 
-	it('Throws error when called with incorrect data', function () {
-		var uploadTiles = proxyquire('../lib/uploadTiles', {
-			config: {}
-		});
-		expect(uploadTiles()).toThrow(new Error('Required data not set'));
-	});
-
 	it('Calls dfs sendFiles', function () {
 		var qStub = stubs.newQStub(),
 			collector = stubs.newCollector(['bucketName', 'dir', 'filePaths']),
@@ -39,7 +32,10 @@ describe('Upload Tiles', function () {
 				name: 'name with spaces',
 				dir: 'dir',
 				minZoom: 0,
-				maxZoom: 3
+				maxZoom: 3,
+				status:{
+					uploaded: false
+				}
 			},
 			expected = {
 				bucketName: 'bucketPrefixname_with_spaces',
@@ -47,12 +43,14 @@ describe('Upload Tiles', function () {
 				filePaths: '{0..3}/*/*.png'
 			};
 
-		uploadTiles(data);
-
-		expect(qStub.defer.resolve.callCount).toEqual(1);
+		uploadTiles({
+			save: function(){},
+			data: data
+		});
+		expect(qStub.defer.resolve.calls.count()).toEqual(1);
 		expect(collector.bucketName).toHaveBeenCalledWith(expected.bucketName);
 		expect(collector.dir).toHaveBeenCalledWith(expected.dir);
 		expect(collector.filePaths).toHaveBeenCalledWith(expected.filePaths);
 	});
 
-})
+});
