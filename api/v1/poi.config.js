@@ -65,11 +65,6 @@ module.exports = {
 				description: 'creator user name',
 				type: 'string',
 				required: true
-			},
-			updated_by: {
-				description: 'creator user name',
-				type: 'string',
-				required: true
 			}
 		},
 		additionalProperties: false
