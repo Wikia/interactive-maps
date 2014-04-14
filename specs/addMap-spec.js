@@ -48,26 +48,20 @@ var proxyquire = require('proxyquire').noCallThru(),
 				},
 				catch: function(){}
 			};
+		},
+		select: function(){
+			return q.defer().promise;
 		}
 	},
 	addMap = proxyquire('../lib/addMap', {
 		'q': q,
 		'./db_connector': dbconnector,
 		'kue': kue,
-		'./config': {}
+		'./config': {},
+		'./logger': {}
 	});
 
 describe('addMap', function () {
-	var consol;
-
-	beforeEach(function () {
-		consol = console.log;
-		console.log = function(){};
-	});
-
-	afterEach(function () {
-		console.log = consol;
-	});
 
 	it('should return promise', function () {
 		var promise = addMap('test', {url: 'http://test.url', name: 'test name', created_by:'user'});
@@ -83,13 +77,15 @@ describe('addMap', function () {
 				insert: function(table, object){
 					expect(table).toEqual('test');
 					expect(object).toEqual({
-						name: data.name,
+						name:'test name',
 						type: 'custom',
+						url: 'http://test.url',
 						width: 0,
 						height: 0,
-						min_zoom: 0,
+						min_zoom: 1,
 						max_zoom: 0,
-						created_by : data.created_by
+						created_on: undefined,
+						created_by: 'user'
 					});
 
 					return {
@@ -100,10 +96,15 @@ describe('addMap', function () {
 						},
 						catch: function(){}
 					};
+				},
+				select: function(){
+					return q.defer().promise;
 				}
 			},
 			'kue': kue,
-			'./config': {}
+			'./config': {
+				minZoom: 1
+			}
 		});
 
 		shouldAddMap('test', data);
