@@ -43,6 +43,27 @@ describe('utils', function () {
 		});
 	});
 
+
+	it('hrTimeToMilliseconds returns time in milliseconds', function() {
+		var testSet = [
+			{
+				check: [1, 0],
+				expected: 1000
+			},
+			{
+				check: [10, 0],
+				expected: 10000
+			},
+			{
+				check: [0, 10000],
+				expected: 1
+			}
+		];
+		testSet.forEach(function (testCase) {
+			expect(utils.hrTimeToMilliseconds(testCase.check)).toBe(testCase.expected);
+		});
+	});
+
 	it('generates correct glob', function(){
 		var testSet = [{
 			base: 'base',
