@@ -72,7 +72,7 @@ describe('Logger module', function () {
 		});
 		logger.debug('Console test');
 		logger.close();
-		expect(console.log).toHaveBeenCalledWith('[DEBUG] "Console test"');
+		expect(console.log).toHaveBeenCalled();
 	});
 
 	it('Should filter unwanted severity levels', function () {
@@ -125,49 +125,74 @@ describe('Logger module', function () {
 	});
 
 	it('getContext should return context', function () {
-		expect(logger.getContext(200, {
+		expect(logger.getContext({req: {
 			url: 'url',
-			method: 'GET'
-		})).toEqual({
+			method: 'GET',
+			ip: '127.0.0.1',
+			hostname: 'test.com'
+		}, response: 200, processTime: 4})).toEqual({
+			clientip: '127.0.0.1',
+			hostname: 'test.com',
+			verb: 'GET',
+			url: 'url',
 			response: 200,
-			url: 'url',
-			method: 'GET'
+			processTime: 4
 		});
 
-		expect(logger.getContext(200, {
+		expect(logger.getContext({req: {
 			url: 'url',
-			method: 'POST'
-		})).toEqual({
+			method: 'POST',
+			ip: '127.0.0.1',
+			hostname: 'test.com'
+		}, response: 200, processTime: 4})).toEqual({
+			clientip: '127.0.0.1',
+			hostname: 'test.com',
+			verb: 'POST',
+			url: 'url',
 			response: 200,
-			url: 'url',
-			method: 'POST'
+			processTime: 4
 		});
 
-		expect(logger.getContext(200, {
+		expect(logger.getContext({req: {
 			url: 'url2',
-			method: 'GET'
-		})).toEqual({
-			response: 200,
+			method: 'GET',
+			ip: '127.0.0.1',
+			hostname: 'test.com'
+		}, response: 200, processTime: 4})).toEqual({
+			clientip: '127.0.0.1',
+			hostname: 'test.com',
+			verb: 'GET',
 			url: 'url2',
-			method: 'GET'
+			response: 200,
+			processTime: 4
 		});
 
-		expect(logger.getContext(400, {
+		expect(logger.getContext({req: {
 			url: 'url3',
-			method: 'POST'
-		})).toEqual({
+			method: 'POST',
+			ip: '127.0.0.1',
+			hostname: 'test.com'
+		}, response: 400, processTime: 4})).toEqual({
+			clientip: '127.0.0.1',
+			hostname: 'test.com',
+			verb: 'POST',
+			url: 'url3',
 			response: 400,
-			url: 'url3',
-			method: 'POST'
+			processTime: 4
 		});
 
-		expect(logger.getContext(600, {
+		expect(logger.getContext({req: {
 			url: 'url4',
-			method: 'PUT'
-		})).toEqual({
+			method: 'DELETE',
+			ip: '127.0.0.1',
+			hostname: 'test.com'
+		}, response: 600, processTime: 45})).toEqual({
+			clientip: '127.0.0.1',
+			hostname: 'test.com',
+			verb: 'DELETE',
+			url: 'url4',
 			response: 600,
-			url: 'url4',
-			method: 'PUT'
+			processTime: 45
 		});
 	});
 
@@ -175,18 +200,19 @@ describe('Logger module', function () {
 
 	it('Should log middleware req/res details', function () {
 		spyOn(console, 'log');
-		function done () {}
+
+		function done() {}
 		var req = {
-				ip: '127.0.0.1',
-				hostname: 'hostname',
-				method: 'GET',
-				path: '/'
-			},
+			ip: '127.0.0.1',
+			hostname: 'hostname',
+			method: 'GET',
+			path: '/'
+		},
 			res = {
 				statusCode: 200,
 				on: function (event, method) {
 					//to call the method once, not twice
-					if(event !== 'close') {
+					if (event !== 'close') {
 						method();
 					}
 				}
