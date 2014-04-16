@@ -53,7 +53,7 @@ var proxyquire = require('proxyquire').noCallThru(),
 			return q.defer().promise;
 		}
 	},
-	addMap = proxyquire('../lib/addMap', {
+	addMap = proxyquire('../lib/addTileSet', {
 		'q': q,
 		'./db_connector': dbconnector,
 		'kue': kue,
@@ -61,7 +61,7 @@ var proxyquire = require('proxyquire').noCallThru(),
 		'./logger': {}
 	});
 
-describe('addMap', function () {
+describe('addTileSet', function () {
 
 	it('should return promise', function () {
 		var promise = addMap('test', {url: 'http://test.url', name: 'test name', created_by:'user'});
@@ -71,7 +71,7 @@ describe('addMap', function () {
 
 	it('should add map to DB', function () {
 		var data = {url: 'http://test.url', name: 'test name', created_by:'user'},
-			shouldAddMap = proxyquire('../lib/addMap', {
+			shouldAddMap = proxyquire('../lib/addTileSet', {
 			'q': q,
 			'./db_connector': {
 				insert: function(table, object){
@@ -80,6 +80,7 @@ describe('addMap', function () {
 						name:'test name',
 						type: 'custom',
 						url: 'http://test.url',
+						org_img : '',
 						width: 0,
 						height: 0,
 						min_zoom: 1,
@@ -112,7 +113,7 @@ describe('addMap', function () {
 
 	it('should add map to processing', function () {
 		var data = {url: 'http://test.url', name: 'test name', created_by:'user'},
-			shouldProcessMap = proxyquire('../lib/addMap', {
+			shouldProcessMap = proxyquire('../lib/addTileSet', {
 				'q': q,
 				'./db_connector': dbconnector,
 				'kue': {
