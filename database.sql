@@ -1,4 +1,4 @@
--- DROP DATABASE IF EXISTS interactive_maps;
+DROP DATABASE IF EXISTS interactive_maps;
 
 START TRANSACTION;
 
@@ -8,11 +8,12 @@ USE interactive_maps;
 
 -- TODO: make sure column names map somewhat to APIs
 
-CREATE TABLE map (
+CREATE TABLE tile_set (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
   type VARCHAR(255) NOT NULL,
   url VARCHAR(255) UNIQUE NOT NULL,
+  org_img VARCHAR(255) NOT NULL,
   width MEDIUMINT UNSIGNED NOT NULL,
   height MEDIUMINT UNSIGNED NOT NULL,
   min_zoom INT UNSIGNED NOT NULL,
@@ -21,17 +22,17 @@ CREATE TABLE map (
   created_by VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE map_instance (
+CREATE TABLE map (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
   city_id INT UNSIGNED NOT NULL,
-  map_id INT UNSIGNED NOT NULL,
+  tile_set_id INT UNSIGNED NOT NULL,
   title VARCHAR(255) NOT NULL,
   locked TINYINT DEFAULT FALSE NOT NULL,
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   created_by VARCHAR(255) NOT NULL,
 
-  FOREIGN KEY (map_id)
-    REFERENCES map(id)
+  FOREIGN KEY (tile_set_id)
+    REFERENCES tile_set(id)
 );
 
 CREATE TABLE poi_category (
@@ -60,18 +61,19 @@ CREATE TABLE poi (
   created_by VARCHAR(255) NOT NULL,
   updated_on TIMESTAMP,
   updated_by VARCHAR(255) NOT NULL,
-  map_instance_id INT UNSIGNED NOT NULL,
+  map_id INT UNSIGNED NOT NULL,
 
   FOREIGN KEY (poi_category_id)
     REFERENCES poi_category(id),
-  FOREIGN KEY (map_instance_id)
-    REFERENCES map_instance(id)
+  FOREIGN KEY (map_id)
+    REFERENCES map(id)
     ON DELETE CASCADE
 );
 
 -- TODO: figure out proper indexes
-CREATE INDEX map ON map ( id );
-CREATE INDEX map_city_id ON map_instance ( city_id );
-CREATE INDEX poi_map ON poi ( map_instance_id );
+CREATE INDEX tile_set ON tile_set ( id );
+CREATE UNIQUE INDEX tile_set_name_unq ON tile_set ( name );
+CREATE INDEX map_city_id ON map ( city_id );
+CREATE INDEX poi_map ON poi ( map_id );
 
 COMMIT;

@@ -4,7 +4,7 @@ module.exports = {
 
 	// table columns used for SELECT query
 	dbColumns: ['id', 'name', 'poi_category_id', 'description', 'link', 'photo', 'lat', 'lon', 'created_on',
-		'created_by', 'updated_on', 'updated_by', 'map_instance_id'
+		'created_by', 'updated_on', 'updated_by', 'map_id'
 	],
 
 	// curd collection custom response objects
@@ -32,8 +32,8 @@ module.exports = {
 				type: 'integer',
 				required: true
 			},
-			map_instance_id: {
-				description: 'Unique identifier for map instance',
+			map_id: {
+				description: 'Unique identifier for map',
 				type: 'integer',
 				required: true
 			},
@@ -123,8 +123,8 @@ module.exports = {
 			paramName: 'poi_url'
 		},
 		map_instance_id: {
-			apiMethod: 'map_instance',
-			paramName: 'map_instance_url'
+			apiMethod: 'map',
+			paramName: 'map_url'
 		},
 		poi_category_id: {
 			apiMethod: 'poi_category',
