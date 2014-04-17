@@ -1,10 +1,10 @@
 'use strict';
 
-describe('Get CRUD Configs', function() {
+describe('Get CRUDs', function() {
 
 	var proxyquire = require('proxyquire').noCallThru(),
 		configs,
-		crudConfigs = proxyquire('./../lib/getCurdConfigs', {
+		getCRUDs = proxyquire('./../lib/getCRUDs', {
 			'fs': {
 				readdirSync: function() {
 					return configs;

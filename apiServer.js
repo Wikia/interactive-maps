@@ -4,26 +4,27 @@
 var express = require('express'),
 	detour = require('detour'),
 
-	// local modules
-	rawBody = require('./lib/rawBody'),
-	crudConfigs = require('./lib/getCurdConfigs'),
-	routeBuilder = require('./lib/routeBuilder'),
-	logger = require('./lib/logger'),
-	renderMap = require('./lib/renderMap'),
+	// express middleware
 	guard = require('./lib/guard'),
+	logger = require('./lib/logger'),
+	rawBody = require('./lib/rawBody'),
 	errorHandler = require('./lib/errorHandler'),
 	healthCheck = require('./lib/healthCheck'),
 
-	port = require('./lib/config').api.port,
+	// API entry points modules
+	getCRUDs = require('./lib/getCRUDs'),
+	routeBuilder = require('./lib/routeBuilder'),
+	renderMap = require('./lib/renderMap'),
 
+	// other local variables
+	port = require('./lib/config').api.port,
 	app = express(),
 	router = detour(),
 
 	// Interactive Maps API Version 1
-	apiConfigUrl = '/api/v1/',
-	apiEntryPointUrlV1 = '/api/v1/',
-	apiAbsolutePath = __dirname + apiConfigUrl,
-	configsV1 = crudConfigs.requireConfigs(crudConfigs.getConfigs(apiAbsolutePath));
+	apiPath = '/api/v1/',
+	apiAbsolutePath = __dirname + apiPath,
+	crudModules = getCRUDs.requireCruds(getCRUDs.getCruds(apiAbsolutePath));
 
 //set up the logger with console transport
 logger.set({
@@ -35,13 +36,13 @@ logger.set({
 });
 
 //build routes for Version 1
-routeBuilder(router, configsV1, apiEntryPointUrlV1);
+routeBuilder(router, crudModules, apiPath);
 
 app.use(guard);
 app.use(logger.middleware);
 app.use(rawBody);
 app.use(router.middleware);
-renderMap(app, apiEntryPointUrlV1, apiAbsolutePath);
+renderMap(app, apiPath, apiAbsolutePath);
 app.use(healthCheck.heartBeatHandler);
 app.use(errorHandler);
 
