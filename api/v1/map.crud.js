@@ -49,7 +49,6 @@ var dbCon = require('./../../lib/db_connector'),
 
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
- * @param url {string} - url path for CRUD
  * @returns {object} - CRUD collection
  */
 
@@ -63,13 +62,14 @@ module.exports = function createCRUD() {
 						'map.id',
 						'map.title',
 						'tile_set.name',
-						'tile_set.org_img'
+						'tile_set.image'
 					])
 					.where({city_id: 1})
 					.select()
 					.then(
 						function (collection) {
 							collection.forEach(function(value) {
+								// TODO: add path to dfs to config
 								value.image = 'http://dev-dfs-p1/' + utils.getBucketName(value.name) + '/' + value.image;
 								value.url = req.protocol + '://' + req.headers.host + req.route.path + '/' + value.id;
 
@@ -161,6 +161,7 @@ module.exports = function createCRUD() {
 								var obj = collection[0];
 
 								if (obj) {
+									// TODO: refactor path building
 									obj.tile_set_url = req.protocol + '://' + req.headers.host + '/api/v1/tile_set/' + obj.tile_set_id;
 									res.send(200, obj);
 									res.end();
@@ -189,6 +190,8 @@ module.exports = function createCRUD() {
 				}
 			},
 			PUT: function (req, res, next) {
+
+				console.log(req);
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator(reqBody, updateSchema);
 
@@ -206,7 +209,8 @@ module.exports = function createCRUD() {
 								var response = {
 									message: 'Map successfully updated',
 									id: id,
-									url: req.protocol + '://' + req.headers.host + req.route.path
+									// TODO: refactor path building
+									url: req.protocol + '://' + req.headers.host + '/api/v1/map/' + id
 								};
 
 								res.send(303, response);

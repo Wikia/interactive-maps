@@ -104,7 +104,6 @@ var dbCon = require('./../../lib/db_connector'),
 
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
- * @param url {string} - url path for CRUD
  * @returns {object} - CRUD collection
  */
 
@@ -138,7 +137,7 @@ module.exports = function createCRUD() {
 								response = {
 									message: 'POI successfully created',
 									id: id,
-									url: 'localhost:3000/api/v1/poi/' + id
+									url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
 								};
 
 							res.send(201, response);
@@ -245,7 +244,8 @@ module.exports = function createCRUD() {
 								var response = {
 									message: 'POI successfully updated',
 									id: id,
-									url: 'localhost:3000/api/v1/poi/' + id
+									// TODO: refactor path building
+									url: req.protocol + '://' + req.headers.host + '/api/v1/poi' + '/' + id
 								};
 
 								res.send(303, response);

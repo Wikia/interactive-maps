@@ -36,7 +36,6 @@ var dbCon = require('./../../lib/db_connector'),
 
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
- * @param url {string} - url path for CRUD
  * @returns {object} - CRUD collection
  */
 
@@ -74,7 +73,7 @@ module.exports = function createCRUD() {
 									response = {
 										message: 'Tile set added to processing queue',
 										id: id,
-										url: req.protocol + '://' + req.headers.host + req.url + '/' + id
+										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
 									};
 
 								res.send(201, response);
@@ -97,7 +96,7 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			GET: function (req, res, next) {
-				var dbColumns = ['name', 'type', 'org_img', 'width', 'height', 'min_zoom', 'max_zoom', 'created_by', 'created_on'],
+				var dbColumns = ['name', 'type', 'image', 'width', 'height', 'min_zoom', 'max_zoom', 'created_by', 'created_on'],
 					id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
