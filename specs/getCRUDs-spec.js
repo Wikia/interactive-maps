@@ -3,54 +3,51 @@
 describe('Get CRUDs', function() {
 
 	var proxyquire = require('proxyquire').noCallThru(),
-		configs,
+		crudModules,
 		getCRUDs = proxyquire('./../lib/getCRUDs', {
 			'fs': {
 				readdirSync: function() {
-					return configs;
+					return crudModules;
 				}
 			}
 		});
 
 	/**
-	 * @desc helper function that build array of config names
-	 * @returns {array} - array of config names
+	 * @desc helper function that build array of CRUD module names
+	 * @returns {array} - array of CRUD module names
 	 */
 
-	function getConfigs() {
-		var configPaths = crudConfigs.getConfigs();
-
-		return Object.keys(configPaths);
+	function getCruds() {
+		return Object.keys(getCRUDs.getCruds());
 	}
 
-	it('builds an array of API config modules', function() {
-		var configNamesArray;
+	it('builds an array of API CRUD modules', function() {
+		var crudNamesArray;
 
-		configs = [
-			'test1.config.js',
-			'test2.config.js',
-			'test3.blabla.config.js'
+		crudModules = [
+			'test1.crud.js',
+			'test2.crud.js',
+			'test3.blabla.crud.js'
 		];
+		crudNamesArray = getCruds();
 
-		configNamesArray = getConfigs();
-
-		expect(configNamesArray.length).toBe(3);
-		expect(configNamesArray[0]).toBe('test1');
-		expect(configNamesArray[1]).toBe('test2');
-		expect(configNamesArray[2]).toBe('test3.blabla');
+		expect(crudNamesArray.length).toBe(3);
+		expect(crudNamesArray[0]).toBe('test1');
+		expect(crudNamesArray[1]).toBe('test2');
+		expect(crudNamesArray[2]).toBe('test3.blabla');
 	});
 
 	it('skips non config files', function() {
-		var configNamesArray;
+		var crudNamesArray;
 
-		configs = [
+		crudModules = [
 			'lorem.ispum.js',
 			'blabla.js',
-			'blabla.config.bla.js',
-			'test123.config.js.bla'
+			'blabla.crud.bla.js',
+			'test123.crud.js.bla'
 		];
-		configNamesArray = getConfigs();
+		crudNamesArray = getCruds();
 
-		expect(configNamesArray.length).toBe(0);
+		expect(crudNamesArray.length).toBe(0);
 	});
 });
