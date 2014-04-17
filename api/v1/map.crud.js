@@ -40,8 +40,8 @@ var dbCon = require('./../../lib/db_connector'),
 		properties: {
 			title: {
 				description: 'Map instance name',
-					type: 'string',
-					minLength: 2
+				type: 'string',
+				minLength: 2
 			}
 		},
 		additionalProperties: false
@@ -75,7 +75,7 @@ module.exports = function createCRUD() {
 					.select()
 					.then(
 						function (collection) {
-							collection.forEach(function(value) {
+							collection.forEach(function (value) {
 								// TODO: add path to dfs to config
 								value.image = 'http://dev-dfs-p1/' + utils.getBucketName(value.name) + '/' + value.image;
 								value.url = req.protocol + '://' + req.headers.host + req.route.path + '/' + value.id;
@@ -89,7 +89,7 @@ module.exports = function createCRUD() {
 						function (err) {
 							next(sqlErrorHandler(err, req));
 						}
-					);
+				);
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
@@ -102,10 +102,10 @@ module.exports = function createCRUD() {
 							function (data) {
 								var id = data[0],
 									response = {
-									message: 'Map successfully created',
-									id: id,
-									url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
-								};
+										message: 'Map successfully created',
+										id: id,
+										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
+									};
 
 								res.send(201, response);
 								res.end();
@@ -113,7 +113,7 @@ module.exports = function createCRUD() {
 							function (err) {
 								next(sqlErrorHandler(err, req));
 							}
-						);
+					);
 				} else {
 					next({
 						status: 400,
@@ -127,7 +127,7 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id ),
+				var id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
 					};
@@ -135,13 +135,13 @@ module.exports = function createCRUD() {
 					dbCon
 						.destroy(dbTable, filter)
 						.then(
-						function () {
-							res.send(204, {});
-							res.end();
-						},
-						function (err) {
-							next(sqlErrorHandler(err, req));
-						}
+							function () {
+								res.send(204, {});
+								res.end();
+							},
+							function (err) {
+								next(sqlErrorHandler(err, req));
+							}
 					);
 				} else {
 					next({
@@ -185,7 +185,7 @@ module.exports = function createCRUD() {
 							function (err) {
 								next(sqlErrorHandler(err, req));
 							}
-						);
+					);
 				} else {
 					next({
 						status: 400,
@@ -212,20 +212,20 @@ module.exports = function createCRUD() {
 						dbCon
 							.update(dbTable, reqBody, filter)
 							.then(
-							function () {
-								var response = {
-									message: 'Map successfully updated',
-									id: id,
-									// TODO: refactor path building
-									url: req.protocol + '://' + req.headers.host + '/api/v1/map/' + id
-								};
+								function () {
+									var response = {
+										message: 'Map successfully updated',
+										id: id,
+										// TODO: refactor path building
+										url: req.protocol + '://' + req.headers.host + '/api/v1/map/' + id
+									};
 
-								res.send(303, response);
-								res.end();
-							},
-							function (err) {
-								next(sqlErrorHandler(err, req));
-							}
+									res.send(303, response);
+									res.end();
+								},
+								function (err) {
+									next(sqlErrorHandler(err, req));
+								}
 						);
 					} else {
 						next({
