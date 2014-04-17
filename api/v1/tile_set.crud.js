@@ -2,6 +2,7 @@
 
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
+	utils = require('./../../lib/utils'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	sqlErrorHandler = require('./../../lib/sqlErrorHandler'),
 
@@ -62,7 +63,7 @@ module.exports = function createCRUD() {
 				);
 			},
 			POST: function (req, res, next) {
-				var	reqBody = reqBodyParser(req.rawBody),
+				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator(reqBody, createSchema);
 
 				if (errors.length === 0) {
@@ -110,7 +111,7 @@ module.exports = function createCRUD() {
 							var obj = collection[0];
 
 							if (obj) {
-								obj.org_img = 'http://dev-dfs-p1/' + 'intmap_' + obj.name.replace(/\s/g, '_') + '/' + obj.org_img;
+								obj.image = 'http://dev-dfs-p1/' + utils.getBucketName(obj.name) + '/' + obj.image;
 
 								res.send(200, obj);
 								res.end();

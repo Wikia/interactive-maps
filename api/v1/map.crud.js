@@ -1,6 +1,7 @@
 'use strict';
 
 var dbCon = require('./../../lib/db_connector'),
+	utils = require('./../../lib/utils'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	sqlErrorHandler = require('./../../lib/sqlErrorHandler'),
@@ -69,11 +70,10 @@ module.exports = function createCRUD() {
 					.then(
 						function (collection) {
 							collection.forEach(function(value) {
-								value.image = 'http://dev-dfs-p1/' + 'intmap_' + value.name.replace(/\s/g, '_') + '/' + value.org_img;
+								value.image = 'http://dev-dfs-p1/' + utils.getBucketName(value.name) + '/' + value.image;
 								value.url = req.protocol + '://' + req.headers.host + req.route.path + '/' + value.id;
 
 								delete value.name;
-								delete value.org_img;
 							});
 
 							res.send(200, collection);
@@ -85,7 +85,7 @@ module.exports = function createCRUD() {
 					);
 			},
 			POST: function (req, res, next) {
-				var	reqBody = reqBodyParser(req.rawBody),
+				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator(reqBody, createSchema);
 
 				if (errors.length === 0) {
@@ -97,7 +97,7 @@ module.exports = function createCRUD() {
 									response = {
 									message: 'Map successfully created',
 									id: id,
-									url: req.protocol + '://' + req.headers.host + req.url + '/' + id
+									url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
 								};
 
 								res.send(201, response);
@@ -206,7 +206,7 @@ module.exports = function createCRUD() {
 								var response = {
 									message: 'Map successfully updated',
 									id: id,
-									url: req.protocol + '://' + req.headers.host + req.url
+									url: req.protocol + '://' + req.headers.host + req.route.path
 								};
 
 								res.send(303, response);

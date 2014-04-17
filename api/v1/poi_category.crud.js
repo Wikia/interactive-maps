@@ -15,6 +15,11 @@ var dbCon = require('./../../lib/db_connector'),
 				type: 'string',
 				required: true
 			},
+			city_id: {
+				description: 'ID of the Wikia this map instance belongs to',
+				type: 'integer',
+				required: true
+			},
 			marker: {
 				description: 'Url to custom marker icon',
 				type: 'string',
@@ -73,7 +78,7 @@ module.exports = function createCRUD(url) {
 				);
 			},
 			POST: function (req, res, next) {
-				var	reqBody = reqBodyParser(req.rawBody),
+				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator(reqBody, createSchema);
 
 				if (errors.length === 0) {
@@ -85,7 +90,7 @@ module.exports = function createCRUD(url) {
 								response = {
 									message: 'POI category successfully created',
 									id: id,
-									url: 'localhost:3000/api/v1/poi_category/' + id
+									url: req.protocol + '://' + req.headers.host + req.url + '/' + id
 								};
 
 							res.send(201, response);
@@ -191,7 +196,7 @@ module.exports = function createCRUD(url) {
 								var response = {
 									message: 'POI category successfully updated',
 									id: id,
-									url: 'localhost:3000/api/v1/poi_category/' + id
+									url: req.protocol + '://' + req.headers.host + req.url
 								};
 
 								res.send(303, response);

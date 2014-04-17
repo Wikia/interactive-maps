@@ -126,7 +126,7 @@ module.exports = function createCRUD() {
 				);
 			},
 			POST: function (req, res, next) {
-				var	reqBody = reqBodyParser(req.rawBody),
+				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator(reqBody, createSchema);
 
 				if (errors.length === 0) {
