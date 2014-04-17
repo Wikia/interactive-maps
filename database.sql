@@ -10,47 +10,47 @@ USE interactive_maps;
 
 CREATE TABLE tile_set (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL,
-  type VARCHAR(255) NOT NULL,
-  url VARCHAR(255) UNIQUE NOT NULL,
-  image VARCHAR(255) NOT NULL,
+  name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  type VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  url VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci UNIQUE NOT NULL,
+  image VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   width MEDIUMINT UNSIGNED NOT NULL,
   height MEDIUMINT UNSIGNED NOT NULL,
   min_zoom INT UNSIGNED NOT NULL,
   max_zoom INT UNSIGNED NOT NULL, -- zoom levels saved in binary format 1011 - > zoom levels 4,2,1 so max that we can show is 2
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  created_by VARCHAR(255) NOT NULL
+  created_by VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
 );
 
 CREATE TABLE map (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
   city_id INT UNSIGNED NOT NULL,
   tile_set_id INT UNSIGNED NOT NULL,
-  title VARCHAR(255) NOT NULL,
+  title VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   locked TINYINT DEFAULT FALSE NOT NULL,
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  created_by VARCHAR(255) NOT NULL,
+  created_by VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
 
   FOREIGN KEY (tile_set_id)
-    REFERENCES tile_set(id)
+  REFERENCES tile_set(id)
 );
 
 CREATE TABLE poi_category (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL,
-  marker VARCHAR(255),
+  name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  marker VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci,
   parent_poi_category_id INT UNSIGNED,
   city_id INT NOT NULL,
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  created_by VARCHAR(255) NOT NULL,
+  created_by VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
 
   FOREIGN KEY (parent_poi_category_id)
-    REFERENCES poi_category(id)
+  REFERENCES poi_category(id)
 );
 
 CREATE TABLE poi (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL,
+  name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   poi_category_id INT UNSIGNED NOT NULL,
   description TEXT,
   link TEXT,
@@ -58,15 +58,15 @@ CREATE TABLE poi (
   lat FLOAT(10,6) NOT NULL,
   lon FLOAT(10,6) NOT NULL,
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  created_by VARCHAR(255) NOT NULL,
+  created_by VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   updated_on TIMESTAMP,
-  updated_by VARCHAR(255) NOT NULL,
+  updated_by VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   map_id INT UNSIGNED NOT NULL,
 
   FOREIGN KEY (poi_category_id)
-    REFERENCES poi_category(id),
+  REFERENCES poi_category(id),
   FOREIGN KEY (map_id)
-    REFERENCES map(id)
+  REFERENCES map(id)
     ON DELETE CASCADE
 );
 
