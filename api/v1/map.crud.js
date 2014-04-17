@@ -56,6 +56,13 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
+				var cityId = parseInt(req.query.city_id, 10) || 0,
+					condition = {};
+
+				if (cityId !== 0) {
+					condition.city_id = cityId;
+				}
+
 				dbCon.knex(dbTable)
 					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
 					.column([
@@ -64,7 +71,7 @@ module.exports = function createCRUD() {
 						'tile_set.name',
 						'tile_set.image'
 					])
-					.where({city_id: 1})
+					.where(condition)
 					.select()
 					.then(
 						function (collection) {
