@@ -127,7 +127,7 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id),
+				var id = parseInt(req.pathVar.id, 10),
 					filter = {
 						id: id
 					};
@@ -155,7 +155,7 @@ module.exports = function createCRUD() {
 			},
 			GET: function (req, res, next) {
 				var dbColumns = ['title', 'tile_set_id', 'city_id', 'created_by', 'created_on'],
-					id = parseInt(req.pathVar.id),
+					id = parseInt(req.pathVar.id, 10),
 					filter = {
 						id: id
 					};
@@ -203,7 +203,7 @@ module.exports = function createCRUD() {
 					errors = jsonValidator(reqBody, updateSchema);
 
 				if (errors.length === 0) {
-					var id = parseInt(req.pathVar.id),
+					var id = parseInt(req.pathVar.id, 10),
 						filter = {
 							id: id
 						};
