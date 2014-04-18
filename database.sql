@@ -2,7 +2,7 @@
 
 START TRANSACTION;
 
-CREATE DATABASE IF NOT EXISTS interactive_maps;
+CREATE DATABASE IF NOT EXISTS interactive_maps CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 USE interactive_maps;
 
