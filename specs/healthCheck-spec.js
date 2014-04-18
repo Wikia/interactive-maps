@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Health Check', function () {
+xdescribe('Health Check', function () {
 
 	var proxyquire = require('proxyquire').noCallThru(),
 		error = null,

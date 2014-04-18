@@ -2,7 +2,7 @@
 
 var decorator = require('../lib/api_res_decor');
 
-describe('decorator', function () {
+xdescribe('decorator', function () {
 
 	var data = [{
 		id: 1,

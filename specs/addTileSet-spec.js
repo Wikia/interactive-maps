@@ -80,7 +80,7 @@ describe('addTileSet', function () {
 						name:'test name',
 						type: 'custom',
 						url: 'http://test.url',
-						org_img : '',
+						image : '',
 						width: 0,
 						height: 0,
 						min_zoom: 1,

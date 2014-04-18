@@ -1,6 +1,11 @@
 'use strict';
 
-var utils = require('../lib/utils');
+var proxyquire = require('proxyquire').noCallThru(),
+    utils = proxyquire('../lib/utils', {
+        './config': {
+            bucketPrefix: ''
+        }
+    });
 
 describe('utils', function () {
 	it('calculates max zoom level correctly', function () {

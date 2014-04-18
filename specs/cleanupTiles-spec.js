@@ -3,7 +3,7 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs');
 
-describe('Clean tiles', function () {
+xdescribe('Clean tiles', function () {
 
 	var qStub,
 		childProcessMock;
