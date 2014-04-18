@@ -40,8 +40,8 @@ var dbCon = require('./../../lib/db_connector'),
 		properties: {
 			title: {
 				description: 'Map instance name',
-					type: 'string',
-					minLength: 2
+				type: 'string',
+				minLength: 2
 			}
 		},
 		additionalProperties: false
@@ -56,6 +56,13 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
+				var cityId = parseInt(req.query.city_id, 10) || 0,
+					filter = {};
+
+				if (cityId !== 0) {
+					filter.city_id = cityId;
+				}
+
 				dbCon.knex(dbTable)
 					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
 					.column([
@@ -64,11 +71,11 @@ module.exports = function createCRUD() {
 						'tile_set.name',
 						'tile_set.image'
 					])
-					.where({city_id: 1})
+					.where(filter)
 					.select()
 					.then(
 						function (collection) {
-							collection.forEach(function(value) {
+							collection.forEach(function (value) {
 								// TODO: add path to dfs to config
 								value.image = 'http://dev-dfs-p1/' + utils.getBucketName(value.name) + '/' + value.image;
 								value.url = req.protocol + '://' + req.headers.host + req.route.path + '/' + value.id;
@@ -82,7 +89,7 @@ module.exports = function createCRUD() {
 						function (err) {
 							next(sqlErrorHandler(err, req));
 						}
-					);
+				);
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
@@ -95,10 +102,10 @@ module.exports = function createCRUD() {
 							function (data) {
 								var id = data[0],
 									response = {
-									message: 'Map successfully created',
-									id: id,
-									url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
-								};
+										message: 'Map successfully created',
+										id: id,
+										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
+									};
 
 								res.send(201, response);
 								res.end();
@@ -106,7 +113,7 @@ module.exports = function createCRUD() {
 							function (err) {
 								next(sqlErrorHandler(err, req));
 							}
-						);
+					);
 				} else {
 					next({
 						status: 400,
@@ -120,7 +127,7 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id ),
+				var id = parseInt(req.pathVar.id, 10),
 					filter = {
 						id: id
 					};
@@ -128,13 +135,13 @@ module.exports = function createCRUD() {
 					dbCon
 						.destroy(dbTable, filter)
 						.then(
-						function () {
-							res.send(204, {});
-							res.end();
-						},
-						function (err) {
-							next(sqlErrorHandler(err, req));
-						}
+							function () {
+								res.send(204, {});
+								res.end();
+							},
+							function (err) {
+								next(sqlErrorHandler(err, req));
+							}
 					);
 				} else {
 					next({
@@ -148,7 +155,7 @@ module.exports = function createCRUD() {
 			},
 			GET: function (req, res, next) {
 				var dbColumns = ['title', 'tile_set_id', 'city_id', 'created_by', 'created_on'],
-					id = parseInt(req.pathVar.id),
+					id = parseInt(req.pathVar.id, 10),
 					filter = {
 						id: id
 					};
@@ -178,7 +185,7 @@ module.exports = function createCRUD() {
 							function (err) {
 								next(sqlErrorHandler(err, req));
 							}
-						);
+					);
 				} else {
 					next({
 						status: 400,
@@ -196,7 +203,7 @@ module.exports = function createCRUD() {
 					errors = jsonValidator(reqBody, updateSchema);
 
 				if (errors.length === 0) {
-					var id = parseInt(req.pathVar.id),
+					var id = parseInt(req.pathVar.id, 10),
 						filter = {
 							id: id
 						};
@@ -205,20 +212,20 @@ module.exports = function createCRUD() {
 						dbCon
 							.update(dbTable, reqBody, filter)
 							.then(
-							function () {
-								var response = {
-									message: 'Map successfully updated',
-									id: id,
-									// TODO: refactor path building
-									url: req.protocol + '://' + req.headers.host + '/api/v1/map/' + id
-								};
+								function () {
+									var response = {
+										message: 'Map successfully updated',
+										id: id,
+										// TODO: refactor path building
+										url: req.protocol + '://' + req.headers.host + '/api/v1/map/' + id
+									};
 
-								res.send(303, response);
-								res.end();
-							},
-							function (err) {
-								next(sqlErrorHandler(err, req));
-							}
+									res.send(303, response);
+									res.end();
+								},
+								function (err) {
+									next(sqlErrorHandler(err, req));
+								}
 						);
 					} else {
 						next({
