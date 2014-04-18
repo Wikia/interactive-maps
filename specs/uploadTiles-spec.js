@@ -3,7 +3,7 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs');
 
-describe('Upload Tiles', function () {
+xdescribe('Upload Tiles', function () {
 
 	it('Calls dfs sendFiles', function () {
 		var qStub = stubs.newQStub(),

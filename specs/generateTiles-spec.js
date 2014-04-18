@@ -3,7 +3,7 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs');
 
-describe('Generate tiles', function () {
+xdescribe('Generate tiles', function () {
 
 	it('throws an error on incorrect data', function () {
 		var generateTiles = proxyquire('../lib/generateTiles', {});

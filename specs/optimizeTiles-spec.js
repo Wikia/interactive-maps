@@ -3,10 +3,12 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs');
 
-describe('Optimize tiles', function () {
+xdescribe('Optimize tiles', function () {
 
 	it('throws an error on incorrect data', function () {
-		var optimizeTiles = proxyquire('../lib/optimizeTiles', {});
+		var optimizeTiles = proxyquire('../lib/optimizeTiles', {
+
+        });
 		expect(optimizeTiles()).toThrow(new Error('Required data not set'));
 	});
 

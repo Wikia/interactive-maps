@@ -2,7 +2,7 @@
 
 var proxyquire = require('proxyquire').noCallThru();
 
-describe('DFS', function () {
+xdescribe('DFS', function () {
 
 	it('Throws error on wrong params', function () {
 		var dfs = proxyquire('../lib/dfs', {});

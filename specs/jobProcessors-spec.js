@@ -3,7 +3,7 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs');
 
-describe('jobProcessors', function () {
+xdescribe('jobProcessors', function () {
 	it('should process jobs', function () {
 		proxyquire('../lib/jobProcessors', {
 			'./config': {
