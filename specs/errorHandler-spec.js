@@ -86,8 +86,6 @@ describe('errorHandler module', function () {
 			stubRes(418, 'I\'m a teapot')
 		);
 
-        console.log(error);
-
 		expect(error).toHaveBeenCalled();
 		expect(error.callCount).toEqual(1);
 		expect(error).toHaveBeenCalledWith('I\'m a teapot', {
