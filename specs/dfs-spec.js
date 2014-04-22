@@ -1,26 +1,50 @@
 'use strict';
 
-var proxyquire = require('proxyquire').noCallThru();
+describe('DFS', function () {
+	var proxyquire = require('proxyquire').noCallThru(),
+		dfs = proxyquire('../lib/dfs', {
+			'./config': {
+				swift: {
+					swiftHost: '',
+					swiftAuthUrl: '',
+					swiftUser: '',
+					swiftKey: ''
+				}
+			},
+			'./logger': {
+				error: function(){},
+				debug: function(){}
+			},
+			http: {
+				get: function(data, callback){
 
-xdescribe('DFS', function () {
+					callback({
+						res: {
+							headers: {
+								'x-storage-url': 'test url',
+								'x-auth-token': 'test auth'
+							}
+						}
+					});
 
-	it('Throws error on wrong params', function () {
-		var dfs = proxyquire('../lib/dfs', {});
-		expect(dfs.sendFiles()).toThrow(new Error('Required data not set'));
+					return {
+						on: function(){
+
+						}
+					};
+				}
+			}
+		});
+
+	it('rejects promise on wrong params', function (done) {
+		dfs.sendFiles().catch(function(err){
+			expect(err).toEqual({ message : 'Most probably wrong key' });
+			done();
+		});
 	});
 
 	it('Uploads files', function () {
-		var dfs = proxyquire('../lib/dfs', {
-			'./config': {
-				swift: {
-					host: '',
-					authPath: '',
-					user: '',
-					key: ''
-				}
-			}
-		}),
-			data = {
+		var data = {
 				bucket: '',
 				dir: '',
 				filePaths: ''
@@ -28,5 +52,4 @@ xdescribe('DFS', function () {
 
 		dfs.sendFiles(data.bucket, data.dir, data.filePaths);
 	});
-
 });
