@@ -103,6 +103,30 @@ var dbCon = require('./../../lib/db_connector'),
 	};
 
 /**
+ * @desc Convenience function to update map's updated_on field
+ *
+ * @param mapId {number}
+ * @returns {object}
+ */
+function changeMapUpdatedOn(mapId) {
+	return dbCon.knex('map')
+		.where({
+			id: mapId
+		})
+		.update({
+			updated_on: dbCon.knex.raw('CURRENT_TIMESTAMP')
+		});
+}
+
+function getMapIdByPoiId(poiId) {
+	return dbCon.knex('poi')
+		.where({
+			id: poiId
+		})
+		.select(['map_id']);
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -132,21 +156,23 @@ module.exports = function createCRUD() {
 					dbCon
 						.insert(dbTable, reqBody)
 						.then(
-						function (data) {
-							var id = data[0],
-								response = {
-									message: 'POI successfully created',
-									id: id,
-									url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
-								};
-
-							res.send(201, response);
-							res.end();
-						},
-						function (err) {
-							next(sqlErrorHandler(err, req));
-						}
-					);
+							function (data) {
+								var id = data[0],
+									response = {
+										message: 'POI successfully created',
+										id: id,
+										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
+									};
+								// MOB-1456 set updated_on to current timestamp;
+								changeMapUpdatedOn(reqBody.map_id ).then(function(){
+									res.send(201, response);
+									res.end();
+								});
+							},
+							function (err) {
+								next(sqlErrorHandler(err, req));
+							}
+						);
 				} else {
 					next({
 						status: 400,
@@ -165,15 +191,23 @@ module.exports = function createCRUD() {
 						id: id
 					};
 				if (isFinite(id)) {
-					dbCon
-						.destroy(dbTable, filter)
-						.then(
-						function () {
-							res.send(204, {});
-							res.end();
-						},
-						function (err) {
-							next(sqlErrorHandler(err, req));
+					getMapIdByPoiId(id).then(
+						function( rows ) {
+							if ( rows.length > 0 ) {
+								dbCon
+									.destroy(dbTable, filter)
+									.then(
+									function () {
+										changeMapUpdatedOn(rows[0].map_id ).then(function(){
+											res.send(204, {});
+											res.end();
+										})
+									},
+									function (err) {
+										next(sqlErrorHandler(err, req));
+									}
+								);
+							}
 						}
 					);
 				} else {
@@ -237,22 +271,30 @@ module.exports = function createCRUD() {
 						};
 
 					if (isFinite(id)) {
-						dbCon
-							.update(dbTable, reqBody, filter)
-							.then(
-							function () {
-								var response = {
-									message: 'POI successfully updated',
-									id: id,
-									// TODO: refactor path building
-									url: req.protocol + '://' + req.headers.host + '/api/v1/poi' + '/' + id
-								};
-
-								res.send(303, response);
-								res.end();
-							},
-							function (err) {
-								next(sqlErrorHandler(err, req));
+						getMapIdByPoiId(id).then(
+							function( rows ) {
+								if ( rows.length > 0 ) {
+									dbCon
+										.update(dbTable, reqBody, filter)
+										.then(
+										function () {
+											var response = {
+												message: 'POI successfully updated',
+												id: id,
+												// TODO: refactor path building
+												url: req.protocol + '://' + req.headers.host + '/api/v1/poi' + '/' + id
+											};
+											// MOB-1456 set updated_on to current timestamp;
+											changeMapUpdatedOn(rows[0].map_id ).then(function(){
+												res.send(303, response);
+												res.end();
+											});
+										},
+										function (err) {
+											next(sqlErrorHandler(err, req));
+										}
+									);
+								}
 							}
 						);
 					} else {
