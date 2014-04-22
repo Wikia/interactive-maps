@@ -86,8 +86,10 @@ describe('errorHandler module', function () {
 			stubRes(418, 'I\'m a teapot')
 		);
 
+        console.log(error);
+
 		expect(error).toHaveBeenCalled();
-		expect(error.calls.count()).toEqual(1);
+		expect(error.callCount).toEqual(1);
 		expect(error).toHaveBeenCalledWith('I\'m a teapot', {
 			response: 418,
 			req: {}
@@ -99,7 +101,7 @@ describe('errorHandler module', function () {
 			stubRes(404, 'Not found')
 		);
 
-		expect(error.calls.count()).toEqual(2);
+		expect(error.callCount).toEqual(2);
 		expect(error).toHaveBeenCalledWith('Not found', {
 			response: 404,
 			req: {}
