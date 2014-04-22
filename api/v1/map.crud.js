@@ -97,7 +97,6 @@ module.exports = function createCRUD() {
 					errors = jsonValidator(reqBody, createSchema);
 
 				if (errors.length === 0) {
-					// MOB-1456 set updated_on to current timestamp;
 					reqBody.updated_on = dbCon.knex.raw('CURRENT_TIMESTAMP');
 					dbCon
 						.insert(dbTable, reqBody)
@@ -210,7 +209,6 @@ module.exports = function createCRUD() {
 						};
 
 					if (isFinite(id)) {
-						// MOB-1456 set updated_on to current timestamp;
 						reqBody.updated_on = 'CURRENT_TIMESTAMP';
 						dbCon
 							.update(dbTable, reqBody, filter)

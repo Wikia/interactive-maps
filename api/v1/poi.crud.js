@@ -103,7 +103,7 @@ var dbCon = require('./../../lib/db_connector'),
 	};
 
 /**
- * @desc Convenience function to update map's updated_on field
+ * @desc Helper function to update map's updated_on field
  *
  * @param mapId {number}
  * @returns {object}
@@ -118,6 +118,13 @@ function changeMapUpdatedOn(mapId) {
 		});
 }
 
+
+/**
+ * Helper function to get map_id from poi_id
+ *
+ * @param poiId {number}
+ * @returns {object}
+ */
 function getMapIdByPoiId(poiId) {
 	return dbCon.knex('poi')
 		.where({
@@ -201,7 +208,7 @@ module.exports = function createCRUD() {
 											changeMapUpdatedOn(rows[0].map_id).then(function () {
 												res.send(204, {});
 												res.end();
-											})
+											});
 										},
 										function (err) {
 											next(sqlErrorHandler(err, req));
