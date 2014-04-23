@@ -9,7 +9,7 @@ var express = require('express'),
 	logger = require('./lib/logger'),
 	rawBody = require('./lib/rawBody'),
 	errorHandler = require('./lib/errorHandler'),
-	healthCheck = require('./lib/healthCheck'),
+	heartBeatHandler = require('./lib/healthCheck').handleHeartBeat,
 
 	// API entry points modules
 	getCRUDs = require('./lib/getCRUDs'),
@@ -43,7 +43,7 @@ app.use(logger.middleware);
 app.use(rawBody);
 app.use(router.middleware);
 renderMap(app, apiPath, apiAbsolutePath);
-app.use(healthCheck.heartBeatHandler);
+heartBeatHandler(app);
 app.use(errorHandler);
 
 

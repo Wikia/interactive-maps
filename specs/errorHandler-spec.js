@@ -105,4 +105,46 @@ describe('errorHandler module', function () {
 			req: {}
 		});
 	});
+
+	it('should handle foreign key errors in sql', function () {
+		errorHandler(
+			{
+				clientError: {
+					name: 'RejectionError',
+					cause: {
+						code: ''
+					}
+				}
+			},
+			stubReq(),
+			stubRes(500, 'Cannot make reference to non-existing value')
+		);
+	});
+
+	it('should handle duplicate unique key error in database', function () {
+		errorHandler(
+			{
+				clientError: {
+					name: 'RejectionError',
+					cause: {
+						code: 'ER_DUP_ENTRY'
+					}
+				}
+			},
+			stubReq(),
+			stubRes(500, 'Name needs to be unique')
+		);
+	});
+
+	it('should handle general sql errors', function () {
+		errorHandler(
+			{
+				clientError: {
+					name: 'SQL Error'
+				}
+			},
+			stubReq(),
+			stubRes(500, 'General database error')
+		);
+	});
 });

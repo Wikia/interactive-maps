@@ -3,7 +3,6 @@
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	jsonValidator = require('./../../lib/jsonValidator'),
-	sqlErrorHandler = require('./../../lib/sqlErrorHandler'),
 
 	dbTable = 'poi_category',
 	createSchema = {
@@ -71,9 +70,7 @@ module.exports = function createCRUD() {
 						res.send(200, collection);
 						res.end();
 					},
-					function (err) {
-						next(sqlErrorHandler(err, req));
-					}
+					next
 				);
 			},
 			POST: function (req, res, next) {
@@ -95,9 +92,7 @@ module.exports = function createCRUD() {
 							res.send(201, response);
 							res.end();
 						},
-						function (err) {
-							next(sqlErrorHandler(err, req));
-						}
+						next
 					);
 				} else {
 					next({
@@ -124,9 +119,7 @@ module.exports = function createCRUD() {
 							res.send(204, {});
 							res.end();
 						},
-						function (err) {
-							next(sqlErrorHandler(err, req));
-						}
+						next
 					);
 				} else {
 					next({
@@ -163,9 +156,7 @@ module.exports = function createCRUD() {
 								});
 							}
 						},
-						function (err) {
-							next(sqlErrorHandler(err, req));
-						}
+						next
 					);
 				} else {
 					next({
@@ -202,9 +193,7 @@ module.exports = function createCRUD() {
 								res.send(303, response);
 								res.end();
 							},
-							function (err) {
-								next(sqlErrorHandler(err, req));
-							}
+							next
 						);
 					} else {
 						next({
