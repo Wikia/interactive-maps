@@ -102,6 +102,37 @@ var dbCon = require('./../../lib/db_connector'),
 	};
 
 /**
+ * @desc Helper function to update map's updated_on field
+ *
+ * @param mapId {number}
+ * @returns {object}
+ */
+function changeMapUpdatedOn(mapId) {
+	return dbCon.update(
+		'map', {
+			updated_on: dbCon.raw('CURRENT_TIMESTAMP')
+		}, {
+			id: mapId
+		}
+	);
+}
+
+
+/**
+ * Helper function to get map_id from poi_id
+ *
+ * @param poiId {number}
+ * @returns {object}
+ */
+function getMapIdByPoiId(poiId) {
+	return dbCon.select(
+		'poi', ['map_id'], {
+			id: poiId
+		}
+	);
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -129,18 +160,22 @@ module.exports = function createCRUD() {
 					dbCon
 						.insert(dbTable, reqBody)
 						.then(
-						function (data) {
-							var id = data[0],
-								response = {
-									message: 'POI successfully created',
-									id: id,
-									url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
-								};
-
-							res.send(201, response);
-							res.end();
-						},
-						next
+							function (data) {
+								var id = data[0],
+									response = {
+										message: 'POI successfully created',
+										id: id,
+										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
+									};
+								changeMapUpdatedOn(reqBody.map_id).then(
+									function () {
+										res.send(201, response);
+										res.end();
+									},
+									next
+								);
+							},
+							next
 					);
 				} else {
 					next({
@@ -155,17 +190,29 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id ),
+				var id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
 					};
 				if (isFinite(id)) {
-					dbCon
-						.destroy(dbTable, filter)
-						.then(
-						function () {
-							res.send(204, {});
-							res.end();
+					getMapIdByPoiId(id).then(
+						function (rows) {
+							if (rows.length > 0) {
+								dbCon
+									.destroy(dbTable, filter)
+									.then(
+										function () {
+											changeMapUpdatedOn(rows[0].map_id).then(
+												function () {
+													res.send(204, {});
+													res.end();
+												},
+												next
+											);
+										},
+										next
+								);
+							}
 						},
 						next
 					);
@@ -181,7 +228,8 @@ module.exports = function createCRUD() {
 			},
 			GET: function (req, res, next) {
 				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'photo', 'lat', 'lon',
-						'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'],
+					'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
+				],
 					id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
@@ -191,21 +239,21 @@ module.exports = function createCRUD() {
 					dbCon
 						.select(dbTable, dbColumns, filter)
 						.then(
-						function (collection) {
-							if (collection[0]) {
-								res.send(200, collection[0]);
-								res.end();
-							} else {
-								next({
-									status: 404,
-									message: {
-										message: 'POI not found',
-										id: id
-									}
-								});
-							}
-						},
-						next
+							function (collection) {
+								if (collection[0]) {
+									res.send(200, collection[0]);
+									res.end();
+								} else {
+									next({
+										status: 404,
+										message: {
+											message: 'POI not found',
+											id: id
+										}
+									});
+								}
+							},
+							next
 					);
 				} else {
 					next({
@@ -228,19 +276,30 @@ module.exports = function createCRUD() {
 						};
 
 					if (isFinite(id)) {
-						dbCon
-							.update(dbTable, reqBody, filter)
-							.then(
-							function () {
-								var response = {
-									message: 'POI successfully updated',
-									id: id,
-									// TODO: refactor path building
-									url: req.protocol + '://' + req.headers.host + '/api/v1/poi' + '/' + id
-								};
-
-								res.send(303, response);
-								res.end();
+						getMapIdByPoiId(id).then(
+							function (rows) {
+								if (rows.length > 0) {
+									dbCon
+										.update(dbTable, reqBody, filter)
+										.then(
+											function () {
+												var response = {
+													message: 'POI successfully updated',
+													id: id,
+													// TODO: refactor path building
+													url: req.protocol + '://' + req.headers.host + '/api/v1/poi' + '/' + id
+												};
+												changeMapUpdatedOn(rows[0].map_id).then(
+													function () {
+														res.send(303, response);
+														res.end();
+													},
+													next
+												);
+											},
+											next
+									);
+								}
 							},
 							next
 						);

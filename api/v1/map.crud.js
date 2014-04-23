@@ -68,7 +68,8 @@ module.exports = function createCRUD() {
 						'map.id',
 						'map.title',
 						'tile_set.name',
-						'tile_set.image'
+						'tile_set.image',
+						'map.updated_on'
 					])
 					.where(filter)
 					.select()
@@ -93,6 +94,7 @@ module.exports = function createCRUD() {
 					errors = jsonValidator(reqBody, createSchema);
 
 				if (errors.length === 0) {
+					reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
 					dbCon
 						.insert(dbTable, reqBody)
 						.then(
@@ -188,8 +190,6 @@ module.exports = function createCRUD() {
 				}
 			},
 			PUT: function (req, res, next) {
-
-				console.log(req);
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator(reqBody, updateSchema);
 
@@ -200,6 +200,7 @@ module.exports = function createCRUD() {
 						};
 
 					if (isFinite(id)) {
+						reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
 						dbCon
 							.update(dbTable, reqBody, filter)
 							.then(
