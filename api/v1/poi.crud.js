@@ -3,7 +3,6 @@
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	jsonValidator = require('./../../lib/jsonValidator'),
-	sqlErrorHandler = require('./../../lib/sqlErrorHandler'),
 
 	dbTable = 'poi',
 	createSchema = {
@@ -110,11 +109,9 @@ var dbCon = require('./../../lib/db_connector'),
  */
 function changeMapUpdatedOn(mapId) {
 	return dbCon.update(
-		'map',
-		{
+		'map', {
 			updated_on: dbCon.raw('CURRENT_TIMESTAMP')
-		},
-		{
+		}, {
 			id: mapId
 		}
 	);
@@ -129,9 +126,7 @@ function changeMapUpdatedOn(mapId) {
  */
 function getMapIdByPoiId(poiId) {
 	return dbCon.select(
-		'poi',
-		['map_id'],
-		{
+		'poi', ['map_id'], {
 			id: poiId
 		}
 	);
@@ -154,9 +149,7 @@ module.exports = function createCRUD() {
 							res.send(200, collection);
 							res.end();
 						},
-						function (err) {
-							next(sqlErrorHandler(err, req));
-						}
+						next
 				);
 			},
 			POST: function (req, res, next) {
@@ -182,9 +175,7 @@ module.exports = function createCRUD() {
 									next
 								);
 							},
-							function (err) {
-								next(sqlErrorHandler(err, req));
-							}
+							next
 					);
 				} else {
 					next({
@@ -219,10 +210,8 @@ module.exports = function createCRUD() {
 												next
 											);
 										},
-										function (err) {
-											next(sqlErrorHandler(err, req));
-										}
-									);
+										next
+								);
 							}
 						},
 						next
@@ -264,9 +253,7 @@ module.exports = function createCRUD() {
 									});
 								}
 							},
-							function (err) {
-								next(sqlErrorHandler(err, req));
-							}
+							next
 					);
 				} else {
 					next({
@@ -310,9 +297,7 @@ module.exports = function createCRUD() {
 													next
 												);
 											},
-											function (err) {
-												next(sqlErrorHandler(err, req));
-											}
+											next
 									);
 								}
 							},

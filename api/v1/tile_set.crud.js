@@ -4,7 +4,6 @@ var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	utils = require('./../../lib/utils'),
 	jsonValidator = require('./../../lib/jsonValidator'),
-	sqlErrorHandler = require('./../../lib/sqlErrorHandler'),
 
 	// custom action for POST method
 	addTileSet = require('./../../lib/addTileSet'),
@@ -56,9 +55,7 @@ module.exports = function createCRUD() {
 						res.send(200, collection);
 						res.end();
 					},
-					function (err) {
-						next(sqlErrorHandler(err, req));
-					}
+					next
 				);
 			},
 			POST: function (req, res, next) {
@@ -79,9 +76,7 @@ module.exports = function createCRUD() {
 								res.send(201, response);
 								res.end();
 							},
-							function (err) {
-								next(sqlErrorHandler(err, req));
-							}
+							next
 						);
 				} else {
 					next({
@@ -124,9 +119,7 @@ module.exports = function createCRUD() {
 								});
 							}
 						},
-						function (err) {
-							next(sqlErrorHandler(err, req));
-						}
+						next
 					);
 				} else {
 					next({
