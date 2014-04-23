@@ -87,7 +87,7 @@ describe('errorHandler module', function () {
 		);
 
 		expect(error).toHaveBeenCalled();
-		expect(error.calls.length).toEqual(1);
+		expect(error.callCount).toEqual(1);
 		expect(error).toHaveBeenCalledWith('I\'m a teapot', {
 			response: 418,
 			req: {}
@@ -99,14 +99,14 @@ describe('errorHandler module', function () {
 			stubRes(404, 'Not found')
 		);
 
-		expect(error.calls.length).toEqual(2);
+		expect(error.callCount).toEqual(2);
 		expect(error).toHaveBeenCalledWith('Not found', {
 			response: 404,
 			req: {}
 		});
 	});
 
-	it('should handle RejectionError sql error', function () {
+	it('should handle foreign key errors in sql', function () {
 		errorHandler(
 			{
 				clientError: {
@@ -121,7 +121,7 @@ describe('errorHandler module', function () {
 		);
 	});
 
-	it('should handle RejectionError sql error', function () {
+	it('should handle duplicate unique key error in database', function () {
 		errorHandler(
 			{
 				clientError: {
@@ -133,6 +133,18 @@ describe('errorHandler module', function () {
 			},
 			stubReq(),
 			stubRes(500, 'Name needs to be unique')
+		);
+	});
+
+	it('should handle general sql errors', function () {
+		errorHandler(
+			{
+				clientError: {
+					name: 'SQL Error'
+				}
+			},
+			stubReq(),
+			stubRes(500, 'General database error')
 		);
 	});
 });
