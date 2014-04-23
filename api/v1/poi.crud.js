@@ -212,10 +212,13 @@ module.exports = function createCRUD() {
 									.destroy(dbTable, filter)
 									.then(
 										function () {
-											changeMapUpdatedOn(rows[0].map_id).then(function () {
-												res.send(204, {});
-												res.end();
-											});
+											changeMapUpdatedOn(rows[0].map_id).then(
+												function () {
+													res.send(204, {});
+													res.end();
+												},
+												next
+											);
 										},
 										function (err) {
 											next(sqlErrorHandler(err, req));
