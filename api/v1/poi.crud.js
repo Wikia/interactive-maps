@@ -174,7 +174,6 @@ module.exports = function createCRUD() {
 										id: id,
 										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
 									};
-								// MOB-1456 set updated_on to current timestamp;
 								changeMapUpdatedOn(reqBody.map_id).then(
 									function () {
 										res.send(201, response);
@@ -223,9 +222,10 @@ module.exports = function createCRUD() {
 										function (err) {
 											next(sqlErrorHandler(err, req));
 										}
-								);
+									);
 							}
-						}
+						},
+						next
 					);
 				} else {
 					next({
@@ -302,7 +302,6 @@ module.exports = function createCRUD() {
 													// TODO: refactor path building
 													url: req.protocol + '://' + req.headers.host + '/api/v1/poi' + '/' + id
 												};
-												// MOB-1456 set updated_on to current timestamp;
 												changeMapUpdatedOn(rows[0].map_id).then(
 													function () {
 														res.send(303, response);
@@ -316,7 +315,8 @@ module.exports = function createCRUD() {
 											}
 									);
 								}
-							}
+							},
+							next
 						);
 					} else {
 						next({
