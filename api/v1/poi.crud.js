@@ -109,13 +109,15 @@ var dbCon = require('./../../lib/db_connector'),
  * @returns {object}
  */
 function changeMapUpdatedOn(mapId) {
-	return dbCon.knex('map')
-		.where({
+	return dbCon.update(
+		'map',
+		{
+			updated_on: dbCon.raw('CURRENT_TIMESTAMP')
+		},
+		{
 			id: mapId
-		})
-		.update({
-			updated_on: dbCon.knex.raw('CURRENT_TIMESTAMP')
-		});
+		}
+	);
 }
 
 
@@ -126,11 +128,13 @@ function changeMapUpdatedOn(mapId) {
  * @returns {object}
  */
 function getMapIdByPoiId(poiId) {
-	return dbCon.knex('poi')
-		.where({
+	return dbCon.select(
+		'poi',
+		['map_id'],
+		{
 			id: poiId
-		})
-		.select(['map_id']);
+		}
+	);
 }
 
 /**
@@ -171,10 +175,13 @@ module.exports = function createCRUD() {
 										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
 									};
 								// MOB-1456 set updated_on to current timestamp;
-								changeMapUpdatedOn(reqBody.map_id).then(function () {
-									res.send(201, response);
-									res.end();
-								});
+								changeMapUpdatedOn(reqBody.map_id).then(
+									function () {
+										res.send(201, response);
+										res.end();
+									},
+									next
+								);
 							},
 							function (err) {
 								next(sqlErrorHandler(err, req));
@@ -293,10 +300,13 @@ module.exports = function createCRUD() {
 													url: req.protocol + '://' + req.headers.host + '/api/v1/poi' + '/' + id
 												};
 												// MOB-1456 set updated_on to current timestamp;
-												changeMapUpdatedOn(rows[0].map_id).then(function () {
-													res.send(303, response);
-													res.end();
-												});
+												changeMapUpdatedOn(rows[0].map_id).then(
+													function () {
+														res.send(303, response);
+														res.end();
+													},
+													next
+												);
 											},
 											function (err) {
 												next(sqlErrorHandler(err, req));
