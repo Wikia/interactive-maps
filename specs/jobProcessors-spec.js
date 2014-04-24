@@ -3,7 +3,7 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs');
 
-xdescribe('jobProcessors', function () {
+describe('jobProcessors', function () {
 	it('should process jobs', function () {
 		proxyquire('../lib/jobProcessors', {
 			'./config': {
@@ -23,7 +23,15 @@ xdescribe('jobProcessors', function () {
 					};
 				}
 			},
-			'./db_connector': {}
+			'./db_connector': {},
+            './utils': {},
+            'image-size': {},
+            './fetchImage': {},
+            './generateTiles': {},
+            './logger': {},
+            './cleanupTiles': {},
+            './uploadTiles': {},
+            './optimizeTiles': {}
 		});
 	});
 });
