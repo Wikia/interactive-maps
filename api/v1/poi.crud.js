@@ -212,6 +212,14 @@ module.exports = function createCRUD() {
 										},
 										next
 								);
+							} else {
+								next({
+									status: 404,
+									message: {
+										message: 'POI not found',
+										details: 'id: ' + req.pathVar.id + ' not found'
+									}
+								});
 							}
 						},
 						next
@@ -299,6 +307,14 @@ module.exports = function createCRUD() {
 											},
 											next
 									);
+								} else {
+									next({
+										status: 404,
+										message: {
+											message: 'POI not found',
+											details: 'id: ' + req.pathVar.id + ' not found'
+										}
+									});
 								}
 							},
 							next
