@@ -119,7 +119,7 @@ function changeMapUpdatedOn(mapId) {
 
 
 /**
- * Helper function to get map_id from poi_id
+ * @desc Helper function to get map_id from poi_id
  *
  * @param poiId {number}
  * @returns {object}
@@ -130,6 +130,22 @@ function getMapIdByPoiId(poiId) {
 			id: poiId
 		}
 	);
+}
+
+/**
+ * @desc Returns Poi not found error
+ *
+ * @param poiId {number} - point id
+ * @returns {object}
+ */
+function poiNotFoundError(poiId) {
+	return {
+		status: 404,
+		message: {
+			message: 'POI not found',
+			details: 'id: ' + poiId + ' not found'
+		}
+	}
 }
 
 /**
@@ -213,13 +229,7 @@ module.exports = function createCRUD() {
 										next
 								);
 							} else {
-								next({
-									status: 404,
-									message: {
-										message: 'POI not found',
-										details: 'id: ' + req.pathVar.id + ' not found'
-									}
-								});
+								next(poiNotFoundError(req.pathVar.id));
 							}
 						},
 						next
@@ -308,13 +318,7 @@ module.exports = function createCRUD() {
 											next
 									);
 								} else {
-									next({
-										status: 404,
-										message: {
-											message: 'POI not found',
-											details: 'id: ' + req.pathVar.id + ' not found'
-										}
-									});
+									next(poiNotFoundError(req.pathVar.id));
 								}
 							},
 							next
