@@ -2,8 +2,8 @@
 
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
-	utils = require('./../../lib/utils'),
 	jsonValidator = require('./../../lib/jsonValidator'),
+	utils = require('./../../lib/utils'),
 
 	// custom action for POST method
 	addTileSet = require('./../../lib/addTileSet'),
@@ -79,13 +79,7 @@ module.exports = function createCRUD() {
 							next
 						);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: errors
-						}
-					});
+					next(utils.badRequestError(errors));
 				}
 			}
 		},
@@ -110,25 +104,13 @@ module.exports = function createCRUD() {
 								res.send(200, obj);
 								res.end();
 							} else {
-								next({
-									status: 404,
-									message: {
-										message: 'Map not found',
-										id: id
-									}
-								});
+								next(utils.elementNotFoundError(dbTable, id));
 							}
 						},
 						next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: 'id: ' + req.pathVar.id + ' should be a number'
-						}
-					});
+					next(utils.badNumberError(req.pathVar.id));
 				}
 			}
 		}
