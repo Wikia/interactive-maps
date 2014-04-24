@@ -107,8 +107,7 @@ describe('errorHandler module', function () {
 	});
 
 	it('should handle foreign key errors in sql', function () {
-		errorHandler(
-			{
+		errorHandler({
 				clientError: {
 					name: 'RejectionError',
 					cause: {
@@ -117,13 +116,14 @@ describe('errorHandler module', function () {
 				}
 			},
 			stubReq(),
-			stubRes(500, 'Cannot make reference to non-existing value')
+			stubRes(500, {
+				message: 'Cannot create reference to non-existing value'
+			})
 		);
 	});
 
 	it('should handle duplicate unique key error in database', function () {
-		errorHandler(
-			{
+		errorHandler({
 				clientError: {
 					name: 'RejectionError',
 					cause: {
@@ -132,19 +132,38 @@ describe('errorHandler module', function () {
 				}
 			},
 			stubReq(),
-			stubRes(500, 'Name needs to be unique')
+			stubRes(500, {
+				message: 'Name needs to be unique'
+			})
+		);
+	});
+
+	it('should handle delete referred', function () {
+		errorHandler({
+				clientError: {
+					name: 'RejectionError',
+					cause: {
+						code: 'ER_ROW_IS_REFERENCED_'
+					}
+				}
+			},
+			stubReq(),
+			stubRes(500, {
+				message: 'Trying to delete row which is referenced'
+			})
 		);
 	});
 
 	it('should handle general sql errors', function () {
-		errorHandler(
-			{
+		errorHandler({
 				clientError: {
 					name: 'SQL Error'
 				}
 			},
 			stubReq(),
-			stubRes(500, 'General database error')
+			stubRes(500, {
+				message: 'General database error'
+			})
 		);
 	});
 });
