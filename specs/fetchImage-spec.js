@@ -5,79 +5,79 @@ var proxyquire = require('proxyquire').noCallThru(),
 
 describe('Fetch image', function () {
 
-    var res = {
-            statusCode: 200,
-            on: function() {
-                return this;
-            }
-        },
-        http = {
-            get: function (x, cb) {
-                cb(res);
-                return this;
-            },
-            on: function() {}
-        },
-        qStub = stubs.newQStub(),
-        fsStub = createSpyObj('fs', ['createWriteStream']),
-        data = {
-            fileUrl: 'http:/example.com/image.jpg',
-            name: 'Lorem ipsum',
-            dir: 'test'
-        },
-        sendToDFS = jasmine.createSpy('sendToDFS'),
-        fetchImage = proxyquire('../lib/fetchImage', {
-            http: http,
-            url: require('url'),
-            fs: fsStub,
-            q: qStub.q,
-            './config': {
-                bucketPrefix: 'test'
-            },
-            './dfs': {
-                sendFiles: sendToDFS
-            },
-            './logger': {
-                debug: function() {},
-                info: function() {},
-                error: function() {}
-        }
-    });
+	var res = {
+		statusCode: 200,
+		on: function () {
+			return this;
+		}
+	},
+		http = {
+			get: function (x, cb) {
+				cb(res);
+				return this;
+			},
+			on: function () {}
+		},
+		qStub = stubs.newQStub(),
+		fsStub = createSpyObj('fs', ['createWriteStream']),
+		data = {
+			fileUrl: 'http:/example.com/image.jpg',
+			name: 'Lorem ipsum',
+			dir: 'test'
+		},
+		sendToDFS = jasmine.createSpy('sendToDFS'),
+		fetchImage = proxyquire('../lib/fetchImage', {
+			http: http,
+			url: require('url'),
+			fs: fsStub,
+			q: qStub.q,
+			'./config': {
+				bucketPrefix: 'test'
+			},
+			'./dfs': {
+				sendFiles: sendToDFS
+			},
+			'./logger': {
+				debug: function () {},
+				info: function () {},
+				error: function () {}
+			}
+		});
 
 
-    it('creates creates write stream to save image in fs', function() {
-        fetchImage(data);
+	it('creates creates write stream to save image in fs', function () {
+		fetchImage(data);
 
-        expect(fsStub.createWriteStream).toHaveBeenCalled();
-    });
+		expect(fsStub.createWriteStream).toHaveBeenCalled();
+	});
 
-    it('creates proper file name from image url', function() {
-        var fileName = 'image.jpg';
+	it('creates proper file name from image url', function () {
+		var fileName = 'image.jpg';
 
-        fetchImage(data);
+		fetchImage(data);
 
-        expect(fsStub.createWriteStream).toHaveBeenCalledWith(data.dir + fileName);
-    });
+		expect(fsStub.createWriteStream).toHaveBeenCalledWith(data.dir + fileName);
+	});
 
-    it('calls calls http.get to fetch image', function() {
-        spyOn(http, 'get').andCallThrough();
+	it('calls calls http.get to fetch image', function () {
+		spyOn(http, 'get').andCallThrough();
 
-        fetchImage(data);
+		fetchImage(data);
 
-        expect(http.get).toHaveBeenCalled();
-    });
+		expect(http.get).toHaveBeenCalled();
+	});
 
-    it('returns correct message if failed to fetch file', function() {
-        var response = {
-            message: 'Could not fetch file'
-        };
+	it('returns correct message if failed to fetch file', function () {
+		var response = {
+			message: 'Could not fetch file'
+		};
 
-        res.statusCode = 0;
-        fetchImage(data);
+		res.statusCode = 0;
+		fetchImage(data);
 
-        expect(qStub.defer.reject).toHaveBeenCalled();
-        expect(qStub.defer.reject).toHaveBeenCalledWith(response);
+		expect(qStub.defer.reject).toHaveBeenCalled();
+		expect(qStub.defer.reject).toHaveBeenCalledWith(response);
 
-        res.statusCode = 200;
-    });
+		res.statusCode = 200;
+	});
 });

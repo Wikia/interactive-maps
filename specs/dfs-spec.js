@@ -12,11 +12,11 @@ describe('DFS', function () {
 				}
 			},
 			'./logger': {
-				error: function(){},
-				debug: function(){}
+				error: function () {},
+				debug: function () {}
 			},
 			http: {
-				get: function(data, callback){
+				get: function (data, callback) {
 
 					callback({
 						res: {
@@ -28,7 +28,7 @@ describe('DFS', function () {
 					});
 
 					return {
-						on: function(){
+						on: function () {
 
 						}
 					};
@@ -37,18 +37,21 @@ describe('DFS', function () {
 		});
 
 	it('rejects promise on wrong params', function (done) {
-		dfs.sendFiles().catch(function(err){
-			expect(err).toEqual({ message : 'Most probably wrong key' });
+		dfs.sendFiles().
+		catch (function (err) {
+			expect(err).toEqual({
+				message: 'Most probably wrong key'
+			});
 			done();
 		});
 	});
 
 	it('Uploads files', function () {
 		var data = {
-				bucket: '',
-				dir: '',
-				filePaths: ''
-			};
+			bucket: '',
+			dir: '',
+			filePaths: ''
+		};
 
 		dfs.sendFiles(data.bucket, data.dir, data.filePaths);
 	});

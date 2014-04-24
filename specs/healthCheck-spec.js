@@ -21,15 +21,15 @@ describe('Health Check', function () {
 				}
 			},
 			http: {
-				get: function(url, ok, error) {
-					var timeout = function(ms, callback){
+				get: function (url, ok, error) {
+					var timeout = function (ms, callback) {
 						callback();
 					};
 					ok({
 						statusCode: 200
 					});
 					return {
-						on: function(){
+						on: function () {
 							return {
 								setTimeout: timeout
 							};
@@ -38,11 +38,11 @@ describe('Health Check', function () {
 					};
 				}
 			},
-            './utils': {
-                hrTimeToMilliseconds: function (hrTimeDiff) {
-                    return Math.ceil(hrTimeDiff[0] * 1000 + hrTimeDiff[1] * 1e-6);
-                }
-            }
+			'./utils': {
+				hrTimeToMilliseconds: function (hrTimeDiff) {
+					return Math.ceil(hrTimeDiff[0] * 1000 + hrTimeDiff[1] * 1e-6);
+				}
+			}
 		});
 
 	it('is module', function () {
@@ -96,21 +96,21 @@ describe('Health Check', function () {
 		);
 	});
 
-	it('it returns the correct heartbeat response', function() {
+	it('it returns the correct heartbeat response', function () {
 		var res = createSpyObj('res', ['send']);
 		healthCheck.heartBeatHandler({}, res);
 		expect(res.send).toHaveBeenCalledWith('OK');
 	});
 
-	it('returns normal heartbeat result', function() {
+	it('returns normal heartbeat result', function () {
 		var callback = createSpy('callback'),
 			thresholds = {
 				20: healthCheck.exitCodes.OK
 			};
 		healthCheck.getApiHeartbeat('localhost', thresholds, callback);
 		expect(callback).toHaveBeenCalledWith({
-			code : 0,
-			message : '1 ms response time'
+			code: 0,
+			message: '1 ms response time'
 		});
 		expect(callback.calls.length).toEqual(1);
 	});

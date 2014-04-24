@@ -13,9 +13,9 @@ describe('jobProcessors', function () {
 				}
 			},
 			'kue': {
-				createQueue: function(){
+				createQueue: function () {
 					return {
-						process: function(name, maxJobs, runner){
+						process: function (name, maxJobs, runner) {
 							expect(name).toMatch(/process|tiling/);
 							expect(maxJobs).toBe(99);
 							expect(typeof runner).toBe('function');
@@ -24,14 +24,14 @@ describe('jobProcessors', function () {
 				}
 			},
 			'./db_connector': {},
-            './utils': {},
-            'image-size': {},
-            './fetchImage': {},
-            './generateTiles': {},
-            './logger': {},
-            './cleanupTiles': {},
-            './uploadTiles': {},
-            './optimizeTiles': {}
+			'./utils': {},
+			'image-size': {},
+			'./fetchImage': {},
+			'./generateTiles': {},
+			'./logger': {},
+			'./cleanupTiles': {},
+			'./uploadTiles': {},
+			'./optimizeTiles': {}
 		});
 	});
 });

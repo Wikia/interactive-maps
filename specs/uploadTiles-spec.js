@@ -16,9 +16,9 @@ describe('Upload Tiles', function () {
 					return {
 						then: function (cb) {
 							cb();
-                            return this;
+							return this;
 						},
-                        catch: function() {}
+						catch: function () {}
 					};
 				}
 			},
@@ -35,7 +35,7 @@ describe('Upload Tiles', function () {
 				dir: 'dir',
 				minZoom: 0,
 				maxZoom: 3,
-				status:{
+				status: {
 					uploaded: false
 				}
 			},
@@ -46,11 +46,11 @@ describe('Upload Tiles', function () {
 			};
 
 		uploadTiles({
-			save: function(){},
+			save: function () {},
 			data: data
 		});
 
-		expect(qStub.defer.resolve.calls.length).toEqual(1);
+		expect(qStub.defer.resolve.callCount).toEqual(1);
 		expect(collector.bucketName).toHaveBeenCalledWith(expected.bucketName);
 		expect(collector.dir).toHaveBeenCalledWith(expected.dir);
 		expect(collector.filePaths).toHaveBeenCalledWith(expected.filePaths);
