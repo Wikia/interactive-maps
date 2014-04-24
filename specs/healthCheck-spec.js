@@ -1,6 +1,6 @@
 'use strict';
 
-xdescribe('Health Check', function () {
+describe('Health Check', function () {
 
 	var proxyquire = require('proxyquire').noCallThru(),
 		error = null,
@@ -37,7 +37,12 @@ xdescribe('Health Check', function () {
 						setTimeout: timeout
 					};
 				}
-			}
+			},
+            './utils': {
+                hrTimeToMilliseconds: function (hrTimeDiff) {
+                    return Math.ceil(hrTimeDiff[0] * 1000 + hrTimeDiff[1] * 1e-6);
+                }
+            }
 		});
 
 	it('is module', function () {
