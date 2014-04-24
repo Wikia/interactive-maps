@@ -96,12 +96,6 @@ describe('Health Check', function () {
 		);
 	});
 
-	it('it returns the correct heartbeat response', function () {
-		var res = createSpyObj('res', ['send']);
-		healthCheck.heartBeatHandler({}, res);
-		expect(res.send).toHaveBeenCalledWith('OK');
-	});
-
 	it('returns normal heartbeat result', function () {
 		var callback = createSpy('callback'),
 			thresholds = {
