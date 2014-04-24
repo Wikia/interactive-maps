@@ -67,11 +67,11 @@ module.exports = function createCRUD() {
 				dbCon
 					.select(dbTable, dbColumns)
 					.then(
-					function (collection) {
-						res.send(200, collection);
-						res.end();
-					},
-					next
+						function (collection) {
+							res.send(200, collection);
+							res.end();
+						},
+						next
 				);
 			},
 			POST: function (req, res, next) {
@@ -82,18 +82,18 @@ module.exports = function createCRUD() {
 					dbCon
 						.insert(dbTable, reqBody)
 						.then(
-						function (data) {
-							var id = data[0],
-								response = {
-									message: 'POI category successfully created',
-									id: id,
-									url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
-								};
+							function (data) {
+								var id = data[0],
+									response = {
+										message: 'POI category successfully created',
+										id: id,
+										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
+									};
 
-							res.send(201, response);
-							res.end();
-						},
-						next
+								res.send(201, response);
+								res.end();
+							},
+							next
 					);
 				} else {
 					next(utils.badRequestError(errors));
@@ -102,7 +102,7 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id ),
+				var id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
 					};
@@ -110,11 +110,11 @@ module.exports = function createCRUD() {
 					dbCon
 						.destroy(dbTable, filter)
 						.then(
-						function () {
-							res.send(204, {});
-							res.end();
-						},
-						next
+							function () {
+								res.send(204, {});
+								res.end();
+							},
+							next
 					);
 				} else {
 					next(utils.badNumberError(req.pathVar.id));
@@ -131,15 +131,15 @@ module.exports = function createCRUD() {
 					dbCon
 						.select(dbTable, dbColumns, filter)
 						.then(
-						function (collection) {
-							if (collection[0]) {
-								res.send(200, collection[0]);
-								res.end();
-							} else {
-								next(utils.elementNotFoundError(dbTable, id));
-							}
-						},
-						next
+							function (collection) {
+								if (collection[0]) {
+									res.send(200, collection[0]);
+									res.end();
+								} else {
+									next(utils.elementNotFoundError(dbTable, id));
+								}
+							},
+							next
 					);
 				} else {
 					next(utils.badNumberError(req.pathVar.id));
@@ -159,18 +159,18 @@ module.exports = function createCRUD() {
 						dbCon
 							.update(dbTable, reqBody, filter)
 							.then(
-							function () {
-								var response = {
-									message: 'POI category successfully updated',
-									id: id,
-									// TODO: refactor path building
-									url: req.protocol + '://' + req.headers.host + '/api/v1/poi_category/' + id
-								};
+								function () {
+									var response = {
+										message: 'POI category successfully updated',
+										id: id,
+										// TODO: refactor path building
+										url: req.protocol + '://' + req.headers.host + '/api/v1/poi_category/' + id
+									};
 
-								res.send(303, response);
-								res.end();
-							},
-							next
+									res.send(303, response);
+									res.end();
+								},
+								next
 						);
 					} else {
 						next(utils.badNumberError(req.pathVar.id));
