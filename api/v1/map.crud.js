@@ -126,9 +126,13 @@ module.exports = function createCRUD() {
 					dbCon
 						.destroy(dbTable, filter)
 						.then(
-							function () {
-								res.send(204, {});
-								res.end();
+							function (affectedRows) {
+								if (affectedRows > 0) {
+									res.send(204, {});
+									res.end();
+								} else {
+									next(utils.elementNotFoundError(dbTable, id));
+								}
 							},
 							next
 					);
@@ -180,16 +184,20 @@ module.exports = function createCRUD() {
 						dbCon
 							.update(dbTable, reqBody, filter)
 							.then(
-								function () {
-									var response = {
-										message: 'Map successfully updated',
-										id: id,
-										// TODO: refactor path building
-										url: req.protocol + '://' + req.headers.host + '/api/v1/map/' + id
-									};
+								function (affectedRows) {
+									if (affectedRows > 0) {
+										var response = {
+											message: 'Map successfully updated',
+											id: id,
+											// TODO: refactor path building
+											url: req.protocol + '://' + req.headers.host + '/api/v1/map/' + id
+										};
 
-									res.send(303, response);
-									res.end();
+										res.send(303, response);
+										res.end();
+									} else {
+										next(utils.elementNotFoundError(dbTable, id));
+									}
 								},
 								next
 						);
