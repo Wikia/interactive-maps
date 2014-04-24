@@ -1,12 +1,12 @@
 'use strict';
 
-describe('Get CRUDs', function() {
+describe('Get CRUDs', function () {
 
 	var proxyquire = require('proxyquire').noCallThru(),
 		crudModules,
 		getCRUDs = proxyquire('./../lib/getCRUDs', {
 			'fs': {
-				readdirSync: function() {
+				readdirSync: function () {
 					return crudModules;
 				}
 			}
@@ -21,7 +21,7 @@ describe('Get CRUDs', function() {
 		return Object.keys(getCRUDs.getCruds());
 	}
 
-	it('builds an array of API CRUD modules', function() {
+	it('builds an array of API CRUD modules', function () {
 		var crudNamesArray;
 
 		crudModules = [
@@ -37,7 +37,7 @@ describe('Get CRUDs', function() {
 		expect(crudNamesArray[2]).toBe('test3.blabla');
 	});
 
-	it('skips non config files', function() {
+	it('skips non config files', function () {
 		var crudNamesArray;
 
 		crudModules = [

@@ -125,12 +125,16 @@ describe('Logger module', function () {
 	});
 
 	it('getContext should return context', function () {
-		expect(logger.getContext({req: {
-			url: 'url',
-			method: 'GET',
-			ip: '127.0.0.1',
-			hostname: 'test.com'
-		}, response: 200, processTime: 4})).toEqual({
+		expect(logger.getContext({
+			req: {
+				url: 'url',
+				method: 'GET',
+				ip: '127.0.0.1',
+				hostname: 'test.com'
+			},
+			response: 200,
+			processTime: 4
+		})).toEqual({
 			clientip: '127.0.0.1',
 			hostname: 'test.com',
 			verb: 'GET',
@@ -139,12 +143,16 @@ describe('Logger module', function () {
 			processTime: 4
 		});
 
-		expect(logger.getContext({req: {
-			url: 'url',
-			method: 'POST',
-			ip: '127.0.0.1',
-			hostname: 'test.com'
-		}, response: 200, processTime: 4})).toEqual({
+		expect(logger.getContext({
+			req: {
+				url: 'url',
+				method: 'POST',
+				ip: '127.0.0.1',
+				hostname: 'test.com'
+			},
+			response: 200,
+			processTime: 4
+		})).toEqual({
 			clientip: '127.0.0.1',
 			hostname: 'test.com',
 			verb: 'POST',
@@ -153,12 +161,16 @@ describe('Logger module', function () {
 			processTime: 4
 		});
 
-		expect(logger.getContext({req: {
-			url: 'url2',
-			method: 'GET',
-			ip: '127.0.0.1',
-			hostname: 'test.com'
-		}, response: 200, processTime: 4})).toEqual({
+		expect(logger.getContext({
+			req: {
+				url: 'url2',
+				method: 'GET',
+				ip: '127.0.0.1',
+				hostname: 'test.com'
+			},
+			response: 200,
+			processTime: 4
+		})).toEqual({
 			clientip: '127.0.0.1',
 			hostname: 'test.com',
 			verb: 'GET',
@@ -167,12 +179,16 @@ describe('Logger module', function () {
 			processTime: 4
 		});
 
-		expect(logger.getContext({req: {
-			url: 'url3',
-			method: 'POST',
-			ip: '127.0.0.1',
-			hostname: 'test.com'
-		}, response: 400, processTime: 4})).toEqual({
+		expect(logger.getContext({
+			req: {
+				url: 'url3',
+				method: 'POST',
+				ip: '127.0.0.1',
+				hostname: 'test.com'
+			},
+			response: 400,
+			processTime: 4
+		})).toEqual({
 			clientip: '127.0.0.1',
 			hostname: 'test.com',
 			verb: 'POST',
@@ -181,12 +197,16 @@ describe('Logger module', function () {
 			processTime: 4
 		});
 
-		expect(logger.getContext({req: {
-			url: 'url4',
-			method: 'DELETE',
-			ip: '127.0.0.1',
-			hostname: 'test.com'
-		}, response: 600, processTime: 45})).toEqual({
+		expect(logger.getContext({
+			req: {
+				url: 'url4',
+				method: 'DELETE',
+				ip: '127.0.0.1',
+				hostname: 'test.com'
+			},
+			response: 600,
+			processTime: 45
+		})).toEqual({
 			clientip: '127.0.0.1',
 			hostname: 'test.com',
 			verb: 'DELETE',

@@ -3,16 +3,16 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs'),
 	kue = {
-		createQueue: function(){
+		createQueue: function () {
 			return {
-				create: function(name, data){
+				create: function (name, data) {
 
 					expect(name).toEqual('process');
 
 					return {
-						priority: function(){
+						priority: function () {
 							return {
-								save: function(){
+								save: function () {
 
 								}
 							};
@@ -23,33 +23,33 @@ var proxyquire = require('proxyquire').noCallThru(),
 		}
 	},
 	q = {
-		defer: function(){
+		defer: function () {
 			return {
 				promise: {
-					then: function(cb){
+					then: function (cb) {
 						cb([]);
 
 						return {
-							catch: function(){}
+							catch: function () {}
 						};
 					}
 				},
-				resolve: function(){}
+				resolve: function () {}
 			};
 		}
 	},
 	dbconnector = {
-		insert: function(){
+		insert: function () {
 			return {
-				then: function(){
+				then: function () {
 					return {
-						catch: function(){}
+						catch: function () {}
 					};
 				},
-				catch: function(){}
+				catch: function () {}
 			};
 		},
-		select: function(){
+		select: function () {
 			return q.defer().promise;
 		}
 	},
@@ -64,62 +64,74 @@ var proxyquire = require('proxyquire').noCallThru(),
 describe('addTileSet', function () {
 
 	it('should return promise', function () {
-		var promise = addMap('test', {url: 'http://test.url', name: 'test name', created_by:'user'});
+		var promise = addMap('test', {
+			url: 'http://test.url',
+			name: 'test name',
+			created_by: 'user'
+		});
 
 		expect(promise.then).toBeDefined();
 	});
 
 	it('should add map to DB', function () {
-		var data = {url: 'http://test.url', name: 'test name', created_by:'user'},
+		var data = {
+			url: 'http://test.url',
+			name: 'test name',
+			created_by: 'user'
+		},
 			shouldAddMap = proxyquire('../lib/addTileSet', {
-			'q': q,
-			'./db_connector': {
-				insert: function(table, object){
-					expect(table).toEqual('test');
-					expect(object).toEqual({
-						name:'test name',
-						type: 'custom',
-						url: 'http://test.url',
-						image : '',
-						width: 0,
-						height: 0,
-						min_zoom: 1,
-						max_zoom: 0,
-						created_on: undefined,
-						created_by: 'user'
-					});
+				'q': q,
+				'./db_connector': {
+					insert: function (table, object) {
+						expect(table).toEqual('test');
+						expect(object).toEqual({
+							name: 'test name',
+							type: 'custom',
+							url: 'http://test.url',
+							image: '',
+							width: 0,
+							height: 0,
+							min_zoom: 1,
+							max_zoom: 0,
+							created_on: undefined,
+							created_by: 'user'
+						});
 
-					return {
-						then: function(){
-							return {
-								catch: function(){}
-							};
-						},
-						catch: function(){}
-					};
+						return {
+							then: function () {
+								return {
+									catch: function () {}
+								};
+							},
+							catch: function () {}
+						};
+					},
+					select: function () {
+						return q.defer().promise;
+					}
 				},
-				select: function(){
-					return q.defer().promise;
+				'kue': kue,
+				'./config': {
+					minZoom: 1
 				}
-			},
-			'kue': kue,
-			'./config': {
-				minZoom: 1
-			}
-		});
+			});
 
 		shouldAddMap('test', data);
 	});
 
 	it('should add map to processing', function () {
-		var data = {url: 'http://test.url', name: 'test name', created_by:'user'},
+		var data = {
+			url: 'http://test.url',
+			name: 'test name',
+			created_by: 'user'
+		},
 			shouldProcessMap = proxyquire('../lib/addTileSet', {
 				'q': q,
 				'./db_connector': dbconnector,
 				'kue': {
-					createQueue: function(){
+					createQueue: function () {
 						return {
-							create: function(name, jobData){
+							create: function (name, jobData) {
 
 								expect(name).toEqual('process');
 								expect(jobData).toEqual({
@@ -131,9 +143,9 @@ describe('addTileSet', function () {
 								});
 
 								return {
-									priority: function(){
+									priority: function () {
 										return {
-											save: function(){
+											save: function () {
 
 											}
 										};

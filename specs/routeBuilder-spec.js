@@ -6,15 +6,15 @@ describe('Route Builder', function () {
 	var routeBuilder = require('./../lib/routeBuilder'),
 		router = {
 			routes: [],
-			route: function(path, handler) {
+			route: function (path, handler) {
 				this.routes.push({
 					path: path,
 					resource: handler
 				});
 			}
 		},
-		crudModules =  {
-			test: function() {
+		crudModules = {
+			test: function () {
 				return {};
 			}
 		},
@@ -36,15 +36,15 @@ describe('Route Builder', function () {
 		router.routes = [];
 	});
 
-	it('Creates routes for multiple CRUD modules', function() {
+	it('Creates routes for multiple CRUD modules', function () {
 		crudModules = {
-			test: function() {
+			test: function () {
 				return {};
 			},
-			test2: function() {
+			test2: function () {
 				return {};
 			},
-			test3: function() {
+			test3: function () {
 				return {};
 			}
 		};
