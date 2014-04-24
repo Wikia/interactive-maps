@@ -8,7 +8,7 @@ var express = require('express'),
 	guard = require('./lib/guard'),
 	logger = require('./lib/logger'),
 	rawBody = require('./lib/rawBody'),
-	errorHandler = require('./lib/errorHandler'),
+	errorHandler = require('./lib/errorHandler').errorHandler,
 	heartBeatHandler = require('./lib/healthCheck').heartBeatHandler,
 
 	// API entry points modules

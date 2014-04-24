@@ -3,7 +3,7 @@
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	jsonValidator = require('./../../lib/jsonValidator'),
-	utils = require('./../../lib/utils'),
+	errorHandler = require('./../../lib/errorHandler'),
 
 	dbTable = 'poi',
 	createSchema = {
@@ -179,7 +179,7 @@ module.exports = function createCRUD() {
 							next
 					);
 				} else {
-					next(utils.badRequestError(errors));
+					next(errorHandler.badRequestError(errors));
 				}
 			}
 		},
@@ -208,13 +208,13 @@ module.exports = function createCRUD() {
 										next
 								);
 							} else {
-								next(utils.elementNotFoundError(dbTable, id));
+								next(errorHandler.elementNotFoundError(dbTable, id));
 							}
 						},
 						next
 					);
 				} else {
-					next(utils.badNumberError(req.pathVar.id));
+					next(errorHandler.badNumberError(req.pathVar.id));
 				}
 			},
 			GET: function (req, res, next) {
@@ -235,13 +235,13 @@ module.exports = function createCRUD() {
 									res.send(200, collection[0]);
 									res.end();
 								} else {
-									next(utils.elementNotFoundError(dbTable, id));
+									next(errorHandler.elementNotFoundError(dbTable, id));
 								}
 							},
 							next
 					);
 				} else {
-					next(utils.badNumberError(req.pathVar.id));
+					next(errorHandler.badNumberError(req.pathVar.id));
 				}
 			},
 			PUT: function (req, res, next) {
@@ -279,17 +279,17 @@ module.exports = function createCRUD() {
 											next
 									);
 								} else {
-									next(utils.elementNotFoundError(dbTable, id));
+									next(errorHandler.elementNotFoundError(dbTable, id));
 								}
 							},
 							next
 						);
 					} else {
-						next(utils.badNumberError(req.pathVar.id));
+						next(errorHandler.badNumberError(req.pathVar.id));
 					}
 
 				} else {
-					next(utils.badRequestError(errors));
+					next(errorHandler.badRequestError(errors));
 				}
 			}
 		}
