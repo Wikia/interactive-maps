@@ -3,6 +3,7 @@
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	jsonValidator = require('./../../lib/jsonValidator'),
+	errorHandler = require('./../../lib/errorHandler'),
 
 	dbTable = 'poi_category',
 	createSchema = {
@@ -66,11 +67,11 @@ module.exports = function createCRUD() {
 				dbCon
 					.select(dbTable, dbColumns)
 					.then(
-					function (collection) {
-						res.send(200, collection);
-						res.end();
-					},
-					next
+						function (collection) {
+							res.send(200, collection);
+							res.end();
+						},
+						next
 				);
 			},
 			POST: function (req, res, next) {
@@ -81,33 +82,27 @@ module.exports = function createCRUD() {
 					dbCon
 						.insert(dbTable, reqBody)
 						.then(
-						function (data) {
-							var id = data[0],
-								response = {
-									message: 'POI category successfully created',
-									id: id,
-									url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
-								};
+							function (data) {
+								var id = data[0],
+									response = {
+										message: 'POI category successfully created',
+										id: id,
+										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
+									};
 
-							res.send(201, response);
-							res.end();
-						},
-						next
+								res.send(201, response);
+								res.end();
+							},
+							next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: errors
-						}
-					});
+					next(errorHandler.badRequestError(errors));
 				}
 			}
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id ),
+				var id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
 					};
@@ -115,20 +110,18 @@ module.exports = function createCRUD() {
 					dbCon
 						.destroy(dbTable, filter)
 						.then(
-						function () {
-							res.send(204, {});
-							res.end();
-						},
-						next
+							function (affectedRows) {
+								if (affectedRows > 0) {
+									res.send(204, {});
+									res.end();
+								} else {
+									next(errorHandler.elementNotFoundError(dbTable, id));
+								}
+							},
+							next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: 'id: ' + req.pathVar.id + ' should be a number'
-						}
-					});
+					next(errorHandler.badNumberError(req.pathVar.id));
 				}
 			},
 			GET: function (req, res, next) {
@@ -142,30 +135,18 @@ module.exports = function createCRUD() {
 					dbCon
 						.select(dbTable, dbColumns, filter)
 						.then(
-						function (collection) {
-							if (collection[0]) {
-								res.send(200, collection[0]);
-								res.end();
-							} else {
-								next({
-									status: 404,
-									message: {
-										message: 'POI not found',
-										id: id
-									}
-								});
-							}
-						},
-						next
+							function (collection) {
+								if (collection[0]) {
+									res.send(200, collection[0]);
+									res.end();
+								} else {
+									next(errorHandler.elementNotFoundError(dbTable, id));
+								}
+							},
+							next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: 'id: ' + req.pathVar.id + ' should be a number'
-						}
-					});
+					next(errorHandler.badNumberError(req.pathVar.id));
 				}
 			},
 			PUT: function (req, res, next) {
@@ -182,34 +163,29 @@ module.exports = function createCRUD() {
 						dbCon
 							.update(dbTable, reqBody, filter)
 							.then(
-							function () {
-								var response = {
-									message: 'POI category successfully updated',
-									id: id,
-									// TODO: refactor path building
-									url: req.protocol + '://' + req.headers.host + '/api/v1/poi_category/' + id
-								};
+								function (affectedRows) {
+									if (affectedRows > 0) {
+										var response = {
+											message: 'POI category successfully updated',
+											id: id,
+											// TODO: refactor path building
+											url: req.protocol + '://' + req.headers.host + '/api/v1/poi_category/' + id
+										};
 
-								res.send(303, response);
-								res.end();
-							},
-							next
+										res.send(303, response);
+										res.end();
+									} else {
+										next(errorHandler.elementNotFoundError(dbTable, id));
+									}
+								},
+								next
 						);
 					} else {
-						next({
-							status: 400,
-							message: {
-								message: 'Bad request',
-								details: 'id: ' + req.pathVar.id + ' should be a number'
-							}
-						});
+						next(errorHandler.badNumberError(req.pathVar.id));
 					}
 
 				} else {
-					next({
-						status: 400,
-						message: errors
-					});
+					next(errorHandler.badRequestError(errors));
 				}
 			}
 		}

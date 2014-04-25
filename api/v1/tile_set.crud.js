@@ -2,8 +2,9 @@
 
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
-	utils = require('./../../lib/utils'),
 	jsonValidator = require('./../../lib/jsonValidator'),
+	utils = require('./../../lib/utils'),
+	errorHandler = require('./../../lib/errorHandler'),
 	config = require('./../../lib/config'),
 
 	// custom action for POST method
@@ -80,13 +81,7 @@ module.exports = function createCRUD() {
 							next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: errors
-						}
-					});
+					next(errorHandler.badRequestError(errors));
 				}
 			}
 		},
@@ -108,29 +103,16 @@ module.exports = function createCRUD() {
 								if (obj) {
 									obj.image = 'http://dev-dfs-p1/' +
 										utils.getBucketName(config.bucketPrefix, obj.name) + '/' + obj.image;
-
 									res.send(200, obj);
 									res.end();
 								} else {
-									next({
-										status: 404,
-										message: {
-											message: 'Map not found',
-											id: id
-										}
-									});
+									next(errorHandler.elementNotFoundError(dbTable, id));
 								}
 							},
 							next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: 'id: ' + req.pathVar.id + ' should be a number'
-						}
-					});
+					next(errorHandler.badNumberError(req.pathVar.id));
 				}
 			}
 		}

@@ -3,6 +3,7 @@
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	jsonValidator = require('./../../lib/jsonValidator'),
+	errorHandler = require('./../../lib/errorHandler'),
 
 	dbTable = 'poi',
 	createSchema = {
@@ -119,7 +120,7 @@ function changeMapUpdatedOn(mapId) {
 
 
 /**
- * Helper function to get map_id from poi_id
+ * @desc Helper function to get map_id from poi_id
  *
  * @param poiId {number}
  * @returns {object}
@@ -178,13 +179,7 @@ module.exports = function createCRUD() {
 							next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: errors
-						}
-					});
+					next(errorHandler.badRequestError(errors));
 				}
 			}
 		},
@@ -212,18 +207,14 @@ module.exports = function createCRUD() {
 										},
 										next
 								);
+							} else {
+								next(errorHandler.elementNotFoundError(dbTable, id));
 							}
 						},
 						next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: 'id: ' + req.pathVar.id + ' should be a number'
-						}
-					});
+					next(errorHandler.badNumberError(req.pathVar.id));
 				}
 			},
 			GET: function (req, res, next) {
@@ -244,25 +235,13 @@ module.exports = function createCRUD() {
 									res.send(200, collection[0]);
 									res.end();
 								} else {
-									next({
-										status: 404,
-										message: {
-											message: 'POI not found',
-											id: id
-										}
-									});
+									next(errorHandler.elementNotFoundError(dbTable, id));
 								}
 							},
 							next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: 'id: ' + req.pathVar.id + ' should be a number'
-						}
-					});
+					next(errorHandler.badNumberError(req.pathVar.id));
 				}
 			},
 			PUT: function (req, res, next) {
@@ -299,25 +278,18 @@ module.exports = function createCRUD() {
 											},
 											next
 									);
+								} else {
+									next(errorHandler.elementNotFoundError(dbTable, id));
 								}
 							},
 							next
 						);
 					} else {
-						next({
-							status: 400,
-							message: {
-								message: 'Bad request',
-								details: 'id: ' + req.pathVar.id + ' should be a number'
-							}
-						});
+						next(errorHandler.badNumberError(req.pathVar.id));
 					}
 
 				} else {
-					next({
-						status: 400,
-						message: errors
-					});
+					next(errorHandler.badRequestError(errors));
 				}
 			}
 		}

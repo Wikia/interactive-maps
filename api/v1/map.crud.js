@@ -1,9 +1,10 @@
 'use strict';
 
 var dbCon = require('./../../lib/db_connector'),
-	utils = require('./../../lib/utils'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	jsonValidator = require('./../../lib/jsonValidator'),
+	utils = require('./../../lib/utils'),
+	errorHandler = require('./../../lib/errorHandler'),
 	config = require('./../../lib/config'),
 
 	dbTable = 'map',
@@ -114,13 +115,7 @@ module.exports = function createCRUD() {
 							next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: errors
-						}
-					});
+					next(errorHandler.badRequestError(errors));
 				}
 			}
 		},
@@ -134,20 +129,18 @@ module.exports = function createCRUD() {
 					dbCon
 						.destroy(dbTable, filter)
 						.then(
-							function () {
-								res.send(204, {});
-								res.end();
+							function (affectedRows) {
+								if (affectedRows > 0) {
+									res.send(204, {});
+									res.end();
+								} else {
+									next(errorHandler.elementNotFoundError(dbTable, id));
+								}
 							},
 							next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: 'id: ' + req.pathVar.id + ' should be a number'
-						}
-					});
+					next(errorHandler.badNumberError(req.pathVar.id));
 				}
 			},
 			GET: function (req, res, next) {
@@ -170,25 +163,13 @@ module.exports = function createCRUD() {
 									res.send(200, obj);
 									res.end();
 								} else {
-									next({
-										status: 404,
-										message: {
-											message: 'Map not found',
-											id: id
-										}
-									});
+									next(errorHandler.elementNotFoundError(dbTable, id));
 								}
 							},
 							next
 					);
 				} else {
-					next({
-						status: 400,
-						message: {
-							message: 'Bad request',
-							details: 'id: ' + req.pathVar.id + ' should be a number'
-						}
-					});
+					next(errorHandler.badNumberError(req.pathVar.id));
 				}
 			},
 			PUT: function (req, res, next) {
@@ -206,34 +187,29 @@ module.exports = function createCRUD() {
 						dbCon
 							.update(dbTable, reqBody, filter)
 							.then(
-								function () {
-									var response = {
-										message: 'Map successfully updated',
-										id: id,
-										// TODO: refactor path building
-										url: req.protocol + '://' + req.headers.host + '/api/v1/map/' + id
-									};
+								function (affectedRows) {
+									if (affectedRows > 0) {
+										var response = {
+											message: 'Map successfully updated',
+											id: id,
+											// TODO: refactor path building
+											url: req.protocol + '://' + req.headers.host + '/api/v1/map/' + id
+										};
 
-									res.send(303, response);
-									res.end();
+										res.send(303, response);
+										res.end();
+									} else {
+										next(errorHandler.elementNotFoundError(dbTable, id));
+									}
 								},
 								next
 						);
 					} else {
-						next({
-							status: 400,
-							message: {
-								message: 'Bad request',
-								details: 'id: ' + req.pathVar.id + ' should be a number'
-							}
-						});
+						next(errorHandler.badNumberError(req.pathVar.id));
 					}
 
 				} else {
-					next({
-						status: 400,
-						message: errors
-					});
+					next(errorHandler.badRequestError(errors));
 				}
 			}
 		}
