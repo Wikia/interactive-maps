@@ -4,6 +4,7 @@ var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	errorHandler = require('./../../lib/errorHandler'),
+	utils = require('./../../lib/utils'),
 
 	dbTable = 'poi_category',
 	createSchema = {
@@ -87,7 +88,7 @@ module.exports = function createCRUD() {
 									response = {
 										message: 'POI category successfully created',
 										id: id,
-										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
+										url: utils.responseUrl(req, req.route.path, id)
 									};
 
 								res.send(201, response);
@@ -168,8 +169,7 @@ module.exports = function createCRUD() {
 										var response = {
 											message: 'POI category successfully updated',
 											id: id,
-											// TODO: refactor path building
-											url: req.protocol + '://' + req.headers.host + '/api/v1/poi_category/' + id
+											url: utils.responseUrl(req, '/api/v1/poi_category', id)
 										};
 
 										res.send(303, response);

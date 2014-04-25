@@ -262,4 +262,32 @@ describe('utils', function () {
 			expect(utils.getBucketName(testCase.prefix, testCase.name)).toBe(testCase.expect);
 		});
 	});
+
+	it('generates correct response url', function() {
+		var newReq = function (protocol, host) {
+				return {
+					protocol: protocol,
+					headers:{
+						host: host
+					}
+				};
+			},
+			testSet = [
+				{
+					req: newReq('http', 'localhost'),
+					path: '/test',
+					id: 1,
+					url: 'http://localhost/test/1'
+				},
+				{
+					req: newReq('https', 'lolcathost'),
+					path: '/testorium/test/fest',
+					id: '3',
+					url: 'https://lolcathost/testorium/test/fest/3'
+				}
+			];
+		testSet.forEach(function(testCase){
+			expect(utils.responseUrl(testCase.req, testCase.path, testCase.id) ).toBe(testCase.url);
+		});
+	});
 });
