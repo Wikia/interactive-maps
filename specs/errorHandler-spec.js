@@ -107,8 +107,7 @@ describe('errorHandler module', function () {
 	});
 
 	it('should handle foreign key errors in sql', function () {
-		errorHandler.errorHandler(
-			{
+		errorHandler.errorHandler({
 				clientError: {
 					name: 'RejectionError',
 					cause: {
@@ -117,13 +116,14 @@ describe('errorHandler module', function () {
 				}
 			},
 			stubReq(),
-			stubRes(500, 'Cannot make reference to non-existing value')
+			stubRes(500, {
+				message: 'Cannot create reference to non-existing value'
+			})
 		);
 	});
 
 	it('should handle duplicate unique key error in database', function () {
-		errorHandler.errorHandler(
-			{
+		errorHandler.errorHandler({
 				clientError: {
 					name: 'RejectionError',
 					cause: {
@@ -132,63 +132,78 @@ describe('errorHandler module', function () {
 				}
 			},
 			stubReq(),
-			stubRes(500, 'Name needs to be unique')
+			stubRes(500, {
+				message: 'Name needs to be unique'
+			})
+		);
+	});
+
+	it('should handle delete referred', function () {
+		errorHandler.errorHandler({
+				clientError: {
+					name: 'RejectionError',
+					cause: {
+						code: 'ER_ROW_IS_REFERENCED_'
+					}
+				}
+			},
+			stubReq(),
+			stubRes(500, {
+				message: 'Trying to delete row which is referenced'
+			})
 		);
 	});
 
 	it('should handle general sql errors', function () {
-		errorHandler.errorHandler(
-			{
+		errorHandler.errorHandler({
 				clientError: {
 					name: 'SQL Error'
 				}
 			},
 			stubReq(),
-			stubRes(500, 'General database error')
+			stubRes(500, {
+				message: 'General database error'
+			})
 		);
 	});
 
-	it('generates valid error messages', function(){
-		var testCases = [
-			{
-				function: 'badNumberError',
-				params: ['as'],
-				result: {
-					status : 400,
-					message : {
-						message : 'Bad request',
-						details : 'id: as should be a number'
-					}
-				}
-			},
-			{
-				function: 'badRequestError',
-				params: [
-					[1, 2, 3]
-				],
-				result: {
-					status : 400,
-					message : {
-						message : 'Bad request',
-						details : [
-							1,2,3
-						]
-					}
-				}
-			},
-			{
-				function: 'elementNotFoundError',
-				params: [ 'name', 'id' ],
-				result: {
-					status : 404,
-					message : {
-						message : 'name not found',
-						details : 'id: id not found'
-					}
+	it('generates valid error messages', function () {
+		var testCases = [{
+			function: 'badNumberError',
+			params: ['as'],
+			result: {
+				status: 400,
+				message: {
+					message: 'Bad request',
+					details: 'id: as should be a number'
 				}
 			}
-		];
-		testCases.forEach(function(testCase){
+		}, {
+			function: 'badRequestError',
+			params: [
+				[1, 2, 3]
+			],
+			result: {
+				status: 400,
+				message: {
+					message: 'Bad request',
+					details: [
+						1, 2, 3
+					]
+				}
+			}
+		}, {
+			function: 'elementNotFoundError',
+			params: ['name', 'id'],
+			result: {
+				status: 404,
+				message: {
+					message: 'name not found',
+					details: 'id: id not found'
+				}
+			}
+		}];
+		testCases.forEach(function (testCase) {
 			var funct = errorHandler[testCase.function];
 			expect(
 				JSON.stringify(funct.apply(funct, testCase.params))

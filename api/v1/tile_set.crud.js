@@ -5,6 +5,7 @@ var dbCon = require('./../../lib/db_connector'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	utils = require('./../../lib/utils'),
 	errorHandler = require('./../../lib/errorHandler'),
+	config = require('./../../lib/config'),
 
 	// custom action for POST method
 	addTileSet = require('./../../lib/addTileSet'),
@@ -100,8 +101,8 @@ module.exports = function createCRUD() {
 								var obj = collection[0];
 
 								if (obj) {
-									obj.image = 'http://dev-dfs-p1/' + utils.getBucketName(obj.name) + '/' + obj.image;
-
+									obj.image = 'http://dev-dfs-p1/' +
+										utils.getBucketName(config.bucketPrefix, obj.name) + '/' + obj.image;
 									res.send(200, obj);
 									res.end();
 								} else {

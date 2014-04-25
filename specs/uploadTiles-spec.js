@@ -3,7 +3,7 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs');
 
-xdescribe('Upload Tiles', function () {
+describe('Upload Tiles', function () {
 
 	it('Calls dfs sendFiles', function () {
 		var qStub = stubs.newQStub(),
@@ -16,7 +16,9 @@ xdescribe('Upload Tiles', function () {
 					return {
 						then: function (cb) {
 							cb();
-						}
+							return this;
+						},
+						catch: function () {}
 					};
 				}
 			},
@@ -33,7 +35,7 @@ xdescribe('Upload Tiles', function () {
 				dir: 'dir',
 				minZoom: 0,
 				maxZoom: 3,
-				status:{
+				status: {
 					uploaded: false
 				}
 			},
@@ -44,13 +46,13 @@ xdescribe('Upload Tiles', function () {
 			};
 
 		uploadTiles({
-			save: function(){},
+			save: function () {},
 			data: data
 		});
-		expect(qStub.defer.resolve.calls.count()).toEqual(1);
+
+		expect(qStub.defer.resolve.callCount).toEqual(1);
 		expect(collector.bucketName).toHaveBeenCalledWith(expected.bucketName);
 		expect(collector.dir).toHaveBeenCalledWith(expected.dir);
 		expect(collector.filePaths).toHaveBeenCalledWith(expected.filePaths);
 	});
-
 });

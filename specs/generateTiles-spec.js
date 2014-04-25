@@ -3,42 +3,59 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs');
 
-xdescribe('Generate tiles', function () {
-
-	it('throws an error on incorrect data', function () {
-		var generateTiles = proxyquire('../lib/generateTiles', {});
-		expect(generateTiles()).toThrow(new Error('Required data not set'));
-	});
-
-	it('executes the tile generating process', function () {
-		var qStub = stubs.newQStub(),
-			collector = stubs.newCollector(['script', 'args']),
-			childProcessStub = {
-				spawn: function (script, args) {
-					collector.script(script);
-					collector.args(args);
-					return {
-						stdout: {
-							on: function () {}
-						},
+describe('Generate tiles', function () {
+	var qStub = stubs.newQStub(),
+		collector = stubs.newCollector(['script', 'args']),
+		childProcessStub = {
+			spawn: function (script, args) {
+				collector.script(script);
+				collector.args(args);
+				return {
+					stdout: {
 						on: function () {}
-					};
-				}
-			},
-			generateTiles = proxyquire('../lib/generateTiles', {
-				q: qStub.q,
-				child_process: childProcessStub
-			}),
-			data = {
+					},
+					on: function () {}
+				};
+			}
+		},
+		loggerInfo = jasmine.createSpy('loggerInfo'),
+		generateTiles = proxyquire('../lib/generateTiles', {
+			q: qStub.q,
+			child_process: childProcessStub,
+			'./logger': {
+				info: loggerInfo,
+				getContext: function () {}
+			}
+		}),
+		job = {
+			data: {
 				minZoom: 0,
 				maxZoom: 2,
 				image: 'image.jpg',
-				dir: 'dir/'
-			};
-		generateTiles(data);
+				dir: 'dir/',
+				status: {
+					tiled: false
+				}
+			}
+		};
+
+	it('executes the tile generating process', function () {
+		generateTiles(job);
+
 		expect(collector.script).toHaveBeenCalledWith('gdal2tiles.py');
 		expect(collector.args).toHaveBeenCalledWith(
-			['-e', '-p', 'raster', '-z', data.minZoom + '-' + data.maxZoom, '-w', 'none', data.image, data.dir]
+			['-p', 'raster', '-z', job.data.minZoom + '-' + job.data.maxZoom, '-w', 'none', '-r', 'near', job.data.image, job.data.dir]
 		);
 	});
+
+	it('doesn\'t execute tile generation process if tiles already created', function () {
+		job.data.status.tiled = true;
+
+		generateTiles(job);
+
+		expect(loggerInfo).toHaveBeenCalled();
+		expect(loggerInfo).toHaveBeenCalledWith('Tiles already generated in: ' + job.data.dir);
+		expect(qStub.defer.resolve).toHaveBeenCalled();
+		expect(qStub.defer.resolve).toHaveBeenCalledWith(job);
+	})
 });

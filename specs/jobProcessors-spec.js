@@ -3,7 +3,7 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs');
 
-xdescribe('jobProcessors', function () {
+describe('jobProcessors', function () {
 	it('should process jobs', function () {
 		proxyquire('../lib/jobProcessors', {
 			'./config': {
@@ -13,9 +13,9 @@ xdescribe('jobProcessors', function () {
 				}
 			},
 			'kue': {
-				createQueue: function(){
+				createQueue: function () {
 					return {
-						process: function(name, maxJobs, runner){
+						process: function (name, maxJobs, runner) {
 							expect(name).toMatch(/process|tiling/);
 							expect(maxJobs).toBe(99);
 							expect(typeof runner).toBe('function');
@@ -23,7 +23,15 @@ xdescribe('jobProcessors', function () {
 					};
 				}
 			},
-			'./db_connector': {}
+			'./db_connector': {},
+			'./utils': {},
+			'image-size': {},
+			'./fetchImage': {},
+			'./generateTiles': {},
+			'./logger': {},
+			'./cleanupTiles': {},
+			'./uploadTiles': {},
+			'./optimizeTiles': {}
 		});
 	});
 });

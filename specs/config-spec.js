@@ -16,17 +16,17 @@ var proxyquire = require('proxyquire').noCallThru(),
 	},
 	config = proxyquire('../lib/config', {
 		'js-yaml': {
-			safeLoad: function(yaml){
+			safeLoad: function (yaml) {
 				return yaml;
 			}
 		},
 		'fs': {
-			readFileSync: function(){
+			readFileSync: function () {
 				return configuration;
 			}
 		},
 		'./logger': {
-			debug: function(){
+			debug: function () {
 
 			}
 		}
@@ -35,15 +35,15 @@ var proxyquire = require('proxyquire').noCallThru(),
 describe('config', function () {
 
 	it('should throw an error on read failure', function () {
-		expect( function(){
+		expect(function () {
 			proxyquire('../lib/config', {
 				'js-yaml': {
-					safeLoad: function(yaml){
+					safeLoad: function (yaml) {
 						return yaml;
 					}
 				},
 				'fs': {
-					readFileSync: function(){
+					readFileSync: function () {
 						throw 'test';
 					}
 				}
