@@ -147,4 +147,55 @@ describe('errorHandler module', function () {
 			stubRes(500, 'General database error')
 		);
 	});
+
+	it('generates valid error messages', function(){
+		var testCases = [
+			{
+				function: 'badNumberError',
+				params: ['as'],
+				result: {
+					status : 400,
+					message : {
+						message : 'Bad request',
+						details : 'id: as should be a number'
+					}
+				}
+			},
+			{
+				function: 'badRequestError',
+				params: [
+					[1, 2, 3]
+				],
+				result: {
+					status : 400,
+					message : {
+						message : 'Bad request',
+						details : [
+							1,2,3
+						]
+					}
+				}
+			},
+			{
+				function: 'elementNotFoundError',
+				params: [ 'name', 'id' ],
+				result: {
+					status : 404,
+					message : {
+						message : 'name not found',
+						details : 'id: id not found'
+					}
+				}
+			}
+		];
+		testCases.forEach(function(testCase){
+			var funct = errorHandler[testCase.function];
+			expect(
+				JSON.stringify(funct.apply(funct, testCase.params))
+			).toBe(
+				JSON.stringify(testCase.result)
+			);
+		});
+	});
+
 });
