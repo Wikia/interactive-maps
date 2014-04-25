@@ -4,6 +4,7 @@ var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	utils = require('./../../lib/utils'),
 	jsonValidator = require('./../../lib/jsonValidator'),
+	config = require('./../../lib/config'),
 
 	// custom action for POST method
 	addTileSet = require('./../../lib/addTileSet'),
@@ -47,15 +48,15 @@ module.exports = function createCRUD() {
 				dbCon
 					.select(dbTable, dbColumns)
 					.then(
-					function (collection) {
-						collection.forEach(function(value) {
-							value.url = req.protocol + '://' + req.headers.host + req.route.path + '/' + value.id;
-						});
+						function (collection) {
+							collection.forEach(function (value) {
+								value.url = req.protocol + '://' + req.headers.host + req.route.path + '/' + value.id;
+							});
 
-						res.send(200, collection);
-						res.end();
-					},
-					next
+							res.send(200, collection);
+							res.end();
+						},
+						next
 				);
 			},
 			POST: function (req, res, next) {
@@ -77,7 +78,7 @@ module.exports = function createCRUD() {
 								res.end();
 							},
 							next
-						);
+					);
 				} else {
 					next({
 						status: 400,
@@ -101,25 +102,26 @@ module.exports = function createCRUD() {
 					dbCon
 						.select(dbTable, dbColumns, filter)
 						.then(
-						function (collection) {
-							var obj = collection[0];
+							function (collection) {
+								var obj = collection[0];
 
-							if (obj) {
-								obj.image = 'http://dev-dfs-p1/' + utils.getBucketName(obj.name) + '/' + obj.image;
+								if (obj) {
+									obj.image = 'http://dev-dfs-p1/' +
+										utils.getBucketName(config.bucketPrefix, obj.name) + '/' + obj.image;
 
-								res.send(200, obj);
-								res.end();
-							} else {
-								next({
-									status: 404,
-									message: {
-										message: 'Map not found',
-										id: id
-									}
-								});
-							}
-						},
-						next
+									res.send(200, obj);
+									res.end();
+								} else {
+									next({
+										status: 404,
+										message: {
+											message: 'Map not found',
+											id: id
+										}
+									});
+								}
+							},
+							next
 					);
 				} else {
 					next({
