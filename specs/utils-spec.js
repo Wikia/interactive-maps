@@ -243,4 +243,23 @@ describe('utils', function () {
 			expect(utils.binToMaxZoomLevel(testCase.bin)).toBe(testCase.expect);
 		});
 	});
+
+	it('generates valid bucket name', function () {
+		var testSet = [{
+			prefix: 'prefix1_',
+			name: 'test',
+			expect: 'prefix1_test'
+		}, {
+			prefix: 'prefix2_',
+			name: ' a sample name ',
+			expect: 'prefix2_a_sample_name'
+		}, {
+			prefix: 'префикс_',
+			name: ' пример ',
+			expect: '%D0%BF%D1%80%D0%B5%D1%84%D0%B8%D0%BA%D1%81_%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80'
+		}];
+		testSet.forEach(function (testCase) {
+			expect(utils.getBucketName(testCase.prefix, testCase.name)).toBe(testCase.expect);
+		});
+	});
 });

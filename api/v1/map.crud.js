@@ -4,6 +4,7 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	jsonValidator = require('./../../lib/jsonValidator'),
+	config = require('./../../lib/config'),
 
 	dbTable = 'map',
 	createSchema = {
@@ -77,7 +78,8 @@ module.exports = function createCRUD() {
 						function (collection) {
 							collection.forEach(function (value) {
 								// TODO: add path to dfs to config
-								value.image = 'http://dev-dfs-p1/' + utils.getBucketName(value.name) + '/' + value.image;
+								value.image = 'http://dev-dfs-p1/' +
+									utils.getBucketName(config.bucketPrefix, value.name) + '/' + value.image;
 								value.url = req.protocol + '://' + req.headers.host + req.route.path + '/' + value.id;
 
 								delete value.name;
