@@ -68,14 +68,18 @@ module.exports = function createCRUD() {
 					addTileSet(dbTable, reqBody)
 						.then(
 							function (data) {
-								var id = data[0],
+								var id = data.id,
+									responseCode = 201,
 									response = {
 										message: 'Tile set added to processing queue',
 										id: id,
 										url: utils.responseUrl(req, req.route.path, id)
 									};
-
-								res.send(201, response);
+								if (data.exists) {
+									response.message = 'This tile set already exists';
+									responseCode = 200;
+								}
+								res.send(responseCode, response);
 								res.end();
 							},
 							next
