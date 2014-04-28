@@ -102,6 +102,12 @@ describe('utils', function () {
 			max: 4,
 			postfix: '/test',
 			expect: 'base/4/test'
+		}, {
+			base: false,
+			min: 4,
+			max: 4,
+			postfix: '/test',
+			expect: '/4/test'
 		}];
 
 		testSet.forEach(function (testCase) {
@@ -182,6 +188,10 @@ describe('utils', function () {
 			minZoom: 3,
 			maxZoom: 4,
 			expect: 12
+		}, {
+			minZoom: 2,
+			maxZoom: 1,
+			expect: 0
 		}];
 
 		testSet.forEach(function (testCase) {
@@ -262,4 +272,63 @@ describe('utils', function () {
 			expect(utils.getBucketName(testCase.prefix, testCase.name)).toBe(testCase.expect);
 		});
 	});
+
+	it('generates correct response url', function () {
+		var newReq = function (protocol, host) {
+			return {
+				protocol: protocol,
+				headers: {
+					host: host
+				}
+			};
+		},
+			testSet = [{
+				req: newReq('http', 'localhost'),
+				path: '/test',
+				id: 1,
+				url: 'http://localhost/test/1'
+			}, {
+				req: newReq('https', 'lolcathost'),
+				path: '/testorium/test/fest',
+				id: '3',
+				url: 'https://lolcathost/testorium/test/fest/3'
+			}];
+		testSet.forEach(function (testCase) {
+			expect(utils.responseUrl(testCase.req, testCase.path, testCase.id)).toBe(testCase.url);
+		});
+	});
+
+	it('extends objects', function () {
+		var testSet = [{
+			obj1: {},
+			obj2: {},
+			expected: {}
+		}, {
+			obj1: {
+				a: 1
+			},
+			obj2: {
+				a: 2
+			},
+			expected: {
+				a: 2
+			}
+		}, {
+			obj1: {
+				a: 1
+			},
+			obj2: {
+				b: 2
+			},
+			expected: {
+				a: 1,
+				b: 2
+			}
+		}];
+		testSet.forEach(function (testCase) {
+			utils.extendObject(testCase.obj1, testCase.obj2)
+			expect(JSON.stringify(testCase.obj1)).toBe(JSON.stringify(testCase.expected));
+		});
+
+	})
 });
