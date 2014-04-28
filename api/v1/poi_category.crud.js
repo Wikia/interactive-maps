@@ -56,6 +56,48 @@ var dbCon = require('./../../lib/db_connector'),
 		additionalProperties: false
 	};
 
+
+/**
+ * @desc Handle deleting used categories by moving all points to CatchAll category
+ *
+ * @param id {number}
+ * @param res {object}
+ * @param next {function}
+ */
+function handleUsedCategories(id, res, next) {
+	dbCon.update(
+		'poi',
+		{
+			poi_category_id: config.catchAllCategoryId
+		},
+		{
+			poi_category_id: id
+		}).then(
+		function (rowsAffected) {
+			if (rowsAffected > 0) {
+				dbCon.destroy(dbTable, {
+					id: id
+				}).then(
+					function (affectedRows) {
+						if (affectedRows > 0) {
+							res.send(204, {});
+							res.end();
+						} else {
+							next(
+								errorHandler.elementNotFoundError(dbTable, id)
+							);
+						}
+					},
+					next
+				);
+			} else {
+				next(errorHandler.elementNotFoundError(dbTable, id));
+			}
+		},
+		next
+	);
+}
+
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
@@ -126,39 +168,7 @@ module.exports = function createCRUD() {
 									err.clientError.name === 'RejectionError' &&
 									err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_'
 								) {
-									if (typeof config.catchAllCategoryId === 'undefined') {
-										logger.error('catchAllCategoryId is not defined in config');
-									}
-									// if POI Category is used, move all points to
-									// 'CatchAll' category and delete afterward
-									dbCon.knex('poi')
-										.where({
-											poi_category_id: id
-										})
-										.update({
-											poi_category_id: config.catchAllCategoryId
-										}).then(
-											function (rowsAffected) {
-												if (rowsAffected > 0) {
-													dbCon.destroy(dbTable, filter).then(
-														function (affectedRows) {
-															if (affectedRows > 0) {
-																res.send(204, {});
-																res.end();
-															} else {
-																next(
-																	errorHandler.elementNotFoundError(dbTable, id)
-																);
-															}
-														},
-														next
-													);
-												} else {
-													next(errorHandler.elementNotFoundError(dbTable, id));
-												}
-											},
-											next
-										);
+									handleUsedCategories(id, res, next);
 								} else {
 									next(err);
 								}
