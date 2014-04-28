@@ -18,6 +18,7 @@ CREATE TABLE tile_set (
   height MEDIUMINT UNSIGNED NOT NULL,
   min_zoom INT UNSIGNED NOT NULL,
   max_zoom INT UNSIGNED NOT NULL, -- zoom levels saved in binary format 1011 - > zoom levels 4,2,1 so max that we can show is 2
+  status TINYINT DEFAULT 0 NOT NULL,
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   created_by VARCHAR(255) NOT NULL
 );
@@ -73,6 +74,7 @@ CREATE TABLE poi (
 
 -- TODO: figure out proper indexes
 CREATE INDEX tile_set ON tile_set ( id );
+CREATE INDEX tile_set_status ON tile_set ( status );
 CREATE UNIQUE INDEX tile_set_name_unq ON tile_set ( name );
 CREATE INDEX map_city_id ON map ( city_id );
 CREATE INDEX poi_map ON poi ( map_id );

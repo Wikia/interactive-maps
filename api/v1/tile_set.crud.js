@@ -47,7 +47,12 @@ module.exports = function createCRUD() {
 				var dbColumns = ['id', 'name', 'type'];
 
 				dbCon
-					.select(dbTable, dbColumns)
+					.select(
+						dbTable,
+						dbColumns, {
+							status: utils.tileSetStatus.ok
+						}
+				)
 					.then(
 						function (collection) {
 							collection.forEach(function (value) {
@@ -94,7 +99,8 @@ module.exports = function createCRUD() {
 				var dbColumns = ['name', 'type', 'image', 'width', 'height', 'min_zoom', 'max_zoom', 'created_by', 'created_on'],
 					id = parseInt(req.pathVar.id),
 					filter = {
-						id: id
+						id: id,
+						status: utils.tileSetStatus.ok
 					};
 
 				if (isFinite(id)) {

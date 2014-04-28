@@ -62,6 +62,7 @@ module.exports = function createCRUD() {
 
 				if (cityId !== 0) {
 					filter.city_id = cityId;
+					filter.status = utils.tileSetStatus.ok;
 				}
 
 				dbCon.knex(dbTable)
