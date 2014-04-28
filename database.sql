@@ -74,6 +74,7 @@ CREATE TABLE poi (
 
 -- TODO: figure out proper indexes
 CREATE INDEX tile_set ON tile_set ( id );
+CREATE INDEX tile_set_status ON tile_set ( status );
 CREATE UNIQUE INDEX tile_set_name_unq ON tile_set ( name );
 CREATE INDEX map_city_id ON map ( city_id );
 CREATE INDEX poi_map ON poi ( map_id );
