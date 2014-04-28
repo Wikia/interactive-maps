@@ -163,6 +163,9 @@ module.exports = function createCRUD() {
 								}
 							},
 							function (err) {
+								// If the delete request results an error, check if the error is reference error
+								// (caused by non able to delete foreign key) and handle this case by calling
+								// the handleUsedCategories function, otherwise handle the error as regular error
 								if (
 									err.hasOwnProperty('clientError') &&
 									err.clientError.name === 'RejectionError' &&
