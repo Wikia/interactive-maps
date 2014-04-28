@@ -5,6 +5,7 @@ var dbCon = require('./../../lib/db_connector'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
+	config = require('./../lib/config'),
 
 	dbTable = 'poi_category',
 	createSchema = {
@@ -119,7 +120,49 @@ module.exports = function createCRUD() {
 									next(errorHandler.elementNotFoundError(dbTable, id));
 								}
 							},
-							next
+							function (err) {
+								if (
+									err.hasOwnProperty('clientError') &&
+									err.clientError.name === 'RejectionError' &&
+									err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_'
+								) {
+									if (typeof config.catchAllCategoryId === 'undefined') {
+										logger.error('catchAllCategoryId is not defined in config');
+									}
+									// if POI Category is used, move all points to
+									// 'CatchAll' category and delete afterward
+									dbCon.knex('poi')
+										.where({
+											poi_category_id: id
+										})
+										.update({
+											poi_category_id: config.catchAllCategoryId
+										}).then(
+											function (rowsAffected) {
+												if (rowsAffected > 0) {
+													dbCon.destroy(dbTable, filter).then(
+														function (affectedRows) {
+															if (affectedRows > 0) {
+																res.send(204, {});
+																res.end();
+															} else {
+																next(
+																	errorHandler.elementNotFoundError(dbTable, id)
+																);
+															}
+														},
+														next
+													);
+												} else {
+													next(errorHandler.elementNotFoundError(dbTable, id));
+												}
+											},
+											next
+										);
+								} else {
+									next(err);
+								}
+							}
 					);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
