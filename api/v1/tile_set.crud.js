@@ -51,7 +51,7 @@ module.exports = function createCRUD() {
 					.then(
 						function (collection) {
 							collection.forEach(function (value) {
-								value.url = req.protocol + '://' + req.headers.host + req.route.path + '/' + value.id;
+								value.url = utils.responseUrl(req, req.route.path, value.id);
 							});
 
 							res.send(200, collection);
@@ -72,7 +72,7 @@ module.exports = function createCRUD() {
 									response = {
 										message: 'Tile set added to processing queue',
 										id: id,
-										url: req.protocol + '://' + req.headers.host + req.route.path + '/' + id
+										url: utils.responseUrl(req, req.route.path, id)
 									};
 
 								res.send(201, response);
