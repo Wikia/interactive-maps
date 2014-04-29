@@ -111,7 +111,8 @@ module.exports = function createCRUD() {
 								var obj = collection[0];
 
 								if (obj) {
-									obj.image = 'http://dev-dfs-p1/' +
+									// TODO: fix hardcoded DFS host
+									obj.image = 'http://s3.dev-dfs-s1/' +
 										utils.getBucketName(config.bucketPrefix, obj.name) + '/' + obj.image;
 									res.send(200, obj);
 									res.end();

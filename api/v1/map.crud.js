@@ -79,8 +79,8 @@ module.exports = function createCRUD() {
 					.then(
 						function (collection) {
 							collection.forEach(function (value) {
-								// TODO: add path to dfs to config
-								value.image = 'http://dev-dfs-p1/' +
+								// TODO: fix hardcoded DFS host
+								value.image = 'http://s3.dev-dfs-s1/' +
 									utils.getBucketName(config.bucketPrefix, value.name) + '/' + value.image;
 								value.url = utils.responseUrl(req, req.route.path, value.id);
 
