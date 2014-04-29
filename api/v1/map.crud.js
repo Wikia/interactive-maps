@@ -72,7 +72,8 @@ module.exports = function createCRUD() {
 						'map.title',
 						'tile_set.name',
 						'tile_set.image',
-						'map.updated_on'
+						'map.updated_on',
+						'tile_set.status'
 					])
 					.where(filter)
 					.select()
