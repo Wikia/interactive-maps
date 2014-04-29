@@ -10,7 +10,7 @@
 	 * @returns {object} Leaflet Marker
 	 */
 	function addPointOnMap(point) {
-		var popupHtml = '<h3>' + point.title + '</h3>' +
+		var popupHtml = '<h3>' + point.name + '</h3>' +
 			'<p>' +point.description + '</p>';
 		return L.marker([ point.lat, point.lon ], {
 			riseOnHover: true
