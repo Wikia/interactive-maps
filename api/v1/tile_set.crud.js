@@ -44,7 +44,7 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name', 'type'];
+				var dbColumns = ['id', 'name', 'type', 'status'];
 
 				dbCon
 					.select(
@@ -96,7 +96,18 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			GET: function (req, res, next) {
-				var dbColumns = ['name', 'type', 'image', 'width', 'height', 'min_zoom', 'max_zoom', 'created_by', 'created_on'],
+				var dbColumns = [
+						'name',
+						'type',
+						'image',
+						'width',
+						'height',
+						'min_zoom',
+						'max_zoom',
+						'status',
+						'created_by',
+						'created_on'
+					],
 					id = parseInt(req.pathVar.id),
 					filter = {
 						id: id,

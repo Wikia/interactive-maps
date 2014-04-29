@@ -72,7 +72,8 @@ module.exports = function createCRUD() {
 						'map.title',
 						'tile_set.name',
 						'tile_set.image',
-						'map.updated_on'
+						'map.updated_on',
+						'tile_set.status'
 					])
 					.where(filter)
 					.select()
@@ -145,7 +146,7 @@ module.exports = function createCRUD() {
 				}
 			},
 			GET: function (req, res, next) {
-				var dbColumns = ['title', 'tile_set_id', 'city_id', 'created_by', 'created_on'],
+				var dbColumns = ['title', 'tile_set_id', 'city_id', 'created_by', 'created_on', 'updated_on'],
 					id = parseInt(req.pathVar.id, 10),
 					filter = {
 						id: id

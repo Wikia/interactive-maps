@@ -30,7 +30,7 @@
 		map = L.map(mapContainerId)
 			.setView([config.latitude, config.longitude], config.zoom);
 
-		L.tileLayer(config.pathTemplate, config.mapSetup).addTo(map);
+		L.tileLayer(config.pathTemplate, config.map).addTo(map);
 
 		config.points.forEach(function (point){
 			addPointOnMap(point);
