@@ -25,7 +25,7 @@
 	 */
 	function createMap(config) {
 		if (config.imagesPath) {
-			L.Icon.Default.imagePath = config.imagePath;
+			L.Icon.Default.imagePath = config.imagesPath;
 		}
 		map = L.map(mapContainerId)
 			.setView([config.latitude, config.longitude], config.zoom);
