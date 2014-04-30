@@ -49,6 +49,37 @@ var dbCon = require('./../../lib/db_connector'),
 	};
 
 /**
+ * @desc Builds object which is later used in knex.orderBy()
+ *       Default value is { column: 'created_on', direction: 'desc' }
+ * @param {String} sort description of sorting passed as GET parameter i.e. title_asc
+ * @returns {*}
+ */
+function buildSort( sort ) {
+	switch(sort) {
+		case 'title_asc':
+			sort = {
+				column: 'map.title',
+				direction: 'asc'
+			};
+			break;
+		case 'updated_on_desc':
+			sort = {
+				column: 'map.updated_on',
+				direction: 'desc'
+			};
+			break;
+		default:
+			sort = {
+				column: 'map.created_on',
+				direction: 'desc'
+			};
+			break;
+	}
+
+	return sort;
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -58,7 +89,8 @@ module.exports = function createCRUD() {
 		handler: {
 			GET: function (req, res, next) {
 				var cityId = parseInt(req.query.city_id, 10) || 0,
-					filter = {};
+					filter = {},
+					sort = buildSort( req.query.sort );
 
 				if (cityId !== 0) {
 					filter.city_id = cityId;
@@ -76,6 +108,7 @@ module.exports = function createCRUD() {
 						'tile_set.status'
 					])
 					.where(filter)
+					.orderBy(sort.column, sort.direction)
 					.select()
 					.then(
 						function (collection) {
