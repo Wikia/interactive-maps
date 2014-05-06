@@ -2,7 +2,8 @@
 
 var gulp = require('gulp'),
 	nodemon = require('gulp-nodemon'),
-	jasmine = require('gulp-jasmine');
+	jasmine = require('gulp-jasmine'),
+	istanbul = require('gulp-istanbul');
 
 gulp.task('dev', function () {
 	nodemon({
@@ -19,9 +20,15 @@ gulp.task('dev', function () {
 	require('./kueServer');
 });
 
-gulp.task('test', function () {
-	gulp.src('specs/**')
-		.pipe(jasmine());
+gulp.task('test', function (cb) {
+	gulp.src(['lib/*.js', 'api/v1/*.js'])
+		.pipe(istanbul()) // Covering files
+	.on('end', function () {
+		gulp.src('specs/**')
+			.pipe(jasmine())
+			.pipe(istanbul.writeReports()) // Creating the reports after tests runned
+		.on('end', cb);
+	});
 });
 
 gulp.task('default', ['dev'], function () {

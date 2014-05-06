@@ -1,3 +1,4 @@
+/* global jasmine */
 'use strict';
 
 describe('Health Check', function () {
@@ -21,7 +22,7 @@ describe('Health Check', function () {
 				}
 			},
 			http: {
-				get: function (url, ok, error) {
+				get: function (url, ok) {
 					var timeout = function (ms, callback) {
 						callback();
 					};
@@ -97,7 +98,7 @@ describe('Health Check', function () {
 	});
 
 	it('returns normal heartbeat result', function () {
-		var callback = createSpy('callback'),
+		var callback = jasmine.createSpy('callback'),
 			thresholds = {
 				20: healthCheck.exitCodes.OK
 			};
