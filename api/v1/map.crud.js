@@ -46,6 +46,20 @@ var dbCon = require('./../../lib/db_connector'),
 			}
 		},
 		additionalProperties: false
+	},
+	sortingOptions = {
+		title_asc: {
+			column: 'map.title',
+			direction: 'asc'
+		},
+		updated_on_desc: {
+			column: 'map.updated_on',
+			direction: 'desc'
+		},
+		created_on: {
+			column: 'map.created_on',
+			direction: 'desc'
+		}
 	};
 
 /**
@@ -55,26 +69,12 @@ var dbCon = require('./../../lib/db_connector'),
  * @returns {*}
  */
 function buildSort( sort ) {
-	var sortingOptions = {
-		title_asc: {
-			column: 'map.title',
-			direction: 'asc'
-		},
-		updated_on_desc: {
-			column: 'map.updated_on',
-			direction: 'desc'
-		},
-		default: {
-			column: 'map.created_on',
-			direction: 'desc'
-		}
-	};
-
 	if( sortingOptions.hasOwnProperty(sort) ) {
 		return sortingOptions[sort];
-	} else {
-		return sortingOptions['default'];
 	}
+
+	// default sorting type
+	return sortingOptions['created_on'];
 }
 
 /**
