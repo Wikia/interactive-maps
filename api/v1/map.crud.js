@@ -55,28 +55,26 @@ var dbCon = require('./../../lib/db_connector'),
  * @returns {*}
  */
 function buildSort( sort ) {
-	switch(sort) {
-		case 'title_asc':
-			sort = {
-				column: 'map.title',
-				direction: 'asc'
-			};
-			break;
-		case 'updated_on_desc':
-			sort = {
-				column: 'map.updated_on',
-				direction: 'desc'
-			};
-			break;
-		default:
-			sort = {
-				column: 'map.created_on',
-				direction: 'desc'
-			};
-			break;
-	}
+	var sortingOptions = {
+		title_asc: {
+			column: 'map.title',
+			direction: 'asc'
+		},
+		updated_on_desc: {
+			column: 'map.updated_on',
+			direction: 'desc'
+		},
+		default: {
+			column: 'map.created_on',
+			direction: 'desc'
+		}
+	};
 
-	return sort;
+	if( sortingOptions.hasOwnProperty(sort) ) {
+		return sortingOptions[sort];
+	} else {
+		return sortingOptions['default'];
+	}
 }
 
 /**
