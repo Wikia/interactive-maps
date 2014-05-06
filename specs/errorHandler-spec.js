@@ -63,7 +63,7 @@ describe('errorHandler module', function () {
 			stubErr(undefined, 'error'),
 			stubReq(),
 			stubRes(500, 'error')
-		);
+		)
 	});
 
 	it('should log the error', function () {
