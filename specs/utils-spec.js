@@ -38,7 +38,7 @@ describe('utils', function () {
 			width: 16384,
 			height: 16384
 		}, {
-			zoom: 1,
+			zoom: 2,
 			width: 700,
 			height: 700
 		}],

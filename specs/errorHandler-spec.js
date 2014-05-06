@@ -1,3 +1,4 @@
+/* global jasmine */
 'use strict';
 
 var proxyquire = require('proxyquire').noCallThru(),
@@ -111,7 +112,7 @@ describe('errorHandler module', function () {
 				clientError: {
 					name: 'RejectionError',
 					cause: {
-						code: ''
+						code: 'ER_NO_REFERENCED_ROW'
 					}
 				}
 			},
