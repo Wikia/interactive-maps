@@ -8,7 +8,7 @@ var express = require('express'),
 	guard = require('./lib/guard'),
 	logger = require('./lib/logger'),
 	rawBody = require('./lib/rawBody'),
-	errorHandler = require('./lib/errorHandler').errorHandler,
+	errorHandler = require('./lib/errorHandler'),
 	heartBeatHandler = require('./lib/healthCheck').heartBeatHandler,
 
 	// API entry points modules
@@ -44,11 +44,11 @@ app.use(rawBody);
 app.use(router.middleware);
 renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
-app.use(errorHandler);
-
 
 // FIXME: Probably we won't serve the assets the API server, but this can be used for debugging right now
 app.use(express.static(__dirname + '/assets'));
+
+app.use(errorHandler.middleware);
 
 app.listen(port);
 logger.info('server is listening on port: ' + port);
