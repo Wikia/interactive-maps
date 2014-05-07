@@ -5,6 +5,7 @@ var dbCon = require('./../../lib/db_connector'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
+	config = require('./../lib/config'),
 
 	dbTable = 'poi_category',
 	createSchema = {
@@ -54,6 +55,48 @@ var dbCon = require('./../../lib/db_connector'),
 		},
 		additionalProperties: false
 	};
+
+
+/**
+ * @desc Handle deleting used categories by moving all points to CatchAll category
+ *
+ * @param id {number}
+ * @param res {object}
+ * @param next {function}
+ */
+function handleUsedCategories(id, res, next) {
+	dbCon.update(
+		'poi',
+		{
+			poi_category_id: config.catchAllCategoryId
+		},
+		{
+			poi_category_id: id
+		}).then(
+		function (rowsAffected) {
+			if (rowsAffected > 0) {
+				dbCon.destroy(dbTable, {
+					id: id
+				}).then(
+					function (affectedRows) {
+						if (affectedRows > 0) {
+							res.send(204, {});
+							res.end();
+						} else {
+							next(
+								errorHandler.elementNotFoundError(dbTable, id)
+							);
+						}
+					},
+					next
+				);
+			} else {
+				next(errorHandler.elementNotFoundError(dbTable, id));
+			}
+		},
+		next
+	);
+}
 
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
@@ -119,7 +162,20 @@ module.exports = function createCRUD() {
 									next(errorHandler.elementNotFoundError(dbTable, id));
 								}
 							},
-							next
+							function (err) {
+								// If the delete request results an error, check if the error is reference error
+								// (caused by non able to delete foreign key) and handle this case by calling
+								// the handleUsedCategories function, otherwise handle the error as regular error
+								if (
+									err.hasOwnProperty('clientError') &&
+									err.clientError.name === 'RejectionError' &&
+									err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_'
+								) {
+									handleUsedCategories(id, res, next);
+								} else {
+									next(err);
+								}
+							}
 					);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
