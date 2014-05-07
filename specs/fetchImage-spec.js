@@ -1,3 +1,4 @@
+/* global jasmine */
 'use strict';
 
 var proxyquire = require('proxyquire').noCallThru(),
@@ -6,11 +7,11 @@ var proxyquire = require('proxyquire').noCallThru(),
 describe('Fetch image', function () {
 
 	var res = {
-		statusCode: 200,
-		on: function () {
-			return this;
-		}
-	},
+			statusCode: 200,
+			on: function () {
+				return this;
+			}
+		},
 		http = {
 			get: function (x, cb) {
 				cb(res);
@@ -19,7 +20,7 @@ describe('Fetch image', function () {
 			on: function () {}
 		},
 		qStub = stubs.newQStub(),
-		fsStub = createSpyObj('fs', ['createWriteStream']),
+		fsStub = jasmine.createSpyObj('fs', ['createWriteStream']),
 		data = {
 			fileUrl: 'http:/example.com/image.jpg',
 			name: 'Lorem ipsum',

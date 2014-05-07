@@ -1,8 +1,9 @@
+/* global jasmine */
 'use strict';
 
 module.exports = {
 	newQStub: function () {
-		var defer = createSpyObj('defer', ['resolve', 'reject', 'promise']);
+		var defer = jasmine.createSpyObj('defer', ['resolve', 'reject', 'promise']);
 
 		return {
 			defer: defer,
@@ -11,10 +12,10 @@ module.exports = {
 					return defer;
 				}
 			}
-		}
+		};
 	},
 
 	newCollector: function (methods) {
-		return createSpyObj('collector', methods);
+		return jasmine.createSpyObj('collector', methods);
 	}
 };

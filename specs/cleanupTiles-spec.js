@@ -1,3 +1,4 @@
+/* global jasmine */
 'use strict';
 
 var proxyquire = require('proxyquire').noCallThru(),
@@ -43,7 +44,7 @@ describe('Clean tiles', function () {
 	function createCleanupTilesMock(isEnabled, job) {
 		return proxyquire('../lib/cleanupTiles', {
 			q: qStub.q,
-			child_process: childProcessMock,
+			'child_process': childProcessMock,
 			'./config': {
 				cleanup: isEnabled
 			},
@@ -65,7 +66,7 @@ describe('Clean tiles', function () {
 
 	beforeEach(function () {
 		qStub = stubs.newQStub();
-		childProcessMock = createSpyObj('child_process', ['exec']);
+		childProcessMock = jasmine.createSpyObj('child_process', ['exec']);
 	});
 
 	it('does not run, if cleanup is disabled by config', function () {
