@@ -5,7 +5,7 @@ var dbCon = require('./../../lib/db_connector'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
-	config = require('./../lib/config'),
+	config = require('./../../lib/config'),
 
 	dbTable = 'poi_category',
 	createSchema = {

@@ -112,8 +112,11 @@ module.exports = function createCRUD() {
 						function (collection) {
 							collection.forEach(function (value) {
 								// TODO: fix hardcoded DFS host
-								value.image = 'http://s3.dev-dfs-s1/' +
-									utils.getBucketName(config.bucketPrefix, value.name) + '/' + value.image;
+								value.image = utils.imageUrl(
+									config.dfsServer,
+									utils.getBucketName(config.bucketPrefix, value.name),
+									value.image
+								);
 								value.url = utils.responseUrl(req, req.route.path, value.id);
 
 								delete value.name;
