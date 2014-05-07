@@ -123,8 +123,11 @@ module.exports = function createCRUD() {
 
 								if (obj) {
 									// TODO: fix hardcoded DFS host
-									obj.image = 'http://s3.dev-dfs-s1/' +
-										utils.getBucketName(config.bucketPrefix, obj.name) + '/' + obj.image;
+									obj.image = utils.imageUrl(
+										config.dfsHost,
+										utils.getBucketName(config.bucketPrefix, obj.name),
+										obj.image
+									);
 									obj.max_zoom = utils.binToMaxZoomLevel(obj.max_zoom);
 									res.send(200, obj);
 									res.end();
