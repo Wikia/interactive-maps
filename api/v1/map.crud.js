@@ -113,7 +113,7 @@ module.exports = function createCRUD() {
 							collection.forEach(function (value) {
 								// TODO: fix hardcoded DFS host
 								value.image = utils.imageUrl(
-									config.dfsServer,
+									config.dfsHost,
 									utils.getBucketName(config.bucketPrefix, value.name),
 									value.image
 								);

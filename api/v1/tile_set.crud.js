@@ -124,7 +124,7 @@ module.exports = function createCRUD() {
 								if (obj) {
 									// TODO: fix hardcoded DFS host
 									obj.image = utils.imageUrl(
-										config.dfsServer,
+										config.dfsHost,
 										utils.getBucketName(config.bucketPrefix, obj.name),
 										obj.image
 									);
