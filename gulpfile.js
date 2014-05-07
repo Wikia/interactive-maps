@@ -21,14 +21,16 @@ gulp.task('dev', function () {
 });
 
 gulp.task('test', function (cb) {
-	gulp.src(['lib/*.js', 'api/v1/*.js'])
+	gulp
+		.src(['lib/*.js'])
 		.pipe(istanbul()) // Covering files
-	.on('end', function () {
-		gulp.src('specs/**')
-			.pipe(jasmine())
-			.pipe(istanbul.writeReports()) // Creating the reports after tests runned
-		.on('end', cb);
-	});
+		.on('end', function () {
+			gulp
+				.src('specs/**')
+				.pipe(jasmine())
+				.pipe(istanbul.writeReports()) // Creating the reports after tests runned
+				.on('end', cb);
+		});
 });
 
 gulp.task('default', ['dev'], function () {
