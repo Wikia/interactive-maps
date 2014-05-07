@@ -17,8 +17,8 @@ var dbCon = require('./../../lib/db_connector'),
 				type: 'string',
 				required: true
 			},
-			city_id: {
-				description: 'ID of the Wikia this map instance belongs to',
+			map_id: {
+				description: 'ID of the map this POI belongs to',
 				type: 'integer',
 				required: true
 			},
@@ -182,7 +182,15 @@ module.exports = function createCRUD() {
 				}
 			},
 			GET: function (req, res, next) {
-				var dbColumns = ['name', 'marker', 'parent_poi_category_id', 'city_id', 'created_on', 'created_by'],
+				var dbColumns = [
+						'name',
+						'marker',
+						'parent_poi_category_id',
+						'map_id',
+						'category_type',
+						'created_on',
+						'created_by'
+					],
 					id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
