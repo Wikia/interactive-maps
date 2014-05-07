@@ -68,13 +68,13 @@ var dbCon = require('./../../lib/db_connector'),
  * @param {String} sort description of sorting passed as GET parameter i.e. title_asc
  * @returns {*}
  */
-function buildSort( sort ) {
-	if( sortingOptions.hasOwnProperty(sort) ) {
+function buildSort(sort) {
+	if(sortingOptions.hasOwnProperty(sort)) {
 		return sortingOptions[sort];
 	}
 
 	// default sorting type
-	return sortingOptions['created_on'];
+	return sortingOptions.created_on;
 }
 
 /**
@@ -88,7 +88,7 @@ module.exports = function createCRUD() {
 			GET: function (req, res, next) {
 				var cityId = parseInt(req.query.city_id, 10) || 0,
 					filter = {},
-					sort = buildSort( req.query.sort );
+					sort = buildSort(req.query.sort);
 
 				if (cityId !== 0) {
 					filter.city_id = cityId;
@@ -180,7 +180,7 @@ module.exports = function createCRUD() {
 				}
 			},
 			GET: function (req, res, next) {
-				var dbColumns = ['title', 'tile_set_id', 'city_id', 'created_by', 'created_on', 'updated_on'],
+				var dbColumns = ['id', 'title', 'tile_set_id', 'city_id', 'created_by', 'created_on', 'updated_on'],
 					id = parseInt(req.pathVar.id, 10),
 					filter = {
 						id: id
@@ -209,11 +209,13 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, updateSchema);
+					errors = jsonValidator(reqBody, updateSchema),
+					id,
+					filter;
 
 				if (errors.length === 0) {
-					var id = parseInt(req.pathVar.id, 10),
-						filter = {
+					id = parseInt(req.pathVar.id, 10);
+					filter = {
 							id: id
 						};
 
