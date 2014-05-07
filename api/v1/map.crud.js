@@ -69,7 +69,7 @@ var dbCon = require('./../../lib/db_connector'),
  * @returns {*}
  */
 function buildSort(sort) {
-	if(sortingOptions.hasOwnProperty(sort)) {
+	if (sortingOptions.hasOwnProperty(sort)) {
 		return sortingOptions[sort];
 	}
 
@@ -216,8 +216,8 @@ module.exports = function createCRUD() {
 				if (errors.length === 0) {
 					id = parseInt(req.pathVar.id, 10);
 					filter = {
-							id: id
-						};
+						id: id
+					};
 
 					if (isFinite(id)) {
 						reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
