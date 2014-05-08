@@ -42,7 +42,8 @@ CREATE TABLE poi_category (
   name VARCHAR(255) NOT NULL,
   marker VARCHAR(255),
   parent_poi_category_id INT UNSIGNED,
-  city_id INT NOT NULL,
+  map_id INT NOT NULL,
+  category_type TINYINT DEFAULT 1 NOT NULL,
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   created_by VARCHAR(255) NOT NULL,
 
