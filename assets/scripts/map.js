@@ -62,7 +62,7 @@
 			.setContent(buildPopupHtml(point));
 
 		return L
-			.marker([ point.lat, point.lon ], {
+			.marker([point.lat, point.lon], {
 				riseOnHover: true
 			})
 			.bindPopup(popup)
@@ -78,7 +78,7 @@
 			L.Icon.Default.imagePath = config.imagesPath;
 		}
 		map = L.map(mapContainerId)
-			.setView([config.latitude, config.longitude], 3);
+			.setView([config.latitude, config.longitude], config.zoom);
 
 		L.tileLayer(config.pathTemplate, config.map).addTo(map);
 
