@@ -51,4 +51,4 @@ app.use(express.static(__dirname + '/assets'));
 app.use(errorHandler.middleware);
 
 app.listen(port);
-logger.info('server is listening on port: ' + port);
+logger.notice('Server started on port: ' + port);
