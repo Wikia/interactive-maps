@@ -110,20 +110,30 @@ module.exports = function createCRUD() {
 					.select()
 					.then(
 						function (collection) {
-							collection.forEach(function (value) {
-								// TODO: fix hardcoded DFS host
-								value.image = utils.imageUrl(
-									config.dfsHost,
-									utils.getBucketName(config.bucketPrefix, value.name),
-									value.image
+							dbCon.knex(dbTable)
+								.count('id as cntr')
+								.where(filter)
+								.then(
+									function (count) {
+										collection.forEach(function (value) {
+											value.image = utils.imageUrl(
+												config.dfsHost,
+												utils.getBucketName(config.bucketPrefix, value.name),
+												value.image
+											);
+											value.url = utils.responseUrl(req, req.route.path, value.id);
+
+											delete value.name;
+										});
+
+										res.send(200, {
+											total: count[0].cntr,
+											items: collection
+										});
+										res.end();
+									},
+									next
 								);
-								value.url = utils.responseUrl(req, req.route.path, value.id);
-
-								delete value.name;
-							});
-
-							res.send(200, collection);
-							res.end();
 						},
 						next
 				);
