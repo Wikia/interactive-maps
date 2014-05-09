@@ -1,4 +1,4 @@
-(function(window, L){
+(function (window, L) {
 	'use strict';
 
 	var mapContainerId = 'map',
@@ -75,24 +75,19 @@
 	 * @returns {object} Leaflet Marker
 	 */
 	function addPointOnMap(point) {
-		var popup, popupWidth;
-
-		popupWidth = (point.photo) ? popupWidthWithPhoto : popupWidthWithoutPhoto;
-
-		popup = L
-			.popup({
-				closeButton: false,
-				minWidth: popupWidth,
-				maxWidth: popupWidth
-			})
-			.setContent(buildPopupHtml(point));
-
-		return L
-			.marker([point.lat, point.lon], {
-				riseOnHover: true
-			})
-			.bindPopup(popup)
+		var popupHtml = '<h3>' + point.name + '</h3>' +
+			'<p>' +point.description + '</p>';
+		return L.marker([ point.lat, point.lon ], {
+			riseOnHover: true
+		})
+			.bindPopup(popupHtml)
 			.addTo(map);
+	}
+
+	function buildLink(link, content) {
+		if (link.length) {
+			return '<a href="' + link + '" target="_blank">' + content + '</a>';
+		}
 	}
 
 	/**
@@ -162,7 +157,7 @@
 			Math.max(config.zoom, defaultMinZoom)
 		);
 
-		config.points.forEach(function (point){
+		config.points.forEach(function (point) {
 			addPointOnMap(point);
 		});
 	}
