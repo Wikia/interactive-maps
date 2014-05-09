@@ -1,41 +1,35 @@
 .leaflet-popup-content-wrapper {
-    padding: 0;
     border-radius: 0;
+    padding: 0;
 }
 
 .leaflet-popup-content {
     margin: 0;
 }
 
-.leaflet-popup article:after {
+.leaflet-popup-content:after {
+    clear: both;
     content: ".";
     display: block;
     height: 0;
-    clear: both;
     visibility: hidden;
 }
 
-.leaflet-popup figure {
-    float: left;
-    margin: 0 20px 0 0;
-}
-
-.leaflet-popup figure img {
+.leaflet-popup img {
     display: block;
-}
-
-.leaflet-popup .description {
-    padding: 15px 20px;
+    float: left;
+    margin-right: 20px;
 }
 
 .leaflet-popup h3 {
-    margin: 0 0 5px 0;
+    margin: 0 20px;
+    padding: 15px 0 5px 0;
 }
 
-.leaflet-popup h3 a {
+.leaflet-popup a {
     text-decoration: none;
 }
 
 .leaflet-popup p {
-    margin: 0;
+    margin: 0 20px 15px;
 }

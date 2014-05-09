@@ -2,7 +2,51 @@
 	'use strict';
 
 	var mapContainerId = 'map',
-		map;
+		map,
+		popupMaxWidth = 380,
+		photoWidth = 90,
+		photoHeight = 90;
+
+	/**
+	 * @desc Build popup HTML
+	 * @param point {object}
+	 * @returns {string} Popup HTML
+	 */
+	function buildPopupHtml(point) {
+		//TODO what about edit link? where do we get it from?
+		return buildPhotoHtml(point) +
+			'<h3>' + buildLink(point, point.name) + '</h3>' +
+			'<p>' + point.description + '</p>';
+	}
+
+	/**
+	 * @desc Build photo HTML if given point has photo
+	 * @param point {object}
+	 * @returns {string} Photo HTML or empty string if there is no photo available
+	 */
+	function buildPhotoHtml(point) {
+		if (point.photo) {
+			//TODO what about that width and height?
+			var imgHtml = '<img src="' + point.photo + '" width="' + photoWidth + '" height="' + photoHeight + '">';
+			return buildLink(point, imgHtml);
+		}
+
+		return '';
+	}
+
+	/**
+	 * @desc Build HTML for "a" element if given point has link
+	 * @param point {object}
+	 * @param innerHtml {string}
+	 * @returns {string} Link HTML element or plain content if there is no link available
+	 */
+	function buildLink(point, innerHtml) {
+		if (point.link) {
+			return '<a href="' + point.link + '" title="' + point.name + '" target="_blank">' + innerHtml + '</a>';
+		}
+
+		return innerHtml;
+	}
 
 	/**
 	 * @desc Add point to the map
@@ -10,29 +54,12 @@
 	 * @returns {object} Leaflet Marker
 	 */
 	function addPointOnMap(point) {
-        //TODO what about edit link? where do we get it from?
-		var popupHtml = '<article>';
-
-		if (point.photo.length) {
-			//TODO what about that width and height?
-			popupHtml += '<figure>' +
-				buildLink(point.link, '<img src="' + point.photo + '" width="90" height="90">') +
-				'</figure>';
-		}
-
-		popupHtml += '<div class="description">';
-		popupHtml += '<h3>' + buildLink(point.link, point.name) + '</h3>';
-		popupHtml += '<p>' + point.description + '</p>';
-		popupHtml += '</div>';
-
-		popupHtml += '</article>';
-
 		var popup = L
 			.popup({
 				closeButton: false,
-				maxWidth: 380
+				maxWidth: popupMaxWidth
 			})
-			.setContent(popupHtml);
+			.setContent(buildPopupHtml(point));
 
 		return L
 			.marker([ point.lat, point.lon ], {
@@ -40,12 +67,6 @@
 			})
 			.bindPopup(popup)
 			.addTo(map);
-	}
-
-	function buildLink(link, content) {
-		if (link.length) {
-			return '<a href="' + link + '" target="_blank">' + content + '</a>';
-		}
 	}
 
 	/**
@@ -57,14 +78,13 @@
 			L.Icon.Default.imagePath = config.imagesPath;
 		}
 		map = L.map(mapContainerId)
-			.setView([config.latitude, config.longitude], config.zoom);
+			.setView([config.latitude, config.longitude], 3);
 
 		L.tileLayer(config.pathTemplate, config.map).addTo(map);
 
 		config.points.forEach(function (point) {
 			addPointOnMap(point);
 		});
-
 	}
 
 	createMap(window.mapSetup);
