@@ -46,7 +46,6 @@
 			Math.max(config.zoom, config.layer.minZoom)
 		);
 
-
 		config.points.forEach(function (point){
 			addPointOnMap(point);
 		});
