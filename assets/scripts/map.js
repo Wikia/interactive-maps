@@ -1,4 +1,4 @@
-(function(window, L){
+(function (window, L) {
 	'use strict';
 
 	var mapContainerId = 'map',
@@ -10,13 +10,42 @@
 	 * @returns {object} Leaflet Marker
 	 */
 	function addPointOnMap(point) {
-		var popupHtml = '<h3>' + point.name + '</h3>' +
-			'<p>' +point.description + '</p>';
-		return L.marker([ point.lat, point.lon ], {
-			riseOnHover: true
-		})
-			.bindPopup(popupHtml)
+        //TODO what about edit link? where do we get it from?
+		var popupHtml = '<article>';
+
+		if (point.photo.length) {
+			//TODO what about that width and height?
+			popupHtml += '<figure>' +
+				buildLink(point.link, '<img src="' + point.photo + '" width="90" height="90">') +
+				'</figure>';
+		}
+
+		popupHtml += '<div class="description">';
+		popupHtml += '<h3>' + buildLink(point.link, point.name) + '</h3>';
+		popupHtml += '<p>' + point.description + '</p>';
+		popupHtml += '</div>';
+
+		popupHtml += '</article>';
+
+		var popup = L
+			.popup({
+				closeButton: false,
+				maxWidth: 380
+			})
+			.setContent(popupHtml);
+
+		return L
+			.marker([ point.lat, point.lon ], {
+				riseOnHover: true
+			})
+			.bindPopup(popup)
 			.addTo(map);
+	}
+
+	function buildLink(link, content) {
+		if (link.length) {
+			return '<a href="' + link + '" target="_blank">' + content + '</a>';
+		}
 	}
 
 	/**
@@ -32,7 +61,7 @@
 
 		L.tileLayer(config.pathTemplate, config.map).addTo(map);
 
-		config.points.forEach(function (point){
+		config.points.forEach(function (point) {
 			addPointOnMap(point);
 		});
 
