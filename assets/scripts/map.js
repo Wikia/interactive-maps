@@ -31,7 +31,8 @@
 				minZoom: config.layer.minZoom,
 				maxZoom: config.layer.maxZoom
 			})
-			.setView([config.latitude, config.longitude], config.layer.maxZoom);
+			.setView([config.latitude, config.longitude],
+				Math.max(config.zoom, config.layer.minZoom));
 
 		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
