@@ -6,6 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 	config = require('./../../lib/config'),
+	createProcessMarkerJob = require('./../../lib/poiCategoryMarker').createProcessMarkerJob,
 
 	dbTable = 'poi_category',
 	createSchema = {
@@ -56,10 +57,6 @@ var dbCon = require('./../../lib/db_connector'),
 		additionalProperties: false
 	};
 
-
-function createMarkerProcessingJob(id, marker) {
-
-}
 
 /**
  * @desc Handle deleting used categories by moving all points to CatchAll category
@@ -138,7 +135,7 @@ module.exports = function createCRUD() {
 										url: utils.responseUrl(req, req.route.path, id)
 									};
 								if (reqBody.marker) {
-									createMarkerProcessingJob(id, reqBody.marker);
+									createProcessMarkerJob(id, reqBody.marker, dbTable);
 								}
 								res.send(201, response);
 								res.end();
@@ -245,7 +242,7 @@ module.exports = function createCRUD() {
 											url: utils.responseUrl(req, '/api/v1/poi_category', id)
 										};
 										if (reqBody.marker) {
-											createMarkerProcessingJob(id, reqBody.marker);
+											createProcessMarkerJob(id, reqBody.marker, dbTable);
 										}
 										res.send(303, response);
 										res.end();
