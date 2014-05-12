@@ -90,7 +90,8 @@ module.exports = function createCRUD() {
 					filter = {},
 					sort = buildSort(req.query.sort),
 					limit = parseInt(req.query.limit, 10) || false,
-					offset = parseInt(req.query.offset, 10) || 0;
+					offset = parseInt(req.query.offset, 10) || 0,
+					query;
 
 				if (cityId !== 0) {
 					filter.city_id = cityId;
@@ -98,7 +99,7 @@ module.exports = function createCRUD() {
 
 				filter.status = utils.tileSetStatus.ok;
 
-				dbCon.knex(dbTable)
+				query = dbCon.knex(dbTable)
 					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
 					.column([
 						'map.id',
@@ -110,8 +111,14 @@ module.exports = function createCRUD() {
 					])
 					.where(filter)
 					.orderBy(sort.column, sort.direction)
-					.select()
-					.then(
+					.select();
+
+				if (limit) {
+					query.limit(limit);
+					query.offset(offset);
+				}
+
+				query.then(
 						function (collection) {
 							dbCon.knex(dbTable)
 								.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
