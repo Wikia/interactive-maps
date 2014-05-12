@@ -9,7 +9,7 @@
 
 	/**
 	 * @desc Build popup HTML
-	 * @param point {object}
+	 * @param point {object} - POI object
 	 * @returns {string} - Popup HTML makup
 	 */
 	function buildPopupHtml(point) {
