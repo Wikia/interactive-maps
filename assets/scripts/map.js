@@ -14,38 +14,37 @@
 	 */
 	function buildPopupHtml(point) {
 		//TODO what about edit link? where do we get it from?
-		return buildPhotoHtml(point) +
-			'<h3>' + buildLink(point, point.name) + '</h3>' +
+		var photoHtml = '';
+
+		if (point.photo && point.link) {
+			photoHtml = buildLinkHtml(point, buildPhotoHtml(point.photo));
+		} else if (point.photo) {
+			photoHtml = buildPhotoHtml(point.photo);
+		}
+
+		return photoHtml +
+			'<h3>' + (point.link ? buildLinkHtml(point, point.name) : point.name) + '</h3>' +
 			'<p>' + point.description + '</p>';
 	}
 
 	/**
-	 * @desc Build photo HTML if given point has photo
-	 * @param point {object}
-	 * @returns {string} Photo HTML or empty string if there is no photo available
+	 * @desc Build photo HTML
+	 * @param photo {string}
+	 * @returns {string} Photo HTML
 	 */
-	function buildPhotoHtml(point) {
-		if (point.photo) {
-			//TODO what about that width and height?
-			var imgHtml = '<img src="' + point.photo + '" width="' + photoWidth + '" height="' + photoHeight + '">';
-			return buildLink(point, imgHtml);
-		}
-
-		return '';
+	function buildPhotoHtml(photo) {
+		//TODO what about that width and height?
+		return '<img src="' + photo + '" width="' + photoWidth + '" height="' + photoHeight + '">';
 	}
 
 	/**
-	 * @desc Build HTML for "a" element if given point has link
+	 * @desc Build link HTML
 	 * @param point {object}
 	 * @param innerHtml {string}
-	 * @returns {string} Link HTML element or plain content if there is no link available
+	 * @returns {string} Link HTML
 	 */
-	function buildLink(point, innerHtml) {
-		if (point.link) {
-			return '<a href="' + point.link + '" title="' + point.name + '" target="_blank">' + innerHtml + '</a>';
-		}
-
-		return innerHtml;
+	function buildLinkHtml(point, innerHtml) {
+		return '<a href="' + point.link + '" title="' + point.name + '" target="_blank">' + innerHtml + '</a>';
 	}
 
 	/**
@@ -77,7 +76,8 @@
 		if (config.imagesPath) {
 			L.Icon.Default.imagePath = config.imagesPath;
 		}
-		map = L.map(mapContainerId)
+		map = L
+			.map(mapContainerId)
 			.setView([config.latitude, config.longitude], config.zoom);
 
 		L.tileLayer(config.pathTemplate, config.map).addTo(map);

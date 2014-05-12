@@ -5,14 +5,7 @@
 
 .leaflet-popup-content {
     margin: 0;
-}
-
-.leaflet-popup-content:after {
-    clear: both;
-    content: ".";
-    display: block;
-    height: 0;
-    visibility: hidden;
+    overflow: hidden;
 }
 
 .leaflet-popup img {
