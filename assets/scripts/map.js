@@ -10,7 +10,7 @@
 	/**
 	 * @desc Build popup HTML
 	 * @param point {object}
-	 * @returns {string} Popup HTML
+	 * @returns {string} - Popup HTML makup
 	 */
 	function buildPopupHtml(point) {
 		//TODO what about edit link? where do we get it from?
@@ -29,19 +29,19 @@
 
 	/**
 	 * @desc Build photo HTML
-	 * @param photo {string}
+	 * @param photoUrl {string} - image URL
 	 * @returns {string} Photo HTML
 	 */
-	function buildPhotoHtml(photo) {
+	function buildPhotoHtml(photoUrl) {
 		//TODO what about that width and height?
-		return '<img src="' + photo + '" width="' + photoWidth + '" height="' + photoHeight + '">';
+		return '<img src="' + photoUrl + '" width="' + photoWidth + '" height="' + photoHeight + '">';
 	}
 
 	/**
 	 * @desc Build link HTML
-	 * @param point {object}
-	 * @param innerHtml {string}
-	 * @returns {string} Link HTML
+	 * @param point {object} - POI object
+	 * @param innerHtml {string} - string of HTML markup
+	 * @returns {string} - HTMl markup for link
 	 */
 	function buildLinkHtml(point, innerHtml) {
 		return '<a href="' + point.link + '" title="' + point.name + '" target="_blank">' + innerHtml + '</a>';
