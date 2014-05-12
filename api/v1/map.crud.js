@@ -88,7 +88,9 @@ module.exports = function createCRUD() {
 			GET: function (req, res, next) {
 				var cityId = parseInt(req.query.city_id, 10) || 0,
 					filter = {},
-					sort = buildSort(req.query.sort);
+					sort = buildSort(req.query.sort),
+					limit = parseInt(req.query.limit, 10) || false,
+					offset = parseInt(req.query.offset, 10) || 0;
 
 				if (cityId !== 0) {
 					filter.city_id = cityId;
