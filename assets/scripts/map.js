@@ -27,15 +27,28 @@
 		if (config.imagesPath) {
 			L.Icon.Default.imagePath = config.imagesPath;
 		}
-		map = L.map(mapContainerId)
-			.setView([config.latitude, config.longitude], config.zoom);
+		map = L.map(mapContainerId, {
+				minZoom: config.layer.minZoom,
+				maxZoom: config.layer.maxZoom
+			})
+		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
-		L.tileLayer(config.pathTemplate, config.map).addTo(map);
+		if (config.hasOwnProperty('boundaries')) {
+			map.setMaxBounds(
+				new L.LatLngBounds(
+					L.latLng(config.boundaries.south, config.boundaries.west),
+					L.latLng(config.boundaries.north, config.boundaries.east)
+				)
+			);
+		}
+
+		map.setView([config.latitude, config.longitude],
+			Math.max(config.zoom, config.layer.minZoom)
+		);
 
 		config.points.forEach(function (point){
 			addPointOnMap(point);
 		});
-
 	}
 
 	createMap(window.mapSetup);
