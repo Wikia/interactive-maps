@@ -57,6 +57,10 @@ var dbCon = require('./../../lib/db_connector'),
 	};
 
 
+function createMarkerProcessingJob(id, marker) {
+
+}
+
 /**
  * @desc Handle deleting used categories by moving all points to CatchAll category
  *
@@ -133,7 +137,9 @@ module.exports = function createCRUD() {
 										id: id,
 										url: utils.responseUrl(req, req.route.path, id)
 									};
-
+								if (reqBody.marker) {
+									createMarkerProcessingJob(id, reqBody.marker);
+								}
 								res.send(201, response);
 								res.end();
 							},
@@ -223,7 +229,10 @@ module.exports = function createCRUD() {
 						filter = {
 							id: id
 						};
-
+					// If new marker is uploaded, reset the marker status to 0
+					if (reqBody.marker) {
+						reqBody.status = 0;
+					}
 					if (isFinite(id)) {
 						dbCon
 							.update(dbTable, reqBody, filter)
@@ -235,7 +244,9 @@ module.exports = function createCRUD() {
 											id: id,
 											url: utils.responseUrl(req, '/api/v1/poi_category', id)
 										};
-
+										if (reqBody.marker) {
+											createMarkerProcessingJob(id, reqBody.marker);
+										}
 										res.send(303, response);
 										res.end();
 									} else {
