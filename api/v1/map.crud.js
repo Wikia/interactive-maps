@@ -92,8 +92,9 @@ module.exports = function createCRUD() {
 
 				if (cityId !== 0) {
 					filter.city_id = cityId;
-					filter.status = utils.tileSetStatus.ok;
 				}
+
+				filter.status = utils.tileSetStatus.ok;
 
 				dbCon.knex(dbTable)
 					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
@@ -111,7 +112,8 @@ module.exports = function createCRUD() {
 					.then(
 						function (collection) {
 							dbCon.knex(dbTable)
-								.count('id as cntr')
+								.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+								.count('* as cntr')
 								.where(filter)
 								.then(
 									function (count) {
