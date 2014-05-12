@@ -17,9 +17,9 @@
 		var photoHtml = '';
 
 		if (point.photo && point.link) {
-			photoHtml = buildLinkHtml(point, buildPhotoHtml(point.photo));
+			photoHtml = buildLinkHtml(point, buildPhotoHtml(point.photo, point.name));
 		} else if (point.photo) {
-			photoHtml = buildPhotoHtml(point.photo);
+			photoHtml = buildPhotoHtml(point.photo, point.name);
 		}
 
 		return photoHtml +
@@ -32,9 +32,9 @@
 	 * @param photo {string}
 	 * @returns {string} Photo HTML
 	 */
-	function buildPhotoHtml(photo) {
+	function buildPhotoHtml(photo, alt) {
 		//TODO what about that width and height?
-		return '<img src="' + photo + '" width="' + photoWidth + '" height="' + photoHeight + '">';
+		return '<img src="' + photo + '" alt="' + alt + '" width="' + photoWidth + '" height="' + photoHeight + '">';
 	}
 
 	/**
