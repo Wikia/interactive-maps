@@ -34,3 +34,7 @@
 .leaflet-popup p {
     margin: 5px 0 0;
 }
+
+#point_types li.enabled {
+    background: #FF0000;
+}
