@@ -135,7 +135,7 @@ module.exports = function createCRUD() {
 										url: utils.responseUrl(req, req.route.path, id)
 									};
 								if (reqBody.marker) {
-									createProcessMarkerJob(id, reqBody.marker, dbTable);
+									createProcessMarkerJob(id, reqBody.map_id, reqBody.marker, dbTable);
 								}
 								res.send(201, response);
 								res.end();
@@ -242,7 +242,7 @@ module.exports = function createCRUD() {
 											url: utils.responseUrl(req, '/api/v1/poi_category', id)
 										};
 										if (reqBody.marker) {
-											createProcessMarkerJob(id, reqBody.marker, dbTable);
+											createProcessMarkerJob(id, reqBody.map_id, reqBody.marker, dbTable);
 										}
 										res.send(303, response);
 										res.end();
