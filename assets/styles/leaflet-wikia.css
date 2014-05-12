@@ -1,0 +1,35 @@
+.leaflet-popup-content-wrapper {
+    border-radius: 0;
+    padding: 0;
+}
+
+.leaflet-popup-content {
+    margin: 0;
+}
+
+.leaflet-popup-content:after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    visibility: hidden;
+}
+
+.leaflet-popup img {
+    display: block;
+    float: left;
+    margin-right: 20px;
+}
+
+.leaflet-popup h3 {
+    margin: 0 20px;
+    padding: 15px 0 5px 0;
+}
+
+.leaflet-popup a {
+    text-decoration: none;
+}
+
+.leaflet-popup p {
+    margin: 0 20px 15px;
+}
