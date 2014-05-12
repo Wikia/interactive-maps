@@ -31,8 +31,6 @@
 				minZoom: config.layer.minZoom,
 				maxZoom: config.layer.maxZoom
 			})
-			.setView([config.latitude, config.longitude], config.layer.maxZoom);
-
 		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
 		if (config.hasOwnProperty('boundaries')) {
@@ -43,6 +41,10 @@
 				)
 			);
 		}
+
+		map.setView([config.latitude, config.longitude],
+			Math.max(config.zoom, config.layer.minZoom)
+		);
 
 		config.points.forEach(function (point){
 			addPointOnMap(point);
