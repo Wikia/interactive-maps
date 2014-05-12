@@ -14,15 +14,15 @@
 	 */
 	function buildPopupHtml(point) {
 		//TODO what about edit link? where do we get it from?
-		var photoHtml = '';
+		var popupHtml = '';
 
 		if (point.photo && point.link) {
-			photoHtml = buildLinkHtml(point, buildPhotoHtml(point.photo));
+			popupHtml = buildLinkHtml(point, buildPhotoHtml(point.photo));
 		} else if (point.photo) {
-			photoHtml = buildPhotoHtml(point.photo);
+			popupHtml = buildPhotoHtml(point.photo);
 		}
 
-		return photoHtml +
+		return popupHtml +
 			'<h3>' + (point.link ? buildLinkHtml(point, point.name) : point.name) + '</h3>' +
 			'<p>' + point.description + '</p>';
 	}
