@@ -44,6 +44,8 @@ CREATE TABLE poi_category (
   parent_poi_category_id INT UNSIGNED,
   map_id INT NOT NULL,
   category_type TINYINT DEFAULT 1 NOT NULL,
+  image VARCHAR(255) NOT NULL,
+  status TINYINT DEFAULT 0 NOT NULL,
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   created_by VARCHAR(255) NOT NULL,
 
