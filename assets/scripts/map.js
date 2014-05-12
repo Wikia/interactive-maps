@@ -30,6 +30,7 @@
 	/**
 	 * @desc Build photo HTML
 	 * @param photoUrl {string} - image URL
+	 * @param alt {string} - image alternate text
 	 * @returns {string} Photo HTML
 	 */
 	function buildPhotoHtml(photoUrl, alt) {
