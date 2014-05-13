@@ -45,7 +45,7 @@
 		var maxSizeForZoom = Math.pow(2, maxZoom + 8),
 			ratio = maxSize / maxSizeForZoom,
 			compensatedViewPortSize = maxViewPortSize / ratio;
-		return sizeToZoomLevel(compensatedViewPortSize);
+		return Math.min(sizeToZoomLevel(compensatedViewPortSize), maxZoom);
 	}
 
 	/**
@@ -53,11 +53,7 @@
 	 * @param config {object}
 	 */
 	function createMap(config) {
-		if (config.imagesPath) {
-			L.Icon.Default.imagePath = config.imagesPath;
-		}
-
-		config.layer.minZoom = getMinZoomLevel(
+		var defaultMinZoom = getMinZoomLevel(
 			config.layer.maxZoom,
 			Math.max(config.width, config.height),
 			Math.max(
@@ -66,10 +62,14 @@
 			)
 		);
 
+		if (config.imagesPath) {
+			L.Icon.Default.imagePath = config.imagesPath;
+		}
+
 		map = L.map(mapContainerId, {
 				minZoom: config.layer.minZoom,
 				maxZoom: config.layer.maxZoom
-			})
+			});
 		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
 		if (config.hasOwnProperty('boundaries')) {
@@ -83,7 +83,7 @@
 
 		map.setView(
 			L.latLng(config.latitude, config.longitude),
-			Math.max(config.zoom, config.layer.minZoom)
+			Math.max(config.zoom, defaultMinZoom)
 		);
 
 		config.points.forEach(function (point){
