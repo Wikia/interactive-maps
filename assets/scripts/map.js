@@ -81,7 +81,8 @@
 			);
 		}
 
-		map.setView([config.latitude, config.longitude],
+		map.setView(
+			L.latLng(config.latitude, config.longitude),
 			Math.max(config.zoom, config.layer.minZoom)
 		);
 
