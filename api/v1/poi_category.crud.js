@@ -6,7 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 	config = require('./../../lib/config'),
-	createProcessMarkerJob = require('./../../lib/poiCategoryMarker').createProcessMarkerJob,
+	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 
 	dbTable = 'poi_category',
 	createSchema = {
@@ -133,7 +133,7 @@ module.exports = function createCRUD() {
 										url: utils.responseUrl(req, req.route.path, id)
 									};
 								if (reqBody.marker) {
-									createProcessMarkerJob(id, reqBody.map_id, reqBody.marker, dbTable);
+									poiCategoryMarker(id, reqBody.map_id, reqBody.marker, dbTable);
 								}
 								res.send(201, response);
 								res.end();
@@ -240,7 +240,7 @@ module.exports = function createCRUD() {
 											url: utils.responseUrl(req, '/api/v1/poi_category', id)
 										};
 										if (reqBody.marker) {
-											createProcessMarkerJob(id, reqBody.map_id, reqBody.marker, dbTable);
+											poiCategoryMarker(id, reqBody.map_id, reqBody.marker, dbTable);
 										}
 										res.send(303, response);
 										res.end();
