@@ -40,19 +40,19 @@ var proxyquire = require('proxyquire').noCallThru(),
 
 describe('errorHandler module', function () {
 	it('should response with appropriate status end message', function () {
-		errorHandler.errorHandler(
+		errorHandler.middleware(
 			stubErr(400, 'error'),
 			stubReq(),
 			stubRes(400, 'error')
 		);
 
-		errorHandler.errorHandler(
+		errorHandler.middleware(
 			stubErr(502, 'error1'),
 			stubReq(),
 			stubRes(502, 'error1')
 		);
 
-		errorHandler.errorHandler(
+		errorHandler.middleware(
 			stubErr(404, 'error2'),
 			stubReq(),
 			stubRes(404, 'error2')
@@ -60,7 +60,7 @@ describe('errorHandler module', function () {
 	});
 
 	it('should use status 500 by default', function () {
-		errorHandler.errorHandler(
+		errorHandler.middleware(
 			stubErr(undefined, 'error'),
 			stubReq(),
 			stubRes(500, 'error')
@@ -81,7 +81,7 @@ describe('errorHandler module', function () {
 				}
 			});
 
-		errorHandler.errorHandler(
+		errorHandler.middleware(
 			stubErr(418, 'I\'m a teapot'),
 			stubReq(),
 			stubRes(418, 'I\'m a teapot')
@@ -94,7 +94,7 @@ describe('errorHandler module', function () {
 			req: {}
 		});
 
-		errorHandler.errorHandler(
+		errorHandler.middleware(
 			stubErr(404, 'Not found'),
 			stubReq(),
 			stubRes(404, 'Not found')
@@ -108,7 +108,7 @@ describe('errorHandler module', function () {
 	});
 
 	it('should handle foreign key errors in sql', function () {
-		errorHandler.errorHandler({
+		errorHandler.middleware({
 				clientError: {
 					name: 'RejectionError',
 					cause: {
@@ -124,7 +124,7 @@ describe('errorHandler module', function () {
 	});
 
 	it('should handle duplicate unique key error in database', function () {
-		errorHandler.errorHandler({
+		errorHandler.middleware({
 				clientError: {
 					name: 'RejectionError',
 					cause: {
@@ -140,7 +140,7 @@ describe('errorHandler module', function () {
 	});
 
 	it('should handle delete referred', function () {
-		errorHandler.errorHandler({
+		errorHandler.middleware({
 				clientError: {
 					name: 'RejectionError',
 					cause: {
@@ -156,7 +156,7 @@ describe('errorHandler module', function () {
 	});
 
 	it('should handle general sql errors', function () {
-		errorHandler.errorHandler({
+		errorHandler.middleware({
 				clientError: {
 					name: 'SQL Error'
 				}
