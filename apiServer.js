@@ -32,6 +32,12 @@ logger.set({
 		enabled: true,
 		level: logger.level.DEBUG,
 		raw: true
+	},
+	syslog: {
+		enabled: true,
+		level: logger.level.NOTICE,
+		tag: 'intMaps',
+		dev: true
 	}
 });
 
