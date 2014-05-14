@@ -67,11 +67,14 @@ var dbCon = require('./../../lib/db_connector'),
  */
 function handleUsedCategories(id, res, next) {
 	dbCon.update(
-		'poi', {
+		'poi',
+		{
 			poi_category_id: config.catchAllCategoryId
-		}, {
+		},
+		{
 			poi_category_id: id
-		}).then(
+		}
+	).then(
 		function (rowsAffected) {
 			if (rowsAffected > 0) {
 				dbCon.destroy(dbTable, {
@@ -184,14 +187,14 @@ module.exports = function createCRUD() {
 			},
 			GET: function (req, res, next) {
 				var dbColumns = [
-					'name',
-					'marker',
-					'parent_poi_category_id',
-					'map_id',
-					'category_type',
-					'created_on',
-					'created_by'
-				],
+						'name',
+						'marker',
+						'parent_poi_category_id',
+						'map_id',
+						'category_type',
+						'created_on',
+						'created_by'
+					],
 					id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
