@@ -9,7 +9,8 @@ describe('jobProcessors', function () {
 			'./config': {
 				kue: {
 					maxFetchJobs: 99,
-					maxCutTilesJobs: 99
+					maxCutTilesJobs: 99,
+					maxProcessMarkerJobs: 99
 				}
 			},
 			'kue': {
