@@ -1,0 +1,161 @@
+(function (window) {
+	var bridge = function () {
+		'use strict';
+		var
+			/**
+			 * @desc Window object to send the messages to
+			 *
+			 * @private
+			 *
+			 * @type {HTMLElement}
+			 */
+			target,
+
+			/**
+			 * @desc URL origin of the target
+			 *
+			 * @private
+			 *
+			 * @type {String}
+			 */
+			targetOrigin,
+
+			/**
+			 * @desc Local URL origin
+			 *
+			 * @private
+			 *
+			 * @type {String}
+			 */
+			localOrigin,
+
+			/**
+			 * @desc Registry for callbacks
+			 *
+			 * @private
+			 *
+			 * @type {Object}
+			 */
+			callbacks = {};
+
+		/**
+		 * @desc Finds appropriate communication channel
+		 * and starts listening for events
+		 *
+		 * @param {HTMLElement | undefined} iframeEl
+		 * call it without arguments to init channel inside iframe
+		 */
+		function init (iframeEl) {
+			if (iframeEl) {
+				target = iframeEl.contentWindow;
+				targetOrigin = target.location.origin;
+				localOrigin = window.location.origin;
+			} else {
+				if (window.top !== window) {
+					target = window.top;
+					targetOrigin = target.location.origin;
+					localOrigin = window.location.origin;
+				} else {
+					throw 'Bridge: No iFrame to communicate with';
+				}
+			}
+
+			window.addEventListener('message', onMessage, false);
+		}
+
+		/**
+		 * @desc Listener for Window messages
+		 *
+		 * @param {Event} event - Window message event
+		 */
+		function onMessage (event) {
+			var data = event.data,
+				context;
+			if (data) {
+				context = JSON.parse(event.data);
+			}
+			if (typeof context.event === 'string') {
+				emit(context.event, context.data, context.callbackId ? context.callbackId : null );
+			}
+		}
+
+		/**
+		 * @desc Communication event subscriber
+		 *
+		 * @param {String} event - communication event name
+		 *
+		 * @param {Function} callback - event handler
+		 */
+		function on (event, callback) {
+			if(!callbacks[event]) {
+				callbacks[event] = [];
+			}
+			callbacks[event].push(callback);
+		}
+
+		/**
+		 * @desc Calls every method subscribed for an event
+		 *
+		 * @param {String} event - communication event name
+		 *
+		 * @param {Object} data - data sent with an event
+		 *
+		 * @param {Number | null} callbackId - unique id of the callback
+		 */
+		function emit (event, data, callbackId) {
+			var eventKey = callbackId ? event : event + '.' + callbackId;
+			if (callbacks[eventKey]) {
+				callbacks[eventKey].forEach(function (callback) {
+					callback.call(window, data, callbackId);
+				});
+			}
+		}
+
+		/**
+		 * @desc Triggers event on the other side of the bridge
+		 *
+		 * @param {String} event - name of the event to trigger
+		 *
+		 * @param {Object} data - user-provided data for event
+		 *
+		 * @param {Function | undefined} callback to call after the response
+		 * to the event
+		 */
+		function send (event, data, callback) {
+			if (typeof event === 'string' && (typeof data === 'object' || !data)) {
+				var callbackId = Math.random().toString().substr(2);
+				target.postMessage(JSON.stringify({
+					event: event,
+					data: data,
+					callbackId: callbackId
+				}), targetOrigin);
+				callbacks[event + '.' + callbackId] = [callback];
+			}
+		}
+
+		/**
+		 * @desc Respond to an event (send data back to the other side of the bridge)
+		 * @param {String} event - event name to respond to
+		 * @param {Object} data - user-provided data attached to response
+		 * @param {Number} callbackId - id of the handler to trigger on the other side
+		 */
+		function respond (event, data, callbackId) {
+			send(event + '.' + callbackId, data);
+		}
+
+		return {
+			init: init,
+			on: on,
+			send: send,
+			respond: respond
+		};
+
+	};
+
+	if (typeof window.define === 'function' && window.define.amd) {
+		define('Bridge', bridge);
+	} else {
+		window.Bridge = bridge();
+	}
+
+})(window);
