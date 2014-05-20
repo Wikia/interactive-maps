@@ -30,15 +30,6 @@
 			localOrigin = '',
 
 			/**
-			 * @desc Indicates of the bridge is ready to communicate
-			 *
-			 * @public
-			 *
-			 * @type {Bool}
-			 */
-			ready = false,
-
-			/**
 			 * @desc Registry for callbacks
 			 *
 			 * @private
@@ -51,25 +42,21 @@
 		 * @desc Finds appropriate communication channel
 		 * and starts listening for events
 		 *
+		 * @param {String} _targetOrigin - URL origin for the second side
+		 *
 		 * @param {HTMLElement | undefined} iframeEl
 		 * call it without arguments to init channel inside iframe
 		 */
-		function init (iframeEl) {
+		function init (_targetOrigin, iframeEl) {
 			function attach (_target) {
 				target = _target;
-				targetOrigin = _target.location.origin;
+				targetOrigin = _targetOrigin;
 				localOrigin = window.location.origin;
 				window.addEventListener('message', onMessage, false);
 				ready = true;
 			}
 			if (iframeEl) {
-				if (iframeEl.contentWindow.location.origin !== 'null') {
-					attach(iframeEl.contentWindow);
-				} else {
-					iframeEl.addEventListener('load', function () {
-						attach(iframeEl.contentWindow);
-					});
-				}
+				attach(iframeEl.contentWindow);
 			} else {
 				if (window.top !== window) {
 					attach(window.top);
@@ -142,7 +129,7 @@
 		 * to the event
 		 */
 		function send (event, data, callback) {
-			if ( ready && typeof event === 'string' && (typeof data === 'object' || !data)) {
+			if (typeof event === 'string' && (typeof data === 'object' || !data)) {
 				var callbackId = Math.random().toString().substr(2);
 				target.postMessage(JSON.stringify({
 					event: event,
