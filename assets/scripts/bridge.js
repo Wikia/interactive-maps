@@ -173,7 +173,7 @@
 	};
 
 	if (typeof window.define === 'function' && window.define.amd) {
-		define('Bridge', bridge);
+		window.define('Bridge', bridge);
 	} else {
 		window.Bridge = bridge();
 	}
