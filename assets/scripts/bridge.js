@@ -18,7 +18,7 @@
 			 *
 			 * @type {String}
 			 */
-			targetOrigin,
+			targetOrigin = '',
 
 			/**
 			 * @desc Local URL origin
@@ -27,7 +27,16 @@
 			 *
 			 * @type {String}
 			 */
-			localOrigin,
+			localOrigin = '',
+
+			/**
+			 * @desc Indicates of the bridge is ready to communicate
+			 *
+			 * @public
+			 *
+			 * @type {Bool}
+			 */
+			ready = false,
 
 			/**
 			 * @desc Registry for callbacks
@@ -46,21 +55,28 @@
 		 * call it without arguments to init channel inside iframe
 		 */
 		function init (iframeEl) {
-			if (iframeEl) {
-				target = iframeEl.contentWindow;
-				targetOrigin = target.location.origin;
+			function attach (_target) {
+				target = _target;
+				targetOrigin = _target.location.origin;
 				localOrigin = window.location.origin;
+				window.addEventListener('message', onMessage, false);
+				ready = true;
+			}
+			if (iframeEl) {
+				if (iframeEl.contentWindow.location.origin !== 'null') {
+					attach(iframeEl.contentWindow);
+				} else {
+					iframeEl.addEventListener('load', function () {
+						attach(iframeEl.contentWindow);
+					});
+				}
 			} else {
 				if (window.top !== window) {
-					target = window.top;
-					targetOrigin = target.location.origin;
-					localOrigin = window.location.origin;
+					attach(window.top);
 				} else {
 					throw 'Bridge: No iFrame to communicate with';
 				}
 			}
-
-			window.addEventListener('message', onMessage, false);
 		}
 
 		/**
@@ -72,7 +88,11 @@
 			var data = event.data,
 				context;
 			if (data) {
-				context = JSON.parse(event.data);
+				try{
+					context = JSON.parse(event.data);
+				} catch (e) {
+					context = {};
+				}
 			}
 			if (typeof context.event === 'string') {
 				emit(context.event, context.data, context.callbackId ? context.callbackId : null );
@@ -122,7 +142,7 @@
 		 * to the event
 		 */
 		function send (event, data, callback) {
-			if (typeof event === 'string' && (typeof data === 'object' || !data)) {
+			if ( ready && typeof event === 'string' && (typeof data === 'object' || !data)) {
 				var callbackId = Math.random().toString().substr(2);
 				target.postMessage(JSON.stringify({
 					event: event,
