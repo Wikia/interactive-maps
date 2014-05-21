@@ -5,7 +5,7 @@
 		// Window object to send the messages to
 		var target,
 			// desc URL origin of the target
-			 targetOrigin = '',
+			targetOrigin = '',
 			// Local URL origin
 			localOrigin = '',
 			// Registry for callbacks
