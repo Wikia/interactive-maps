@@ -19,22 +19,16 @@
 		 * call it without arguments to init channel inside iframe
 		 */
 		function init (_targetOrigin, iframeEl) {
-			function attach (_target) {
-				target = _target;
-				targetOrigin = _targetOrigin;
-				localOrigin = window.location.origin;
-				window.addEventListener('message', onMessage, false);
-				ready = true;
+			target = (iframeEl ? iframeEl.contentWindow :
+				window.top !== window ? window.top : null);
+
+			if ( !target ) {
+				throw new Error('Bridge: No iframe to communicate with');
 			}
-			if (iframeEl) {
-				attach(iframeEl.contentWindow);
-			} else {
-				if (window.top !== window) {
-					attach(window.top);
-				} else {
-					throw 'Bridge: No iFrame to communicate with';
-				}
-			}
+
+			targetOrigin = _targetOrigin;
+			localOrigin = window.location.origin;
+			window.addEventListener('message', onMessage, false);
 		}
 
 		/**
@@ -42,17 +36,14 @@
 		 * @param {Event} event - Window message event
 		 */
 		function onMessage (event) {
-			var data = event.data,
-				context;
-			if (data) {
-				try{
-					context = JSON.parse(event.data);
-				} catch (e) {
-					context = {};
-				}
+			var hash;
+			try {
+				hash = JSON.parse(event.data);
+			} catch (e) {
+				hash = {};
 			}
-			if (typeof context.event === 'string') {
-				emit(context.event, context.data, context.callbackId ? context.callbackId : null );
+			if (typeof hash.event === 'string') {
+				emit(hash.event, hash.data, hash.callbackId);
 			}
 		}
 
@@ -75,10 +66,10 @@
 		 * @param {Number | null} callbackId - unique id of the callback
 		 */
 		function emit (event, data, callbackId) {
-			var eventKey = callbackId ? event : event + '.' + callbackId;
+			var eventKey = !callbackId ? event : event + '.' + callbackId;
 			if (callbacks[eventKey]) {
 				callbacks[eventKey].forEach(function (callback) {
-					callback.call(window, data, callbackId);
+					callback(data);
 				});
 			}
 		}
