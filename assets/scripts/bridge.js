@@ -14,9 +14,7 @@
 		/**
 		 * @desc Finds appropriate communication channel
 		 * and starts listening for events
-		 *
 		 * @param {String} _targetOrigin - URL origin for the second side
-		 *
 		 * @param {HTMLElement | undefined} iframeEl
 		 * call it without arguments to init channel inside iframe
 		 */
@@ -61,9 +59,7 @@
 
 		/**
 		 * @desc Communication event subscriber
-		 *
 		 * @param {String} event - communication event name
-		 *
 		 * @param {Function} callback - event handler
 		 */
 		function on (event, callback) {
@@ -75,11 +71,8 @@
 
 		/**
 		 * @desc Calls every method subscribed for an event
-		 *
 		 * @param {String} event - communication event name
-		 *
 		 * @param {Object} data - data sent with an event
-		 *
 		 * @param {Number | null} callbackId - unique id of the callback
 		 */
 		function emit (event, data, callbackId) {
@@ -93,11 +86,8 @@
 
 		/**
 		 * @desc Triggers event on the other side of the bridge
-		 *
 		 * @param {String} event - name of the event to trigger
-		 *
 		 * @param {Object} data - user-provided data for event
-		 *
 		 * @param {Function | undefined} callback to call after the response
 		 * to the event
 		 */
