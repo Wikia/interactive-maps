@@ -19,8 +19,8 @@ CREATE TABLE tile_set (
   min_zoom INT UNSIGNED NOT NULL,
   max_zoom INT UNSIGNED NOT NULL, -- zoom levels saved in binary format 1011 - > zoom levels 4,2,1 so max that we can show is 2
   status TINYINT DEFAULT 0 NOT NULL,
-  attribution VARCHAR(255) NOT NULL,
-  subdomains VARCHAR(15) NOT NULL,
+  attribution VARCHAR(255) NOT NULL DEFAULT "",
+  subdomains VARCHAR(15) NOT NULL DEFAULT "",
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   created_by VARCHAR(255) NOT NULL
 );
