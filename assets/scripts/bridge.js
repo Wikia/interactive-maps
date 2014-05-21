@@ -1,41 +1,14 @@
 (function (window) {
 	var bridge = function () {
 		'use strict';
-		var
-			/**
-			 * @desc Window object to send the messages to
-			 *
-			 * @private
-			 *
-			 * @type {HTMLElement}
-			 */
-			target,
-
-			/**
-			 * @desc URL origin of the target
-			 *
-			 * @private
-			 *
-			 * @type {String}
-			 */
-			targetOrigin = '',
-
-			/**
-			 * @desc Local URL origin
-			 *
-			 * @private
-			 *
-			 * @type {String}
-			 */
+		
+		// Window object to send the messages to
+		var target,
+			// desc URL origin of the target
+			 getOrigin = '',
+			// Local URL origin
 			localOrigin = '',
-
-			/**
-			 * @desc Registry for callbacks
-			 *
-			 * @private
-			 *
-			 * @type {Object}
-			 */
+			// Registry for callbacks
 			callbacks = {};
 
 		/**
