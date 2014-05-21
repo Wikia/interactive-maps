@@ -48,7 +48,6 @@ describe('utils', function () {
 		});
 	});
 
-
 	it('hrTimeToMilliseconds returns time in milliseconds', function () {
 		var testSet = [{
 			check: [1, 0],
@@ -326,9 +325,151 @@ describe('utils', function () {
 			}
 		}];
 		testSet.forEach(function (testCase) {
-			utils.extendObject(testCase.obj1, testCase.obj2)
-			expect(JSON.stringify(testCase.obj1)).toBe(JSON.stringify(testCase.expected));
+			expect(JSON.stringify(utils.extendObject(testCase.obj1, testCase.obj2)))
+				.toBe(JSON.stringify(testCase.expected));
+		});
+	});
+
+	it('returns correct image url', function () {
+		var testSet = [
+			{
+				dfsHost: 'example.com',
+				path: 'path',
+				image: 'image.png',
+				expected: 'http://example.com/path/image.png'
+			}
+		];
+		testSet.forEach(function (testCase) {
+			expect(utils.imageUrl(testCase.dfsHost, testCase.path, testCase.image))
+				.toBe(testCase.expected);
+		});
+	});
+
+	it('generates correct map boundaries', function () {
+		// @TODO Add more real cases when the north calculation logic is fixed
+		var testSet = [
+			{
+				width: 256,
+				height: 256,
+				maxZoom: 0,
+				expected: {
+					north: 90,
+					east: 180,
+					south: -90,
+					west: -180
+				}
+			}
+		];
+		testSet.forEach(function (testCase) {
+			expect(JSON.stringify(utils.getMapBoundaries(testCase.width, testCase.height, testCase.maxZoom)))
+				.toBe(JSON.stringify(testCase.expected));
+		});
+	});
+
+	it('returns correct bucket name', function () {
+		var testSet = [
+			{
+				markersPrefix: 'markers_',
+				mapId: 1,
+				expected: 'markers_1'
+			},
+			{
+				markersPrefix: 2,
+				mapId: 3,
+				expected: '23'
+			}
+		];
+		testSet.forEach(function (testCase) {
+			expect(utils.getMarkersBucketName(testCase.markersPrefix, testCase.mapId))
+				.toBe(testCase.expected);
+		});
+	});
+
+	it('returns correct zoom level', function () {
+		var testSet = [
+			{
+				zoom: 2,
+				minZoom: 0,
+				maxZoom: 3,
+				expected: 2
+			},
+			{
+				zoom: -1,
+				minZoom: 0,
+				maxZoom: 3,
+				expected: 0
+			},
+			{
+				zoom: 5,
+				minZoom: 0,
+				maxZoom: 3,
+				expected: 3
+			},
+		];
+		testSet.forEach(function (testCase) {
+			expect(utils.getZoomLevel(testCase.zoom, testCase.minZoom, testCase.maxZoom))
+				.toBe(testCase.expected);
 		});
 
-	})
+	});
+
+	it('returns correct latitude', function () {
+		var testSet = [
+			{
+				latitude: 20.1,
+				boundaries: {
+					north: 20,
+					south: -20,
+					east: 20,
+					west: -20
+				},
+				expected: 20.1
+			},
+			{
+				latitude: 0,
+				boundaries: {
+					north: 20,
+					south: -20,
+					east: 20,
+					west: -20
+				},
+				expected: 0
+			}
+		];
+		testSet.forEach(function (testCase) {
+			expect(utils.getLatitude(testCase.latitude, testCase.boundaries))
+				.toBe(testCase.expected);
+		});
+	});
+
+	it('returns correct longitude', function () {
+		var testSet = [
+			{
+				longitude: 20.1,
+				boundaries: {
+					north: 20,
+					south: -20,
+					east: 20,
+					west: -20
+				},
+				expected: 20.1
+			},
+			{
+				longitude: 0,
+				boundaries: {
+					north: 20,
+					south: -20,
+					east: 20,
+					west: -20
+				},
+				expected: 0
+			}
+		];
+		testSet.forEach(function (testCase) {
+			expect(utils.getLongitude(testCase.longitude, testCase.boundaries))
+				.toBe(testCase.expected);
+		});
+	});
+
+
 });

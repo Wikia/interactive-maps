@@ -88,14 +88,18 @@ module.exports = function createCRUD() {
 			GET: function (req, res, next) {
 				var cityId = parseInt(req.query.city_id, 10) || 0,
 					filter = {},
-					sort = buildSort(req.query.sort);
+					sort = buildSort(req.query.sort),
+					limit = parseInt(req.query.limit, 10) || false,
+					offset = parseInt(req.query.offset, 10) || 0,
+					query;
 
 				if (cityId !== 0) {
 					filter.city_id = cityId;
-					filter.status = utils.tileSetStatus.ok;
 				}
 
-				dbCon.knex(dbTable)
+				filter.status = utils.tileSetStatus.ok;
+
+				query = dbCon.knex(dbTable)
 					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
 					.column([
 						'map.id',
@@ -107,23 +111,40 @@ module.exports = function createCRUD() {
 					])
 					.where(filter)
 					.orderBy(sort.column, sort.direction)
-					.select()
-					.then(
+					.select();
+
+				if (limit) {
+					query.limit(limit);
+					query.offset(offset);
+				}
+
+				query.then(
 						function (collection) {
-							collection.forEach(function (value) {
-								// TODO: fix hardcoded DFS host
-								value.image = utils.imageUrl(
-									config.dfsHost,
-									utils.getBucketName(config.bucketPrefix, value.name),
-									value.image
+							dbCon.knex(dbTable)
+								.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+								.count('* as cntr')
+								.where(filter)
+								.then(
+									function (count) {
+										collection.forEach(function (value) {
+											value.image = utils.imageUrl(
+												config.dfsHost,
+												utils.getBucketName(config.bucketPrefix, value.name),
+												value.image
+											);
+											value.url = utils.responseUrl(req, req.route.path, value.id);
+
+											delete value.name;
+										});
+
+										res.send(200, {
+											total: count[0].cntr,
+											items: collection
+										});
+										res.end();
+									},
+									next
 								);
-								value.url = utils.responseUrl(req, req.route.path, value.id);
-
-								delete value.name;
-							});
-
-							res.send(200, collection);
-							res.end();
 						},
 						next
 				);

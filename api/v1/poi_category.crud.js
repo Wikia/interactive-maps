@@ -6,6 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 	config = require('./../../lib/config'),
+	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 
 	dbTable = 'poi_category',
 	createSchema = {
@@ -56,13 +57,12 @@ var dbCon = require('./../../lib/db_connector'),
 		additionalProperties: false
 	};
 
-
 /**
  * @desc Handle deleting used categories by moving all points to CatchAll category
  *
- * @param id {number}
- * @param res {object}
- * @param next {function}
+ * @param {number} id
+ * @param {object} res
+ * @param {function} next
  */
 function handleUsedCategories(id, res, next) {
 	dbCon.update(
@@ -72,7 +72,8 @@ function handleUsedCategories(id, res, next) {
 		},
 		{
 			poi_category_id: id
-		}).then(
+		}
+	).then(
 		function (rowsAffected) {
 			if (rowsAffected > 0) {
 				dbCon.destroy(dbTable, {
@@ -133,7 +134,9 @@ module.exports = function createCRUD() {
 										id: id,
 										url: utils.responseUrl(req, req.route.path, id)
 									};
-
+								if (reqBody.marker) {
+									poiCategoryMarker(id, reqBody.map_id, reqBody.marker, dbTable);
+								}
 								res.send(201, response);
 								res.end();
 							},
@@ -223,7 +226,10 @@ module.exports = function createCRUD() {
 						filter = {
 							id: id
 						};
-
+					// If new marker is uploaded, reset the marker status to 0
+					if (reqBody.marker) {
+						reqBody.status = 0;
+					}
 					if (isFinite(id)) {
 						dbCon
 							.update(dbTable, reqBody, filter)
@@ -235,7 +241,9 @@ module.exports = function createCRUD() {
 											id: id,
 											url: utils.responseUrl(req, '/api/v1/poi_category', id)
 										};
-
+										if (reqBody.marker) {
+											poiCategoryMarker(id, reqBody.map_id, reqBody.marker, dbTable);
+										}
 										res.send(303, response);
 										res.end();
 									} else {

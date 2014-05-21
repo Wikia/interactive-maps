@@ -2,7 +2,72 @@
 	'use strict';
 
 	var mapContainerId = 'map',
-		map;
+		map,
+		popupWidthWithPhoto = 414,
+		popupWidthWithoutPhoto = 314,
+		photoWidth = 90,
+		photoHeight = 90;
+
+	/**
+	 * @desc Build popup HTML
+	 * @param point {object} - POI object
+	 * @returns {string} - Popup HTML makup
+	 */
+	function buildPopupHtml(point) {
+		//TODO what about edit link? where do we get it from?
+		var photoHtml = '',
+			titleHtml = '',
+			descriptionHtml = '';
+
+		if (point.photo && point.link) {
+			photoHtml = buildLinkHtml(point, buildPhotoHtml(point.photo, point.name), 'photo');
+		} else if (point.photo) {
+			photoHtml = buildPhotoHtml(point.photo, point.name);
+		}
+
+		if (point.name) {
+			titleHtml = '<h3>' + (point.link ? buildLinkHtml(point, point.name) : point.name) + '</h3>';
+		}
+
+		if (point.description) {
+			descriptionHtml = '<p>' + point.description + '</p>';
+		}
+
+		return photoHtml +
+			'<div class="description">' +
+			titleHtml +
+			descriptionHtml +
+			'</div>';
+	}
+
+	/**
+	 * @desc Build photo HTML
+	 * @param photoUrl {string} - image URL
+	 * @param alt {string} - image alternate text
+	 * @returns {string} Photo HTML
+	 */
+	function buildPhotoHtml(photoUrl, alt) {
+		//TODO what about that width and height?
+		return '<img src="' + photoUrl + '" alt="' + alt + '" width="' + photoWidth + '" height="' + photoHeight + '">';
+	}
+
+	/**
+	 * @desc Build link HTML
+	 * @param point {object} - POI object
+	 * @param innerHtml {string} - string of HTML markup
+	 * @param className {string=} - class name
+	 * @returns {string} - HTMl markup for link
+	 */
+	function buildLinkHtml(point, innerHtml, className) {
+		var classString;
+
+		className = (typeof (className) !== 'undefined') ? className : null;
+		classString = (className) ? ' class="' + className + '"' : '';
+
+		return '<a href="' + point.link + '" title="' + point.name + '"' + classString + ' target="_blank">' +
+			innerHtml +
+			'</a>';
+	}
 
 	/**
 	 * @desc Add point to the map
@@ -10,12 +75,23 @@
 	 * @returns {object} Leaflet Marker
 	 */
 	function addPointOnMap(point) {
-		var popupHtml = '<h3>' + point.name + '</h3>' +
-			'<p>' +point.description + '</p>';
-		return L.marker([ point.lat, point.lon ], {
-			riseOnHover: true
-		})
-			.bindPopup(popupHtml)
+		var popup, popupWidth;
+
+		popupWidth = (point.photo) ? popupWidthWithPhoto : popupWidthWithoutPhoto;
+
+		popup = L
+			.popup({
+				closeButton: false,
+				minWidth: popupWidth,
+				maxWidth: popupWidth
+			})
+			.setContent(buildPopupHtml(point));
+
+		return L
+			.marker([point.lat, point.lon], {
+				riseOnHover: true
+			})
+			.bindPopup(popup)
 			.addTo(map);
 	}
 

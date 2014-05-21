@@ -1,0 +1,36 @@
+.leaflet-popup-content-wrapper {
+    border-radius: 0;
+    padding: 0;
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    overflow: hidden;
+}
+
+.leaflet-popup a.photo, .leaflet-popup img, .leaflet-popup .description {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.leaflet-popup .description {
+    padding: 15px 20px;
+    width: 285px;
+    word-wrap: break-word;
+}
+
+.leaflet-popup h3 {
+    color: #0078A8;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.leaflet-popup a {
+    text-decoration: none;
+}
+
+.leaflet-popup p {
+    margin: 5px 0 0;
+}
