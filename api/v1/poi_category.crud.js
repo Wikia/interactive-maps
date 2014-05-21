@@ -57,13 +57,12 @@ var dbCon = require('./../../lib/db_connector'),
 		additionalProperties: false
 	};
 
-
 /**
  * @desc Handle deleting used categories by moving all points to CatchAll category
  *
- * @param id {number}
- * @param res {object}
- * @param next {function}
+ * @param {number} id
+ * @param {object} res
+ * @param {function} next
  */
 function handleUsedCategories(id, res, next) {
 	dbCon.update(
