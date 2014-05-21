@@ -64,11 +64,12 @@
 
 #filter_menu h3 {
     background: rgba(0, 0, 0, 0.8);
-    -webkit-flex: 0 0 auto;
-    -moz-flex: 0 0 auto;
-    -ms-flex: 0 0 auto;
-    -o-flex: 0 0 auto;
-    flex: 0 0 auto;
+    -ms-flex-negative: 0;
+    -webkit-flex-shrink: 0;
+    -moz-flex-shrink: 0;
+    -ms-flex-shrink: 0;
+    -o-flex-shrink: 0;
+    flex-shrink: 0;
     font-weight: bold;
     height: 50px;
     line-height: 50px;
@@ -78,11 +79,7 @@
 
 #point_types {
     background: rgba(0, 0, 0, 0.7);
-    -webkit-flex: 0 1 auto;
-    -moz-flex: 0 1 auto;
-    -ms-flex: 0 1 auto;
-    -o-flex: 0 1 auto;
-    flex: 0 1 auto;
+    -ms-flex-negative: 1;
     list-style: none;
     margin: 0;
     overflow-x: hidden;
