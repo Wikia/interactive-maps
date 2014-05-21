@@ -39,7 +39,6 @@
 
 		/**
 		 * @desc Listener for Window messages
-		 *
 		 * @param {Event} event - Window message event
 		 */
 		function onMessage (event) {
