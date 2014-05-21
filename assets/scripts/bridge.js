@@ -43,7 +43,7 @@
 				hash = {};
 			}
 			if (typeof hash.event === 'string') {
-				emit(hash.event, hash.data, hash.callbackId);
+				emit(hash.event, hash.type, hash.data, hash.callbackId);
 			}
 		}
 
@@ -65,11 +65,11 @@
 		 * @param {Object} data - data sent with an event
 		 * @param {Number | null} callbackId - unique id of the callback
 		 */
-		function emit (event, data, callbackId) {
-			var eventKey = !callbackId ? event : event + '.' + callbackId;
-			if (callbacks[eventKey]) {
+		function emit (event, type, data, callbackId) {
+			var eventKey = event;
+				if (callbacks[eventKey]) {
 				callbacks[eventKey].forEach(function (callback) {
-					callback(data);
+					callback(data, callbackId);
 				});
 			}
 		}
@@ -81,11 +81,12 @@
 		 * @param {Function | undefined} callback to call after the response
 		 * to the event
 		 */
-		function send (event, data, callback) {
+		function send (event, type, data, callback) {
 			if (typeof event === 'string' && (typeof data === 'object' || !data)) {
 				var callbackId = Math.random().toString().substr(2);
 				target.postMessage(JSON.stringify({
 					event: event,
+					type: type,
 					data: data,
 					callbackId: callbackId
 				}), targetOrigin);
@@ -100,14 +101,24 @@
 		 * @param {Number} callbackId - id of the handler to trigger on the other side
 		 */
 		function respond (event, data, callbackId) {
-			send(event + '.' + callbackId, data);
+			send(event + '.' + callbackId, 'response', data);
+		}
+
+		/**
+		 * @desc Request an event (on the other side of the bridge)
+		 * @param {String} event - event name
+		 * @param {Object} data - user-provided data attached to request
+		 * @param {Number} callbackId - id of the handler to trigger on the other side
+		 */
+		function request (event, data, callback) {
+			send(event, 'request', data, callback);
 		}
 
 		return {
 			init: init,
 			on: on,
-			send: send,
-			respond: respond
+			respond: respond,
+			request: request
 		};
 
 	};
