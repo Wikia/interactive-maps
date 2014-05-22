@@ -33,12 +33,14 @@ var dbCon = require('./../../lib/db_connector'),
 			link: {
 				description: 'Link to article connected with this POI',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
+				pattern: '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
+					'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?'
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
+				pattern: '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
+					'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?'
 			},
 			lat: {
 				description: 'POI latitude',
@@ -77,13 +79,15 @@ var dbCon = require('./../../lib/db_connector'),
 			link: {
 				description: 'Link to article connected with this POI',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})',
+				pattern: '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
+					'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
 				format: 'uri'
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})',
+				pattern: '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
+					'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
 				format: 'uri'
 			},
 			lat: {
@@ -220,8 +224,8 @@ module.exports = function createCRUD() {
 			},
 			GET: function (req, res, next) {
 				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'photo', 'lat', 'lon',
-					'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
-				],
+						'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
+					],
 					id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
@@ -247,13 +251,15 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, updateSchema);
+					errors = jsonValidator(reqBody, updateSchema),
+					id,
+					filter;
 
 				if (errors.length === 0) {
-					var id = parseInt(req.pathVar.id),
-						filter = {
-							id: id
-						};
+					id = parseInt(req.pathVar.id);
+					filter = {
+						id: id
+					};
 
 					if (isFinite(id)) {
 						getMapIdByPoiId(id).then(
