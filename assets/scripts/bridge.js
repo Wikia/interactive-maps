@@ -2,14 +2,16 @@
 	var bridge = function () {
 		'use strict';
 
-		// Window object to send the messages to
-		var target,
+		var TYPE_REQUEST = 0,
+			TYPE_RESPONSE = 1,
+			// Window object to send the messages to
+			target,
 			// desc URL origin of the target
 			targetOrigin = '',
 			// Local URL origin
 			localOrigin = '',
 			// Registry for callbacks
-			callbacks = {};
+			callbacks = {},;
 
 		/**
 		 * @desc Finds appropriate communication channel
@@ -62,11 +64,21 @@
 		/**
 		 * @desc Calls every method subscribed for an event
 		 * @param {String} event - communication event name
+		 * @param {String} type - type of the call
 		 * @param {Object} data - data sent with an event
 		 * @param {Number | null} callbackId - unique id of the callback
 		 */
 		function emit(event, type, data, callbackId) {
-			var eventKey = event;
+			var eventKey;
+			if (type === TYPE_REQUEST) {
+				eventKey = event;
+			} else {
+				if (callbackId) {
+					eventKey = event + '.' + callbackId;
+				} else {
+					return;
+				}
+			}
 			if (callbacks[eventKey]) {
 				callbacks[eventKey].forEach(function (callback) {
 					callback(data, callbackId);
@@ -76,22 +88,10 @@
 
 		/**
 		 * @desc Triggers event on the other side of the bridge
-		 * @param {String} event - name of the event to trigger
-		 * @param {Object} data - user-provided data for event
-		 * @param {Function | undefined} callback to call after the response
-		 * to the event
+		 * @param {Object} payload - hash to be sent to the other side
 		 */
-		function send(event, type, data, callback) {
-			if (typeof event === 'string' && (typeof data === 'object' || !data)) {
-				var callbackId = Math.random().toString().substr(2);
-				target.postMessage(JSON.stringify({
-					event: event,
-					type: type,
-					data: data,
-					callbackId: callbackId
-				}), targetOrigin);
-				callbacks[event + '.' + callbackId] = [callback];
-			}
+		function send(payload) {
+			target.postMessage(JSON.stringify(payload), targetOrigin);
 		}
 
 		/**
@@ -101,17 +101,36 @@
 		 * @param {Number} callbackId - id of the handler to trigger on the other side
 		 */
 		function respond(event, data, callbackId) {
-			send(event + '.' + callbackId, 'response', data);
+			if (typeof event === 'string' && (typeof data === 'object' || !data)) {
+				send({
+					event: event,
+					type: TYPE_RESPONSE,
+					data: data,
+					callbackId: callbackId
+				});
+			}
 		}
 
 		/**
 		 * @desc Request an event (on the other side of the bridge)
 		 * @param {String} event - event name
 		 * @param {Object} data - user-provided data attached to request
-		 * @param {Number} callbackId - id of the handler to trigger on the other side
+		 * @param {Function} callback - handler to trigger after the response
 		 */
 		function request(event, data, callback) {
-			send(event, 'request', data, callback);
+			if (typeof event === 'string' && (typeof data === 'object' || !data)) {
+				var callbackId;
+				if (typeof callback === 'function') {
+					callbackId = Math.random().toString().substr(2);
+				}
+				send({
+					event: event,
+					type: TYPE_REQUEST,
+					data: data,
+					callbackId: callbackId
+				});
+				callbacks[event + '.' + callbackId] = [callback];
+			}
 		}
 
 		return {
