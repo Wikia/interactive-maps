@@ -185,6 +185,10 @@
 		}
 	}
 
+	/**
+	 * @desc Add or remove .hidden class from all point type filters
+	 * @param operation {string} - Function name to call on filter element classList property, it's "add" or "remove"
+	 */
 	function toggleAllPointTypeFilters(operation) {
 		var filters = pointTypeFiltersContainer.getElementsByClassName('point-type');
 
@@ -195,7 +199,7 @@
 
 	/**
 	 * Add .hidden class to all elements from given NodeList
-	 * @param points {NodeList}
+	 * @param points {NodeList} - List of elements to hide
 	 */
 	function hidePoints(points) {
 		for (var i = 0; i < points.length; i++) {
@@ -205,7 +209,7 @@
 
 	/**
 	 * Remove .hidden class from all elements from given NodeList
-	 * @param points {NodeList}
+	 * @param points {NodeList} - List of elements to show
 	 */
 	function showPoints(points) {
 		for (var i = 0; i < points.length; i++) {
