@@ -39,7 +39,7 @@
     display: none;
 }
 
-#filterMenu {
+.filter-menu {
     box-sizing: border-box;
     color: #fff;
     display: -ms-flexbox;
@@ -62,7 +62,7 @@
     z-index: 1;
 }
 
-#filterMenu h3 {
+.filter-menu h3 {
     background: rgba(0, 0, 0, 0.8);
     -ms-flex-negative: 0;
     -webkit-flex-shrink: 0;
@@ -77,22 +77,23 @@
     padding: 0 15px;
 }
 
-#pointTypes {
+.point-types {
     background: rgba(0, 0, 0, 0.7);
     -ms-flex-negative: 1;
     list-style: none;
     margin: 0;
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 0 10px 0 15px;
+    padding: 0;
 }
 
-#pointTypes li {
-    padding: 10px 0;
+.point-types li {
+    padding: 10px 10px 10px 15px;
 }
 
-#pointTypes li.enabled {
+.point-types li.enabled {
     background: url('/images/selected.png') right center no-repeat;
+    background-origin: content-box;
 }
 
 .point-type img {

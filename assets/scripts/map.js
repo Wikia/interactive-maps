@@ -2,8 +2,9 @@
 	'use strict';
 
 	var mapContainerId = 'map',
+		pointTypeFiltersContainerId = 'pointTypes',
+		allPointTypesFilterId = 'allPointTypes',
 		map,
-		pointTypesContainerId = 'pointTypes',
 		pointTypeFiltersContainer,
 		popupWidthWithPhoto = 414,
 		popupWidthWithoutPhoto = 314,
@@ -14,7 +15,6 @@
 		pointIcons = {},
 		pointCache = {},
 		pointTypes = {};
-
 
 	/**
 	 * @desc Build popup HTML
@@ -28,9 +28,9 @@
 			descriptionHtml = '';
 
 		if (point.photo && point.link) {
-			photoHtml = buildLinkHtml(point, buildPhotoHtml(point.photo, point.name), 'photo');
+			photoHtml = buildLinkHtml(point, buildImageHtml(point.photo, point.name, photoWidth, photoHeight), 'photo');
 		} else if (point.photo) {
-			photoHtml = buildPhotoHtml(point.photo, point.name);
+			photoHtml = buildImageHtml(point.photo, point.name, photoWidth, photoHeight);
 		}
 
 		if (point.name) {
@@ -49,14 +49,13 @@
 	}
 
 	/**
-	 * @desc Build photo HTML
-	 * @param photoUrl {string} - Image URL
+	 * @desc Build image HTML
+	 * @param imageUrl {string} - Image URL
 	 * @param alt {string} - Image alternate text
 	 * @returns {string} - HTML markup for photo
 	 */
-	function buildPhotoHtml(photoUrl, alt) {
-		//TODO what about that width and height?
-		return '<img src="' + photoUrl + '" alt="' + alt + '" width="' + photoWidth + '" height="' + photoHeight + '">';
+	function buildImageHtml(imageUrl, alt, imageWidth, imageHeight) {
+		return '<img src="' + imageUrl + '" alt="' + alt + '" width="' + imageWidth + '" height="' + imageHeight + '">';
 	}
 
 	/**
@@ -103,27 +102,22 @@
 	}
 
 	/**
-	 * @desc Add filter for all point types
+	 * @desc Build point type filter HTML
+	 * @param pointType {object} - POI type object
+	 * @returns {string} - HTML markup for point type filter
 	 */
-	function addAllPointsFilter() {
-		var pointsToggleHtml = '<li id="pointTypeAll" class="point-type enabled" data-point-type="0">' +
-			'All Pin Types' + //TODO what about translation?
+	function buildPointTypeFilterHtml(pointType) {
+		return '<li class="point-type enabled" data-point-type="' + pointType.id + '">' +
+			buildImageHtml(pointType.marker, pointType.name, pointIconWidth, pointIconHeight) +
+			'<span>' + pointType.name + '</span>' +
 			'</li>';
-		pointTypeFiltersContainer.innerHTML += pointsToggleHtml;
 	}
 
 	/**
-	 * @desc Add filter for given point type and set its icon
+	 * @desc Setup icon for markers with given point type
 	 * @param pointType {object} - POI type object
 	 */
-	function addPointType(pointType) {
-		// if you change this structure then check if bindPointTypeFilters() function is still working
-		var pointTypeHtml = '<li class="point-type enabled" data-point-type="' + pointType.id + '">' +
-			'<img src="' + pointType.marker + '" width="' + pointIconWidth + '" height="' + pointIconHeight + '">' +
-			'<span>' + pointType.name + '</span>' +
-			'</li>';
-		pointTypeFiltersContainer.innerHTML += pointTypeHtml;
-
+	function setupPointTypeIcon(pointType) {
 		pointIcons[pointType.id] = L.icon({
 			iconUrl: pointType.marker,
 			iconSize: [pointIconWidth, pointIconHeight],
@@ -132,142 +126,142 @@
 	}
 
 	/**
-	 * @desc Return DOM elements for given point type, store them in cache
+	 * @desc Loads points of given type to cache and returns them
 	 * @param pointType {number} - Id of point type, 0 for all types
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
-	function getPointsByType(pointType) {
-		if (typeof pointCache[pointType] === 'undefined') {
-			if (pointType === 0) {
-				pointCache[pointType] = document.getElementsByClassName('leaflet-marker-icon');
-			} else {
-				pointCache[pointType] = document.getElementsByClassName('point-type-' + pointType);
-			}
-		}
+	function loadPointsToCache(pointType) {
+		pointCache[pointType] = document.getElementsByClassName(
+			(pointType === 0) ?
+			'leaflet-marker-icon' :
+			'point-type-' + pointType
+		);
 
 		return pointCache[pointType];
 	}
 
 	/**
-	 * @desc Mark filters for given point type as disabled
-	 * @param filterClicked {Element} - Clicked filter element
+	 * @desc Return DOM elements for given point type
 	 * @param pointType {number} - Id of point type, 0 for all types
+	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
-	function markPointTypeFiltersAsDisabled(filterClicked, pointType) {
-		// remove .enabled class from clicked filter
-		filterClicked.classList.remove('enabled');
+	function getPointsByType(pointType) {
+		return (typeof pointCache[pointType] !== 'undefined') ? pointCache[pointType] : loadPointsToCache(pointType);
+	}
+
+	/**
+	 * @desc Adds or removes class of DOM element
+	 * @param element {Element} - DOM element
+	 * @param className {string} - Name of class to toggle
+	 * @param operation {string} - 'add' or 'remove' class
+	 */
+	function toggleClass(element, className, operation) {
+		element.classList[operation](className);
+	}
+
+	/**
+	 * @desc Toggles visibility of points corresponding with clicked filter
+	 * @param filterClicked {Element} - Filter element that was clicked
+	 */
+	function togglePoints(filterClicked) {
+		var pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10),
+			points = getPointsByType(pointType),
+			filterEnabled = filterClicked.classList.contains('enabled'),
+			i;
+
+		for (i = 0; i < points.length; i++) {
+			toggleClass(points[i], 'hidden', (filterEnabled) ? 'remove' : 'add');
+		}
+	}
+
+	/**
+	 * @desc Toggles state of point type filter
+	 * @param filterClicked {Element} - Filter element that was clicked
+	 */
+	function togglePointTypeFilter(filterClicked) {
+		var filterEnabled = filterClicked.classList.contains('enabled');
+
+		toggleClass(filterClicked, 'enabled', (filterEnabled) ? 'remove' : 'add');
+	}
+
+	/**
+	 * @desc Toggles state of "All pin types" filter
+	 */
+	function toggleAllPointTypesFilter() {
+		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
+			filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
+
+		toggleClass(allPointTypesFilter, 'enabled', (pointTypes.length === filtersEnabledLength) ? 'add' : 'remove');
+	}
+
+	/**
+	 * @desc Handles click on "All pin types" filter
+	 */
+	function allPointTypesFilterClickHandler() {
+		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
+			filterEnabled = allPointTypesFilter.classList.contains('enabled'),
+			filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
+			i;
+
+		for (i = 0; i < filters.length; i++) {
+			toggleClass(filters[i], 'enabled', (filterEnabled) ? 'remove' : 'add');
+		}
+
+		toggleAllPointTypesFilter();
+		togglePoints(allPointTypesFilter);
+	}
+
+	/**
+	 * @desc Handles click on point type filter
+	 * @param filterClicked {Element} - Filter element that was clicked
+	 */
+	function pointTypeFilterClickHandler(filterClicked) {
+		togglePointTypeFilter(filterClicked);
+		toggleAllPointTypesFilter();
+		togglePoints(filterClicked);
+	}
+
+	/**
+	 * @desc Handles click on point type filters container
+	 * @param event {Event} - Click event
+	 */
+	function pointTypeFiltersContainerClickHandler(event) {
+		var elementClicked = event.target,
+			filterClicked = elementClicked,
+			pointType;
+
+		if (elementClicked.parentNode.tagName === 'LI') {
+			filterClicked = elementClicked.parentNode;
+		}
+
+		pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10);
 
 		if (pointType === 0) {
-			// remove .enabled class from all filters
-			toggleAllPointTypeFilters('remove');
+			allPointTypesFilterClickHandler();
 		} else {
-			// remove .enabled class from "All pin types"
-			document.getElementById('pointTypeAll').classList.remove('enabled');
+			pointTypeFilterClickHandler(filterClicked);
 		}
-	}
-
-	/**
-	 * @desc Mark filters for given point type as enabled
-	 * @param filterClicked {Element} - Clicked filter element
-	 * @param pointType {number} - Id of point type, 0 for all types
-	 */
-	function markPointTypeFiltersAsEnabled(filterClicked, pointType) {
-		if (pointType === 0) {
-			// add .enabled class to all filters
-			toggleAllPointTypeFilters('add');
-		} else {
-			// add .enabled class to clicked filter and if all filters are enabled then add it to "All pin types" too
-			filterClicked.classList.add('enabled');
-
-			if (pointTypes.length === pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length) {
-				document.getElementById('pointTypeAll').classList.add('enabled');
-			}
-		}
-	}
-
-	/**
-	 * @desc Add or remove .hidden class from all point type filters
-	 * @param operation {string} - Function name to call on filter element classList property, it's "add" or "remove"
-	 */
-	function toggleAllPointTypeFilters(operation) {
-		var filters = pointTypeFiltersContainer.getElementsByClassName('point-type');
-
-		Array.prototype.forEach.call(filters, function (filterElement) {
-			filterElement.classList[operation]('enabled');
-		});
-	}
-
-	/**
-	 * Add .hidden class to all elements from given NodeList
-	 * @param points {NodeList} - List of elements to hide
-	 */
-	function hidePoints(points) {
-		for (var i = 0; i < points.length; i++) {
-			points[i].classList.add('hidden');
-		}
-	}
-
-	/**
-	 * Remove .hidden class from all elements from given NodeList
-	 * @param points {NodeList} - List of elements to show
-	 */
-	function showPoints(points) {
-		for (var i = 0; i < points.length; i++) {
-			points[i].classList.remove('hidden');
-		}
-	}
-
-	/**
-	 * @desc Add event listener on click event for point type filters
-	 */
-	function bindPointTypeFilters() {
-		pointTypeFiltersContainer.addEventListener('click', function (e) {
-			var filterClicked = e.target,
-				pointType,
-				points;
-
-			if (filterClicked.tagName === 'UL') {
-				// we are too high in DOM, abort
-				return;
-			}
-
-			if (filterClicked.parentNode.tagName === 'LI') {
-				filterClicked = filterClicked.parentNode;
-			}
-
-			pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10);
-
-			points = getPointsByType(pointType);
-
-			if (filterClicked.classList.contains('enabled')) {
-				markPointTypeFiltersAsDisabled(filterClicked, pointType);
-				hidePoints(points);
-
-			} else {
-				markPointTypeFiltersAsEnabled(filterClicked, pointType);
-				showPoints(points);
-			}
-		}, false);
 	}
 
 	/**
 	 * @desc Create points and filters for them
 	 * @param config {object}
 	 */
-	function createPoints(config) {
+	function setupPoints(config) {
+		var pointTypeFiltersHtml = '';
+
 		pointTypes = config.types;
 
-		addAllPointsFilter();
-
 		config.types.forEach(function (pointType) {
-			addPointType(pointType);
+			setupPointTypeIcon(pointType);
+			pointTypeFiltersHtml += buildPointTypeFilterHtml(pointType);
 		});
 
-		config.points.forEach(function (point) {
-			addPointOnMap(point);
-		});
+		pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
 
-		bindPointTypeFilters();
+		config.points.forEach(addPointOnMap);
+
+		pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
 	}
 
 	/**
@@ -345,10 +339,10 @@
 		});
 		map.addControl(zoomControl);
 
-		createPoints(config);
+		setupPoints(config);
 	}
 
-	pointTypeFiltersContainer = document.getElementById(pointTypesContainerId);
+	pointTypeFiltersContainer = document.getElementById(pointTypeFiltersContainerId);
 
 	createMap(window.mapSetup);
 
