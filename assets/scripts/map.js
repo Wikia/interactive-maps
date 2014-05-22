@@ -257,6 +257,7 @@
 			pointTypeFiltersHtml += buildPointTypeFilterHtml(pointType);
 		});
 
+		pointTypeFiltersContainer = document.getElementById(pointTypeFiltersContainerId);
 		pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
 
 		config.points.forEach(addPointOnMap);
@@ -341,8 +342,6 @@
 
 		setupPoints(config);
 	}
-
-	pointTypeFiltersContainer = document.getElementById(pointTypeFiltersContainerId);
 
 	createMap(window.mapSetup);
 
