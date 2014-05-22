@@ -3,7 +3,7 @@
 
 	var mapContainerId = 'map',
 		map,
-		pointTypesContainerId = 'point_types',
+		pointTypesContainerId = 'pointTypes',
 		pointTypeFiltersContainer,
 		popupWidthWithPhoto = 414,
 		popupWidthWithoutPhoto = 314,
@@ -106,7 +106,7 @@
 	 * @desc Add filter for all point types
 	 */
 	function addAllPointsFilter() {
-		var pointsToggleHtml = '<li id="point_type_all" class="point_type enabled" data-point-type="0">' +
+		var pointsToggleHtml = '<li id="pointTypeAll" class="point-type enabled" data-point-type="0">' +
 			'All Pin Types' + //TODO what about translation?
 			'</li>';
 		pointTypeFiltersContainer.innerHTML += pointsToggleHtml;
@@ -118,7 +118,7 @@
 	 */
 	function addPointType(pointType) {
 		// if you change this structure then check if bindPointTypeFilters() function is still working
-		var pointTypeHtml = '<li class="point_type enabled" data-point-type="' + pointType.id + '">' +
+		var pointTypeHtml = '<li class="point-type enabled" data-point-type="' + pointType.id + '">' +
 			'<img src="' + pointType.marker + '" width="' + pointIconWidth + '" height="' + pointIconHeight + '">' +
 			'<span>' + pointType.name + '</span>' +
 			'</li>';
@@ -154,18 +154,15 @@
 	 * @param pointType {number} - Id of point type, 0 for all types
 	 */
 	function markPointTypeFiltersAsDisabled(filterClicked, pointType) {
-		var filters;
-
+		// remove .enabled class from clicked filter
 		filterClicked.classList.remove('enabled');
 
 		if (pointType === 0) {
-			filters = pointTypeFiltersContainer.getElementsByClassName('point_type');
-
-			Array.prototype.forEach.call(filters, function (filterElement) {
-				filterElement.classList.remove('enabled');
-			});
+			// remove .enabled class from all filters
+			toggleAllPointTypeFilters('remove');
 		} else {
-			document.getElementById('point_type_all').classList.remove('enabled');
+			// remove .enabled class from "All pin types"
+			document.getElementById('pointTypeAll').classList.remove('enabled');
 		}
 	}
 
@@ -175,20 +172,44 @@
 	 * @param pointType {number} - Id of point type, 0 for all types
 	 */
 	function markPointTypeFiltersAsEnabled(filterClicked, pointType) {
-		var filters;
-
 		if (pointType === 0) {
-			filters = pointTypeFiltersContainer.getElementsByClassName('point_type');
-
-			Array.prototype.forEach.call(filters, function (filterElement) {
-				filterElement.classList.add('enabled');
-			});
+			// add .enabled class to all filters
+			toggleAllPointTypeFilters('add');
 		} else {
+			// add .enabled class to clicked filter and if all filters are enabled then add it to "All pin types" too
 			filterClicked.classList.add('enabled');
 
-			if (pointTypes.length === pointTypeFiltersContainer.getElementsByClassName('point_type enabled').length) {
-				document.getElementById('point_type_all').classList.add('enabled');
+			if (pointTypes.length === pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length) {
+				document.getElementById('pointTypeAll').classList.add('enabled');
 			}
+		}
+	}
+
+	function toggleAllPointTypeFilters(operation) {
+		var filters = pointTypeFiltersContainer.getElementsByClassName('point-type');
+
+		Array.prototype.forEach.call(filters, function (filterElement) {
+			filterElement.classList[operation]('enabled');
+		});
+	}
+
+	/**
+	 * Add .hidden class to all elements from given NodeList
+	 * @param points {NodeList}
+	 */
+	function hidePoints(points) {
+		for (var i = 0; i < points.length; i++) {
+			points[i].classList.add('hidden');
+		}
+	}
+
+	/**
+	 * Remove .hidden class from all elements from given NodeList
+	 * @param points {NodeList}
+	 */
+	function showPoints(points) {
+		for (var i = 0; i < points.length; i++) {
+			points[i].classList.remove('hidden');
 		}
 	}
 
@@ -199,8 +220,7 @@
 		pointTypeFiltersContainer.addEventListener('click', function (e) {
 			var filterClicked = e.target,
 				pointType,
-				points,
-				i;
+				points;
 
 			if (filterClicked.tagName === 'UL') {
 				// we are too high in DOM, abort
@@ -217,18 +237,11 @@
 
 			if (filterClicked.classList.contains('enabled')) {
 				markPointTypeFiltersAsDisabled(filterClicked, pointType);
+				hidePoints(points);
 
-				// hide points
-				for (i = 0; i < points.length; i++) {
-					points[i].classList.add('hidden');
-				}
 			} else {
 				markPointTypeFiltersAsEnabled(filterClicked, pointType);
-
-				// show points
-				for (i = 0; i < points.length; i++) {
-					points[i].classList.remove('hidden');
-				}
+				showPoints(points);
 			}
 		}, false);
 	}
