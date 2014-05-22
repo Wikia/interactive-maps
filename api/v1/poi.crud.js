@@ -6,6 +6,9 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 
+	urlPattern = '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
+		'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
+
 	dbTable = 'poi',
 	createSchema = {
 		description: 'Schema for creating POI',
@@ -33,14 +36,12 @@ var dbCon = require('./../../lib/db_connector'),
 			link: {
 				description: 'Link to article connected with this POI',
 				type: 'string',
-				pattern: '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
-					'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?'
+				pattern: urlPattern
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
 				type: 'string',
-				pattern: '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
-					'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?'
+				pattern: urlPattern
 			},
 			lat: {
 				description: 'POI latitude',
@@ -79,15 +80,13 @@ var dbCon = require('./../../lib/db_connector'),
 			link: {
 				description: 'Link to article connected with this POI',
 				type: 'string',
-				pattern: '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
-					'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
+				pattern: urlPattern,
 				format: 'uri'
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
 				type: 'string',
-				pattern: '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
-					'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
+				pattern: urlPattern,
 				format: 'uri'
 			},
 			lat: {
