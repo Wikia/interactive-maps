@@ -11,7 +11,7 @@
 			// Local URL origin
 			localOrigin = '',
 			// Registry for callbacks
-			callbacks = {},;
+			callbacks = {};
 
 		/**
 		 * @desc Finds appropriate communication channel
