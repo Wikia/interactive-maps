@@ -11,7 +11,7 @@ var dbCon = require('./../../lib/db_connector'),
 	addTileSet = require('./../../lib/addTileSet'),
 
 	urlPattern = '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
-		'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
+	'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
 
 	dbTable = 'tile_set',
 	createSchema = {

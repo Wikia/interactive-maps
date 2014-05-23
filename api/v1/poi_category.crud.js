@@ -9,7 +9,7 @@ var dbCon = require('./../../lib/db_connector'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 
 	urlPattern = '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
-		'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
+	'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
 
 	dbTable = 'poi_category',
 	createSchema = {
@@ -70,11 +70,9 @@ var dbCon = require('./../../lib/db_connector'),
  */
 function handleUsedCategories(id, res, next) {
 	dbCon.update(
-		'poi',
-		{
+		'poi', {
 			poi_category_id: config.catchAllCategoryId
-		},
-		{
+		}, {
 			poi_category_id: id
 		}
 	).then(
