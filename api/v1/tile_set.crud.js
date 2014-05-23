@@ -10,6 +10,9 @@ var dbCon = require('./../../lib/db_connector'),
 	// custom action for POST method
 	addTileSet = require('./../../lib/addTileSet'),
 
+	urlPattern = '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
+		'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
+
 	dbTable = 'tile_set',
 	createSchema = {
 		description: 'Schema for creating tile set',
@@ -23,7 +26,7 @@ var dbCon = require('./../../lib/db_connector'),
 			url: {
 				description: 'URL to image from which tiles wil be created',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})',
+				pattern: urlPattern,
 				required: true
 			},
 			created_by: {

@@ -8,6 +8,9 @@ var dbCon = require('./../../lib/db_connector'),
 	config = require('./../../lib/config'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 
+	urlPattern = '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
+		'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
+
 	dbTable = 'poi_category',
 	createSchema = {
 		description: 'Schema for creating a category',
@@ -26,7 +29,7 @@ var dbCon = require('./../../lib/db_connector'),
 			marker: {
 				description: 'Url to custom marker icon',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
+				pattern: urlPattern
 			},
 			parent_poi_category_id: {
 				description: 'Unique identifier for parent category',
@@ -51,7 +54,7 @@ var dbCon = require('./../../lib/db_connector'),
 			marker: {
 				description: 'Url to custom marker icon',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
+				pattern: urlPattern
 			}
 		},
 		additionalProperties: false
