@@ -146,7 +146,7 @@
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
 	function getPointsByType(pointType) {
-		return (typeof pointCache[pointType] !== 'undefined') ? pointCache[pointType] : loadPointsToCache(pointType);
+		return (pointCache.hasOwnProperty(pointType)) ? pointCache[pointType] : loadPointsToCache(pointType);
 	}
 
 	/**
@@ -166,10 +166,11 @@
 	function togglePoints(filterClicked) {
 		var pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10),
 			points = getPointsByType(pointType),
+			pointsLength = points.length,
 			filterEnabled = filterClicked.classList.contains('enabled'),
 			i;
 
-		for (i = 0; i < points.length; i++) {
+		for (i = 0; i < pointsLength; i++) {
 			toggleClass(points[i], 'hidden', (filterEnabled) ? 'remove' : 'add');
 		}
 	}
@@ -201,9 +202,10 @@
 		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
 			filterEnabled = allPointTypesFilter.classList.contains('enabled'),
 			filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
+			filtersLength = filters.length,
 			i;
 
-		for (i = 0; i < filters.length; i++) {
+		for (i = 0; i < filtersLength; i++) {
 			toggleClass(filters[i], 'enabled', (filterEnabled) ? 'remove' : 'add');
 		}
 
