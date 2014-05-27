@@ -10,7 +10,7 @@
                 margin: 0;
                 padding: 0;
             }
-            html, body, .int_map {
+            html, body, .int-map {
                 height: 100%;
             }
         </style>
@@ -19,7 +19,13 @@
         </script>
     </head>
     <body>
-        <div id="map" class="int_map"></div>
+        <div class="filter-menu">
+            <h3>Filters</h3>
+            <ul id="pointTypes" class="point-types">
+                <li id="allPointTypes" class="enabled" data-point-type="0">All Pin Types</li>
+            </ul>
+        </div>
+        <div id="map" class="int-map"></div>
         <script src="/scripts/leaflet.js"></script>
         <script src="/scripts/map.js"></script>
     </body>
