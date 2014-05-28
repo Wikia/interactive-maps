@@ -119,39 +119,39 @@ module.exports = function createCRUD() {
 				}
 
 				query.then(
-						function (collection) {
-							dbCon.knex(dbTable)
-								.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-								.count('* as cntr')
-								.where(filter)
-								.then(
-									function (count) {
-										collection.forEach(function (value) {
-											value.image = utils.imageUrl(
-												config.dfsHost,
-												utils.getBucketName(config.bucketPrefix, value.name),
-												value.image
-											);
-											value.url = utils.responseUrl(req, req.route.path, value.id);
+					function (collection) {
+						dbCon.knex(dbTable)
+							.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+							.count('* as cntr')
+							.where(filter)
+							.then(
+								function (count) {
+									collection.forEach(function (value) {
+										value.image = utils.imageUrl(
+											config.dfsHost,
+											utils.getBucketName(config.bucketPrefix, value.name),
+											value.image
+										);
+										value.url = utils.responseUrl(req, req.route.path, value.id);
 
-											delete value.name;
-										});
+										delete value.name;
+									});
 
-										res.send(200, {
-											total: count[0].cntr,
-											items: collection
-										});
-										res.end();
-									},
-									next
-								);
-						},
-						next
+									res.send(200, {
+										total: count[0].cntr,
+										items: collection
+									});
+									res.end();
+								},
+								next
+						);
+					},
+					next
 				);
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, createSchema);
+					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
 					reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
@@ -230,7 +230,7 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, updateSchema),
+					errors = jsonValidator.validateJSON(reqBody, updateSchema),
 					id,
 					filter;
 
