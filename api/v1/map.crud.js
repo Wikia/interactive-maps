@@ -188,7 +188,10 @@ module.exports = function createCRUD() {
 						.then(
 							function (affectedRows) {
 								if (affectedRows > 0) {
-									res.send(204, {});
+									res.send(204, {
+										message: 'Map successfully deleted',
+										id: id
+									});
 									res.end();
 								} else {
 									next(errorHandler.elementNotFoundError(dbTable, id));
