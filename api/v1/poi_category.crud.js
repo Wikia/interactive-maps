@@ -8,8 +8,7 @@ var dbCon = require('./../../lib/db_connector'),
 	config = require('./../../lib/config'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 
-	urlPattern = '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
-	'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
+	urlPattern = jsonValidator.getUrlPattern(),
 
 	dbTable = 'poi_category',
 	createSchema = {
@@ -122,7 +121,7 @@ module.exports = function createCRUD() {
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, createSchema);
+					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
 					dbCon
@@ -220,13 +219,15 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, updateSchema);
+					errors = jsonValidator.validateJSON(reqBody, updateSchema),
+					id,
+					filter;
 
 				if (errors.length === 0) {
-					var id = parseInt(req.pathVar.id),
-						filter = {
-							id: id
-						};
+					id = parseInt(req.pathVar.id);
+					filter = {
+						id: id
+					};
 					// If new marker is uploaded, reset the marker status to 0
 					if (reqBody.marker) {
 						reqBody.status = 0;

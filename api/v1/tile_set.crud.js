@@ -10,8 +10,7 @@ var dbCon = require('./../../lib/db_connector'),
 	// custom action for POST method
 	addTileSet = require('./../../lib/addTileSet'),
 
-	urlPattern = '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
-	'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
+	urlPattern = jsonValidator.getUrlPattern(),
 
 	dbTable = 'tile_set',
 	createSchema = {
@@ -70,7 +69,7 @@ module.exports = function createCRUD() {
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, createSchema);
+					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
 					addTileSet(dbTable, reqBody)

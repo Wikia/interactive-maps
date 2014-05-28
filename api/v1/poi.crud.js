@@ -6,8 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 
-	urlPattern = '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+' +
-		'((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?',
+	urlPattern = jsonValidator.getUrlPattern(),
 
 	dbTable = 'poi',
 	createSchema = {
@@ -159,7 +158,7 @@ module.exports = function createCRUD() {
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, createSchema);
+					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
 					dbCon
@@ -250,7 +249,7 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, updateSchema),
+					errors = jsonValidator.validateJSON(reqBody, updateSchema),
 					id,
 					filter;
 
