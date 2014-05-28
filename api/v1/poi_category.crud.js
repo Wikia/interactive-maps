@@ -8,6 +8,8 @@ var dbCon = require('./../../lib/db_connector'),
 	config = require('./../../lib/config'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 
+	urlPattern = jsonValidator.getUrlPattern(),
+
 	dbTable = 'poi_category',
 	createSchema = {
 		description: 'Schema for creating a category',
@@ -26,7 +28,7 @@ var dbCon = require('./../../lib/db_connector'),
 			marker: {
 				description: 'Url to custom marker icon',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
+				pattern: urlPattern
 			},
 			parent_poi_category_id: {
 				description: 'Unique identifier for parent category',
@@ -51,7 +53,7 @@ var dbCon = require('./../../lib/db_connector'),
 			marker: {
 				description: 'Url to custom marker icon',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
+				pattern: urlPattern
 			}
 		},
 		additionalProperties: false
@@ -66,11 +68,9 @@ var dbCon = require('./../../lib/db_connector'),
  */
 function handleUsedCategories(id, res, next) {
 	dbCon.update(
-		'poi',
-		{
+		'poi', {
 			poi_category_id: config.catchAllCategoryId
-		},
-		{
+		}, {
 			poi_category_id: id
 		}
 	).then(
@@ -121,7 +121,7 @@ module.exports = function createCRUD() {
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, createSchema);
+					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
 					dbCon
@@ -219,13 +219,15 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, updateSchema);
+					errors = jsonValidator.validateJSON(reqBody, updateSchema),
+					id,
+					filter;
 
 				if (errors.length === 0) {
-					var id = parseInt(req.pathVar.id),
-						filter = {
-							id: id
-						};
+					id = parseInt(req.pathVar.id);
+					filter = {
+						id: id
+					};
 					// If new marker is uploaded, reset the marker status to 0
 					if (reqBody.marker) {
 						reqBody.status = 0;
