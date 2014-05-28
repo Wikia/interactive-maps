@@ -1,17 +1,25 @@
-(function(window, L){
+(function (window, L) {
 	'use strict';
 
 	var mapContainerId = 'map',
+		pointTypeFiltersContainerId = 'pointTypes',
+		allPointTypesFilterId = 'allPointTypes',
 		map,
+		pointTypeFiltersContainer,
 		popupWidthWithPhoto = 414,
 		popupWidthWithoutPhoto = 314,
 		photoWidth = 90,
-		photoHeight = 90;
+		photoHeight = 90,
+		pointIconWidth = 32,
+		pointIconHeight = 32,
+		pointIcons = {},
+		pointCache = {},
+		pointTypes = {};
 
 	/**
 	 * @desc Build popup HTML
 	 * @param point {object} - POI object
-	 * @returns {string} - Popup HTML makup
+	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
 		//TODO what about edit link? where do we get it from?
@@ -20,9 +28,9 @@
 			descriptionHtml = '';
 
 		if (point.photo && point.link) {
-			photoHtml = buildLinkHtml(point, buildPhotoHtml(point.photo, point.name), 'photo');
+			photoHtml = buildLinkHtml(point, buildImageHtml(point.photo, point.name, photoWidth, photoHeight), 'photo');
 		} else if (point.photo) {
-			photoHtml = buildPhotoHtml(point.photo, point.name);
+			photoHtml = buildImageHtml(point.photo, point.name, photoWidth, photoHeight);
 		}
 
 		if (point.name) {
@@ -41,14 +49,13 @@
 	}
 
 	/**
-	 * @desc Build photo HTML
-	 * @param photoUrl {string} - image URL
-	 * @param alt {string} - image alternate text
-	 * @returns {string} Photo HTML
+	 * @desc Build image HTML
+	 * @param imageUrl {string} - Image URL
+	 * @param alt {string} - Image alternate text
+	 * @returns {string} - HTML markup for photo
 	 */
-	function buildPhotoHtml(photoUrl, alt) {
-		//TODO what about that width and height?
-		return '<img src="' + photoUrl + '" alt="' + alt + '" width="' + photoWidth + '" height="' + photoHeight + '">';
+	function buildImageHtml(imageUrl, alt, imageWidth, imageHeight) {
+		return '<img src="' + imageUrl + '" alt="' + alt + '" width="' + imageWidth + '" height="' + imageHeight + '">';
 	}
 
 	/**
@@ -71,8 +78,8 @@
 
 	/**
 	 * @desc Add point to the map
-	 * @param point {object}
-	 * @returns {object} Leaflet Marker
+	 * @param point {object} - POI object
+	 * @returns {object} - Leaflet Marker
 	 */
 	function addPointOnMap(point) {
 		var popup, popupWidth;
@@ -87,12 +94,177 @@
 			})
 			.setContent(buildPopupHtml(point));
 
-		return L
-			.marker([point.lat, point.lon], {
-				riseOnHover: true
-			})
-			.bindPopup(popup)
-			.addTo(map);
+		return L.marker([point.lat, point.lon], {
+			icon: pointIcons[point.poi_category_id],
+			riseOnHover: true,
+			type: point.type
+		}).bindPopup(popup).addTo(map);
+	}
+
+	/**
+	 * @desc Build point type filter HTML
+	 * @param pointType {object} - POI type object
+	 * @returns {string} - HTML markup for point type filter
+	 */
+	function buildPointTypeFilterHtml(pointType) {
+		return '<li class="point-type enabled" data-point-type="' + pointType.id + '">' +
+			buildImageHtml(pointType.marker, pointType.name, pointIconWidth, pointIconHeight) +
+			'<span>' + pointType.name + '</span>' +
+			'</li>';
+	}
+
+	/**
+	 * @desc Setup icon for markers with given point type
+	 * @param pointType {object} - POI type object
+	 */
+	function setupPointTypeIcon(pointType) {
+		pointIcons[pointType.id] = L.icon({
+			iconUrl: pointType.marker,
+			iconSize: [pointIconWidth, pointIconHeight],
+			className: 'point-type-' + pointType.id
+		});
+	}
+
+	/**
+	 * @desc Loads points of given type to cache and returns them
+	 * @param pointType {number} - Id of point type, 0 for all types
+	 * @returns {NodeList} - List of DOM elements corresponding with given point type
+	 */
+	function loadPointsToCache(pointType) {
+		pointCache[pointType] = document.getElementsByClassName(
+			(pointType === 0) ?
+			'leaflet-marker-icon' :
+			'point-type-' + pointType
+		);
+
+		return pointCache[pointType];
+	}
+
+	/**
+	 * @desc Return DOM elements for given point type
+	 * @param pointType {number} - Id of point type, 0 for all types
+	 * @returns {NodeList} - List of DOM elements corresponding with given point type
+	 */
+	function getPointsByType(pointType) {
+		return (pointCache.hasOwnProperty(pointType)) ? pointCache[pointType] : loadPointsToCache(pointType);
+	}
+
+	/**
+	 * @desc Adds or removes class of DOM element
+	 * @param element {Element} - DOM element
+	 * @param className {string} - Name of class to toggle
+	 * @param operation {string} - 'add' or 'remove' class
+	 */
+	function toggleClass(element, className, operation) {
+		element.classList[operation](className);
+	}
+
+	/**
+	 * @desc Toggles visibility of points corresponding with clicked filter
+	 * @param filterClicked {Element} - Filter element that was clicked
+	 */
+	function togglePoints(filterClicked) {
+		var pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10),
+			points = getPointsByType(pointType),
+			pointsLength = points.length,
+			filterEnabled = filterClicked.classList.contains('enabled'),
+			i;
+
+		for (i = 0; i < pointsLength; i++) {
+			toggleClass(points[i], 'hidden', (filterEnabled) ? 'remove' : 'add');
+		}
+	}
+
+	/**
+	 * @desc Toggles state of point type filter
+	 * @param filterClicked {Element} - Filter element that was clicked
+	 */
+	function togglePointTypeFilter(filterClicked) {
+		var filterEnabled = filterClicked.classList.contains('enabled');
+
+		toggleClass(filterClicked, 'enabled', (filterEnabled) ? 'remove' : 'add');
+	}
+
+	/**
+	 * @desc Toggles state of "All pin types" filter
+	 */
+	function toggleAllPointTypesFilter() {
+		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
+			filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
+
+		toggleClass(allPointTypesFilter, 'enabled', (pointTypes.length === filtersEnabledLength) ? 'add' : 'remove');
+	}
+
+	/**
+	 * @desc Handles click on "All pin types" filter
+	 */
+	function allPointTypesFilterClickHandler() {
+		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
+			filterEnabled = allPointTypesFilter.classList.contains('enabled'),
+			filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
+			filtersLength = filters.length,
+			i;
+
+		for (i = 0; i < filtersLength; i++) {
+			toggleClass(filters[i], 'enabled', (filterEnabled) ? 'remove' : 'add');
+		}
+
+		toggleAllPointTypesFilter();
+		togglePoints(allPointTypesFilter);
+	}
+
+	/**
+	 * @desc Handles click on point type filter
+	 * @param filterClicked {Element} - Filter element that was clicked
+	 */
+	function pointTypeFilterClickHandler(filterClicked) {
+		togglePointTypeFilter(filterClicked);
+		toggleAllPointTypesFilter();
+		togglePoints(filterClicked);
+	}
+
+	/**
+	 * @desc Handles click on point type filters container
+	 * @param event {Event} - Click event
+	 */
+	function pointTypeFiltersContainerClickHandler(event) {
+		var elementClicked = event.target,
+			filterClicked = elementClicked,
+			pointType;
+
+		if (elementClicked.parentNode.tagName === 'LI') {
+			filterClicked = elementClicked.parentNode;
+		}
+
+		pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10);
+
+		if (pointType === 0) {
+			allPointTypesFilterClickHandler();
+		} else {
+			pointTypeFilterClickHandler(filterClicked);
+		}
+	}
+
+	/**
+	 * @desc Create points and filters for them
+	 * @param config {object}
+	 */
+	function setupPoints(config) {
+		var pointTypeFiltersHtml = '';
+
+		pointTypes = config.types;
+
+		config.types.forEach(function (pointType) {
+			setupPointTypeIcon(pointType);
+			pointTypeFiltersHtml += buildPointTypeFilterHtml(pointType);
+		});
+
+		pointTypeFiltersContainer = document.getElementById(pointTypeFiltersContainerId);
+		pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
+
+		config.points.forEach(addPointOnMap);
+
+		pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
 	}
 
 	/**
@@ -125,11 +297,13 @@
 	}
 
 	/**
-	 * @desc Create new map and add points to it
+	 * @desc Create new map
 	 * @param config {object}
 	 */
 	function createMap(config) {
-		var defaultMinZoom = getMinZoomLevel(
+		var zoomControl, defaultMinZoom;
+
+		defaultMinZoom = getMinZoomLevel(
 			config.layer.maxZoom,
 			Math.max(config.width, config.height),
 			Math.max(
@@ -143,9 +317,10 @@
 		}
 
 		map = L.map(mapContainerId, {
-				minZoom: config.layer.minZoom,
-				maxZoom: config.layer.maxZoom
-			});
+			minZoom: config.layer.minZoom,
+			maxZoom: config.layer.maxZoom,
+			zoomControl: false
+		});
 		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
 		if (config.hasOwnProperty('boundaries')) {
@@ -162,9 +337,12 @@
 			Math.max(config.zoom, defaultMinZoom)
 		);
 
-		config.points.forEach(function (point){
-			addPointOnMap(point);
+		zoomControl = L.control.zoom({
+			position: 'bottomright'
 		});
+		map.addControl(zoomControl);
+
+		setupPoints(config);
 	}
 
 	createMap(window.mapSetup);

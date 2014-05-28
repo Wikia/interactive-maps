@@ -109,7 +109,9 @@ module.exports = function createCRUD() {
 						'max_zoom',
 						'status',
 						'created_by',
-						'created_on'
+						'created_on',
+						'attribution',
+						'subdomains'
 					],
 					id = parseInt(req.pathVar.id),
 					filter = {
