@@ -39,19 +39,6 @@
                 vertical-align: middle;
             }
         </style>
-        <script>
-            (function (window) {
-                function init() {
-                    var error = {{{error}}};
-
-                    if (error.originalImageUrl) {
-                        document.body.style.backgroundImage = 'url(\'' + error.originalImageUrl + '\')';
-                    }
-                }
-
-                window.onload = init;
-            })(window);
-        </script>
     </head>
     <body>
         <div class="center">
@@ -59,5 +46,13 @@
                 <p>{{{errorMessage}}}</p>
             </div>
         </div>
+
+        <script>
+            var error = {{{error}}};
+
+            if (error.originalImageUrl) {
+                document.body.style.backgroundImage = 'url(\'' + error.originalImageUrl + '\')';
+            }
+        </script>
     </body>
 </html>
