@@ -16,7 +16,8 @@ var dbCon = require('./../../lib/db_connector'),
 			name: {
 				description: 'POI name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1
 			},
 			poi_category_id: {
 				description: 'Unique identifier for category',
@@ -30,7 +31,8 @@ var dbCon = require('./../../lib/db_connector'),
 			},
 			description: {
 				description: 'POI description',
-				type: 'string'
+				type: 'string',
+				minLength: 1
 			},
 			link: {
 				description: 'Link to article connected with this POI',
@@ -55,7 +57,8 @@ var dbCon = require('./../../lib/db_connector'),
 			created_by: {
 				description: 'creator user name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1
 			}
 		},
 		additionalProperties: false
@@ -66,7 +69,8 @@ var dbCon = require('./../../lib/db_connector'),
 		properties: {
 			name: {
 				description: 'POI name',
-				type: 'string'
+				type: 'string',
+				minLength: 1
 			},
 			poi_category_id: {
 				description: 'Unique identifier for category',
@@ -74,7 +78,8 @@ var dbCon = require('./../../lib/db_connector'),
 			},
 			description: {
 				description: 'POI description',
-				type: 'string'
+				type: 'string',
+				minLength: 1
 			},
 			link: {
 				description: 'Link to article connected with this POI',
@@ -99,7 +104,8 @@ var dbCon = require('./../../lib/db_connector'),
 			updated_by: {
 				description: 'Editor user name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1
 			}
 		},
 		additionalProperties: false
@@ -108,7 +114,7 @@ var dbCon = require('./../../lib/db_connector'),
 /**
  * @desc Helper function to update map's updated_on field
  *
- * @param mapId {number}
+ * @param {number} mapId
  * @returns {object}
  */
 function changeMapUpdatedOn(mapId) {
@@ -121,11 +127,10 @@ function changeMapUpdatedOn(mapId) {
 	);
 }
 
-
 /**
  * @desc Helper function to get map_id from poi_id
  *
- * @param poiId {number}
+ * @param {number} poiId
  * @returns {object}
  */
 function getMapIdByPoiId(poiId) {

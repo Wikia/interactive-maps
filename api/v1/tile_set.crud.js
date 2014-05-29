@@ -20,7 +20,8 @@ var dbCon = require('./../../lib/db_connector'),
 			name: {
 				description: 'Tile set name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1
 			},
 			url: {
 				description: 'URL to image from which tiles wil be created',
@@ -31,7 +32,8 @@ var dbCon = require('./../../lib/db_connector'),
 			created_by: {
 				description: 'Creator user name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1
 			}
 		},
 		additionalProperties: false

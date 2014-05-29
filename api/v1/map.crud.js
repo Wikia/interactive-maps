@@ -15,7 +15,8 @@ var dbCon = require('./../../lib/db_connector'),
 			title: {
 				description: 'Map title',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1
 			},
 			tile_set_id: {
 				description: 'Unique identifier for a tile set',
@@ -30,7 +31,8 @@ var dbCon = require('./../../lib/db_connector'),
 			created_by: {
 				description: 'creator user name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1
 			}
 		},
 		additionalProperties: false
