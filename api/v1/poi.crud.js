@@ -17,7 +17,8 @@ var dbCon = require('./../../lib/db_connector'),
 				description: 'POI name',
 				type: 'string',
 				required: true,
-				minLength: 1
+				minLength: 1,
+				maxLength: 255
 			},
 			poi_category_id: {
 				description: 'Unique identifier for category',
@@ -37,12 +38,14 @@ var dbCon = require('./../../lib/db_connector'),
 			link: {
 				description: 'Link to article connected with this POI',
 				type: 'string',
-				pattern: urlPattern
+				pattern: urlPattern,
+				maxLength: 255
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
 				type: 'string',
-				pattern: urlPattern
+				pattern: urlPattern,
+				maxLength: 255
 			},
 			lat: {
 				description: 'POI latitude',
@@ -58,7 +61,8 @@ var dbCon = require('./../../lib/db_connector'),
 				description: 'creator user name',
 				type: 'string',
 				required: true,
-				minLength: 1
+				minLength: 1,
+				maxLength: 255
 			}
 		},
 		additionalProperties: false
@@ -70,7 +74,8 @@ var dbCon = require('./../../lib/db_connector'),
 			name: {
 				description: 'POI name',
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: 255
 			},
 			poi_category_id: {
 				description: 'Unique identifier for category',
@@ -85,13 +90,15 @@ var dbCon = require('./../../lib/db_connector'),
 				description: 'Link to article connected with this POI',
 				type: 'string',
 				pattern: urlPattern,
-				format: 'uri'
+				format: 'uri',
+				maxLength: 255
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
 				type: 'string',
 				pattern: urlPattern,
-				format: 'uri'
+				format: 'uri',
+				maxLength: 255
 			},
 			lat: {
 				description: 'POI latitude',
@@ -105,7 +112,8 @@ var dbCon = require('./../../lib/db_connector'),
 				description: 'Editor user name',
 				type: 'string',
 				required: true,
-				minLength: 1
+				minLength: 1,
+				maxLength: 255
 			}
 		},
 		additionalProperties: false
