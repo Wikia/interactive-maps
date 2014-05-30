@@ -38,8 +38,7 @@ var dbCon = require('./../../lib/db_connector'),
 			link: {
 				description: 'Link to article connected with this POI',
 				type: 'string',
-				pattern: urlPattern,
-				maxLength: 255
+				pattern: urlPattern
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
@@ -90,8 +89,7 @@ var dbCon = require('./../../lib/db_connector'),
 				description: 'Link to article connected with this POI',
 				type: 'string',
 				pattern: urlPattern,
-				format: 'uri',
-				maxLength: 255
+				format: 'uri'
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
