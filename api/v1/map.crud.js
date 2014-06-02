@@ -46,7 +46,7 @@ var dbCon = require('./../../lib/db_connector'),
 			},
 			deleted: {
 				description: 'Map instance name',
-				type: 'bool',
+				type: 'bool'
 			}
 		},
 		additionalProperties: false
