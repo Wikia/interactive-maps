@@ -46,8 +46,11 @@ var dbCon = require('./../../lib/db_connector'),
 			title: {
 				description: 'Map instance name',
 				type: 'string',
-				minLength: 1,
-				maxLength: 255
+				minLength: 1
+			},
+			deleted: {
+				description: 'Map instance name',
+				type: 'bool'
 			}
 		},
 		additionalProperties: false
@@ -92,7 +95,9 @@ module.exports = function createCRUD() {
 		handler: {
 			GET: function (req, res, next) {
 				var cityId = parseInt(req.query.city_id, 10) || 0,
-					filter = {},
+					filter = {
+						deleted: false
+					},
 					sort = buildSort(req.query.sort),
 					limit = parseInt(req.query.limit, 10) || false,
 					offset = parseInt(req.query.offset, 10) || 0,
