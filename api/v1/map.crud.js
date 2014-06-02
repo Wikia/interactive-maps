@@ -43,6 +43,10 @@ var dbCon = require('./../../lib/db_connector'),
 				description: 'Map instance name',
 				type: 'string',
 				minLength: 2
+			},
+			deleted: {
+				description: 'Map instance name',
+				type: 'bool',
 			}
 		},
 		additionalProperties: false
