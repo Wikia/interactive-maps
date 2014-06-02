@@ -97,6 +97,8 @@ module.exports = function createCRUD() {
 					offset = parseInt(req.query.offset, 10) || 0,
 					query;
 
+				filter.deleted = false;
+
 				if (cityId !== 0) {
 					filter.city_id = cityId;
 				}
