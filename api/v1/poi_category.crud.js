@@ -18,7 +18,9 @@ var dbCon = require('./../../lib/db_connector'),
 			name: {
 				description: 'Name of a category',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1,
+				maxLength: 255
 			},
 			map_id: {
 				description: 'ID of the map this POI belongs to',
@@ -28,7 +30,8 @@ var dbCon = require('./../../lib/db_connector'),
 			marker: {
 				description: 'Url to custom marker icon',
 				type: 'string',
-				pattern: urlPattern
+				pattern: urlPattern,
+				maxLength: 255
 			},
 			parent_poi_category_id: {
 				description: 'Unique identifier for parent category',
@@ -37,7 +40,9 @@ var dbCon = require('./../../lib/db_connector'),
 			created_by: {
 				description: 'creator user name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1,
+				maxLength: 255
 			}
 		},
 		additionalProperties: false
@@ -48,12 +53,15 @@ var dbCon = require('./../../lib/db_connector'),
 		properties: {
 			name: {
 				description: 'Name of a category',
-				type: 'string'
+				type: 'string',
+				minLength: 1,
+				maxLength: 255
 			},
 			marker: {
 				description: 'Url to custom marker icon',
 				type: 'string',
-				pattern: urlPattern
+				pattern: urlPattern,
+				maxLength: 255
 			}
 		},
 		additionalProperties: false
