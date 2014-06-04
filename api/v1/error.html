@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{{errorMessage}}}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <style>
+            body {
+                background: #000 center no-repeat;
+                margin: 0;
+                padding: 0;
+            }
+
+            html, body {
+                height: 100%;
+            }
+
+            .center {
+                bottom: 0;
+                height: 100px;
+                left: 0;
+                margin: auto;
+                position: absolute;
+                right: 0;
+                top: 0;
+                width: 300px;
+            }
+
+            .error-wrapper {
+                background: white;
+                box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+                display: table;
+                height: 100%;
+                text-align: center;
+                width: 100%;
+            }
+
+            .error-wrapper p {
+                display: table-cell;
+                vertical-align: middle;
+            }
+
+            button {
+                margin-top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="center">
+            <div class="error-wrapper">
+                <p>{{{errorMessage}}}<br><button id="refresh">Refresh</button></p>
+            </div>
+        </div>
+
+        <script>
+            var error = {{{error}}};
+
+            if (error.originalImageUrl) {
+                document.body.style.backgroundImage = 'url(\'' + error.originalImageUrl + '\')';
+            }
+
+            document.getElementById('refresh').addEventListener('click', function () {
+                window.location.href = window.location.href;
+            });
+        </script>
+    </body>
+</html>

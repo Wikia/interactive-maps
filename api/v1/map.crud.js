@@ -49,7 +49,7 @@ var dbCon = require('./../../lib/db_connector'),
 				minLength: 1
 			},
 			deleted: {
-				description: 'Map instance name',
+				description: 'Map deleted flag',
 				type: 'bool'
 			}
 		},
