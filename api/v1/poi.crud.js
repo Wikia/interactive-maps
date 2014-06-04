@@ -16,9 +16,7 @@ var dbCon = require('./../../lib/db_connector'),
 			name: {
 				description: 'POI name',
 				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
+				required: true
 			},
 			poi_category_id: {
 				description: 'Unique identifier for category',
@@ -233,8 +231,8 @@ module.exports = function createCRUD() {
 			},
 			GET: function (req, res, next) {
 				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'photo', 'lat', 'lon',
-						'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
-					],
+					'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
+				],
 					id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
