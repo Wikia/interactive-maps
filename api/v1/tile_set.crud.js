@@ -10,6 +10,8 @@ var dbCon = require('./../../lib/db_connector'),
 	// custom action for POST method
 	addTileSet = require('./../../lib/addTileSet'),
 
+	urlPattern = jsonValidator.getUrlPattern(),
+
 	dbTable = 'tile_set',
 	createSchema = {
 		description: 'Schema for creating tile set',
@@ -18,18 +20,23 @@ var dbCon = require('./../../lib/db_connector'),
 			name: {
 				description: 'Tile set name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1,
+				maxLength: 255
 			},
 			url: {
 				description: 'URL to image from which tiles wil be created',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})',
-				required: true
+				pattern: urlPattern,
+				required: true,
+				maxLength: 255
 			},
 			created_by: {
 				description: 'Creator user name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1,
+				maxLength: 255
 			}
 		},
 		additionalProperties: false
@@ -67,7 +74,7 @@ module.exports = function createCRUD() {
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, createSchema);
+					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
 					addTileSet(dbTable, reqBody)

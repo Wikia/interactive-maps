@@ -6,6 +6,8 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 
+	urlPattern = jsonValidator.getUrlPattern(),
+
 	dbTable = 'poi',
 	createSchema = {
 		description: 'Schema for creating POI',
@@ -14,7 +16,9 @@ var dbCon = require('./../../lib/db_connector'),
 			name: {
 				description: 'POI name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1,
+				maxLength: 255
 			},
 			poi_category_id: {
 				description: 'Unique identifier for category',
@@ -28,17 +32,19 @@ var dbCon = require('./../../lib/db_connector'),
 			},
 			description: {
 				description: 'POI description',
-				type: 'string'
+				type: 'string',
+				minLength: 1
 			},
 			link: {
 				description: 'Link to article connected with this POI',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
+				pattern: urlPattern
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
+				pattern: urlPattern,
+				maxLength: 255
 			},
 			lat: {
 				description: 'POI latitude',
@@ -53,7 +59,9 @@ var dbCon = require('./../../lib/db_connector'),
 			created_by: {
 				description: 'creator user name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1,
+				maxLength: 255
 			}
 		},
 		additionalProperties: false
@@ -64,7 +72,9 @@ var dbCon = require('./../../lib/db_connector'),
 		properties: {
 			name: {
 				description: 'POI name',
-				type: 'string'
+				type: 'string',
+				minLength: 1,
+				maxLength: 255
 			},
 			poi_category_id: {
 				description: 'Unique identifier for category',
@@ -72,19 +82,21 @@ var dbCon = require('./../../lib/db_connector'),
 			},
 			description: {
 				description: 'POI description',
-				type: 'string'
+				type: 'string',
+				minLength: 1
 			},
 			link: {
 				description: 'Link to article connected with this POI',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})',
+				pattern: urlPattern,
 				format: 'uri'
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
 				type: 'string',
-				pattern: '(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})',
-				format: 'uri'
+				pattern: urlPattern,
+				format: 'uri',
+				maxLength: 255
 			},
 			lat: {
 				description: 'POI latitude',
@@ -97,7 +109,9 @@ var dbCon = require('./../../lib/db_connector'),
 			updated_by: {
 				description: 'Editor user name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1,
+				maxLength: 255
 			}
 		},
 		additionalProperties: false
@@ -106,7 +120,7 @@ var dbCon = require('./../../lib/db_connector'),
 /**
  * @desc Helper function to update map's updated_on field
  *
- * @param mapId {number}
+ * @param {number} mapId
  * @returns {object}
  */
 function changeMapUpdatedOn(mapId) {
@@ -119,11 +133,10 @@ function changeMapUpdatedOn(mapId) {
 	);
 }
 
-
 /**
  * @desc Helper function to get map_id from poi_id
  *
- * @param poiId {number}
+ * @param {number} poiId
  * @returns {object}
  */
 function getMapIdByPoiId(poiId) {
@@ -156,7 +169,7 @@ module.exports = function createCRUD() {
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, createSchema);
+					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
 					dbCon
@@ -220,8 +233,8 @@ module.exports = function createCRUD() {
 			},
 			GET: function (req, res, next) {
 				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'photo', 'lat', 'lon',
-					'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
-				],
+						'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
+					],
 					id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
@@ -247,13 +260,15 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, updateSchema);
+					errors = jsonValidator.validateJSON(reqBody, updateSchema),
+					id,
+					filter;
 
 				if (errors.length === 0) {
-					var id = parseInt(req.pathVar.id),
-						filter = {
-							id: id
-						};
+					id = parseInt(req.pathVar.id);
+					filter = {
+						id: id
+					};
 
 					if (isFinite(id)) {
 						getMapIdByPoiId(id).then(

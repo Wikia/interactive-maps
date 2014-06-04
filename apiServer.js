@@ -33,6 +33,12 @@ logger.set({
 		level: logger.level.DEBUG,
 		raw: true
 	},
+	file: {
+		enabled: true,
+		level: logger.level.DEBUG,
+		raw: true,
+		path: 'intMaps.log'
+	},
 	syslog: {
 		enabled: true,
 		level: logger.level.NOTICE,

@@ -15,7 +15,9 @@ var dbCon = require('./../../lib/db_connector'),
 			title: {
 				description: 'Map title',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1,
+				maxLength: 255
 			},
 			tile_set_id: {
 				description: 'Unique identifier for a tile set',
@@ -30,7 +32,9 @@ var dbCon = require('./../../lib/db_connector'),
 			created_by: {
 				description: 'creator user name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1,
+				maxLength: 255
 			}
 		},
 		additionalProperties: false
@@ -42,7 +46,11 @@ var dbCon = require('./../../lib/db_connector'),
 			title: {
 				description: 'Map instance name',
 				type: 'string',
-				minLength: 2
+				minLength: 1
+			},
+			deleted: {
+				description: 'Map instance name',
+				type: 'bool'
 			}
 		},
 		additionalProperties: false
@@ -87,7 +95,9 @@ module.exports = function createCRUD() {
 		handler: {
 			GET: function (req, res, next) {
 				var cityId = parseInt(req.query.city_id, 10) || 0,
-					filter = {},
+					filter = {
+						deleted: false
+					},
 					sort = buildSort(req.query.sort),
 					limit = parseInt(req.query.limit, 10) || false,
 					offset = parseInt(req.query.offset, 10) || 0,
@@ -119,39 +129,39 @@ module.exports = function createCRUD() {
 				}
 
 				query.then(
-						function (collection) {
-							dbCon.knex(dbTable)
-								.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-								.count('* as cntr')
-								.where(filter)
-								.then(
-									function (count) {
-										collection.forEach(function (value) {
-											value.image = utils.imageUrl(
-												config.dfsHost,
-												utils.getBucketName(config.bucketPrefix, value.name),
-												value.image
-											);
-											value.url = utils.responseUrl(req, req.route.path, value.id);
+					function (collection) {
+						dbCon.knex(dbTable)
+							.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+							.count('* as cntr')
+							.where(filter)
+							.then(
+								function (count) {
+									collection.forEach(function (value) {
+										value.image = utils.imageUrl(
+											config.dfsHost,
+											utils.getBucketName(config.bucketPrefix, value.name),
+											value.image
+										);
+										value.url = utils.responseUrl(req, req.route.path, value.id);
 
-											delete value.name;
-										});
+										delete value.name;
+									});
 
-										res.send(200, {
-											total: count[0].cntr,
-											items: collection
-										});
-										res.end();
-									},
-									next
-								);
-						},
-						next
+									res.send(200, {
+										total: count[0].cntr,
+										items: collection
+									});
+									res.end();
+								},
+								next
+						);
+					},
+					next
 				);
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, createSchema);
+					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
 					reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
@@ -188,7 +198,10 @@ module.exports = function createCRUD() {
 						.then(
 							function (affectedRows) {
 								if (affectedRows > 0) {
-									res.send(204, {});
+									res.send(204, {
+										message: 'Map successfully deleted',
+										id: id
+									});
 									res.end();
 								} else {
 									next(errorHandler.elementNotFoundError(dbTable, id));
@@ -230,7 +243,7 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator(reqBody, updateSchema),
+					errors = jsonValidator.validateJSON(reqBody, updateSchema),
 					id,
 					filter;
 
