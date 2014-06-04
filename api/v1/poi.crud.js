@@ -16,7 +16,9 @@ var dbCon = require('./../../lib/db_connector'),
 			name: {
 				description: 'POI name',
 				type: 'string',
-				required: true
+				required: true,
+				minLength: 1,
+				maxLength: 255
 			},
 			poi_category_id: {
 				description: 'Unique identifier for category',
