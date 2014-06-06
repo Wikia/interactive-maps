@@ -116,11 +116,18 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name', 'marker'];
+				var dbColumns = ['id', 'name', 'marker', 'map_id'];
 				dbCon
 					.select(dbTable, dbColumns)
 					.then(
 						function (collection) {
+							collection.forEach(function (value) {
+								value.marker = utils.imageUrl(
+									config.dfsHost,
+									utils.getMarkersBucketName(config.markersPrefix, value.map_id),
+									value.marker
+								);
+							});
 							res.send(200, collection);
 							res.end();
 						},
