@@ -103,25 +103,23 @@
 
 	/**
 	 * @desc Build point type filter HTML
-	 * @param markersPath {string} - URL for markers bucket
 	 * @param pointType {object} - POI type object
 	 * @returns {string} - HTML markup for point type filter
 	 */
-	function buildPointTypeFilterHtml(markersPath, pointType) {
+	function buildPointTypeFilterHtml(pointType) {
 		return '<li class="point-type enabled" data-point-type="' + pointType.id + '">' +
-			buildImageHtml(markersPath + pointType.marker, pointType.name, pointIconWidth, pointIconHeight) +
+			buildImageHtml(pointType.marker, pointType.name, pointIconWidth, pointIconHeight) +
 			'<span>' + pointType.name + '</span>' +
 			'</li>';
 	}
 
 	/**
 	 * @desc Setup icon for markers with given point type
-     * @param markersPath {string} - URL for markers bucket
 	 * @param pointType {object} - POI type object
 	 */
-	function setupPointTypeIcon(markersPath, pointType) {
+	function setupPointTypeIcon(pointType) {
 		pointIcons[pointType.id] = L.icon({
-			iconUrl: markersPath + pointType.marker,
+			iconUrl: pointType.marker,
 			iconSize: [pointIconWidth, pointIconHeight],
 			className: 'point-type-' + pointType.id
 		});
@@ -257,8 +255,8 @@
 		pointTypes = config.types;
 
 		config.types.forEach(function (pointType) {
-			setupPointTypeIcon(config.markersPath, pointType);
-			pointTypeFiltersHtml += buildPointTypeFilterHtml(config.markersPath, pointType);
+			setupPointTypeIcon(pointType);
+			pointTypeFiltersHtml += buildPointTypeFilterHtml(pointType);
 		});
 
 		pointTypeFiltersContainer = document.getElementById(pointTypeFiltersContainerId);
