@@ -116,7 +116,7 @@
 
 	/**
 	 * @desc Setup icon for markers with given point type
-     * @param markersPath {string} - URL for markers bucket
+	 * @param markersPath {string} - URL for markers bucket
 	 * @param pointType {object} - POI type object
 	 */
 	function setupPointTypeIcon(markersPath, pointType) {
