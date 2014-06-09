@@ -103,7 +103,7 @@
 
 	/**
 	 * @desc Build point type filter HTML
-     * @param markersPath {string} - URL for markers bucket
+	 * @param markersPath {string} - URL for markers bucket
 	 * @param pointType {object} - POI type object
 	 * @returns {string} - HTML markup for point type filter
 	 */
