@@ -85,8 +85,9 @@ module.exports = function createCRUD() {
 				if (search) {
 					search = search.trim();
 					if (search.length < minSearchCharacters) {
-						next(errorHandler.badRequestError(['Search string should be at least ' + minSearchCharacters +
-							' long.']));
+						next(errorHandler.badRequestError([
+							'Search string should be at least ' + minSearchCharacters + ' long.'
+						]));
 					}
 					/**
 					 * Note knex does not escape %, _ for like
