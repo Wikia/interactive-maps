@@ -40,7 +40,9 @@ var dbCon = require('./../../lib/db_connector'),
 			}
 		},
 		additionalProperties: false
-	};
+	},
+	searchLimit = 50,
+	minSearchCharacters = 2;
 
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
@@ -51,16 +53,50 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name', 'type', 'status'];
+				var dbColumns = [
+						'id',
+						'name',
+						'type',
+						'status',
+						'width',
+						'height',
+						'image'
+					],
+					filter = {
+						status: utils.tileSetStatus.ok
+					},
+					limit = parseInt(req.query.limit, 10) || false,
+					offset = parseInt(req.query.offset, 10) || 0,
+					search = req.query.search || false,
+					query;
 
-				dbCon
-					.select(
-						dbTable,
-						dbColumns, {
-							status: utils.tileSetStatus.ok
-						}
-				)
-					.then(
+				query = dbCon.select(
+					dbTable,
+					dbColumns,
+					filter
+				);
+				if (limit) {
+					query.limit(limit).offset(offset);
+				}
+
+				/**
+				 * TODO: This will not scale well. Consider using separate MyISAM search table or Solr, ES
+				 */
+				if (search) {
+					search = search.trim();
+					if (search.length < minSearchCharacters) {
+						next(errorHandler.badRequestError(['Search string shold be at least ' + minSearchCharacters +
+							' long.']));
+					}
+					/**
+					 * Note knex does no
+					 */
+					query.where('name', 'like', '%' + search + '%');
+					query.limit(searchLimit).offset(0);
+					query.orderBy('created_on', 'desc');
+				}
+
+				query.then(
 						function (collection) {
 							collection.forEach(function (value) {
 								value.url = utils.responseUrl(req, req.route.path, value.id);
