@@ -85,11 +85,11 @@ module.exports = function createCRUD() {
 				if (search) {
 					search = search.trim();
 					if (search.length < minSearchCharacters) {
-						next(errorHandler.badRequestError(['Search string shold be at least ' + minSearchCharacters +
+						next(errorHandler.badRequestError(['Search string should be at least ' + minSearchCharacters +
 							' long.']));
 					}
 					/**
-					 * Note knex does no
+					 * Note knex does not escape %, _ for like
 					 */
 					query.where('name', 'like', '%' + search + '%');
 					query.limit(searchLimit).offset(0);
