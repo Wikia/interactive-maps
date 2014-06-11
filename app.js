@@ -12,14 +12,6 @@ var logger = require('./lib/logger'),
 	kue = require('kue'),
 	jobs;
 
-logger.set({
-	console: {
-		enabled: true,
-		level: logger.level.DEBUG,
-		raw: true
-	}
-});
-
 config = require('./lib/config');
 
 config.setRoot(__dirname);

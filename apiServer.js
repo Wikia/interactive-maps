@@ -41,8 +41,8 @@ logger.set({
 	},
 	syslog: {
 		enabled: true,
-		level: logger.level.NOTICE,
-		tag: 'interactive-maps',
+		level: logger.level.DEBUG,
+		tag: 'intMaps',
 		dev: true
 	}
 });
