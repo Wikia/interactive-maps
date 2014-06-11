@@ -37,7 +37,7 @@ logger.set({
 		enabled: true,
 		level: logger.level.DEBUG,
 		raw: true,
-		path: 'intMaps.log'
+		path: 'interactive-maps.log'
 	},
 	syslog: {
 		enabled: true,
