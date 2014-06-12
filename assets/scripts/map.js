@@ -1,10 +1,20 @@
-(function (window, L) {
+(function (window, L, Ponto) {
 	'use strict';
 
 	var mapContainerId = 'map',
 		pointTypeFiltersContainerId = 'pointTypes',
 		allPointTypesFilterId = 'allPointTypes',
 		map,
+		pontoBridgeModule = 'wikia.intMap.pontoBridge',
+		drawControls = new L.Control.Draw({
+			position: 'bottomright',
+			draw: {
+				polyline: false,
+				polygon: false,
+				circle: false,
+				rectangle: false
+			}
+		}),
 		pointTypeFiltersContainer,
 		popupWidthWithPhoto = 414,
 		popupWidthWithoutPhoto = 314,
@@ -18,7 +28,7 @@
 
 	/**
 	 * @desc Build popup HTML
-	 * @param point {object} - POI object
+	 * @param {object} point - POI object
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
@@ -50,8 +60,8 @@
 
 	/**
 	 * @desc Build image HTML
-	 * @param imageUrl {string} - Image URL
-	 * @param alt {string} - Image alternate text
+	 * @param {string} imageUrl - Image URL
+	 * @param {string} alt - Image alternate text
 	 * @returns {string} - HTML markup for photo
 	 */
 	function buildImageHtml(imageUrl, alt, imageWidth, imageHeight) {
@@ -60,9 +70,9 @@
 
 	/**
 	 * @desc Build link HTML
-	 * @param point {object} - POI object
-	 * @param innerHtml {string} - string of HTML markup
-	 * @param className {string=} - class name
+	 * @param {object} point - POI object
+	 * @param {string} innerHtml - string of HTML markup
+	 * @param {string=} className - class name
 	 * @returns {string} - HTMl markup for link
 	 */
 	function buildLinkHtml(point, innerHtml, className) {
@@ -78,7 +88,7 @@
 
 	/**
 	 * @desc Add point to the map
-	 * @param point {object} - POI object
+	 * @param {object} point - POI object
 	 * @returns {object} - Leaflet Marker
 	 */
 	function addPointOnMap(point) {
@@ -103,7 +113,7 @@
 
 	/**
 	 * @desc Build point type filter HTML
-	 * @param pointType {object} - POI type object
+	 * @param {object} pointType - POI type object
 	 * @returns {string} - HTML markup for point type filter
 	 */
 	function buildPointTypeFilterHtml(pointType) {
@@ -115,7 +125,7 @@
 
 	/**
 	 * @desc Setup icon for markers with given point type
-	 * @param pointType {object} - POI type object
+	 * @param {object} pointType - POI type object
 	 */
 	function setupPointTypeIcon(pointType) {
 		pointIcons[pointType.id] = L.icon({
@@ -127,7 +137,7 @@
 
 	/**
 	 * @desc Loads points of given type to cache and returns them
-	 * @param pointType {number} - Id of point type, 0 for all types
+	 * @param {number} pointType - Id of point type, 0 for all types
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
 	function loadPointsToCache(pointType) {
@@ -142,7 +152,7 @@
 
 	/**
 	 * @desc Return DOM elements for given point type
-	 * @param pointType {number} - Id of point type, 0 for all types
+	 * @param {number} pointType - Id of point type, 0 for all types
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
 	function getPointsByType(pointType) {
@@ -151,9 +161,9 @@
 
 	/**
 	 * @desc Adds or removes class of DOM element
-	 * @param element {Element} - DOM element
-	 * @param className {string} - Name of class to toggle
-	 * @param operation {string} - 'add' or 'remove' class
+	 * @param {Element} element - DOM element
+	 * @param {string} className - Name of class to toggle
+	 * @param {string} operation - 'add' or 'remove' class
 	 */
 	function toggleClass(element, className, operation) {
 		element.classList[operation](className);
@@ -161,7 +171,7 @@
 
 	/**
 	 * @desc Toggles visibility of points corresponding with clicked filter
-	 * @param filterClicked {Element} - Filter element that was clicked
+	 * @param {Element} filterClicked - Filter element that was clicked
 	 */
 	function togglePoints(filterClicked) {
 		var pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10),
@@ -177,7 +187,7 @@
 
 	/**
 	 * @desc Toggles state of point type filter
-	 * @param filterClicked {Element} - Filter element that was clicked
+	 * @param {Element} filterClicked - Filter element that was clicked
 	 */
 	function togglePointTypeFilter(filterClicked) {
 		var filterEnabled = filterClicked.classList.contains('enabled');
@@ -215,7 +225,7 @@
 
 	/**
 	 * @desc Handles click on point type filter
-	 * @param filterClicked {Element} - Filter element that was clicked
+	 * @param {Element} filterClicked - Filter element that was clicked
 	 */
 	function pointTypeFilterClickHandler(filterClicked) {
 		togglePointTypeFilter(filterClicked);
@@ -225,7 +235,7 @@
 
 	/**
 	 * @desc Handles click on point type filters container
-	 * @param event {Event} - Click event
+	 * @param {Event} event - Click event
 	 */
 	function pointTypeFiltersContainerClickHandler(event) {
 		var elementClicked = event.target,
@@ -247,7 +257,7 @@
 
 	/**
 	 * @desc Create points and filters for them
-	 * @param config {object}
+	 * @param {object} config
 	 */
 	function setupPoints(config) {
 		var pointTypeFiltersHtml = '';
@@ -269,7 +279,7 @@
 
 	/**
 	 * @desc Converts size to maximal zoom level
-	 * @param size {number} - maximal size length
+	 * @param {number} size - maximal size length
 	 * @returns {number} - maximal zoom level
 	 */
 	function sizeToZoomLevel(size) {
@@ -284,9 +294,9 @@
 	 * then multiplies the ratio to the maximal viewport size and gets the minimum zoom level for the compensated
 	 * vieport size
 	 *
-	 * @param maxZoom {number} - maximal zoom level for the map
-	 * @param maxSize {number} - max size of the image
-	 * @param maxViewPortSize {number} - maximum viewport size
+	 * @param {number} maxZoom - maximal zoom level for the map
+	 * @param {number} maxSize - max size of the image
+	 * @param {number} maxViewPortSize - maximum viewport size
 	 * @returns {number} - minimal zoom level
 	 */
 	function getMinZoomLevel(maxZoom, maxSize, maxViewPortSize) {
@@ -297,11 +307,55 @@
 	}
 
 	/**
+	 * @desc sends add point action via ponto
+	 * @param {object} event
+	 */
+	function addPointAction(event) {
+		var marker = event.layer,
+			latLng = marker.getLatLng(),
+			mapSetup = window.mapSetup,
+			params = {
+				action: 'editPOI',
+				data: {
+					mapId: mapSetup.id,
+					categories: mapSetup.types,
+					lat: latLng.lat,
+					lng: latLng.lng
+				}
+			};
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, addPointOnMap, showPontoError, true);
+	}
+
+	/**
+	 * @desc shows error message for ponto communication
+	 * @param {string} message - error message
+	 * @todo figure out were to display them
+	 */
+
+	function showPontoError(message) {
+		console.log(message);
+		console.log('error!!!');
+	}
+
+	/**
+	 * @desc setup edit options for Wikia only
+	 * @param {bool} isWikia - true if iframe is displayed on Wikia page
+	 */
+	function setUpEditOptions(isWikia) {
+		if (isWikia) {
+			map.addControl(drawControls);
+			map.on('draw:created', addPointAction);
+		}
+	}
+
+	/**
 	 * @desc Create new map
-	 * @param config {object}
+	 * @param {object} config
 	 */
 	function createMap(config) {
-		var zoomControl, defaultMinZoom;
+		var zoomControl,
+			defaultMinZoom;
 
 		defaultMinZoom = getMinZoomLevel(
 			config.layer.maxZoom,
@@ -340,11 +394,18 @@
 		zoomControl = L.control.zoom({
 			position: 'bottomright'
 		});
+
 		map.addControl(zoomControl);
+
+		// setup edit controls if iframe displayed on Wikia page
+		if (window.self !== window.top) {
+			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
+			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, true);
+		}
 
 		setupPoints(config);
 	}
 
 	createMap(window.mapSetup);
 
-})(window, window.L);
+})(window, window.L, window.Ponto);
