@@ -54,13 +54,13 @@ module.exports = function createCRUD() {
 		handler: {
 			GET: function (req, res, next) {
 				var dbColumns = [
-						'id',
-						'name',
-						'type',
-						'status',
-						'width',
-						'height',
-						'image'
+						'tile_set.id',
+						'tile_set.name',
+						'tile_set.type',
+						'tile_set.status',
+						'tile_set.width',
+						'tile_set.height',
+						'tile_set.image'
 					],
 					filter = {
 						status: utils.tileSetStatus.ok
@@ -70,18 +70,11 @@ module.exports = function createCRUD() {
 					search = req.query.search || false,
 					query;
 
-				query = dbCon.select(
-					dbTable,
-					dbColumns,
-					filter
-				);
+				query = dbCon.knex(dbTable).column(dbColumns).where(filter);
 				if (limit) {
 					query.limit(limit).offset(offset);
 				}
 
-				/**
-				 * TODO: This will not scale well. Consider using separate MyISAM search table or Solr, ES
-				 */
 				if (search) {
 					search = search.trim();
 					if (search.length < minSearchCharacters) {
@@ -89,15 +82,14 @@ module.exports = function createCRUD() {
 							'Search string should be at least ' + minSearchCharacters + ' long.'
 						]));
 					}
-					/**
-					 * Note knex does not escape %, _ for like
-					 */
-					query.where('name', 'like', '%' + search + '%');
-					query.limit(searchLimit).offset(0);
+					limit = Math.min(searchLimit, limit);
+					query.join('tile_set_search', 'tile_set.id', '=', 'tile_set_search.id');
+					query.whereRaw('MATCH (tile_set_search.name) AGAINST (?)', [search]);
+					query.limit(limit).offset(0);
 					query.orderBy('created_on', 'desc');
 				}
 
-				query.then(
+				query.select().then(
 						function (collection) {
 							collection.forEach(function (value) {
 								value.url = utils.responseUrl(req, req.route.path, value.id);

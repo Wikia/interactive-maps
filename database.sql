@@ -25,6 +25,12 @@ CREATE TABLE tile_set (
   created_by VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE tile_set_search (
+  id INT UNSIGNED PRIMARY KEY NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  FULLTEXT (name)
+) ENGINE=MyISAM;
+
 CREATE TABLE map (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
   city_id INT UNSIGNED NOT NULL,
@@ -79,6 +85,7 @@ CREATE TABLE poi (
 
 -- TODO: figure out proper indexes
 CREATE INDEX tile_set ON tile_set ( id );
+CREATE INDEX tile_set_search_id ON tile_set_search ( id );
 CREATE INDEX tile_set_status ON tile_set ( status );
 CREATE INDEX tile_set_created_on ON tile_set ( created_on );
 CREATE UNIQUE INDEX tile_set_name_unq ON tile_set ( name );
