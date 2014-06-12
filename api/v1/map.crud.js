@@ -217,7 +217,8 @@ module.exports = function createCRUD() {
 				var dbColumns = ['id', 'title', 'tile_set_id', 'city_id', 'created_by', 'created_on', 'updated_on'],
 					id = parseInt(req.pathVar.id, 10),
 					filter = {
-						id: id
+						id: id,
+						deleted: false
 					};
 
 				if (isFinite(id)) {

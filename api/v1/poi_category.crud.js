@@ -116,11 +116,17 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name', 'marker'];
+				var dbColumns = ['id', 'name', 'marker', 'map_id'];
 				dbCon
 					.select(dbTable, dbColumns)
 					.then(
 						function (collection) {
+							utils.convertMarkersNamesToUrls(
+								collection,
+								config.dfsHost,
+								config.bucketPrefix,
+								config.markersPrefix
+							);
 							res.send(200, collection);
 							res.end();
 						},
@@ -212,6 +218,12 @@ module.exports = function createCRUD() {
 						.select(dbTable, dbColumns, filter)
 						.then(
 							function (collection) {
+								utils.convertMarkersNamesToUrls(
+									collection,
+									config.dfsHost,
+									config.bucketPrefix,
+									config.markersPrefix
+								);
 								if (collection[0]) {
 									res.send(200, collection[0]);
 									res.end();
