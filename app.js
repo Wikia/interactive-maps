@@ -1,6 +1,6 @@
 'use strict';
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NEW_RELIC_ENABLED === 'true') {
 	require('newrelic');
 }
 
