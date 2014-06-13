@@ -13,38 +13,41 @@ var dbCon = require('./../../lib/db_connector'),
 	dbTable = 'poi_category',
 	createSchema = {
 		description: 'Schema for creating a category',
-		type: 'object',
-		properties: {
-			name: {
-				description: 'Name of a category',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
+		type: 'array',
+		items: {
+			type: 'object',
+			properties: {
+				name: {
+					description: 'Name of a category',
+					type: 'string',
+					required: true,
+					minLength: 1,
+					maxLength: 255
+				},
+				map_id: {
+					description: 'ID of the map this POI belongs to',
+					type: 'integer',
+					required: true
+				},
+				marker: {
+					description: 'Url to custom marker icon',
+					type: 'string',
+					pattern: urlPattern,
+					maxLength: 255
+				},
+				parent_poi_category_id: {
+					description: 'Unique identifier for parent category',
+					type: 'integer'
+				},
+				created_by: {
+					description: 'creator user name',
+					type: 'string',
+					required: true,
+					minLength: 1,
+					maxLength: 255
+				}
 			},
-			map_id: {
-				description: 'ID of the map this POI belongs to',
-				type: 'integer',
-				required: true
-			},
-			marker: {
-				description: 'Url to custom marker icon',
-				type: 'string',
-				pattern: urlPattern,
-				maxLength: 255
-			},
-			parent_poi_category_id: {
-				description: 'Unique identifier for parent category',
-				type: 'integer'
-			},
-			created_by: {
-				description: 'creator user name',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			}
-		},
+		}
 		additionalProperties: false
 	},
 	updateSchema = {
@@ -65,6 +68,20 @@ var dbCon = require('./../../lib/db_connector'),
 			}
 		},
 		additionalProperties: false
+	},
+	groupUpdateSchema = {
+		description: 'Schema for updating many categories at once',
+		type: 'array',
+		items: updateSchema
+	},
+	groupDeleteSchema = {
+		description: 'Schema for deleting many categories at once',
+		type: 'array',
+		items: {
+			description: 'ID of the map to be deleted'
+			type: 'integer',
+			minLength: 1
+		}
 	};
 
 /**
@@ -142,20 +159,20 @@ module.exports = function createCRUD() {
 					dbCon
 						.insert(dbTable, reqBody)
 						.then(
-							function (data) {
-								var id = data[0],
-									response = {
-										message: 'POI category successfully created',
-										id: id,
-										url: utils.responseUrl(req, req.route.path, id)
-									};
-								if (reqBody.marker) {
-									poiCategoryMarker(id, reqBody.map_id, reqBody.marker, dbTable);
-								}
-								res.send(201, response);
-								res.end();
-							},
-							next
+						function (data) {
+							var id = data[0],
+								response = {
+									message: 'POI category successfully created',
+									id: id,
+									url: utils.responseUrl(req, req.route.path, id)
+								};
+							if (reqBody.marker) {
+								poiCategoryMarker(id, reqBody.map_id, reqBody.marker, dbTable);
+							}
+							res.send(201, response);
+							res.end();
+						},
+						next
 					);
 				} else {
 					next(errorHandler.badRequestError(errors));
