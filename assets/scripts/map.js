@@ -354,7 +354,6 @@
 	 * @param {object} marker - marker object
 	 */
 	function editMarker(marker) {
-		console.log(marker);
 		var params = {
 				action: 'editPOI',
 				data: marker.point
@@ -370,7 +369,7 @@
 				markers.removeLayer(marker);
 			}
 			// adds new marker to layer group
-			if (params) {
+			if (point) {
 				addPointOnMap(point).openPopup();
 			}
 		}, showPontoError, true);
