@@ -4,8 +4,14 @@
 	var mapContainerId = 'map',
 		pointTypeFiltersContainerId = 'pointTypes',
 		allPointTypesFilterId = 'allPointTypes',
-		map,
+
 		pontoBridgeModule = 'wikia.intMap.pontoBridge',
+
+		// leaflet map object
+		map,
+		// leaflet layer for storing markers
+		markers = new L.LayerGroup(),
+		// leaflet layer for drawing controls
 		drawControls = new L.Control.Draw({
 			position: 'bottomright',
 			draw: {
@@ -15,13 +21,16 @@
 				rectangle: false
 			}
 		}),
-		pointTypeFiltersContainer,
+
+		// constants
 		popupWidthWithPhoto = 414,
 		popupWidthWithoutPhoto = 314,
 		photoWidth = 90,
 		photoHeight = 90,
 		pointIconWidth = 32,
 		pointIconHeight = 32,
+
+		pointTypeFiltersContainer,
 		pointIcons = {},
 		pointCache = {},
 		pointTypes = {};
@@ -32,8 +41,8 @@
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
-		//TODO what about edit link? where do we get it from?
-		var photoHtml = '',
+		var editLink = '<a href="" title="Edit" class="editPOILink" data-marker-id="' + point.leafletId + '">Edit</a>',
+			photoHtml = '',
 			titleHtml = '',
 			descriptionHtml = '';
 
@@ -54,6 +63,7 @@
 		return photoHtml +
 			'<div class="description">' +
 			titleHtml +
+			editLink +
 			descriptionHtml +
 			'</div>';
 	}
@@ -62,6 +72,8 @@
 	 * @desc Build image HTML
 	 * @param {string} imageUrl - Image URL
 	 * @param {string} alt - Image alternate text
+	 * @param {number} imageWidth
+	 * @param {number} imageHeight
 	 * @returns {string} - HTML markup for photo
 	 */
 	function buildImageHtml(imageUrl, alt, imageWidth, imageHeight) {
@@ -89,26 +101,31 @@
 	/**
 	 * @desc Add point to the map
 	 * @param {object} point - POI object
-	 * @returns {object} - Leaflet Marker
 	 */
 	function addPointOnMap(point) {
-		var popup, popupWidth;
-
-		popupWidth = (point.photo) ? popupWidthWithPhoto : popupWidthWithoutPhoto;
-
-		popup = L
-			.popup({
+		var marker = L.marker([point.lat, point.lon], {
+				icon: pointIcons[point.poi_category_id],
+				riseOnHover: true,
+				type: point.type
+			}),
+			popupWidth = (point.photo) ? popupWidthWithPhoto : popupWidthWithoutPhoto,
+			popup =  L.popup({
 				closeButton: false,
 				minWidth: popupWidth,
 				maxWidth: popupWidth
-			})
-			.setContent(buildPopupHtml(point));
+			});
 
-		return L.marker([point.lat, point.lon], {
-			icon: pointIcons[point.poi_category_id],
-			riseOnHover: true,
-			type: point.type
-		}).bindPopup(popup).addTo(map);
+		// extend point data with marker leaflet id - need to be done after adding marker to the map layer group !!!
+		marker.addTo(markers);
+		point.leafletId = marker._leaflet_id;
+
+		// extend marker object with point data;
+		marker.point = point;
+
+		popup.setContent(buildPopupHtml(point));
+		marker.bindPopup(popup);
+
+		return marker;
 	}
 
 	/**
@@ -307,24 +324,56 @@
 	}
 
 	/**
-	 * @desc sends add point action via ponto
-	 * @param {object} event
+	 * @desc adds temporary marker
+	 * @param {Event} event
+	 * @returns {object} temp marker object
 	 */
-	function addPointAction(event) {
+	function addTempMarker(event) {
 		var marker = event.layer,
-			latLng = marker.getLatLng(),
-			mapSetup = window.mapSetup,
-			params = {
-				action: 'editPOI',
-				data: {
-					mapId: mapSetup.id,
-					categories: mapSetup.types,
-					lat: latLng.lat,
-					lng: latLng.lng
-				}
-			};
+			latLng = marker.getLatLng();
 
-		Ponto.invoke(pontoBridgeModule, 'processData', params, addPointOnMap, showPontoError, true);
+		marker.point = {
+			lat: latLng.lat,
+			lon: latLng.lng
+		};
+
+		return marker;
+	}
+
+	/**
+	 * @desc get marker from markers layer group
+	 * @param {string} id - leaflet markers id
+	 * @returns {object} - marker object
+	 */
+	function getMarker(id) {
+		return markers.getLayer(id);
+	}
+
+	/**
+	 * @desc sends data to Wikia Client via ponto to add / edit POI
+	 * @param {object} marker - marker object
+	 */
+	function editMarker(marker) {
+		console.log(marker);
+		var params = {
+				action: 'editPOI',
+				data: marker.point
+			},
+			mapSetup = window.mapSetup;
+
+		params.data.mapId = mapSetup.id;
+		params.data.categories = mapSetup.types;
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, function(point) {
+			// removes old marker from layer group
+			if (markers.hasLayer(marker)) {
+				markers.removeLayer(marker);
+			}
+			// adds new marker to layer group
+			if (params) {
+				addPointOnMap(point).openPopup();
+			}
+		}, showPontoError, true);
 	}
 
 	/**
@@ -339,13 +388,43 @@
 	}
 
 	/**
+	 * @desc setup Ponto communication for Wikia Client
+	 */
+	function setupPontoWikiaClient() {
+		if (window.self !== window.top) {
+			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
+			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, false);
+		}
+	}
+
+	/**
 	 * @desc setup edit options for Wikia only
 	 * @param {bool} isWikia - true if iframe is displayed on Wikia page
 	 */
 	function setUpEditOptions(isWikia) {
+		var doc = window.document,
+			mapContainer = doc.getElementById(mapContainerId);
+
 		if (isWikia) {
+			// add POI handler
+			map.on('draw:created', function(event) {
+				editMarker(addTempMarker(event));
+			});
+
+			// edit POI handler
+			mapContainer.addEventListener('click', function(event) {
+				var target = event.target;
+
+				if (target.classList.contains('editPOILink')) {
+					event.preventDefault();
+
+					editMarker(getMarker(target.getAttribute('data-marker-id')));
+				}
+			}, false);
+
+			// show edit UI elements
+			mapContainer.classList.add('enableEdit');
 			map.addControl(drawControls);
-			map.on('draw:created', addPointAction);
 		}
 	}
 
@@ -396,14 +475,9 @@
 		});
 
 		map.addControl(zoomControl);
-
-		// setup edit controls if iframe displayed on Wikia page
-		if (window.self !== window.top) {
-			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
-			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, true);
-		}
-
+		setupPontoWikiaClient();
 		setupPoints(config);
+		markers.addTo(map);
 	}
 
 	createMap(window.mapSetup);

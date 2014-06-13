@@ -109,3 +109,11 @@
     width: 210px;
     word-wrap: break-word;
 }
+
+.editPOILink {
+    display: none;
+}
+
+.enableEdit .editPOILink {
+    display: inline;
+}
