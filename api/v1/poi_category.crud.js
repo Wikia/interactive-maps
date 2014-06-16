@@ -47,8 +47,8 @@ var dbCon = require('./../../lib/db_connector'),
 					maxLength: 255
 				}
 			},
+			additionalProperties: false
 		}
-		additionalProperties: false
 	},
 	updateSchema = {
 		description: 'Schema for updating a category',
@@ -161,7 +161,7 @@ module.exports = function createCRUD() {
 						function (data) {
 							var id = data[0],
 								response = {
-									message: 'POI category successfully created',
+									message: 'POI categories successfully created',
 									id: id,
 									url: utils.responseUrl(req, req.route.path, id)
 								};
