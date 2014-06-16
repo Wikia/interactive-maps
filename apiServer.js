@@ -41,7 +41,7 @@ logger.set({
 	},
 	syslog: {
 		enabled: true,
-		level: logger.level.NOTICE,
+		level: logger.level.DEBUG,
 		tag: 'intMaps',
 		dev: true
 	}
