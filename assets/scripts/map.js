@@ -41,7 +41,7 @@
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
-		var editLink = '<a href="" title="Edit" class="editPOILink" data-marker-id="' + point.leafletId + '">Edit</a>',
+		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">Edit</a>',
 			photoHtml = '',
 			titleHtml = '',
 			descriptionHtml = '';
@@ -101,6 +101,7 @@
 	/**
 	 * @desc Add point to the map
 	 * @param {object} point - POI object
+	 * @returns {object} - marker object
 	 */
 	function addPointOnMap(point) {
 		var marker = L.marker([point.lat, point.lon], {
@@ -414,7 +415,7 @@
 			mapContainer.addEventListener('click', function(event) {
 				var target = event.target;
 
-				if (target.classList.contains('editPOILink')) {
+				if (target.classList.contains('edit-poi-link')) {
 					event.preventDefault();
 
 					editMarker(getMarker(target.getAttribute('data-marker-id')));
@@ -422,7 +423,7 @@
 			}, false);
 
 			// show edit UI elements
-			mapContainer.classList.add('enableEdit');
+			mapContainer.classList.add('enable-edit');
 			map.addControl(drawControls);
 		}
 	}

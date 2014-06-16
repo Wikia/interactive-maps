@@ -110,10 +110,10 @@
     word-wrap: break-word;
 }
 
-.editPOILink {
+.edit-poi-link {
     display: none;
 }
 
-.enableEdit .editPOILink {
+.enable-edit .edit-poi-link {
     display: inline;
 }
