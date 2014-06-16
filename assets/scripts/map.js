@@ -6,6 +6,7 @@
 		allPointTypesFilterId = 'allPointTypes',
 
 		pontoBridgeModule = 'wikia.intMap.pontoBridge',
+		uiControlsPosition = 'bottomright',
 
 		// leaflet map object
 		map,
@@ -13,12 +14,19 @@
 		markers = new L.LayerGroup(),
 		// leaflet layer for drawing controls
 		drawControls = new L.Control.Draw({
-			position: 'bottomright',
+			position: uiControlsPosition,
 			draw: {
 				polyline: false,
 				polygon: false,
 				circle: false,
 				rectangle: false
+			}
+		}),
+		embedMapCodeButton = new L.Control.EmbedMapCode({
+			position: uiControlsPosition,
+			title: '< >',
+			onClick: function() {
+				console.log('CLick Click!!');
 			}
 		}),
 
@@ -41,7 +49,8 @@
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
-		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">Edit</a>',
+		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId +
+				'">Edit</a>',
 			photoHtml = '',
 			titleHtml = '',
 			descriptionHtml = '';
@@ -425,7 +434,20 @@
 			// show edit UI elements
 			mapContainer.classList.add('enable-edit');
 			map.addControl(drawControls);
+			map.addControl(embedMapCodeButton);
 		}
+	}
+
+	/**
+	 * @desc sends data to Wikia Client via ponto to show embed map code modal
+	 */
+	function embedMapCode() {
+		var params = {
+				action: 'embedMapCode',
+				data: window.mapSetup.id
+			};
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, null, showPontoError, true);
 	}
 
 	/**
@@ -471,7 +493,7 @@
 		);
 
 		zoomControl = L.control.zoom({
-			position: 'bottomright'
+			position: uiControlsPosition
 		});
 
 		map.addControl(zoomControl);
