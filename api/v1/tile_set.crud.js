@@ -68,9 +68,8 @@ module.exports = function createCRUD() {
 					limit = parseInt(req.query.limit, 10) || false,
 					offset = parseInt(req.query.offset, 10) || 0,
 					search = req.query.search || false,
-					query;
+					query = dbCon.knex(dbTable).column(dbColumns).where(filter);
 
-				query = dbCon.knex(dbTable).column(dbColumns).where(filter);
 				if (limit) {
 					query.limit(limit).offset(offset);
 				}
