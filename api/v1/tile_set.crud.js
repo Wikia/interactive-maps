@@ -81,7 +81,7 @@ module.exports = function createCRUD() {
 							'Search string should be at least ' + minSearchCharacters + ' long.'
 						]));
 					}
-					limit = Math.min(searchLimit, limit);
+					limit = limit ? Math.min(searchLimit, limit) : searchLimit;
 					query.join('tile_set_search', 'tile_set.id', '=', 'tile_set_search.id');
 					query.whereRaw('MATCH (tile_set_search.name) AGAINST (?)', [search]);
 					query.limit(limit).offset(0);
