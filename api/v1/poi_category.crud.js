@@ -116,21 +116,30 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name', 'marker', 'map_id'];
-				dbCon
-					.select(dbTable, dbColumns)
-					.then(
-						function (collection) {
-							utils.convertMarkersNamesToUrls(
-								collection,
-								config.dfsHost,
-								config.bucketPrefix,
-								config.markersPrefix
-							);
-							res.send(200, collection);
-							res.end();
-						},
-						next
+				var dbColumns = ['id', 'name', 'marker', 'map_id'],
+					query = dbCon.knex(dbTable).column(dbColumns),
+
+					// check for parameter parents=1 in URL
+					parents = parseInt(req.query.parents) || false;
+
+				if (parents) {
+					query.where({
+						parent_poi_category_id: null
+					});
+				}
+
+				query.select().then(
+					function (collection) {
+						utils.convertMarkersNamesToUrls(
+							collection,
+							config.dfsHost,
+							config.bucketPrefix,
+							config.markersPrefix
+						);
+						res.send(200, collection);
+						res.end();
+					},
+					next
 				);
 			},
 			POST: function (req, res, next) {
