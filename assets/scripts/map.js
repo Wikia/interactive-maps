@@ -25,9 +25,7 @@
 		embedMapCodeButton = new L.Control.EmbedMapCode({
 			position: uiControlsPosition,
 			title: '< >',
-			onClick: function() {
-				console.log('CLick Click!!');
-			}
+			onClick: embedMapCode
 		}),
 
 		// constants
@@ -444,7 +442,9 @@
 	function embedMapCode() {
 		var params = {
 				action: 'embedMapCode',
-				data: window.mapSetup.id
+				data: {
+					mapId: window.mapSetup.id
+				}
 			};
 
 		Ponto.invoke(pontoBridgeModule, 'processData', params, null, showPontoError, true);
