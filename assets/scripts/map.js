@@ -33,7 +33,8 @@
 		pointTypeFiltersContainer,
 		pointIcons = {},
 		pointCache = {},
-		pointTypes = {};
+		pointTypes = {},
+		config = window.mapSetup;
 
 	/**
 	 * @desc Build popup HTML
@@ -156,9 +157,9 @@
 			// TODO the line below doesn't work WHY???!!!
 			// pointIcons[pointType.id] = L.Icon.Default();
 			pointIcons[pointType.id] = L.icon({
-				iconUrl: '/vendor/leaflet/images/marker-icon.png',
-				iconRetinaUrl: '/vendor/leaflet/images/marker-icon-2x.png',
-				shadowUrl: '/vendor/leaflet/images/marker-shadow.png',
+				iconUrl: config.imagesPath + '/marker-icon.png',
+				iconRetinaUrl: config.imagesPath + '/marker-icon-2x.png',
+				shadowUrl: config.imagesPath + '/marker-shadow.png',
 				className: 'point-type-' + pointType.id,
 				iconSize: [25, 41],
 				iconAnchor: [12, 41],
@@ -290,9 +291,8 @@
 
 	/**
 	 * @desc Create points and filters for them
-	 * @param {object} config
 	 */
-	function setupPoints(config) {
+	function setupPoints() {
 		var pointTypeFiltersHtml = '';
 
 		pointTypes = config.types;
@@ -445,9 +445,8 @@
 
 	/**
 	 * @desc Create new map
-	 * @param {object} config
 	 */
-	function createMap(config) {
+	function createMap() {
 		var zoomControl,
 			defaultMinZoom;
 
@@ -491,10 +490,10 @@
 
 		map.addControl(zoomControl);
 		setupPontoWikiaClient();
-		setupPoints(config);
+		setupPoints();
 		markers.addTo(map);
 	}
 
-	createMap(window.mapSetup);
+	createMap();
 
 })(window, window.L, window.Ponto);
