@@ -60,6 +60,8 @@ describe('i18n', function () {
 	});
 
 	it('throws error if the language is not provided', function () {
-		expect(i18n.message('test')).toThrow('Translation language not set');
+		expect(function () {
+			i18n.message('test');
+		}).toThrow('Translation language not set');
 	});
 });
