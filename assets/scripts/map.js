@@ -154,18 +154,7 @@
 				className: 'point-type-' + pointType.id
 			});
 		} else {
-			// TODO the line below doesn't work WHY???!!!
-			// pointIcons[pointType.id] = L.Icon.Default();
-			pointIcons[pointType.id] = L.icon({
-				iconUrl: config.imagesPath + '/marker-icon.png',
-				iconRetinaUrl: config.imagesPath + '/marker-icon-2x.png',
-				shadowUrl: config.imagesPath + '/marker-shadow.png',
-				className: 'point-type-' + pointType.id,
-				iconSize: [25, 41],
-				iconAnchor: [12, 41],
-				popupAnchor: [1, -34],
-				shadowSize: [41, 41]
-			});
+			pointIcons[pointType.id] = new L.Icon.Default();
 		}
 	}
 
