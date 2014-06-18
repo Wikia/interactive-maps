@@ -147,7 +147,7 @@
 	 * @param {object} pointType - POI type object
 	 */
 	function setupPointTypeIcon(pointType) {
-		if( pointType.marker !== null ) {
+		if (pointType.marker !== null) {
 			pointIcons[pointType.id] = L.icon({
 				iconUrl: pointType.marker,
 				iconSize: [pointIconWidth, pointIconHeight],
