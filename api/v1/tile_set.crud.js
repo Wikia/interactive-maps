@@ -40,7 +40,9 @@ var dbCon = require('./../../lib/db_connector'),
 			}
 		},
 		additionalProperties: false
-	};
+	},
+	searchLimit = 50,
+	minSearchCharacters = 2;
 
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
@@ -51,16 +53,42 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name', 'type', 'status'];
+				var dbColumns = [
+						'tile_set.id',
+						'tile_set.name',
+						'tile_set.type',
+						'tile_set.status',
+						'tile_set.width',
+						'tile_set.height',
+						'tile_set.image'
+					],
+					filter = {
+						status: utils.tileSetStatus.ok
+					},
+					limit = parseInt(req.query.limit, 10) || false,
+					offset = parseInt(req.query.offset, 10) || 0,
+					search = req.query.search || false,
+					query = dbCon.knex(dbTable).column(dbColumns).where(filter);
 
-				dbCon
-					.select(
-						dbTable,
-						dbColumns, {
-							status: utils.tileSetStatus.ok
-						}
-				)
-					.then(
+				if (limit) {
+					query.limit(limit).offset(offset);
+				}
+
+				if (search) {
+					search = search.trim();
+					if (search.length < minSearchCharacters) {
+						next(errorHandler.badRequestError([
+							'Search string should be at least ' + minSearchCharacters + ' long.'
+						]));
+					}
+					limit = limit ? Math.min(searchLimit, limit) : searchLimit;
+					query.join('tile_set_search', 'tile_set.id', '=', 'tile_set_search.id');
+					query.whereRaw('MATCH (tile_set_search.name) AGAINST (?)', [search]);
+					query.limit(limit).offset(0);
+					query.orderBy('created_on', 'desc');
+				}
+
+				query.select().then(
 						function (collection) {
 							collection.forEach(function (value) {
 								value.url = utils.responseUrl(req, req.route.path, value.id);

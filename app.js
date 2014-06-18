@@ -1,6 +1,6 @@
 'use strict';
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NEW_RELIC_ENABLED === 'true') {
 	require('newrelic');
 }
 
@@ -17,6 +17,28 @@ config = require('./lib/config');
 config.setRoot(__dirname);
 
 jobs = kue.createQueue(config);
+
+
+//set up the logger with console transport
+logger.set({
+	console: {
+		enabled: true,
+		level: logger.level.DEBUG,
+		raw: true
+	},
+	file: {
+		enabled: true,
+		level: logger.level.DEBUG,
+		raw: true,
+		path: 'intMaps.log'
+	},
+	syslog: {
+		enabled: true,
+		level: logger.level.DEBUG,
+		tag: 'intMaps',
+		dev: true
+	}
+});
 
 /**
  * @desc Called on exit to cleanup kue and close it
