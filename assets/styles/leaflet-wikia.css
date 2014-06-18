@@ -109,3 +109,11 @@
     width: 210px;
     word-wrap: break-word;
 }
+
+.edit-poi-link {
+    display: none;
+}
+
+.enable-edit .edit-poi-link {
+    display: inline;
+}
