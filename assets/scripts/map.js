@@ -147,15 +147,22 @@
 	 * @param {object} pointType - POI type object
 	 */
 	function setupPointTypeIcon(pointType) {
-		if( pointType.marker !== null ) {
-			pointIcons[pointType.id] = L.icon({
+		var pointTypeIcon;
+
+		if (pointType.marker !== null) {
+			pointTypeIcon = L.icon({
 				iconUrl: pointType.marker,
-				iconSize: [pointIconWidth, pointIconHeight],
-				className: 'point-type-' + pointType.id
+				iconSize: [pointIconWidth, pointIconHeight]
 			});
 		} else {
-			pointIcons[pointType.id] = new L.Icon.Default();
+			pointTypeIcon = new L.Icon.Default();
 		}
+
+		L.setOptions(pointTypeIcon, {
+			className: 'point-type-' + pointType.id
+		});
+
+		pointIcons[pointType.id] = pointTypeIcon;
 	}
 
 	/**
