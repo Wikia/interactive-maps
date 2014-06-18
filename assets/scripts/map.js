@@ -156,6 +156,9 @@
 			});
 		} else {
 			pointTypeIcon = new L.Icon.Default();
+			// this is the nicest way to do that I found
+			// we need to overwrite it here so in the filter box we have not broken image
+			pointType.marker = pointTypeIcon._getIconUrl( 'icon' );
 		}
 
 		L.setOptions(pointTypeIcon, {
