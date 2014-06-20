@@ -185,6 +185,7 @@ function deletePOICategories(ids, res, next) {
 								) {
 									handleUsedCategories(id, res, next);
 								} else {
+									trx.rollback();
 									next(err);
 								}
 							}
