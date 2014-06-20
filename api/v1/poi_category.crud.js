@@ -7,7 +7,6 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	config = require('./../../lib/config'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
-	Q = require('q'),
 
 	urlPattern = jsonValidator.getUrlPattern(),
 
