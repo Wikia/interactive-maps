@@ -33,7 +33,8 @@
 		pointTypeFiltersContainer,
 		pointIcons = {},
 		pointCache = {},
-		pointTypes = {};
+		pointTypes = {},
+		config = window.mapSetup;
 
 	/**
 	 * @desc Build popup HTML
@@ -146,11 +147,15 @@
 	 * @param {object} pointType - POI type object
 	 */
 	function setupPointTypeIcon(pointType) {
-		pointIcons[pointType.id] = L.icon({
-			iconUrl: pointType.marker,
-			iconSize: [pointIconWidth, pointIconHeight],
-			className: 'point-type-' + pointType.id
-		});
+		if (pointType.marker !== null) {
+			pointIcons[pointType.id] = L.icon({
+				iconUrl: pointType.marker,
+				iconSize: [pointIconWidth, pointIconHeight],
+				className: 'point-type-' + pointType.id
+			});
+		} else {
+			pointIcons[pointType.id] = new L.Icon.Default();
+		}
 	}
 
 	/**
@@ -275,9 +280,8 @@
 
 	/**
 	 * @desc Create points and filters for them
-	 * @param {object} config
 	 */
-	function setupPoints(config) {
+	function setupPoints() {
 		var pointTypeFiltersHtml = '';
 
 		pointTypes = config.types;
@@ -364,7 +368,7 @@
 		params.data.mapId = mapSetup.id;
 		params.data.categories = mapSetup.types;
 
-		Ponto.invoke(pontoBridgeModule, 'processData', params, function(point) {
+		Ponto.invoke(pontoBridgeModule, 'processData', params, function (point) {
 			// removes old marker from layer group
 			if (markers.hasLayer(marker)) {
 				markers.removeLayer(marker);
@@ -407,12 +411,12 @@
 
 		if (isWikia) {
 			// add POI handler
-			map.on('draw:created', function(event) {
+			map.on('draw:created', function (event) {
 				editMarker(addTempMarker(event));
 			});
 
 			// edit POI handler
-			mapContainer.addEventListener('click', function(event) {
+			mapContainer.addEventListener('click', function (event) {
 				var target = event.target;
 
 				if (target.classList.contains('edit-poi-link')) {
@@ -430,9 +434,8 @@
 
 	/**
 	 * @desc Create new map
-	 * @param {object} config
 	 */
-	function createMap(config) {
+	function createMap() {
 		var zoomControl,
 			defaultMinZoom;
 
@@ -476,10 +479,10 @@
 
 		map.addControl(zoomControl);
 		setupPontoWikiaClient();
-		setupPoints(config);
+		setupPoints();
 		markers.addTo(map);
 	}
 
-	createMap(window.mapSetup);
+	createMap();
 
 })(window, window.L, window.Ponto);
