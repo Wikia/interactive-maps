@@ -228,6 +228,7 @@ function updatePOICategories(req, res, next, reqBody) {
 					};
 					dbCon
 						.update(dbTable, each, filter)
+						.transacting(trx)
 						.then(
 						function (affectedRows) {
 							if (affectedRows > 0) {
@@ -400,17 +401,10 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, updateSchema),
-					id,
-					filter;
+					errors = jsonValidator.validateJSON(reqBody, updateSchema);
 
 				if (errors.length === 0) {
 					updatePOICategories(req, res, next, reqBody);
-					filter = {
-						id: id
-					};
-
-
 				} else {
 					next(errorHandler.badRequestError(errors));
 				}
