@@ -3,7 +3,11 @@
 var gulp = require('gulp'),
 	nodemon = require('gulp-nodemon'),
 	jasmine = require('gulp-jasmine'),
-	istanbul = require('gulp-istanbul');
+	istanbul = require('gulp-istanbul'),
+	download = require('gulp-download'),
+	translationUrl = 'http://mediawiki119.evgeniy.wikia-dev.com/' +
+		'wikia.php?controller=WikiaInteractiveMaps&method=translation',
+	localesDir = './locales/';
 
 gulp.task('dev', function () {
 	nodemon({
@@ -31,6 +35,11 @@ gulp.task('test', function (cb) {
 				.pipe(istanbul.writeReports()) // Creating the reports after tests runned
 				.on('end', cb);
 		});
+});
+
+gulp.task('translation', function () {
+	download(translationUrl)
+		.pipe(gulp.dest(localesDir));
 });
 
 gulp.task('default', ['dev'], function () {
