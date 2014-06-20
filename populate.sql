@@ -11,7 +11,7 @@ max_zoom = 524287,
 status = 0,
 created_on = '2014-01-01 12:00:00',
 created_by = 'Wikia',
-attribution = 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png"> | © OpenStreetMap contributors', -- Check MOB-1875 for the copy
+attribution = '© OpenStreetMap contributors | <p>Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png"></p>',
 subdomains = '1234';
 
 
