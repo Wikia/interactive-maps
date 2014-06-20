@@ -149,6 +149,12 @@ function handleUsedCategories(id, res, next) {
 	);
 }
 
+/**
+ * @desc Deletes categories with given IDs from DB
+ * @param {array} ids
+ * @param {object} res
+ * @param {function} next
+ */
 function deletePOICategories(ids, res, next) {
 	dbCon
 		.knex
@@ -205,6 +211,13 @@ function deletePOICategories(ids, res, next) {
 	});
 }
 
+/**
+ * @desc Updates categories with given ID's in DB
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ * @param {object} reqBody Raw ayload of the request
+ */
 function updatePOICategories(req, res, next, reqBody) {
 	// If new marker is uploaded, reset the marker status to 0
 	dbCon
