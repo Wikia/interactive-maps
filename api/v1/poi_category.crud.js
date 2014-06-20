@@ -152,7 +152,7 @@ function handleUsedCategories(id, res, next) {
 function deletePOICategories(ids, res, next) {
 	dbCon
 		.knex
-		.transaction(function (trx){
+		.transaction(function (trx) {
 			var filter,
 				results;
 			ids.forEach(function (id) {
@@ -164,30 +164,30 @@ function deletePOICategories(ids, res, next) {
 						.destroy(dbTable, filter)
 						.transacting(trx)
 						.then(
-						function (affectedRows) {
-							if (affectedRows > 0) {
-								if (ids[ids.length - 1] === id){
-									trx.commit();
+							function (affectedRows) {
+								if (affectedRows > 0) {
+									if (ids[ids.length - 1] === id) {
+										trx.commit();
+									}
+								} else {
+									trx.rollback();
+									next(errorHandler.elementNotFoundError(dbTable, id));
 								}
-							} else {
-								trx.rollback();
-								next(errorHandler.elementNotFoundError(dbTable, id));
-							}
-						},
-						function (err) {
-							// If the delete request results an error, check if the error is reference error
-							// (caused by non able to delete foreign key) and handle this case by calling
-							// the handleUsedCategories function, otherwise handle the error as regular error
-							if (
-								err.hasOwnProperty('clientError') &&
+							},
+							function (err) {
+								// If the delete request results an error, check if the error is reference error
+								// (caused by non able to delete foreign key) and handle this case by calling
+								// the handleUsedCategories function, otherwise handle the error as regular error
+								if (
+									err.hasOwnProperty('clientError') &&
 									err.clientError.name === 'RejectionError' &&
 									err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_'
 								) {
-								handleUsedCategories(id, res, next);
-							} else {
-								next(err);
+									handleUsedCategories(id, res, next);
+								} else {
+									next(err);
+								}
 							}
-						}
 					);
 				} else {
 					next(errorHandler.badNumberError(id));
@@ -198,9 +198,10 @@ function deletePOICategories(ids, res, next) {
 			res.send(204, {});
 			res.end();
 		})
-		.catch(function (err){
-			next(err);
-		});
+		.
+	catch (function (err) {
+		next(err);
+	});
 }
 
 function updatePOICategories(req, res, next, reqBody) {
@@ -230,24 +231,24 @@ function updatePOICategories(req, res, next, reqBody) {
 						.update(dbTable, each, filter)
 						.transacting(trx)
 						.then(
-						function (affectedRows) {
-							if (affectedRows > 0) {
-								results.push({
-									id: eachId,
-									url: utils.responseUrl(req, '/api/v1/poi_category', eachId)
-								});
-								if (each.marker) {
-									poiCategoryMarker(id, each.map_id, each.marker, dbTable);
+							function (affectedRows) {
+								if (affectedRows > 0) {
+									results.push({
+										id: eachId,
+										url: utils.responseUrl(req, '/api/v1/poi_category', eachId)
+									});
+									if (each.marker) {
+										poiCategoryMarker(id, each.map_id, each.marker, dbTable);
+									}
+									if (each === reqBody[reqBody.length - 1]) {
+										trx.commit(results);
+									}
+								} else {
+									trx.rollback();
+									next(errorHandler.elementNotFoundError(dbTable, id));
 								}
-								if(each === reqBody[reqBody.length - 1]) {
-									trx.commit(results);
-								}
-							} else {
-								trx.rollback();
-								next(errorHandler.elementNotFoundError(dbTable, id));
-							}
-						},
-						next
+							},
+							next
 					);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
@@ -261,9 +262,10 @@ function updatePOICategories(req, res, next, reqBody) {
 			});
 			res.end();
 		})
-		.catch(function (err) {
-			next(err);
-		});
+		.
+	catch (function (err) {
+		next(err);
+	});
 
 }
 
@@ -300,25 +302,25 @@ module.exports = function createCRUD() {
 				if (errors.length === 0) {
 					dbCon
 						.knex
-						.transaction(function (trx){
+						.transaction(function (trx) {
 							var results = [];
 							reqBody.forEach(function (each) {
 								dbCon.insert(dbTable, each)
 									.transacting(trx)
 									.then(
-									function (data){
-										results.push({
-											id: data[0]
-										});
-										if(each === reqBody[reqBody.length - 1]){
-											trx.commit(results);
+										function (data) {
+											results.push({
+												id: data[0]
+											});
+											if (each === reqBody[reqBody.length - 1]) {
+												trx.commit(results);
+											}
 										}
-									}
 								);
 							});
 						})
-						.then(function (result){
-							results.forEach(function (result){
+						.then(function (result) {
+							results.forEach(function (result) {
 								result.url = utils.responseUrl(req, req.route.path, result.id);
 							});
 							res.send(201, {
@@ -327,14 +329,15 @@ module.exports = function createCRUD() {
 							});
 							res.end();
 						})
-						.catch(function (err){
-							next(err);
-						});
+						.
+					catch (function (err) {
+						next(err);
+					});
 				} else {
 					next(errorHandler.badRequestError(errors));
 				}
 			},
-			PUT: function (req, res, next){
+			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, multiUpdateSchema);
 
@@ -344,7 +347,7 @@ module.exports = function createCRUD() {
 					next(errorHandler.badRequestError(errors));
 				}
 			},
-			DELETE: function (req, res, next){
+			DELETE: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, multiDeleteSchema);
 
@@ -362,14 +365,14 @@ module.exports = function createCRUD() {
 			},
 			GET: function (req, res, next) {
 				var dbColumns = [
-						'name',
-						'marker',
-						'parent_poi_category_id',
-						'map_id',
-						'category_type',
-						'created_on',
-						'created_by'
-					],
+					'name',
+					'marker',
+					'parent_poi_category_id',
+					'map_id',
+					'category_type',
+					'created_on',
+					'created_by'
+				],
 					id = parseInt(req.pathVar.id),
 					filter = {
 						id: id
