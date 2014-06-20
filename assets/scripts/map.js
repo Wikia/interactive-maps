@@ -51,7 +51,8 @@
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
-		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">Edit</a>',
+		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
+				translate('wikia-interactive-maps-edit-poi') + '</a>',
 			photoHtml = '',
 			titleHtml = '',
 			descriptionHtml = '';
@@ -471,11 +472,22 @@
 	}
 
 	/**
+	 * @desc Sets up the interface translations
+	 */
+	function setupInterfaceTranslations() {
+		L.drawLocal.draw.handlers.marker.tooltip.start = translate('wikia-interactive-maps-create-marker-handler');
+		L.drawLocal.draw.toolbar.buttons.marker = translate('wikia-interactive-maps-create-marker-tooltip');
+		L.drawLocal.draw.toolbar.actions.text = translate('wikia-interactive-maps-create-marker-cancel');
+	}
+
+	/**
 	 * @desc Create new map
 	 */
 	function createMap() {
 		var zoomControl,
 			defaultMinZoom;
+
+		setupInterfaceTranslations();
 
 		defaultMinZoom = getMinZoomLevel(
 			config.layer.maxZoom,
