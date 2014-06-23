@@ -55,13 +55,13 @@ describe('i18n', function () {
 		}
 		];
 		testCases.forEach(function (testCase) {
-			expect(i18n.message(testCase.key, testCase.language)).toEqual(testCase.expected);
+			expect(i18n.msg(testCase.key, testCase.language)).toEqual(testCase.expected);
 		});
 	});
 
 	it('throws error if the language is not provided', function () {
 		expect(function () {
-			i18n.message('test');
+			i18n.msg('test');
 		}).toThrow('Translation language not set');
 	});
 
