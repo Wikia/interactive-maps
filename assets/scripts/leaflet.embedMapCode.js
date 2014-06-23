@@ -33,7 +33,7 @@
 			this._map = map;
 			this._container = container;
 
-			this._createButton(this._config);
+			this._createButton();
 
 			return this._container;
 		},
@@ -52,46 +52,42 @@
 
 		/**
 		 * @desc creates embed code button markup and binds events
-		 * @param {object} config - config for embed code button
-		 * @returns {Element} - HTML element for embed code button
+		 * @returns {object} - Leaflet Button object
 		 * @private
 		 */
-		_createButton: function (config) {
-			var button = this._createMarkup(config, this._container);
+		_createButton: function() {
+			var button = this._createMarkup();
 
-			this._bindEvent(config, button);
+			this._bindEvent(button);
 
 			return button;
 		},
 
 		/**
 		 * @desc creates embed code button markup
-		 * @param {object} config - config for embed code button
-		 * @param {Element} container - HTML element for button container
-		 * @returns {Element} - HTML element for embed code button
+		 * @returns {object} - Leaflet Button object
 		 * @private
 		 */
-		_createMarkup: function(config, container) {
-			var button = L.DomUtil.create('div', className + '-button leaflet-bar', container),
+		_createMarkup: function() {
+			var button = L.DomUtil.create('div', className + '-button leaflet-bar', this._container),
 				link = L.DomUtil.create('a', className + '-button', button);
 
-			link.title = config.title;
+			link.title = this._config.title;
 			link.href = '#';
-			link.textContent = config.title;
+			link.textContent = this._config.title;
 
 			return button;
 		},
 
 		/**
 		 * @desc binds events to embed code button
-		 * @param {object} config - config for embed code button
-		 * @param {Element} button - HTML element for embed code button
+		 * @param {object} button - Leaflet Button object
 		 * @private
 		 */
-		_bindEvent: function(config, button) {
+		_bindEvent: function(button) {
 			L.DomEvent
 				.addListener(button, 'click', L.DomEvent.stop)
-				.addListener(button, 'click', config.onClick, this);
+				.addListener(button, 'click', this._config.onClick, this);
 
 			L.DomEvent.disableClickPropagation(button);
 		}
