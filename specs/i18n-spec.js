@@ -52,8 +52,11 @@ describe('i18n', function () {
 			key: 'test1',
 			language: 'fr',
 			expected: 'en_test1'
-		}
-		];
+		},{
+			key: 'test_key',
+			language: 'qqx',
+			expected: 'test_key'
+		}];
 		testCases.forEach(function (testCase) {
 			expect(i18n.msg(testCase.key, testCase.language)).toEqual(testCase.expected);
 		});
