@@ -213,7 +213,6 @@ module.exports = function createCRUD() {
 						'marker',
 						'parent_poi_category_id',
 						'map_id',
-						'category_type',
 						'created_on',
 						'created_by'
 					],
