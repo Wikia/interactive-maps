@@ -119,10 +119,10 @@ module.exports = function createCRUD() {
 				var dbColumns = ['id', 'name', 'marker', 'map_id'],
 					query = dbCon.knex(dbTable).column(dbColumns),
 
-					// check for parameter parents=1 in URL
-					parents = parseInt(req.query.parents, 10) || false;
+					// check for parameter parentsOnly in URL
+					parentsOnly = req.query.hasOwnProperty('parentsOnly');
 
-				if (parents) {
+				if (parentsOnly) {
 					query.where({
 						parent_poi_category_id: null
 					});
