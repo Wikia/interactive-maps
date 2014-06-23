@@ -64,4 +64,22 @@ describe('i18n', function () {
 			i18n.message('test');
 		}).toThrow('Translation language not set');
 	});
+
+	it('returns correct language for getLanguage', function () {
+		var testCases = [{
+			language: 'en',
+			expected: 'en'
+		},{
+			language: 'de',
+			expected: 'de'
+		},{
+			language: 'fr',
+			expected: 'en'
+		},{
+			expected: 'en'
+		}];
+		testCases.forEach(function (testCase) {
+			expect(i18n.getLanguage(testCase.language)).toEqual(testCase.expected);
+		});
+	});
 });
