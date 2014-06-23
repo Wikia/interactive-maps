@@ -26,27 +26,6 @@ var express = require('express'),
 	apiAbsolutePath = __dirname + apiPath,
 	crudModules = getCRUDs.requireCruds(getCRUDs.getCruds(apiAbsolutePath));
 
-//set up the logger with console transport
-logger.set({
-	console: {
-		enabled: true,
-		level: logger.level.DEBUG,
-		raw: true
-	},
-	file: {
-		enabled: true,
-		level: logger.level.DEBUG,
-		raw: true,
-		path: 'intMaps.log'
-	},
-	syslog: {
-		enabled: true,
-		level: logger.level.DEBUG,
-		tag: 'intMaps',
-		dev: true
-	}
-});
-
 //build routes for Version 1
 routeBuilder(router, crudModules, apiPath);
 

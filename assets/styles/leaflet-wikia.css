@@ -54,7 +54,7 @@
     -ms-flex-direction: column;
     -o-flex-direction: column;
     flex-direction: column;
-    height: 100%;
+    max-height: 100%;
     padding: 10px;
     position: absolute;
     top: 0;

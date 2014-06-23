@@ -39,7 +39,8 @@
 		pointTypeFiltersContainer,
 		pointIcons = {},
 		pointCache = {},
-		pointTypes = {};
+		pointTypes = {},
+		config = window.mapSetup;
 
 	/**
 	 * @desc Build popup HTML
@@ -153,11 +154,25 @@
 	 * @param {object} pointType - POI type object
 	 */
 	function setupPointTypeIcon(pointType) {
-		pointIcons[pointType.id] = L.icon({
-			iconUrl: pointType.marker,
-			iconSize: [pointIconWidth, pointIconHeight],
+		var pointTypeIcon;
+
+		if (pointType.marker !== null) {
+			pointTypeIcon = L.icon({
+				iconUrl: pointType.marker,
+				iconSize: [pointIconWidth, pointIconHeight]
+			});
+		} else {
+			pointTypeIcon = new L.Icon.Default();
+			// this is the nicest way to do that I found
+			// we need to overwrite it here so in the filter box we have not broken image
+			pointType.marker = pointTypeIcon._getIconUrl( 'icon' );
+		}
+
+		L.setOptions(pointTypeIcon, {
 			className: 'point-type-' + pointType.id
 		});
+
+		pointIcons[pointType.id] = pointTypeIcon;
 	}
 
 	/**
@@ -282,9 +297,8 @@
 
 	/**
 	 * @desc Create points and filters for them
-	 * @param {object} config
 	 */
-	function setupPoints(config) {
+	function setupPoints() {
 		var pointTypeFiltersHtml = '';
 
 		pointTypes = config.types;
@@ -452,9 +466,8 @@
 
 	/**
 	 * @desc Create new map
-	 * @param {object} config
 	 */
-	function createMap(config) {
+	function createMap() {
 		var zoomControl,
 			defaultMinZoom;
 
@@ -498,10 +511,10 @@
 
 		map.addControl(zoomControl);
 		setupPontoWikiaClient();
-		setupPoints(config);
+		setupPoints();
 		markers.addTo(map);
 	}
 
-	createMap(window.mapSetup);
+	createMap();
 
 })(window, window.L, window.Ponto);
