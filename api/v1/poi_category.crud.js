@@ -120,7 +120,7 @@ module.exports = function createCRUD() {
 					query = dbCon.knex(dbTable).column(dbColumns),
 
 					// check for parameter parents=1 in URL
-					parents = parseInt(req.query.parents) || false;
+					parents = parseInt(req.query.parents, 10) || false;
 
 				if (parents) {
 					query.where({
@@ -172,7 +172,7 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id),
+				var id = parseInt(req.pathVar.id, 10),
 					filter = {
 						id: id
 					};
@@ -217,7 +217,7 @@ module.exports = function createCRUD() {
 						'created_on',
 						'created_by'
 					],
-					id = parseInt(req.pathVar.id),
+					id = parseInt(req.pathVar.id, 10),
 					filter = {
 						id: id
 					};
@@ -253,7 +253,7 @@ module.exports = function createCRUD() {
 					filter;
 
 				if (errors.length === 0) {
-					id = parseInt(req.pathVar.id);
+					id = parseInt(req.pathVar.id, 10);
 					filter = {
 						id: id
 					};
