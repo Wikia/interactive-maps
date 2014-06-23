@@ -4,10 +4,11 @@ var gulp = require('gulp'),
 	nodemon = require('gulp-nodemon'),
 	jasmine = require('gulp-jasmine'),
 	istanbul = require('gulp-istanbul'),
-	download = require('gulp-download'),
-	translationUrl = 'http://mediawiki119.evgeniy.wikia-dev.com/' +
+	exec = require('child_process').exec,
+	localesDir = './locales/',
+	translationUrl = 'http://mediawiki119.interactivemaps.wikia-dev.com/' +
 		'wikia.php?controller=WikiaInteractiveMaps&method=translation',
-	localesDir = './locales/';
+	translationFile = localesDir + 'translations.json';
 
 gulp.task('dev', function () {
 	nodemon({
@@ -37,9 +38,14 @@ gulp.task('test', function (cb) {
 		});
 });
 
-gulp.task('translation', function () {
-	download(translationUrl)
-		.pipe(gulp.dest(localesDir));
+gulp.task('update_translation', function () {
+	var cmd = 'curl "' + translationUrl + '" -o ' + translationFile;
+	exec(cmd, function () {
+		// check if the downloaded translation is consistent
+		var translation = require(translationFile);
+		console.assert(typeof translation.messages === 'object', 'Translation is broken');
+	});
+
 });
 
 gulp.task('default', ['dev'], function () {
