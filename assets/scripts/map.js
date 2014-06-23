@@ -41,7 +41,7 @@
 	 * @param {string} message
 	 * @returns {string}
 	 */
-	function translate(message) {
+	function msg(message) {
 		return config.i18n.hasOwnProperty(message) ? config.i18n[message] : message;
 	}
 
@@ -52,7 +52,7 @@
 	 */
 	function buildPopupHtml(point) {
 		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
-				translate('wikia-interactive-maps-edit-poi') + '</a>',
+				msg('wikia-interactive-maps-edit-poi') + '</a>',
 			photoHtml = '',
 			titleHtml = '',
 			descriptionHtml = '';
@@ -301,7 +301,7 @@
 
 		div.setAttribute('class', 'filter-menu');
 
-		h3.appendChild(document.createTextNode(translate('wikia-interactive-maps-filters')));
+		h3.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
 		div.appendChild(h3);
 
 		ul.setAttribute('id', pointTypeFiltersContainerId);
@@ -310,7 +310,7 @@
 		li.setAttribute('id', 'allPointTypes');
 		li.setAttribute('class', 'enabled');
 		li.setAttribute('data-point-type', '0');
-		li.appendChild(document.createTextNode(translate('wikia-interactive-maps-all-pin-types')));
+		li.appendChild(document.createTextNode(msg('wikia-interactive-maps-all-pin-types')));
 		ul.appendChild(li);
 		div.appendChild(ul);
 		container.appendChild(div);
@@ -475,9 +475,9 @@
 	 * @desc Sets up the interface translations
 	 */
 	function setupInterfaceTranslations() {
-		L.drawLocal.draw.handlers.marker.tooltip.start = translate('wikia-interactive-maps-create-marker-handler');
-		L.drawLocal.draw.toolbar.buttons.marker = translate('wikia-interactive-maps-create-marker-tooltip');
-		L.drawLocal.draw.toolbar.actions.text = translate('wikia-interactive-maps-create-marker-cancel');
+		L.drawLocal.draw.handlers.marker.tooltip.start = msg('wikia-interactive-maps-create-marker-handler');
+		L.drawLocal.draw.toolbar.buttons.marker = msg('wikia-interactive-maps-create-marker-tooltip');
+		L.drawLocal.draw.toolbar.actions.text = msg('wikia-interactive-maps-create-marker-cancel');
 	}
 
 	/**
