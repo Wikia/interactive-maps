@@ -10,6 +10,7 @@ var express = require('express'),
 	rawBody = require('./lib/rawBody'),
 	errorHandler = require('./lib/errorHandler'),
 	heartBeatHandler = require('./lib/healthCheck').heartBeatHandler,
+	cachingUtils = require('./lib/cachingUtils'),
 
 	// API entry points modules
 	getCRUDs = require('./lib/getCRUDs'),
@@ -20,7 +21,6 @@ var express = require('express'),
 	port = require('./lib/config').api.port,
 	app = express(),
 	router = detour(),
-	cachingUtils = require('./lib/cachingUtils'),
 
 	// Interactive Maps API Version 1
 	apiPath = '/api/v1/',
