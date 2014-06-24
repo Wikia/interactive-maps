@@ -37,7 +37,8 @@ var dbCon = require('./../../lib/db_connector'),
 				},
 				parent_poi_category_id: {
 					description: 'Unique identifier for parent category',
-					type: 'integer'
+					type: 'integer',
+					required: 'true'
 				},
 				created_by: {
 					description: 'creator user name',
@@ -48,7 +49,8 @@ var dbCon = require('./../../lib/db_connector'),
 				}
 			},
 			additionalProperties: false
-		}
+		},
+		minLength: 1
 	},
 	updateSchema = {
 		description: 'Schema for updating a category',
@@ -79,7 +81,6 @@ var dbCon = require('./../../lib/db_connector'),
 				id: {
 					description: 'Identifier of the category',
 					type: 'integer',
-					minLength: 1,
 					required: true
 				},
 				name: {
@@ -96,16 +97,17 @@ var dbCon = require('./../../lib/db_connector'),
 				}
 			},
 			additionalProperties: false
-		}
+		},
+		minLength: 1
 	},
 	multiDeleteSchema = {
 		description: 'Schema for deleting many categories at once',
 		type: 'array',
 		items: {
 			description: 'ID of the map to be deleted',
-			type: 'integer',
-			minLength: 1
-		}
+			type: 'integer'
+		},
+		minLength: 1
 	};
 
 /**
@@ -204,10 +206,9 @@ function deletePOICategories(ids, res, next) {
 			res.send(204, {});
 			res.end();
 		})
-		.
-	catch (function (err) {
-		next(err);
-	});
+		.catch (function (err) {
+			next(err);
+		});
 }
 
 /**
@@ -226,7 +227,7 @@ function updatePOICategories(req, res, next, reqBody) {
 				filter,
 				results = [];
 			//unify the wildcard case
-			id = parseInt(req.pathVar.id);
+			id = parseInt(req.pathVar.id, 10);
 			if (id) {
 				reqBody.id = id;
 				reqBody = [reqBody];
@@ -258,13 +259,13 @@ function updatePOICategories(req, res, next, reqBody) {
 									}
 								} else {
 									trx.rollback();
-									next(errorHandler.elementNotFoundError(dbTable, id));
+									next(errorHandler.elementNotFoundError(dbTable, eachId));
 								}
 							},
 							next
 					);
 				} else {
-					next(errorHandler.badNumberError(req.pathVar.id));
+					next(errorHandler.badNumberError(eachId));
 				}
 			});
 		})
@@ -275,11 +276,9 @@ function updatePOICategories(req, res, next, reqBody) {
 			});
 			res.end();
 		})
-		.
-	catch (function (err) {
-		next(err);
-	});
-
+		.catch (function (err) {
+			next(err);
+		});
 }
 
 /**
@@ -320,16 +319,14 @@ module.exports = function createCRUD() {
 							reqBody.forEach(function (each) {
 								dbCon.insert(dbTable, each)
 									.transacting(trx)
-									.then(
-										function (data) {
-											results.push({
-												id: data[0]
-											});
-											if (each === reqBody[reqBody.length - 1]) {
-												trx.commit(results);
-											}
+									.then(function (data) {
+										results.push({
+											id: data[0]
+										});
+										if (each === reqBody[reqBody.length - 1]) {
+											trx.commit(results);
 										}
-								);
+									});
 							});
 						})
 						.then(function (result) {
@@ -342,10 +339,9 @@ module.exports = function createCRUD() {
 							});
 							res.end();
 						})
-						.
-					catch (function (err) {
-						next(err);
-					});
+						.catch (function (err) {
+							next(err);
+						});
 				} else {
 					next(errorHandler.badRequestError(errors));
 				}
@@ -373,7 +369,7 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id);
+				var id = parseInt(req.pathVar.id, 10);
 				deletePOICategories([id], res, next);
 			},
 			GET: function (req, res, next) {
