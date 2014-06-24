@@ -18,6 +18,6 @@ dfs.sendFiles(bucketName, dataDir, fileName)
 .then(function (result) {
 	console.log(result);
 })
-.catch (function (error) {
+.catch(function (error) {
 	console.log(error);
 });
