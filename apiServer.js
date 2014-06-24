@@ -33,13 +33,13 @@ routeBuilder(router, crudModules, apiPath);
 app.use(guard);
 app.use(logger.middleware);
 app.use(rawBody);
+app.use(cachingUtils.middleware);
 app.use(router.middleware);
 renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
-app.use(cachingUtils.middleware);
 
 // FIXME: Probably we won't serve the assets the API server, but this can be used for debugging right now
-app.use(express.static(__dirname + '/assets'));
+app.use(express.static(__dirname + '/assets', {maxAge: 300 * 1000}));
 
 app.use(errorHandler.middleware);
 
