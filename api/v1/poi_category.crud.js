@@ -38,7 +38,7 @@ var dbCon = require('./../../lib/db_connector'),
 				parent_poi_category_id: {
 					description: 'Unique identifier for parent category',
 					type: 'integer',
-					required: 'true'
+					required: true
 				},
 				created_by: {
 					description: 'creator user name',
