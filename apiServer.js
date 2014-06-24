@@ -38,8 +38,9 @@ app.use(router.middleware);
 renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
 
-// FIXME: Probably we won't serve the assets the API server, but this can be used for debugging right now
-app.use(express.static(__dirname + '/assets', {maxAge: 300 * 1000}));
+// MOB-1177 assets cachebusting
+app.use('/assets', cachingUtils.filterCachebuster);
+app.use('/assets', express.static(__dirname + '/assets', {maxAge: 300 * 1000}));
 
 app.use(errorHandler.middleware);
 
