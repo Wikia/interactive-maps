@@ -121,13 +121,12 @@ module.exports = function createCRUD() {
 					.select(dbTable, dbColumns)
 					.then(
 						function (collection) {
-							collection.forEach(function (value) {
-								value.marker = utils.imageUrl(
-									config.dfsHost,
-									utils.getMarkersBucketName(config.markersPrefix, value.map_id),
-									value.marker
-								);
-							});
+							utils.convertMarkersNamesToUrls(
+								collection,
+								config.dfsHost,
+								config.bucketPrefix,
+								config.markersPrefix
+							);
 							res.send(200, collection);
 							res.end();
 						},
@@ -219,6 +218,12 @@ module.exports = function createCRUD() {
 						.select(dbTable, dbColumns, filter)
 						.then(
 							function (collection) {
+								utils.convertMarkersNamesToUrls(
+									collection,
+									config.dfsHost,
+									config.bucketPrefix,
+									config.markersPrefix
+								);
 								if (collection[0]) {
 									res.send(200, collection[0]);
 									res.end();

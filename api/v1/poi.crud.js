@@ -172,6 +172,10 @@ module.exports = function createCRUD() {
 					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
+					// extend data object
+					reqBody.updated_by = reqBody.created_by;
+					reqBody.created_on = dbCon.knex.raw('CURRENT_TIMESTAMP');
+
 					dbCon
 						.insert(dbTable, reqBody)
 						.then(
