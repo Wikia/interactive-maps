@@ -13,3 +13,7 @@ created_on = CURRENT_TIMESTAMP,
 created_by = 'Wikia',
 attribution = 'TBD', -- TODO Add proper attribution here
 subdomains = '1234';
+
+INSERT INTO poi_category SET
+id = 1,
+name = 'Others';
