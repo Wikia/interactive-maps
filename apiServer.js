@@ -20,6 +20,7 @@ var express = require('express'),
 	port = require('./lib/config').api.port,
 	app = express(),
 	router = detour(),
+	cachingUtils = require('./lib/cachingUtils'),
 
 	// Interactive Maps API Version 1
 	apiPath = '/api/v1/',
@@ -35,6 +36,7 @@ app.use(rawBody);
 app.use(router.middleware);
 renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
+app.use(cachingUtils.middleware);
 
 // FIXME: Probably we won't serve the assets the API server, but this can be used for debugging right now
 app.use(express.static(__dirname + '/assets'));
