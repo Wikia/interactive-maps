@@ -279,6 +279,8 @@
 			filterClicked = elementClicked.parentNode;
 		}
 
+		map.closePopup();
+
 		pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10);
 
 		if (pointType === 0) {
