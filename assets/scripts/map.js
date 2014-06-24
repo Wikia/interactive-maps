@@ -457,6 +457,9 @@
 			maxZoom: config.layer.maxZoom,
 			zoomControl: false
 		});
+
+		map.attributionControl.setPrefix(false);
+
 		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
 		if (config.hasOwnProperty('boundaries')) {

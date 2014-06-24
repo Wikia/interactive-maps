@@ -11,7 +11,7 @@ max_zoom = 524287,
 status = 0,
 created_on = '2014-01-01 12:00:00',
 created_by = 'Wikia',
-attribution = '© OpenStreetMap contributors | <p>Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png"></p>',
+attribution = '&copy; OpenStreetMap contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">',
 subdomains = '1234';
 
 
