@@ -7,6 +7,7 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	config = require('./../../lib/config'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
+	squidUpdate = require('./../../lib/squidUpdate'),
 
 	urlPattern = jsonValidator.getUrlPattern(),
 
@@ -147,10 +148,12 @@ module.exports = function createCRUD() {
 										message: 'POI category successfully created',
 										id: id,
 										url: utils.responseUrl(req, req.route.path, id)
-									};
+									},
+									mapId = reqBody.map_id;
 								if (reqBody.marker) {
-									poiCategoryMarker(id, reqBody.map_id, reqBody.marker, dbTable);
+									poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
 								}
+								squidUpdate.purgeKey('map-' + mapId, 'poiCategoryCreated');
 								res.send(201, response);
 								res.end();
 							},
@@ -173,6 +176,8 @@ module.exports = function createCRUD() {
 						.then(
 							function (affectedRows) {
 								if (affectedRows > 0) {
+									// TODO: how to get mapId here? Additional query to DB/required mapId passed in requestBody?
+									//squidUpdate.purgeKey('map-' + id, 'poiCategoryDeleted');
 									res.send(204, {});
 									res.end();
 								} else {
@@ -262,10 +267,13 @@ module.exports = function createCRUD() {
 											message: 'POI category successfully updated',
 											id: id,
 											url: utils.responseUrl(req, '/api/v1/poi_category', id)
-										};
+										},
+										mapId = reqBody.map_id;
 										if (reqBody.marker) {
-											poiCategoryMarker(id, reqBody.map_id, reqBody.marker, dbTable);
+											poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
 										}
+										// TODO: fix bug with no map_id in request
+										// squidUpdate.purgeKey('map-' + mapId, 'poiCategoryUpdated');
 										res.send(303, response);
 										res.end();
 									} else {
