@@ -5,7 +5,7 @@ var dbCon = require('./../../lib/db_connector'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
-	cachingUtils = require('./../../lib/cachingUtils'),
+	squidUpdate = require('./../../lib/squidUpdate'),
 
 	urlPattern = jsonValidator.getUrlPattern(),
 
@@ -186,9 +186,11 @@ module.exports = function createCRUD() {
 										message: 'POI successfully created',
 										id: id,
 										url: utils.responseUrl(req, req.route.path, id)
-									};
-								changeMapUpdatedOn(reqBody.map_id).then(
+									},
+									mapId = reqBody.map_id;
+								changeMapUpdatedOn(mapId).then(
 									function () {
+										squidUpdate.purgeKey('map-' + mapId, 'mapPoiCreated');
 										res.send(201, response);
 										res.end();
 									},
@@ -212,12 +214,15 @@ module.exports = function createCRUD() {
 					getMapIdByPoiId(id).then(
 						function (rows) {
 							if (rows.length > 0) {
+								var mapId = rows[0].map_id;
+
 								dbCon
 									.destroy(dbTable, filter)
 									.then(
 										function () {
-											changeMapUpdatedOn(rows[0].map_id).then(
+											changeMapUpdatedOn(mapId).then(
 												function () {
+													squidUpdate.purgeKey('map-' + mapId, 'mapPoiDeleted');
 													res.send(204, {});
 													res.end();
 												},
@@ -292,7 +297,7 @@ module.exports = function createCRUD() {
 												};
 												changeMapUpdatedOn(mapId).then(
 													function () {
-														cachingUtils.purgeKey('map-' + mapId, 'mapPoiUpdate');
+														squidUpdate.purgeKey('map-' + mapId, 'mapPoiUpdated');
 														res.send(303, response);
 														res.end();
 													},
