@@ -326,7 +326,7 @@
 		ul.appendChild(li);
 		div.appendChild(ul);
 		container.appendChild(div);
-		return div;
+		return ul;
 	}
 
 	/**
