@@ -36,6 +36,7 @@ routeBuilder(router, crudModules, apiPath);
 app.use(guard);
 app.use(logger.middleware);
 app.use(rawBody);
+// add default HTTP request headers
 app.use(cachingUtils.middleware);
 app.use(router.middleware);
 renderMap(app, apiPath, apiAbsolutePath);
