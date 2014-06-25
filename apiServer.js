@@ -38,7 +38,7 @@ app.use(router.middleware);
 renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
 
-// MOB-1177 assets cachebusting
+// assets cachebusting
 app.use('/assets', cachingUtils.filterCachebuster);
 app.use('/assets', express.static(__dirname + '/assets', {maxAge: 300 * 1000}));
 
