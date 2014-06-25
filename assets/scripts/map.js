@@ -168,7 +168,7 @@
 			pointTypeIcon = new L.Icon.Default();
 			// this is the nicest way to do that I found
 			// we need to overwrite it here so in the filter box we have not broken image
-			pointType.marker = pointTypeIcon._getIconUrl( 'icon' );
+			pointType.marker = pointTypeIcon._getIconUrl('icon');
 		}
 
 		L.setOptions(pointTypeIcon, {
@@ -519,6 +519,9 @@
 			maxZoom: config.layer.maxZoom,
 			zoomControl: false
 		});
+
+		map.attributionControl.setPrefix(false);
+
 		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
 		if (config.hasOwnProperty('boundaries')) {
