@@ -18,14 +18,17 @@ var express = require('express'),
 	renderMap = require('./lib/renderMap'),
 
 	// other local variables
-	port = require('./lib/config').api.port,
+	config = require('./lib/config'),
+	port = config.api.port,
 	app = express(),
 	router = detour(),
 
 	// Interactive Maps API Version 1
 	apiPath = '/api/v1/',
 	apiAbsolutePath = __dirname + apiPath,
-	crudModules = getCRUDs.requireCruds(getCRUDs.getCruds(apiAbsolutePath));
+	crudModules = getCRUDs.requireCruds(getCRUDs.getCruds(apiAbsolutePath)),
+	// express divides passed maxAge by 1000
+	staticMaxAge = cachingUtils.cacheShort * 1000;
 
 //build routes for Version 1
 routeBuilder(router, crudModules, apiPath);
@@ -38,9 +41,10 @@ app.use(router.middleware);
 renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
 
-// assets cachebusting
-app.use('/assets', cachingUtils.filterCachebuster);
-app.use('/assets', express.static(__dirname + '/assets', {maxAge: 300 * 1000}));
+// assets' cachebusting
+app.use( '/' + config.getCachebuster() + '/', express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
+// for assets required in leaflet-wikia.css
+app.use( express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
 
 app.use(errorHandler.middleware);
 

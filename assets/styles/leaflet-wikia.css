@@ -92,7 +92,7 @@
 }
 
 .point-types li.enabled {
-    background: url('/assets/images/selected.png') right center no-repeat;
+    background: url('/images/selected.png') right center no-repeat;
     background-origin: content-box;
 }
 
