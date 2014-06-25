@@ -6,6 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	errorHandler = require('./../../lib/errorHandler'),
 	config = require('./../../lib/config'),
+	squidUpdate = require('./../../lib/squidUpdate'),
 
 	dbTable = 'map',
 	createSchema = {
@@ -198,6 +199,7 @@ module.exports = function createCRUD() {
 						.then(
 							function (affectedRows) {
 								if (affectedRows > 0) {
+									squidUpdate.purgeKey('map-' + id, 'mapDeleted');
 									res.send(204, {
 										message: 'Map successfully deleted',
 										id: id
