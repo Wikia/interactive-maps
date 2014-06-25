@@ -37,12 +37,22 @@
 		config = window.mapSetup;
 
 	/**
+	 * @desc Translates message
+	 * @param {string} message
+	 * @returns {string}
+	 */
+	function msg(message) {
+		return config.i18n.hasOwnProperty(message) ? config.i18n[message] : message;
+	}
+
+	/**
 	 * @desc Build popup HTML
 	 * @param {object} point - POI object
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
-		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">Edit</a>',
+		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
+				msg('wikia-interactive-maps-edit-poi') + '</a>',
 			photoHtml = '',
 			titleHtml = '',
 			descriptionHtml = '';
@@ -147,15 +157,25 @@
 	 * @param {object} pointType - POI type object
 	 */
 	function setupPointTypeIcon(pointType) {
+		var pointTypeIcon;
+
 		if (pointType.marker !== null) {
-			pointIcons[pointType.id] = L.icon({
+			pointTypeIcon = L.icon({
 				iconUrl: pointType.marker,
-				iconSize: [pointIconWidth, pointIconHeight],
-				className: 'point-type-' + pointType.id
+				iconSize: [pointIconWidth, pointIconHeight]
 			});
 		} else {
-			pointIcons[pointType.id] = new L.Icon.Default();
+			pointTypeIcon = new L.Icon.Default();
+			// this is the nicest way to do that I found
+			// we need to overwrite it here so in the filter box we have not broken image
+			pointType.marker = pointTypeIcon._getIconUrl('icon');
 		}
+
+		L.setOptions(pointTypeIcon, {
+			className: 'point-type-' + pointType.id
+		});
+
+		pointIcons[pointType.id] = pointTypeIcon;
 	}
 
 	/**
@@ -269,6 +289,8 @@
 			filterClicked = elementClicked.parentNode;
 		}
 
+		map.closePopup();
+
 		pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10);
 
 		if (pointType === 0) {
@@ -276,6 +298,35 @@
 		} else {
 			pointTypeFilterClickHandler(filterClicked);
 		}
+	}
+
+	/**
+	 * Create Point types filter container
+	 * @param {object} container
+	 * @returns {object}
+	 */
+	function createPointTypeFiltersContainer(container) {
+		var div = document.createElement('div'),
+			h3 = document.createElement('h3'),
+			ul = document.createElement('ul'),
+			li = document.createElement('li');
+
+		div.setAttribute('class', 'filter-menu');
+
+		h3.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
+		div.appendChild(h3);
+
+		ul.setAttribute('id', pointTypeFiltersContainerId);
+		ul.setAttribute('class', 'point-types');
+
+		li.setAttribute('id', 'allPointTypes');
+		li.setAttribute('class', 'enabled');
+		li.setAttribute('data-point-type', '0');
+		li.appendChild(document.createTextNode(msg('wikia-interactive-maps-all-pin-types')));
+		ul.appendChild(li);
+		div.appendChild(ul);
+		container.appendChild(div);
+		return div;
 	}
 
 	/**
@@ -291,7 +342,7 @@
 			pointTypeFiltersHtml += buildPointTypeFilterHtml(pointType);
 		});
 
-		pointTypeFiltersContainer = document.getElementById(pointTypeFiltersContainerId);
+		pointTypeFiltersContainer = createPointTypeFiltersContainer(document.body);
 		pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
 
 		config.points.forEach(addPointOnMap);
@@ -433,11 +484,22 @@
 	}
 
 	/**
+	 * @desc Sets up the interface translations
+	 */
+	function setupInterfaceTranslations() {
+		L.drawLocal.draw.handlers.marker.tooltip.start = msg('wikia-interactive-maps-create-marker-handler');
+		L.drawLocal.draw.toolbar.buttons.marker = msg('wikia-interactive-maps-create-marker-tooltip');
+		L.drawLocal.draw.toolbar.actions.text = msg('wikia-interactive-maps-create-marker-cancel');
+	}
+
+	/**
 	 * @desc Create new map
 	 */
 	function createMap() {
 		var zoomControl,
 			defaultMinZoom;
+
+		setupInterfaceTranslations();
 
 		defaultMinZoom = getMinZoomLevel(
 			config.layer.maxZoom,

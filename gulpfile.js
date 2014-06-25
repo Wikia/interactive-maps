@@ -3,7 +3,11 @@
 var gulp = require('gulp'),
 	nodemon = require('gulp-nodemon'),
 	jasmine = require('gulp-jasmine'),
-	istanbul = require('gulp-istanbul');
+	istanbul = require('gulp-istanbul'),
+	exec = require('child_process').exec,
+	config = require('./lib/config.js'),
+	localesDir = './locales/',
+	translationFile = localesDir + 'translations.json';
 
 gulp.task('dev', function () {
 	nodemon({
@@ -31,6 +35,22 @@ gulp.task('test', function (cb) {
 				.pipe(istanbul.writeReports()) // Creating the reports after tests runned
 				.on('end', cb);
 		});
+});
+
+/**
+ * Translation is currently downloaded from MediaWiki as we use the existing infrastructure for translations.
+ * The translationUrl is defined in config. After the translation is downloaded the task makes a quick sanity check
+ * in case something is wrong with the translation JSON file.
+ */
+gulp.task('update_translation', function () {
+	console.assert(typeof config.translationUrl === 'string', 'Translation URL not set');
+	var cmd = 'curl "' + config.translationUrl + '" -o ' + translationFile;
+	exec(cmd, function () {
+		// check if the downloaded translation is consistent
+		var translation = require(translationFile);
+		console.assert(typeof translation.messages === 'object', 'Translation is broken');
+	});
+
 });
 
 gulp.task('default', ['dev'], function () {

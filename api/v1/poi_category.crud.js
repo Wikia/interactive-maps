@@ -116,21 +116,30 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name', 'marker', 'map_id'];
-				dbCon
-					.select(dbTable, dbColumns)
-					.then(
-						function (collection) {
-							utils.convertMarkersNamesToUrls(
-								collection,
-								config.dfsHost,
-								config.bucketPrefix,
-								config.markersPrefix
-							);
-							res.send(200, collection);
-							res.end();
-						},
-						next
+				var dbColumns = ['id', 'name', 'marker', 'map_id'],
+					query = dbCon.knex(dbTable).column(dbColumns),
+
+					// check for parameter parentsOnly in URL
+					parentsOnly = req.query.hasOwnProperty('parentsOnly');
+
+				if (parentsOnly) {
+					query.where({
+						parent_poi_category_id: null
+					});
+				}
+
+				query.select().then(
+					function (collection) {
+						utils.convertMarkersNamesToUrls(
+							collection,
+							config.dfsHost,
+							config.bucketPrefix,
+							config.markersPrefix
+						);
+						res.send(200, collection);
+						res.end();
+					},
+					next
 				);
 			},
 			POST: function (req, res, next) {
@@ -163,7 +172,7 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id),
+				var id = parseInt(req.pathVar.id, 10),
 					filter = {
 						id: id
 					};
@@ -204,11 +213,10 @@ module.exports = function createCRUD() {
 						'marker',
 						'parent_poi_category_id',
 						'map_id',
-						'category_type',
 						'created_on',
 						'created_by'
 					],
-					id = parseInt(req.pathVar.id),
+					id = parseInt(req.pathVar.id, 10),
 					filter = {
 						id: id
 					};
@@ -244,7 +252,7 @@ module.exports = function createCRUD() {
 					filter;
 
 				if (errors.length === 0) {
-					id = parseInt(req.pathVar.id);
+					id = parseInt(req.pathVar.id, 10);
 					filter = {
 						id: id
 					};

@@ -14,11 +14,10 @@ created_by = 'Wikia',
 attribution = '&copy; OpenStreetMap contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">',
 subdomains = '1234';
 
-
 INSERT INTO poi_category VALUES
-(1, 'Location', NULL, NULL, 0, 0, 1, 1, '2014-01-01 12:00:00', 'Wikia'),
-(2, 'Quest', NULL, NULL, 0, 0, 1, 2, '2014-01-01 12:00:00', 'Wikia'),
-(3, 'Character', NULL, NULL, 0, 0, 1, 3, '2014-01-01 12:00:00', 'Wikia'),
-(4, 'Item', NULL, NULL, 0, 0, 1, 4, '2014-01-01 12:00:00', 'Wikia'),
-(5, 'Event', NULL, NULL, 0, 0, 1, 5, '2014-01-01 12:00:00', 'Wikia'),
-(6, 'Other', NULL, NULL, 0, 0, 1, 6, '2014-01-01 12:00:00', 'Wikia');
+(1, 'Other', NULL, NULL, NULL, 1, 1, '2014-01-01 12:00:00', 'Wikia'),
+(2, 'Location', NULL, NULL, NULL, 1, 2, '2014-01-01 12:00:00', 'Wikia'),
+(3, 'Quest', NULL, NULL, NULL, 1, 3, '2014-01-01 12:00:00', 'Wikia'),
+(4, 'Character', NULL, NULL, NULL, 1, 4, '2014-01-01 12:00:00', 'Wikia'),
+(5, 'Item', NULL, NULL, NULL, 1, 5, '2014-01-01 12:00:00', 'Wikia'),
+(6, 'Event', NULL, NULL, NULL, 1, 6, '2014-01-01 12:00:00', 'Wikia');
