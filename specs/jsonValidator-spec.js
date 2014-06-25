@@ -2,7 +2,7 @@
 
 describe('json validator', function () {
 	var proxyquire = require('proxyquire').noCallThru(),
-		jsonValidator = proxyquire('./../lib/jsonValidator', {
+		validator = proxyquire('./../lib/jsonValidator', {
 			'JSV': {
 				JSV: {
 					createEnvironment: function () {
@@ -16,7 +16,9 @@ describe('json validator', function () {
 					}
 				}
 			}
-		});
+		}),
+		jsonValidator = validator.validateJSON;
+
 
 	it('returns "Incorrect JSON format" error', function () {
 		var testCases = [
@@ -30,7 +32,6 @@ describe('json validator', function () {
 
 		testCases.forEach(function (value) {
 			var errors = jsonValidator(value);
-
 			expect(Array.isArray(errors)).toBeTruthy();
 			expect(errors.length).toBe(1);
 			expect(errors[0]).toBe('Incorrect JSON format');

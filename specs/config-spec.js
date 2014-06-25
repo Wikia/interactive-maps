@@ -12,6 +12,12 @@ var proxyquire = require('proxyquire').noCallThru(),
 		tmp: '/tmp/',
 		wgFSSwiftConfig: {
 			test: ''
+		},
+		api: {
+			test: {
+				port: 123,
+				token: 'XYZ'
+			}
 		}
 	},
 	config = proxyquire('../lib/config', {
@@ -29,7 +35,8 @@ var proxyquire = require('proxyquire').noCallThru(),
 			debug: function () {
 
 			}
-		}
+		},
+		'test/InteractiveMapsConfig.json': configuration
 	});
 
 describe('config', function () {
@@ -48,7 +55,7 @@ describe('config', function () {
 					}
 				}
 			});
-		}).toThrow('Problem with config: test');
+		}).toThrow('Problem with config: Error: Cannot find module \'test/InteractiveMapsConfig.json\'');
 	});
 
 	it('should read configuration', function () {
