@@ -74,17 +74,17 @@ plan.briefing(briefing);
 plan.local(function (local) {
 	var branchName = getCurrentBranch(local),
 		filesToCopy;
-	local.log('Run build on branch: ' + branchName);
-	local.exec('gulp test');
 
 	local.log('Install dependencies');
 	local.exec('npm --production install');
+
+	local.log('Run build on branch: ' + branchName);
+	local.exec('gulp test');
 
 	createCacheBuster(cacheBusterFileName, local);
 
 	local.log('Copy files to remote hosts');
 	filesToCopy = local.git('ls-files', {silent: true});
-	// Copy deployment files to tmp
 	local.transfer(filesToCopy, '/tmp/' + tmpDir);
 });
 
@@ -93,12 +93,6 @@ plan.remote(function (remote) {
 	var deployUser = config.flightPlan.deployUser,
 		deployDirectory = config.flightPlan.deployDirectory;
 
-	if (plan.target.destination === 'production') {
-		var input = remote.prompt('Ready for deploying to production? [yes]');
-		if (input.indexOf('yes') === -1) {
-			remote.abort('user canceled flight');
-		}
-	}
 	remote.log('Move folder to web root');
 	remote.sudo('cp -R /tmp/' + tmpDir + ' ' + deployDirectory, {user: deployUser});
 	remote.rm('-rf /tmp/' + tmpDir);
