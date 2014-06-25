@@ -5,6 +5,7 @@ var dbCon = require('./../../lib/db_connector'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
+	cachingUtils = require('./../../lib/cachingUtils'),
 
 	urlPattern = jsonValidator.getUrlPattern(),
 
@@ -266,7 +267,8 @@ module.exports = function createCRUD() {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, updateSchema),
 					id,
-					filter;
+					filter,
+					mapId;
 
 				if (errors.length === 0) {
 					id = parseInt(req.pathVar.id);
@@ -278,6 +280,7 @@ module.exports = function createCRUD() {
 						getMapIdByPoiId(id).then(
 							function (rows) {
 								if (rows.length > 0) {
+									mapId = rows[0].map_id;
 									dbCon
 										.update(dbTable, reqBody, filter)
 										.then(
@@ -287,8 +290,9 @@ module.exports = function createCRUD() {
 													id: id,
 													url: utils.responseUrl(req, '/api/v1/poi', id)
 												};
-												changeMapUpdatedOn(rows[0].map_id).then(
+												changeMapUpdatedOn(mapId).then(
 													function () {
+														cachingUtils.purgeKey('map-' + mapId, 'mapPoiUpdate');
 														res.send(303, response);
 														res.end();
 													},
