@@ -235,6 +235,13 @@
 	function togglePointTypeFilter(filterClicked) {
 		var filterEnabled = filterClicked.classList.contains('enabled');
 
+		Tracker.track(
+			'map',
+			Tracker.ACTIONS.CLICK,
+			'poi-category-filter',
+			parseInt(filterClicked.getAttribute('data-point-type'), 10)
+		);
+
 		toggleClass(filterClicked, 'enabled', (filterEnabled) ? 'remove' : 'add');
 	}
 
@@ -264,6 +271,8 @@
 
 		toggleAllPointTypesFilter();
 		togglePoints(allPointTypesFilter);
+
+		Tracker.track('map', Tracker.ACTIONS.CLICK, 'poi-category-filter', 0);
 	}
 
 	/**
@@ -326,7 +335,7 @@
 		ul.appendChild(li);
 		div.appendChild(ul);
 		container.appendChild(div);
-		return div;
+		return ul;
 	}
 
 	/**
