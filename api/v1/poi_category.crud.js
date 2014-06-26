@@ -109,6 +109,21 @@ function handleUsedCategories(id, res, next) {
 }
 
 /**
+ * @desc Gets map id for a POI category
+ *
+ * @param {integer} poiCategoryId
+ */
+function getMapId(poiCategoryId) {
+	var query = dbCon.knex(dbTable)
+			.column(['map_id'])
+			.where({
+				id: poiCategoryId
+			});
+
+	return query.select();
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -266,34 +281,37 @@ module.exports = function createCRUD() {
 						reqBody.status = 0;
 					}
 					if (isFinite(id)) {
-						dbCon
-							.update(dbTable, reqBody, filter)
-							.then(
-								function (affectedRows) {
-									if (affectedRows > 0) {
-										var response = {
-											message: 'POI category successfully updated',
-											id: id,
-											url: utils.responseUrl(req, '/api/v1/poi_category', id)
+						getMapId(id).then(
+							function(collection) {
+								var mapId = parseInt(collection[0].map_id, 10);
+								dbCon
+									.update(dbTable, reqBody, filter)
+									.then(
+										function (affectedRows) {
+											if (affectedRows > 0) {
+												var response = {
+													message: 'POI category successfully updated',
+													id: id,
+													url: utils.responseUrl(req, '/api/v1/poi_category', id)
+												};
+												if (reqBody.marker) {
+													poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
+												}
+												squidUpdate.purgeKey('map-' + mapId, 'poiCategoryUpdated');
+												res.send(303, response);
+												res.end();
+											} else {
+												next(errorHandler.elementNotFoundError(dbTable, id));
+											}
 										},
-										mapId = reqBody.map_id;
-										if (reqBody.marker) {
-											poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
-										}
-										// TODO: fix bug with no map_id in request
-										// squidUpdate.purgeKey('map-' + mapId, 'poiCategoryUpdated');
-										res.send(303, response);
-										res.end();
-									} else {
-										next(errorHandler.elementNotFoundError(dbTable, id));
-									}
-								},
-								next
+										next
+									);
+							},
+							next
 						);
 					} else {
 						next(errorHandler.badNumberError(req.pathVar.id));
 					}
-
 				} else {
 					next(errorHandler.badRequestError(errors));
 				}
