@@ -5,7 +5,8 @@ var FlightPlan = require('flightplan'),
 	config = require('./lib/config'),
 	applicationName = 'interactive-maps',
 	now = new Date().getTime(),
-	tmpDir = applicationName + '-' + now,
+	build = applicationName + '-' + now,
+	archive = build + '.tar.gz',
 	cacheBusterFileName = __dirname + '/cachebuster.json',
 	plan = new FlightPlan(),
 	briefing;
@@ -17,7 +18,7 @@ var FlightPlan = require('flightplan'),
  */
 function setupBriefing(destinations) {
 	var briefing = {
-			debug: false,
+			debug: true,
 			destinations: {}
 		},
 		agent = process.env.SSH_AUTH_SOCK;
@@ -40,15 +41,14 @@ function setupBriefing(destinations) {
  */
 function createCacheBuster(fileName, transport) {
 	var cb = {
-		cb: now
-	};
-	fs.writeFile(fileName, JSON.stringify(cb), function (err) {
-		if (err) {
-			transport.abort(err);
-		} else {
-			transport.log('New cache buster ' + now + ' saved in ' + fileName);
-		}
-	});
+			cb: now
+		},
+		err = fs.writeFileSync(fileName, JSON.stringify(cb));
+	if (err) {
+		transport.abort(err);
+	} else {
+		transport.log('New cache buster ' + now + ' saved in ' + fileName);
+	}
 }
 
 /**
@@ -72,8 +72,7 @@ plan.briefing(briefing);
 
 // Perform local operations
 plan.local(function (local) {
-	var branchName = getCurrentBranch(local),
-		filesToCopy;
+	var branchName = getCurrentBranch(local);
 
 	local.log('Install dependencies');
 	local.exec('npm --production install');
@@ -83,9 +82,12 @@ plan.local(function (local) {
 
 	createCacheBuster(cacheBusterFileName, local);
 
+	local.log('Creating build archive');
+	local.exec('tar zcf /tmp/' + archive + ' . --exclude=.git');
+	local.exec('mv /tmp/' + archive + ' ./');
+
 	local.log('Copy files to remote hosts');
-	filesToCopy = local.git('ls-files', {silent: true});
-	local.transfer(filesToCopy, '/tmp/' + tmpDir);
+	local.transfer(archive, '/tmp');
 });
 
 // run commands on remote hosts (destinations)
@@ -94,10 +96,17 @@ plan.remote(function (remote) {
 		deployDirectory = config.flightPlan.deployDirectory;
 
 	remote.log('Move folder to web root');
-	remote.sudo('cp -R /tmp/' + tmpDir + ' ' + deployDirectory, {user: deployUser});
-	remote.rm('-rf /tmp/' + tmpDir);
+	remote.exec('mkdir ' + deployDirectory + build, {user: deployUser});
+	remote.exec('tar zxf /tmp/' + archive + ' -C ' + deployDirectory + build, {user: deployUser});
+
+	remote.rm('-rf /tmp/' + archive, {user: deployUser});
 
 	remote.log('Reload application');
-	remote.sudo('ln -snf ' + deployDirectory + tmpDir + ' ' + deployDirectory + applicationName, {user: deployUser});
+	remote.sudo('ln -snf ' + deployDirectory + build + ' ' + deployDirectory + applicationName, {user: deployUser});
 	remote.sudo('service restart ' + applicationName, {user: deployUser});
+});
+
+plan.debriefing(function () {
+	console.log('removing ' + archive);
+	fs.unlinkSync('./' + archive);
 });
