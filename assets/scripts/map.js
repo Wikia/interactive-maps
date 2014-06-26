@@ -313,14 +313,25 @@
 	 */
 	function createPointTypeFiltersContainer(container) {
 		var div = document.createElement('div'),
-			h3 = document.createElement('h3'),
+			header = document.createElement('div'),
+			headerTitle = document.createElement('span'),
+			headerEdit = document.createElement('span'),
 			ul = document.createElement('ul'),
 			li = document.createElement('li');
 
 		div.setAttribute('class', 'filter-menu');
 
-		h3.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
-		div.appendChild(h3);
+		header.setAttribute('class', 'filter-menu-header');
+
+		headerTitle.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
+		header.appendChild(headerTitle);
+
+		headerEdit.setAttribute('id', editPointTypesButtonId);
+		headerEdit.setAttribute('class', 'edit-point-types');
+		headerEdit.appendChild(document.createTextNode(msg('wikia-interactive-maps-edit-pin-types')));
+		header.appendChild(headerEdit);
+
+		div.appendChild(header);
 
 		ul.setAttribute('id', pointTypeFiltersContainerId);
 		ul.setAttribute('class', 'point-types');
@@ -332,7 +343,7 @@
 		ul.appendChild(li);
 		div.appendChild(ul);
 		container.appendChild(div);
-		return div;
+		return ul;
 	}
 
 	/**
