@@ -171,7 +171,7 @@
 			pointTypeIcon = new L.Icon.Default();
 			// this is the nicest way to do that I found
 			// we need to overwrite it here so in the filter box we have not broken image
-			pointType.marker = pointTypeIcon._getIconUrl( 'icon' );
+			pointType.marker = pointTypeIcon._getIconUrl('icon');
 
 			// we need this one for edit POI categories popup
 			pointType.no_marker = true;
@@ -448,6 +448,9 @@
 		}, showPontoError, true);
 	}
 
+	/**
+	 * @desc invokes Wikia Client edit POI category action
+	 */
 	function editPointTypes() {
 		var mapSetup = window.mapSetup,
 			params = {
@@ -469,7 +472,6 @@
 	 * @param {string} message - error message
 	 * @todo figure out were to display them
 	 */
-
 	function showPontoError(message) {
 		console.log(message);
 		console.log('error!!!');
@@ -512,9 +514,7 @@
 			}, false);
 
 			// edit POI categories handler
-			editPointTypesButton.addEventListener('click', function () {
-				editPointTypes();
-			}, false);
+			editPointTypesButton.addEventListener('click', editPointTypes, false);
 
 			// show edit UI elements
 			doc.body.classList.add('enable-edit');
