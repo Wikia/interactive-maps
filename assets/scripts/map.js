@@ -402,13 +402,13 @@
 				action: 'poiCategories',
 				data: {
 					mapId: mapSetup.id,
-					poiCategories: mapSetup.types
+					poiCategories: mapSetup.types,
+					mode: 'edit'
 				}
 			};
 
-		Ponto.invoke(pontoBridgeModule, 'processData', params, function (data) {
-			console.log('ponto data: ', data);
-			//window.location.href = window.location.href;
+		Ponto.invoke(pontoBridgeModule, 'processData', params, function () {
+			window.location.href = window.location.href;
 		}, showPontoError, true);
 	}
 
