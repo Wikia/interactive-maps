@@ -100,7 +100,7 @@ plan.remote(function (remote) {
 	remote.exec('tar zxf /tmp/' + archive + ' -C ' + deployDirectory + build, {user: deployUser});
 
 	remote.log('Remove build archive');
-	remote.rm('-rf /tmp/' + archive, {user: deployUser});
+	remote.sudo('rm -rf /tmp/' + archive, {user: deployUser});
 
 	remote.log('Create symbolic link: ' + deployDirectory + build + ' -> ' + deployDirectory + applicationName);
 	remote.sudo('ln -snf ' + deployDirectory + build + ' ' + deployDirectory + applicationName, {user: deployUser});
@@ -110,6 +110,9 @@ plan.remote(function (remote) {
 });
 
 plan.debriefing(function () {
-	console.log('Removing ' + archive);
-	fs.unlinkSync('./' + archive);
+	var archiveFile = './' + archive;
+	if (fs.existsSync(archiveFile)) {
+		console.log('Removing ' + archive);
+		fs.unlinkSync(archiveFile);
+	}
 });
