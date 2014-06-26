@@ -95,18 +95,21 @@ plan.remote(function (remote) {
 	var deployUser = config.flightPlan.deployUser,
 		deployDirectory = config.flightPlan.deployDirectory;
 
-	remote.log('Move folder to web root');
+	remote.log('Extract build files to: ' + deployDirectory + build);
 	remote.exec('mkdir ' + deployDirectory + build, {user: deployUser});
 	remote.exec('tar zxf /tmp/' + archive + ' -C ' + deployDirectory + build, {user: deployUser});
 
+	remote.log('Remove build archive');
 	remote.rm('-rf /tmp/' + archive, {user: deployUser});
 
-	remote.log('Reload application');
+	remote.log('Create symbolic link: ' + deployDirectory + build + ' -> ' + deployDirectory + applicationName);
 	remote.sudo('ln -snf ' + deployDirectory + build + ' ' + deployDirectory + applicationName, {user: deployUser});
+
+	remote.log('Restart application');
 	remote.sudo('service restart ' + applicationName, {user: deployUser});
 });
 
 plan.debriefing(function () {
-	console.log('removing ' + archive);
+	console.log('Removing ' + archive);
 	fs.unlinkSync('./' + archive);
 });
