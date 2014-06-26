@@ -3,6 +3,7 @@
 
 	var mapContainerId = 'map',
 		pointTypeFiltersContainerId = 'pointTypes',
+		editPointTypesButtonId = 'editPointTypes',
 		allPointTypesFilterId = 'allPointTypes',
 
 		pontoBridgeModule = 'wikia.intMap.pontoBridge',
@@ -159,6 +160,9 @@
 			// this is the nicest way to do that I found
 			// we need to overwrite it here so in the filter box we have not broken image
 			pointType.marker = pointTypeIcon._getIconUrl( 'icon' );
+
+			// we need this one for edit POI categories popup
+			pointType.no_marker = true;
 		}
 
 		L.setOptions(pointTypeIcon, {
@@ -392,6 +396,22 @@
 		}, showPontoError, true);
 	}
 
+	function editPointTypes() {
+		var mapSetup = window.mapSetup,
+			params = {
+				action: 'poiCategories',
+				data: {
+					mapId: mapSetup.id,
+					poiCategories: mapSetup.types
+				}
+			};
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, function (data) {
+			console.log('ponto data: ', data);
+			//window.location.href = window.location.href;
+		}, showPontoError, true);
+	}
+
 	/**
 	 * @desc shows error message for ponto communication
 	 * @param {string} message - error message
@@ -419,16 +439,17 @@
 	 */
 	function setUpEditOptions(isWikia) {
 		var doc = window.document,
+			editPointTypesButton = doc.getElementById(editPointTypesButtonId),
 			mapContainer = doc.getElementById(mapContainerId);
 
 		if (isWikia) {
 			// add POI handler
-			map.on('draw:created', function(event) {
+			map.on('draw:created', function (event) {
 				editMarker(addTempMarker(event));
 			});
 
 			// edit POI handler
-			mapContainer.addEventListener('click', function(event) {
+			mapContainer.addEventListener('click', function (event) {
 				var target = event.target;
 
 				if (target.classList.contains('edit-poi-link')) {
@@ -438,8 +459,13 @@
 				}
 			}, false);
 
+			// edit POI categories handler
+			editPointTypesButton.addEventListener('click', function () {
+				editPointTypes();
+			}, false);
+
 			// show edit UI elements
-			mapContainer.classList.add('enable-edit');
+			doc.body.classList.add('enable-edit');
 			map.addControl(drawControls);
 		}
 	}
