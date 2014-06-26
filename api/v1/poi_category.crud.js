@@ -160,8 +160,7 @@ function deletePOICategories(ids, res, next) {
 	dbCon
 		.knex
 		.transaction(function (trx) {
-			var filter,
-				results;
+			var filter;
 			ids.forEach(function (id) {
 				if (isFinite(id)) {
 					filter = {
@@ -310,7 +309,6 @@ module.exports = function createCRUD() {
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, createSchema);
-
 				if (errors.length === 0) {
 					dbCon
 						.knex
@@ -329,7 +327,7 @@ module.exports = function createCRUD() {
 									});
 							});
 						})
-						.then(function (result) {
+						.then(function (results) {
 							results.forEach(function (result) {
 								result.url = utils.responseUrl(req, req.route.path, result.id);
 							});
