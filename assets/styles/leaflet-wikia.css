@@ -111,6 +111,7 @@
 }
 
 .edit-poi-link {
+	cursor: pointer;
     display: none;
 }
 
