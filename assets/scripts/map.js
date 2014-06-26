@@ -551,7 +551,8 @@
 	 */
 	function createMap() {
 		var zoomControl,
-			defaultMinZoom;
+			defaultMinZoom,
+			zoom;
 
 		setupInterfaceTranslations();
 
@@ -587,9 +588,13 @@
 			);
 		}
 
+		zoom = Math.max(config.zoom, defaultMinZoom);
+		if (config.type !== 'custom') {
+			zoom = config.defaultZoomForRealMap;
+		}
 		map.setView(
 			L.latLng(config.latitude, config.longitude),
-			Math.max(config.zoom, defaultMinZoom)
+			zoom
 		);
 
 		zoomControl = L.control.zoom({
