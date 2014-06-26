@@ -93,6 +93,7 @@ describe('addTileSet', function () {
 							height: 0,
 							min_zoom: 1,
 							max_zoom: 0,
+							status: 2,
 							created_on: undefined,
 							created_by: 'user'
 						});

@@ -63,6 +63,10 @@ var dbCon = require('./../../lib/db_connector'),
 				type: 'string',
 				pattern: urlPattern,
 				maxLength: 255
+			},
+			parent_poi_category_id: {
+				description: 'Unique identifier for parent category',
+				type: 'integer'
 			}
 		},
 		additionalProperties: false

@@ -3,9 +3,11 @@
 
 	var mapContainerId = 'map',
 		pointTypeFiltersContainerId = 'pointTypes',
+		editPointTypesButtonId = 'editPointTypes',
 		allPointTypesFilterId = 'allPointTypes',
 
 		pontoBridgeModule = 'wikia.intMap.pontoBridge',
+		uiControlsPosition = 'bottomright',
 
 		// leaflet map object
 		map,
@@ -13,7 +15,7 @@
 		markers = new L.LayerGroup(),
 		// leaflet layer for drawing controls
 		drawControls = new L.Control.Draw({
-			position: 'bottomright',
+			position: uiControlsPosition,
 			draw: {
 				polyline: false,
 				polygon: false,
@@ -21,6 +23,7 @@
 				rectangle: false
 			}
 		}),
+		embedMapCodeButton,
 
 		// constants
 		popupWidthWithPhoto = 414,
@@ -169,6 +172,9 @@
 			// this is the nicest way to do that I found
 			// we need to overwrite it here so in the filter box we have not broken image
 			pointType.marker = pointTypeIcon._getIconUrl('icon');
+
+			// we need this one for edit POI categories popup
+			pointType.no_marker = true;
 		}
 
 		L.setOptions(pointTypeIcon, {
@@ -307,14 +313,25 @@
 	 */
 	function createPointTypeFiltersContainer(container) {
 		var div = document.createElement('div'),
-			h3 = document.createElement('h3'),
+			header = document.createElement('div'),
+			headerTitle = document.createElement('span'),
+			headerEdit = document.createElement('span'),
 			ul = document.createElement('ul'),
 			li = document.createElement('li');
 
 		div.setAttribute('class', 'filter-menu');
 
-		h3.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
-		div.appendChild(h3);
+		header.setAttribute('class', 'filter-menu-header');
+
+		headerTitle.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
+		header.appendChild(headerTitle);
+
+		headerEdit.setAttribute('id', editPointTypesButtonId);
+		headerEdit.setAttribute('class', 'edit-point-types');
+		headerEdit.appendChild(document.createTextNode(msg('wikia-interactive-maps-edit-pin-types')));
+		header.appendChild(headerEdit);
+
+		div.appendChild(header);
 
 		ul.setAttribute('id', pointTypeFiltersContainerId);
 		ul.setAttribute('class', 'point-types');
@@ -432,11 +449,29 @@
 	}
 
 	/**
+	 * @desc invokes Wikia Client edit POI category action
+	 */
+	function editPointTypes() {
+		var mapSetup = window.mapSetup,
+			params = {
+				action: 'poiCategories',
+				data: {
+					mapId: mapSetup.id,
+					poiCategories: mapSetup.types,
+					mode: 'edit'
+				}
+			};
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, function () {
+			window.location.href = window.location.href;
+		}, showPontoError, true);
+	}
+
+	/**
 	 * @desc shows error message for ponto communication
 	 * @param {string} message - error message
 	 * @todo figure out were to display them
 	 */
-
 	function showPontoError(message) {
 		console.log(message);
 		console.log('error!!!');
@@ -458,6 +493,7 @@
 	 */
 	function setUpEditOptions(isWikia) {
 		var doc = window.document,
+			editPointTypesButton = doc.getElementById(editPointTypesButtonId),
 			mapContainer = doc.getElementById(mapContainerId);
 
 		if (isWikia) {
@@ -477,10 +513,28 @@
 				}
 			}, false);
 
+			// edit POI categories handler
+			editPointTypesButton.addEventListener('click', editPointTypes, false);
+
 			// show edit UI elements
-			mapContainer.classList.add('enable-edit');
+			doc.body.classList.add('enable-edit');
 			map.addControl(drawControls);
+			map.addControl(embedMapCodeButton);
 		}
+	}
+
+	/**
+	 * @desc sends data to Wikia Client via ponto to show embed map code modal
+	 */
+	function embedMapCode() {
+		var params = {
+			action: 'embedMapCode',
+			data: {
+				mapId: window.mapSetup.id
+			}
+		};
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, null, showPontoError, true);
 	}
 
 	/**
@@ -539,13 +593,21 @@
 		);
 
 		zoomControl = L.control.zoom({
-			position: 'bottomright'
+			position: uiControlsPosition
+		});
+
+		embedMapCodeButton = new L.Control.EmbedMapCode({
+			position: uiControlsPosition,
+			//TODO fix icon
+			title: '< >',
+			onClick: embedMapCode
 		});
 
 		map.addControl(zoomControl);
 		setupPontoWikiaClient();
 		setupPoints();
 		markers.addTo(map);
+
 	}
 
 	createMap();
