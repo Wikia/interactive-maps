@@ -7,7 +7,7 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	config = require('./../../lib/config'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
-	squidUpdate = require('./../../lib/squidUpdate'),
+	scribeUpdate = require('./../../lib/scribeUpdate'),
 
 	urlPattern = jsonValidator.getUrlPattern(),
 
@@ -177,7 +177,7 @@ module.exports = function createCRUD() {
 								if (reqBody.marker) {
 									poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
 								}
-								squidUpdate.purgeKey('map-' + mapId, 'poiCategoryCreated');
+								scribeUpdate.purgeKey('map-' + mapId, 'poiCategoryCreated');
 								res.send(201, response);
 								res.end();
 							},
@@ -204,7 +204,7 @@ module.exports = function createCRUD() {
 								.then(
 								function (affectedRows) {
 									if (affectedRows > 0) {
-										squidUpdate.purgeKey('map-' + mapId, 'poiCategoryDeleted');
+										scribeUpdate.purgeKey('map-' + mapId, 'poiCategoryDeleted');
 										res.send(204, {});
 										res.end();
 									} else {
@@ -303,7 +303,7 @@ module.exports = function createCRUD() {
 												if (reqBody.marker) {
 													poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
 												}
-												squidUpdate.purgeKey('map-' + mapId, 'poiCategoryUpdated');
+												scribeUpdate.purgeKey('map-' + mapId, 'poiCategoryUpdated');
 												res.send(303, response);
 												res.end();
 											} else {

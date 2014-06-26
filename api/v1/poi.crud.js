@@ -5,7 +5,7 @@ var dbCon = require('./../../lib/db_connector'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
-	squidUpdate = require('./../../lib/squidUpdate'),
+	squidUpdate = require('./../../lib/scribeUpdate'),
 
 	urlPattern = jsonValidator.getUrlPattern(),
 
