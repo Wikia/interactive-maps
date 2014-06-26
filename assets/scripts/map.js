@@ -6,6 +6,7 @@
 		allPointTypesFilterId = 'allPointTypes',
 
 		pontoBridgeModule = 'wikia.intMap.pontoBridge',
+		uiControlsPosition = 'bottomright',
 
 		// leaflet map object
 		map,
@@ -13,7 +14,7 @@
 		markers = new L.LayerGroup(),
 		// leaflet layer for drawing controls
 		drawControls = new L.Control.Draw({
-			position: 'bottomright',
+			position: uiControlsPosition,
 			draw: {
 				polyline: false,
 				polygon: false,
@@ -21,6 +22,7 @@
 				rectangle: false
 			}
 		}),
+		embedMapCodeButton,
 
 		// constants
 		popupWidthWithPhoto = 414,
@@ -495,6 +497,20 @@
 	}
 
 	/**
+	 * @desc sends data to Wikia Client via ponto to show embed map code modal
+	 */
+	function embedMapCode() {
+		var params = {
+			action: 'embedMapCode',
+			data: {
+				mapId: window.mapSetup.id
+			}
+		};
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, null, showPontoError, true);
+	}
+
+	/**
 	 * @desc Sets up the interface translations
 	 */
 	function setupInterfaceTranslations() {
@@ -565,7 +581,14 @@
 		);
 
 		zoomControl = L.control.zoom({
-			position: 'bottomright'
+			position: uiControlsPosition
+		});
+
+		embedMapCodeButton = new L.Control.EmbedMapCode({
+			position: uiControlsPosition,
+			//TODO fix icon
+			title: '< >',
+			onClick: embedMapCode
 		});
 
 		map.addControl(zoomControl);
@@ -573,6 +596,7 @@
 		setupPoints();
 		setupClickTracking();
 		markers.addTo(map);
+
 	}
 
 	createMap();
