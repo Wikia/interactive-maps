@@ -461,7 +461,7 @@
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, false);
 		} else {
-			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed');
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed', parseInt(mapSetup.id, 10));
 		}
 	}
 
@@ -493,7 +493,7 @@
 			mapContainer.classList.add('enable-edit');
 			map.addControl(drawControls);
 			map.addControl(embedMapCodeButton);
-			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed');
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(mapSetup.id, 10));
 		}
 	}
 
