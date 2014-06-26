@@ -474,7 +474,6 @@
 
 				if (target.classList.contains('edit-poi-link')) {
 					event.preventDefault();
-
 					editMarker(getMarker(target.getAttribute('data-marker-id')));
 				}
 			}, false);
@@ -493,6 +492,15 @@
 		L.drawLocal.draw.handlers.marker.tooltip.start = msg('wikia-interactive-maps-create-marker-handler');
 		L.drawLocal.draw.toolbar.buttons.marker = msg('wikia-interactive-maps-create-marker-tooltip');
 		L.drawLocal.draw.toolbar.actions.text = msg('wikia-interactive-maps-create-marker-cancel');
+	}
+
+	/**
+	 * @desc Sets up click tracking for service
+	 */
+	function setupClickTracking() {
+		map.on('popupopen', function() {
+			Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_IMAGE, 'poi');
+		});
 	}
 
 	/**
@@ -548,6 +556,7 @@
 		map.addControl(zoomControl);
 		setupPontoWikiaClient();
 		setupPoints();
+		setupClickTracking();
 		markers.addTo(map);
 	}
 
