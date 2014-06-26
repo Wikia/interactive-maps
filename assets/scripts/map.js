@@ -147,15 +147,25 @@
 	 * @param {object} pointType - POI type object
 	 */
 	function setupPointTypeIcon(pointType) {
+		var pointTypeIcon;
+
 		if (pointType.marker !== null) {
-			pointIcons[pointType.id] = L.icon({
+			pointTypeIcon = L.icon({
 				iconUrl: pointType.marker,
-				iconSize: [pointIconWidth, pointIconHeight],
-				className: 'point-type-' + pointType.id
+				iconSize: [pointIconWidth, pointIconHeight]
 			});
 		} else {
-			pointIcons[pointType.id] = new L.Icon.Default();
+			pointTypeIcon = new L.Icon.Default();
+			// this is the nicest way to do that I found
+			// we need to overwrite it here so in the filter box we have not broken image
+			pointType.marker = pointTypeIcon._getIconUrl( 'icon' );
 		}
+
+		L.setOptions(pointTypeIcon, {
+			className: 'point-type-' + pointType.id
+		});
+
+		pointIcons[pointType.id] = pointTypeIcon;
 	}
 
 	/**
@@ -268,6 +278,8 @@
 		if (elementClicked.parentNode.tagName === 'LI') {
 			filterClicked = elementClicked.parentNode;
 		}
+
+		map.closePopup();
 
 		pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10);
 
