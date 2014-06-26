@@ -7,6 +7,7 @@
 		allPointTypesFilterId = 'allPointTypes',
 
 		pontoBridgeModule = 'wikia.intMap.pontoBridge',
+		uiControlsPosition = 'bottomright',
 
 		// leaflet map object
 		map,
@@ -14,7 +15,7 @@
 		markers = new L.LayerGroup(),
 		// leaflet layer for drawing controls
 		drawControls = new L.Control.Draw({
-			position: 'bottomright',
+			position: uiControlsPosition,
 			draw: {
 				polyline: false,
 				polygon: false,
@@ -22,6 +23,7 @@
 				rectangle: false
 			}
 		}),
+		embedMapCodeButton,
 
 		// constants
 		popupWidthWithPhoto = 414,
@@ -38,12 +40,22 @@
 		config = window.mapSetup;
 
 	/**
+	 * @desc Translates message
+	 * @param {string} message
+	 * @returns {string}
+	 */
+	function msg(message) {
+		return config.i18n.hasOwnProperty(message) ? config.i18n[message] : message;
+	}
+
+	/**
 	 * @desc Build popup HTML
 	 * @param {object} point - POI object
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
-		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">Edit</a>',
+		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
+				msg('wikia-interactive-maps-edit-poi') + '</a>',
 			photoHtml = '',
 			titleHtml = '',
 			descriptionHtml = '';
@@ -295,6 +307,35 @@
 	}
 
 	/**
+	 * Create Point types filter container
+	 * @param {object} container
+	 * @returns {object}
+	 */
+	function createPointTypeFiltersContainer(container) {
+		var div = document.createElement('div'),
+			h3 = document.createElement('h3'),
+			ul = document.createElement('ul'),
+			li = document.createElement('li');
+
+		div.setAttribute('class', 'filter-menu');
+
+		h3.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
+		div.appendChild(h3);
+
+		ul.setAttribute('id', pointTypeFiltersContainerId);
+		ul.setAttribute('class', 'point-types');
+
+		li.setAttribute('id', 'allPointTypes');
+		li.setAttribute('class', 'enabled');
+		li.setAttribute('data-point-type', '0');
+		li.appendChild(document.createTextNode(msg('wikia-interactive-maps-all-pin-types')));
+		ul.appendChild(li);
+		div.appendChild(ul);
+		container.appendChild(div);
+		return div;
+	}
+
+	/**
 	 * @desc Create points and filters for them
 	 */
 	function setupPoints() {
@@ -307,7 +348,7 @@
 			pointTypeFiltersHtml += buildPointTypeFilterHtml(pointType);
 		});
 
-		pointTypeFiltersContainer = document.getElementById(pointTypeFiltersContainerId);
+		pointTypeFiltersContainer = createPointTypeFiltersContainer(document.body);
 		pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
 
 		config.points.forEach(addPointOnMap);
@@ -384,7 +425,7 @@
 		params.data.mapId = mapSetup.id;
 		params.data.categories = mapSetup.types;
 
-		Ponto.invoke(pontoBridgeModule, 'processData', params, function(point) {
+		Ponto.invoke(pontoBridgeModule, 'processData', params, function (point) {
 			// removes old marker from layer group
 			if (markers.hasLayer(marker)) {
 				markers.removeLayer(marker);
@@ -467,7 +508,31 @@
 			// show edit UI elements
 			doc.body.classList.add('enable-edit');
 			map.addControl(drawControls);
+			map.addControl(embedMapCodeButton);
 		}
+	}
+
+	/**
+	 * @desc sends data to Wikia Client via ponto to show embed map code modal
+	 */
+	function embedMapCode() {
+		var params = {
+			action: 'embedMapCode',
+			data: {
+				mapId: window.mapSetup.id
+			}
+		};
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, null, showPontoError, true);
+	}
+
+	/**
+	 * @desc Sets up the interface translations
+	 */
+	function setupInterfaceTranslations() {
+		L.drawLocal.draw.handlers.marker.tooltip.start = msg('wikia-interactive-maps-create-marker-handler');
+		L.drawLocal.draw.toolbar.buttons.marker = msg('wikia-interactive-maps-create-marker-tooltip');
+		L.drawLocal.draw.toolbar.actions.text = msg('wikia-interactive-maps-create-marker-cancel');
 	}
 
 	/**
@@ -476,6 +541,8 @@
 	function createMap() {
 		var zoomControl,
 			defaultMinZoom;
+
+		setupInterfaceTranslations();
 
 		defaultMinZoom = getMinZoomLevel(
 			config.layer.maxZoom,
@@ -495,6 +562,9 @@
 			maxZoom: config.layer.maxZoom,
 			zoomControl: false
 		});
+
+		map.attributionControl.setPrefix(false);
+
 		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
 		if (config.hasOwnProperty('boundaries')) {
@@ -512,13 +582,21 @@
 		);
 
 		zoomControl = L.control.zoom({
-			position: 'bottomright'
+			position: uiControlsPosition
+		});
+
+		embedMapCodeButton = new L.Control.EmbedMapCode({
+			position: uiControlsPosition,
+			//TODO fix icon
+			title: '< >',
+			onClick: embedMapCode
 		});
 
 		map.addControl(zoomControl);
 		setupPontoWikiaClient();
 		setupPoints();
 		markers.addTo(map);
+
 	}
 
 	createMap();
