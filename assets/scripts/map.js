@@ -51,7 +51,7 @@
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
-		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
+		var editLink = '<a title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
 				msg('wikia-interactive-maps-edit-poi') + '</a>',
 			photoHtml = '',
 			titleHtml = '',
