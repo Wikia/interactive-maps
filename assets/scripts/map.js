@@ -64,7 +64,7 @@
 		}
 
 		if (point.name) {
-			titleHtml = '<h3>' + (point.link ? buildLinkHtml(point, point.name) : point.name) + '</h3>';
+			titleHtml = '<h3>' + (point.link ? buildLinkHtml(point, point.name, 'poi-article-link') : point.name) + '</h3>';
 		}
 
 		if (point.description) {
@@ -509,6 +509,12 @@
 	function setupClickTracking() {
 		map.on('popupopen', function() {
 			Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_IMAGE, 'poi');
+		});
+
+		window.document.addEventListener('click', function (event) {
+			if(event.target.classList.contains('poi-article-link')) {
+				Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article')
+			}
 		});
 	}
 
