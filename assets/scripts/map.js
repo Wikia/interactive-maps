@@ -492,6 +492,7 @@
 			// show edit UI elements
 			mapContainer.classList.add('enable-edit');
 			map.addControl(drawControls);
+			map.addControl(embedMapCodeButton);
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed');
 		}
 	}
