@@ -8,6 +8,7 @@ var FlightPlan = require('flightplan'),
 	build = applicationName + '-' + now,
 	archive = build + '.tar.gz',
 	cacheBusterFileName = __dirname + '/cachebuster.json',
+	currentBuildName = 'current',
 	plan = new FlightPlan(),
 	briefing;
 
@@ -96,14 +97,14 @@ plan.remote(function (remote) {
 		deployDirectory = config.flightPlan.deployDirectory;
 
 	remote.log('Extract build files to: ' + deployDirectory + build);
-	remote.exec('mkdir ' + deployDirectory + build, {user: deployUser});
-	remote.exec('tar zxf /tmp/' + archive + ' -C ' + deployDirectory + build, {user: deployUser});
+	remote.sudo('mkdir ' + deployDirectory + build, {user: deployUser});
+	remote.sudo('tar zxf /tmp/' + archive + ' -C ' + deployDirectory + build, {user: deployUser});
 
 	remote.log('Remove build archive');
 	remote.sudo('rm -rf /tmp/' + archive, {user: deployUser});
 
 	remote.log('Create symbolic link: ' + deployDirectory + build + ' -> ' + deployDirectory + applicationName);
-	remote.sudo('ln -snf ' + deployDirectory + build + ' ' + deployDirectory + applicationName, {user: deployUser});
+	remote.sudo('ln -snf ' + deployDirectory + build + ' ' + deployDirectory + currentBuildName, {user: deployUser});
 
 	remote.log('Restart application');
 	remote.sudo('service restart ' + applicationName, {user: deployUser});
