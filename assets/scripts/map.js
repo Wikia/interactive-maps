@@ -1,4 +1,4 @@
-(function (window, L, Ponto) {
+(function (window, L, Ponto, Tracker) {
 	'use strict';
 
 	var mapContainerId = 'map',
@@ -449,6 +449,8 @@
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, false);
+		} else {
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed');
 		}
 	}
 
@@ -480,6 +482,7 @@
 			// show edit UI elements
 			mapContainer.classList.add('enable-edit');
 			map.addControl(drawControls);
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed');
 		}
 	}
 
@@ -550,4 +553,4 @@
 
 	createMap();
 
-})(window, window.L, window.Ponto);
+})(window, window.L, window.Ponto, window.Tracker);
