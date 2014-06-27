@@ -6,7 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	errorHandler = require('./../../lib/errorHandler'),
 	config = require('./../../lib/config'),
-	squidUpdate = require('./../../lib/scribeUpdate'),
+	squidUpdate = require('./../../lib/squidUpdate'),
 
 	dbTable = 'map',
 	createSchema = {
