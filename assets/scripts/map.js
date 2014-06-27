@@ -3,6 +3,7 @@
 
 	var mapContainerId = 'map',
 		pointTypeFiltersContainerId = 'pointTypes',
+		editPointTypesButtonId = 'editPointTypes',
 		allPointTypesFilterId = 'allPointTypes',
 
 		pontoBridgeModule = 'wikia.intMap.pontoBridge',
@@ -171,6 +172,9 @@
 			// this is the nicest way to do that I found
 			// we need to overwrite it here so in the filter box we have not broken image
 			pointType.marker = pointTypeIcon._getIconUrl('icon');
+
+			// we need this one for edit POI categories popup
+			pointType.no_marker = true;
 		}
 
 		L.setOptions(pointTypeIcon, {
@@ -186,10 +190,10 @@
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
 	function loadPointsToCache(pointType) {
-		pointCache[pointType] = document.getElementsByClassName(
+		pointCache[pointType] = document.querySelectorAll(
 			(pointType === 0) ?
-			'leaflet-marker-icon' :
-			'point-type-' + pointType
+			'.leaflet-marker-icon, .leaflet-marker-shadow' :
+			'.point-type-' + pointType
 		);
 
 		return pointCache[pointType];
@@ -318,14 +322,25 @@
 	 */
 	function createPointTypeFiltersContainer(container) {
 		var div = document.createElement('div'),
-			h3 = document.createElement('h3'),
+			header = document.createElement('div'),
+			headerTitle = document.createElement('span'),
+			headerEdit = document.createElement('span'),
 			ul = document.createElement('ul'),
 			li = document.createElement('li');
 
 		div.setAttribute('class', 'filter-menu');
 
-		h3.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
-		div.appendChild(h3);
+		header.setAttribute('class', 'filter-menu-header');
+
+		headerTitle.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
+		header.appendChild(headerTitle);
+
+		headerEdit.setAttribute('id', editPointTypesButtonId);
+		headerEdit.setAttribute('class', 'edit-point-types');
+		headerEdit.appendChild(document.createTextNode(msg('wikia-interactive-maps-edit-pin-types')));
+		header.appendChild(headerEdit);
+
+		div.appendChild(header);
 
 		ul.setAttribute('id', pointTypeFiltersContainerId);
 		ul.setAttribute('class', 'point-types');
@@ -443,11 +458,29 @@
 	}
 
 	/**
+	 * @desc invokes Wikia Client edit POI category action
+	 */
+	function editPointTypes() {
+		var mapSetup = window.mapSetup,
+			params = {
+				action: 'poiCategories',
+				data: {
+					mapId: mapSetup.id,
+					poiCategories: mapSetup.types,
+					mode: 'edit'
+				}
+			};
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, function () {
+			window.location.href = window.location.href;
+		}, showPontoError, true);
+	}
+
+	/**
 	 * @desc shows error message for ponto communication
 	 * @param {string} message - error message
 	 * @todo figure out were to display them
 	 */
-
 	function showPontoError(message) {
 		console.log(message);
 		console.log('error!!!');
@@ -471,6 +504,7 @@
 	 */
 	function setUpEditOptions(isWikia) {
 		var doc = window.document,
+			editPointTypesButton = doc.getElementById(editPointTypesButtonId),
 			mapContainer = doc.getElementById(mapContainerId);
 
 		if (isWikia) {
@@ -489,8 +523,11 @@
 				}
 			}, false);
 
+			// edit POI categories handler
+			editPointTypesButton.addEventListener('click', editPointTypes, false);
+
 			// show edit UI elements
-			mapContainer.classList.add('enable-edit');
+			doc.body.classList.add('enable-edit');
 			map.addControl(drawControls);
 			map.addControl(embedMapCodeButton);
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(mapSetup.id, 10));
@@ -540,7 +577,8 @@
 	 */
 	function createMap() {
 		var zoomControl,
-			defaultMinZoom;
+			defaultMinZoom,
+			zoom;
 
 		setupInterfaceTranslations();
 
@@ -576,9 +614,13 @@
 			);
 		}
 
+		zoom = Math.max(config.zoom, defaultMinZoom);
+		if (config.type !== 'custom') {
+			zoom = config.defaultZoomForRealMap;
+		}
 		map.setView(
 			L.latLng(config.latitude, config.longitude),
-			Math.max(config.zoom, defaultMinZoom)
+			zoom
 		);
 
 		zoomControl = L.control.zoom({
