@@ -1,4 +1,4 @@
-(function (window, L, Ponto) {
+(function (window, L, Ponto, Tracker) {
 	'use strict';
 
 	var mapContainerId = 'map',
@@ -54,7 +54,7 @@
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
-		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
+		var editLink = '<a title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
 				msg('wikia-interactive-maps-edit-poi') + '</a>',
 			photoHtml = '',
 			titleHtml = '',
@@ -67,7 +67,7 @@
 		}
 
 		if (point.name) {
-			titleHtml = '<h3>' + (point.link ? buildLinkHtml(point, point.name) : point.name) + '</h3>';
+			titleHtml = '<h3>' + (point.link ? buildLinkHtml(point, point.name, 'poi-article-link') : point.name) + '</h3>';
 		}
 
 		if (point.description) {
@@ -190,10 +190,10 @@
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
 	function loadPointsToCache(pointType) {
-		pointCache[pointType] = document.getElementsByClassName(
+		pointCache[pointType] = document.querySelectorAll(
 			(pointType === 0) ?
-			'leaflet-marker-icon' :
-			'point-type-' + pointType
+			'.leaflet-marker-icon, .leaflet-marker-shadow' :
+			'.point-type-' + pointType
 		);
 
 		return pointCache[pointType];
@@ -241,6 +241,13 @@
 	function togglePointTypeFilter(filterClicked) {
 		var filterEnabled = filterClicked.classList.contains('enabled');
 
+		Tracker.track(
+			'map',
+			Tracker.ACTIONS.CLICK,
+			'poi-category-filter',
+			parseInt(filterClicked.getAttribute('data-point-type'), 10)
+		);
+
 		toggleClass(filterClicked, 'enabled', (filterEnabled) ? 'remove' : 'add');
 	}
 
@@ -270,6 +277,8 @@
 
 		toggleAllPointTypesFilter();
 		togglePoints(allPointTypesFilter);
+
+		Tracker.track('map', Tracker.ACTIONS.CLICK, 'poi-category-filter', 0);
 	}
 
 	/**
@@ -484,6 +493,8 @@
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, false);
+		} else {
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed', parseInt(mapSetup.id, 10));
 		}
 	}
 
@@ -508,7 +519,6 @@
 
 				if (target.classList.contains('edit-poi-link')) {
 					event.preventDefault();
-
 					editMarker(getMarker(target.getAttribute('data-marker-id')));
 				}
 			}, false);
@@ -520,6 +530,7 @@
 			doc.body.classList.add('enable-edit');
 			map.addControl(drawControls);
 			map.addControl(embedMapCodeButton);
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(mapSetup.id, 10));
 		}
 	}
 
@@ -547,11 +558,27 @@
 	}
 
 	/**
+	 * @desc Sets up click tracking for service
+	 */
+	function setupClickTracking() {
+		map.on('popupopen', function() {
+			Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_IMAGE, 'poi');
+		});
+
+		window.document.addEventListener('click', function (event) {
+			if(event.target.classList.contains('poi-article-link')) {
+				Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article')
+			}
+		});
+	}
+
+	/**
 	 * @desc Create new map
 	 */
 	function createMap() {
 		var zoomControl,
-			defaultMinZoom;
+			defaultMinZoom,
+			zoom;
 
 		setupInterfaceTranslations();
 
@@ -587,9 +614,13 @@
 			);
 		}
 
+		zoom = Math.max(config.zoom, defaultMinZoom);
+		if (config.type !== 'custom') {
+			zoom = config.defaultZoomForRealMap;
+		}
 		map.setView(
 			L.latLng(config.latitude, config.longitude),
-			Math.max(config.zoom, defaultMinZoom)
+			zoom
 		);
 
 		zoomControl = L.control.zoom({
@@ -606,10 +637,11 @@
 		map.addControl(zoomControl);
 		setupPontoWikiaClient();
 		setupPoints();
+		setupClickTracking();
 		markers.addTo(map);
 
 	}
 
 	createMap();
 
-})(window, window.L, window.Ponto);
+})(window, window.L, window.Ponto, window.Tracker);
