@@ -107,6 +107,7 @@ var dbCon = require('./../../lib/db_connector'),
 			description: 'ID of the map to be deleted',
 			type: 'integer'
 		},
+		uniqueItems: true,
 		minLength: 1
 	};
 
@@ -160,7 +161,9 @@ function deletePOICategories(ids, res, next) {
 	dbCon
 		.knex
 		.transaction(function (trx) {
-			var filter;
+			var filter,
+				numberOfAll = ids.length,
+				numberOfDeleted = 0;
 			ids.forEach(function (id) {
 				if (isFinite(id)) {
 					filter = {
@@ -172,12 +175,11 @@ function deletePOICategories(ids, res, next) {
 						.then(
 							function (affectedRows) {
 								if (affectedRows > 0) {
-									if (ids[ids.length - 1] === id) {
+									if (numberOfAll === ++numberOfDeleted) {
 										trx.commit();
 									}
 								} else {
-									trx.rollback();
-									next(errorHandler.elementNotFoundError(dbTable, id));
+									trx.rollback(errorHandler.elementNotFoundError(dbTable, id));
 								}
 							},
 							function (err) {
@@ -257,8 +259,7 @@ function updatePOICategories(req, res, next, reqBody) {
 										trx.commit(results);
 									}
 								} else {
-									trx.rollback();
-									next(errorHandler.elementNotFoundError(dbTable, eachId));
+									trx.rollback(errorHandler.elementNotFoundError(dbTable, eachId));
 								}
 							},
 							next
