@@ -190,10 +190,10 @@
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
 	function loadPointsToCache(pointType) {
-		pointCache[pointType] = document.getElementsByClassName(
+		pointCache[pointType] = document.querySelectorAll(
 			(pointType === 0) ?
-			'leaflet-marker-icon' :
-			'point-type-' + pointType
+			'.leaflet-marker-icon, .leaflet-marker-shadow' :
+			'.point-type-' + pointType
 		);
 
 		return pointCache[pointType];
