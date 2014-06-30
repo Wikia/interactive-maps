@@ -112,6 +112,20 @@ function handleUsedCategories(id, res, next) {
 }
 
 /**
+ * @desc If the marker is still being processed, set it to null
+ * @param {object} collection
+ */
+function handleDefaultMarker(collection) {
+	collection.map(function (item) {
+		if(item.status) {
+			item.marker = null;
+		}
+		delete item.status;
+		return item;
+	});
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -120,7 +134,7 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name', 'marker', 'map_id'],
+				var dbColumns = ['id', 'name', 'marker', 'map_id', 'status'],
 					query = dbCon.knex(dbTable).column(dbColumns),
 
 					// check for parameter parentsOnly in URL
@@ -140,6 +154,7 @@ module.exports = function createCRUD() {
 							config.bucketPrefix,
 							config.markersPrefix
 						);
+						handleDefaultMarker(collection);
 						res.send(200, collection);
 						res.end();
 					},
