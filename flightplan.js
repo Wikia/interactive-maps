@@ -89,31 +89,25 @@ plan.local(function (local) {
 
 	local.log('Copy files to remote hosts');
 	local.transfer(archive, '/tmp');
+
+	local.log('Remove local copy of archive');
+	local.exec('rm ./' + archive);
 });
 
 // run commands on remote hosts (destinations)
 plan.remote(function (remote) {
-	var deployUser = config.flightPlan.deployUser,
-		deployDirectory = config.flightPlan.deployDirectory;
+	var deployDirectory = config.flightPlan.deployDirectory;
 
 	remote.log('Extract build files to: ' + deployDirectory + build);
-	remote.sudo('mkdir ' + deployDirectory + build, {user: deployUser});
-	remote.sudo('tar zxf /tmp/' + archive + ' -C ' + deployDirectory + build, {user: deployUser});
+	remote.exec('mkdir ' + deployDirectory + build);
+	remote.exec('tar zxf /tmp/' + archive + ' -C ' + deployDirectory + build);
 
 	remote.log('Remove build archive');
-	remote.sudo('rm -rf /tmp/' + archive, {user: deployUser});
+	remote.exec('rm -rf /tmp/' + archive);
 
 	remote.log('Create symbolic link: ' + deployDirectory + build + ' -> ' + deployDirectory + applicationName);
-	remote.sudo('ln -snf ' + deployDirectory + build + ' ' + deployDirectory + currentBuildName, {user: deployUser});
+	remote.exec('ln -snf ' + deployDirectory + build + ' ' + deployDirectory + currentBuildName);
 
 	remote.log('Restart application');
-	remote.sudo('service restart ' + applicationName, {user: deployUser});
-});
-
-plan.debriefing(function () {
-	var archiveFile = './' + archive;
-	if (fs.existsSync(archiveFile)) {
-		console.log('Removing ' + archive);
-		fs.unlinkSync(archiveFile);
-	}
+	remote.exec('service restart ' + applicationName);
 });
