@@ -117,7 +117,7 @@ function handleUsedCategories(id, res, next) {
  */
 function handleDefaultMarker(collection) {
 	collection.map(function (item) {
-		if(item.status) {
+		if(item.status === utils.poiCategoryStatus.external) {
 			item.marker = null;
 		}
 		delete item.status;
