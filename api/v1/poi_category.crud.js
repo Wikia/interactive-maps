@@ -112,19 +112,6 @@ function handleUsedCategories(id, res, next) {
 }
 
 /**
- * @desc If the marker is still being processed, set it to null
- * @param {object} collection
- */
-function handleDefaultMarker(collection) {
-	collection.map(function (item) {
-		if (item.status === utils.poiCategoryStatus.external) {
-			item.marker = null;
-		}
-		return item;
-	});
-}
-
-/**
  * @desc Gets map id for a POI category
  *
  * @param {integer} poiCategoryId
@@ -162,7 +149,7 @@ module.exports = function createCRUD() {
 
 				query.select().then(
 					function (collection) {
-						handleDefaultMarker(collection);
+						utils.handleDefaultMarker(collection);
 						utils.convertMarkersNamesToUrls(
 							collection,
 							config.dfsHost,
@@ -268,7 +255,7 @@ module.exports = function createCRUD() {
 						.select(dbTable, dbColumns, filter)
 						.then(
 							function (collection) {
-								handleDefaultMarker(collection);
+								utils.handleDefaultMarker(collection);
 								utils.convertMarkersNamesToUrls(
 									collection,
 									config.dfsHost,
