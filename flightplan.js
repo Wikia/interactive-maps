@@ -109,5 +109,5 @@ plan.remote(function (remote) {
 	remote.exec('ln -snf ' + deployDirectory + build + ' ' + deployDirectory + currentBuildName);
 
 	remote.log('Restart application');
-	remote.sudo('sv restart ' + applicationName);
+	remote.exec('sudo sv restart ' + applicationName);
 });
