@@ -119,3 +119,11 @@ plan.remote(function (remote) {
 	remote.log('Restart application');
 	remote.exec('sudo sv restart ' + applicationName);
 });
+
+plan.debriefing(function () {
+	var archiveFile = './' + archive;
+	if (fs.existsSync(archiveFile)) {
+		console.log('Removing ' + archive);
+		fs.unlinkSync(archiveFile);
+	}
+});
