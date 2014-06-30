@@ -63,7 +63,7 @@ function getCurrentBranch(transport) {
 	if (result.code !== 0) {
 		transport.abort('Error getting current branch: ' + result.stderr);
 	}
-	return result.stdout;
+	return result.stdout.trim();
 }
 
 // Get machines setup from config
