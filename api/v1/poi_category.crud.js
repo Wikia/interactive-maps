@@ -135,7 +135,7 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name', 'marker', 'map_id'],
+				var dbColumns = ['id', 'name', 'marker', 'map_id', 'status'],
 					query = dbCon.knex(dbTable).column(dbColumns),
 
 					// check for parameter parentsOnly in URL
@@ -149,6 +149,7 @@ module.exports = function createCRUD() {
 
 				query.select().then(
 					function (collection) {
+						utils.handleDefaultMarker(collection);
 						utils.convertMarkersNamesToUrls(
 							collection,
 							config.dfsHost,
@@ -239,6 +240,7 @@ module.exports = function createCRUD() {
 						'name',
 						'marker',
 						'parent_poi_category_id',
+						'status',
 						'map_id',
 						'created_on',
 						'created_by'
@@ -253,6 +255,7 @@ module.exports = function createCRUD() {
 						.select(dbTable, dbColumns, filter)
 						.then(
 							function (collection) {
+								utils.handleDefaultMarker(collection);
 								utils.convertMarkersNamesToUrls(
 									collection,
 									config.dfsHost,
