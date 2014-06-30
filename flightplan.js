@@ -9,6 +9,7 @@ var FlightPlan = require('flightplan'),
 	archive = build + '.tar.gz',
 	cacheBusterFileName = __dirname + '/cachebuster.json',
 	currentBuildName = 'current',
+	deployBranch = 'master',
 	plan = new FlightPlan(),
 	briefing;
 
@@ -74,6 +75,13 @@ plan.briefing(briefing);
 // Perform local operations
 plan.local(function (local) {
 	var branchName = getCurrentBranch(local);
+
+	if (branchName !== deployBranch) {
+		var input = local.prompt('Are you sure you want to deploy branch "' + branchName + '"? [yes]');
+		if (input.indexOf('yes') === -1) {
+			local.abort('user canceled flight');
+		}
+	}
 
 	local.log('Install dependencies');
 	local.exec('npm --production install');
