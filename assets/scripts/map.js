@@ -67,7 +67,8 @@
 		}
 
 		if (point.name) {
-			titleHtml = '<h3>' + (point.link ? buildLinkHtml(point, point.name, 'poi-article-link') : point.name) + '</h3>';
+			titleHtml = '<h3>' + (point.link ? buildLinkHtml(point, point.name, 'poi-article-link') : point.name) +
+				'</h3>';
 		}
 
 		if (point.description) {
@@ -127,7 +128,8 @@
 			popup =  L.popup({
 				closeButton: false,
 				minWidth: popupWidth,
-				maxWidth: popupWidth
+				maxWidth: popupWidth,
+				keepInView: true
 			});
 
 		// extend point data with marker leaflet id - need to be done after adding marker to the map layer group !!!
@@ -439,11 +441,10 @@
 		var params = {
 				action: 'editPOI',
 				data: marker.point
-			},
-			mapSetup = window.mapSetup;
+			};
 
-		params.data.mapId = mapSetup.id;
-		params.data.categories = mapSetup.types;
+		params.data.mapId = config.id;
+		params.data.categories = config.types;
 
 		Ponto.invoke(pontoBridgeModule, 'processData', params, function (point) {
 			// removes old marker from layer group
@@ -461,18 +462,17 @@
 	 * @desc invokes Wikia Client edit POI category action
 	 */
 	function editPointTypes() {
-		var mapSetup = window.mapSetup,
-			params = {
+		var params = {
 				action: 'poiCategories',
 				data: {
-					mapId: mapSetup.id,
-					poiCategories: mapSetup.types,
+					mapId: config.id,
+					poiCategories: config.types,
 					mode: 'edit'
 				}
 			};
 
 		Ponto.invoke(pontoBridgeModule, 'processData', params, function () {
-			window.location.href = window.location.href;
+			window.location.reload();
 		}, showPontoError, true);
 	}
 
@@ -494,7 +494,8 @@
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, false);
 		} else {
-			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed', parseInt(mapSetup.id, 10));
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
+				parseInt(config.id, 10));
 		}
 	}
 
@@ -530,7 +531,7 @@
 			doc.body.classList.add('enable-edit');
 			map.addControl(drawControls);
 			map.addControl(embedMapCodeButton);
-			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(mapSetup.id, 10));
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
 		}
 	}
 
@@ -541,7 +542,7 @@
 		var params = {
 			action: 'embedMapCode',
 			data: {
-				mapId: window.mapSetup.id
+				mapId: config.id
 			}
 		};
 
@@ -567,7 +568,7 @@
 
 		window.document.addEventListener('click', function (event) {
 			if(event.target.classList.contains('poi-article-link')) {
-				Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article')
+				Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article');
 			}
 		});
 	}
@@ -578,7 +579,8 @@
 	function createMap() {
 		var zoomControl,
 			defaultMinZoom,
-			zoom;
+			zoom,
+			mapBounds;
 
 		setupInterfaceTranslations();
 
@@ -606,12 +608,15 @@
 		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
 		if (config.hasOwnProperty('boundaries')) {
-			map.setMaxBounds(
-				new L.LatLngBounds(
-					L.latLng(config.boundaries.south, config.boundaries.west),
-					L.latLng(config.boundaries.north, config.boundaries.east)
-				)
+			mapBounds = new L.LatLngBounds(
+				L.latLng(config.boundaries.south, config.boundaries.west),
+				L.latLng(config.boundaries.north, config.boundaries.east)
 			);
+
+			map.setMaxBounds(mapBounds);
+			map.on('popupclose', function() {
+				map.panInsideBounds(mapBounds);
+			});
 		}
 
 		zoom = Math.max(config.zoom, defaultMinZoom);

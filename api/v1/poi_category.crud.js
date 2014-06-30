@@ -112,6 +112,21 @@ function handleUsedCategories(id, res, next) {
 }
 
 /**
+ * @desc Gets map id for a POI category
+ *
+ * @param {integer} poiCategoryId
+ */
+function getMapId(poiCategoryId) {
+	var query = dbCon.knex(dbTable)
+			.column(['map_id'])
+			.where({
+				id: poiCategoryId
+			});
+
+	return query.select();
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -160,9 +175,10 @@ module.exports = function createCRUD() {
 										message: 'POI category successfully created',
 										id: id,
 										url: utils.responseUrl(req, req.route.path, id)
-									};
+									},
+									mapId = reqBody.map_id;
 								if (reqBody.marker) {
-									poiCategoryMarker(id, reqBody.map_id, reqBody.marker, dbTable);
+									poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
 								}
 								res.send(201, response);
 								res.end();
@@ -181,31 +197,38 @@ module.exports = function createCRUD() {
 						id: id
 					};
 				if (isFinite(id)) {
-					dbCon
-						.destroy(dbTable, filter)
-						.then(
-							function (affectedRows) {
-								if (affectedRows > 0) {
-									res.send(204, {});
-									res.end();
-								} else {
-									next(errorHandler.elementNotFoundError(dbTable, id));
+					getMapId(id).then(
+						function(collection) {
+							var mapId = parseInt(collection[0].map_id, 10);
+
+							dbCon
+								.destroy(dbTable, filter)
+								.then(
+								function (affectedRows) {
+									if (affectedRows > 0) {
+										res.send(204, {});
+										res.end();
+									} else {
+										next(errorHandler.elementNotFoundError(dbTable, id));
+									}
+								},
+								function (err) {
+									// If the delete request results an error, check if the error is reference error
+									// (caused by non able to delete foreign key) and handle this case by calling
+									// the handleUsedCategories function, otherwise handle the error as regular error
+									if (
+										err.hasOwnProperty('clientError') &&
+											err.clientError.name === 'RejectionError' &&
+											err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_'
+										) {
+										handleUsedCategories(id, res, next);
+									} else {
+										next(err);
+									}
 								}
-							},
-							function (err) {
-								// If the delete request results an error, check if the error is reference error
-								// (caused by non able to delete foreign key) and handle this case by calling
-								// the handleUsedCategories function, otherwise handle the error as regular error
-								if (
-									err.hasOwnProperty('clientError') &&
-									err.clientError.name === 'RejectionError' &&
-									err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_'
-								) {
-									handleUsedCategories(id, res, next);
-								} else {
-									next(err);
-								}
-							}
+							);
+						},
+						next
 					);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
@@ -265,31 +288,36 @@ module.exports = function createCRUD() {
 						reqBody.status = 0;
 					}
 					if (isFinite(id)) {
-						dbCon
-							.update(dbTable, reqBody, filter)
-							.then(
-								function (affectedRows) {
-									if (affectedRows > 0) {
-										var response = {
-											message: 'POI category successfully updated',
-											id: id,
-											url: utils.responseUrl(req, '/api/v1/poi_category', id)
-										};
-										if (reqBody.marker) {
-											poiCategoryMarker(id, reqBody.map_id, reqBody.marker, dbTable);
-										}
-										res.send(303, response);
-										res.end();
-									} else {
-										next(errorHandler.elementNotFoundError(dbTable, id));
-									}
-								},
-								next
+						getMapId(id).then(
+							function(collection) {
+								var mapId = parseInt(collection[0].map_id, 10);
+								dbCon
+									.update(dbTable, reqBody, filter)
+									.then(
+										function (affectedRows) {
+											if (affectedRows > 0) {
+												var response = {
+													message: 'POI category successfully updated',
+													id: id,
+													url: utils.responseUrl(req, '/api/v1/poi_category', id)
+												};
+												if (reqBody.marker) {
+													poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
+												}
+												res.send(303, response);
+												res.end();
+											} else {
+												next(errorHandler.elementNotFoundError(dbTable, id));
+											}
+										},
+										next
+									);
+							},
+							next
 						);
 					} else {
 						next(errorHandler.badNumberError(req.pathVar.id));
 					}
-
 				} else {
 					next(errorHandler.badRequestError(errors));
 				}
