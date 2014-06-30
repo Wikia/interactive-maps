@@ -147,13 +147,13 @@ module.exports = function createCRUD() {
 
 				query.select().then(
 					function (collection) {
+						handleDefaultMarker(collection);
 						utils.convertMarkersNamesToUrls(
 							collection,
 							config.dfsHost,
 							config.bucketPrefix,
 							config.markersPrefix
 						);
-						handleDefaultMarker(collection);
 						res.send(200, collection);
 						res.end();
 					},
@@ -245,6 +245,7 @@ module.exports = function createCRUD() {
 						.select(dbTable, dbColumns, filter)
 						.then(
 							function (collection) {
+								handleDefaultMarker(collection);
 								utils.convertMarkersNamesToUrls(
 									collection,
 									config.dfsHost,
