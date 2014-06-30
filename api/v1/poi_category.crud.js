@@ -120,7 +120,6 @@ function handleDefaultMarker(collection) {
 		if(item.status === utils.poiCategoryStatus.external) {
 			item.marker = null;
 		}
-		delete item.status;
 		return item;
 	});
 }
@@ -231,6 +230,7 @@ module.exports = function createCRUD() {
 						'name',
 						'marker',
 						'parent_poi_category_id',
+						'status',
 						'map_id',
 						'created_on',
 						'created_by'
