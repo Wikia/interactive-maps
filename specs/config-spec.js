@@ -69,7 +69,7 @@ describe('config', function () {
 		expect(config.tmp).toEqual('/tmp/');
 
 		config.setRoot('rootpath');
-		expect(config.tmp).toEqual('rootpath/tmp/');
+		expect(config.tmp).toEqual('/tmp/');
 		expect(config.root).toEqual('rootpath');
 	});
 });

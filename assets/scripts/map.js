@@ -1,11 +1,13 @@
-(function (window, L, Ponto) {
+(function (window, L, Ponto, Tracker) {
 	'use strict';
 
 	var mapContainerId = 'map',
 		pointTypeFiltersContainerId = 'pointTypes',
+		editPointTypesButtonId = 'editPointTypes',
 		allPointTypesFilterId = 'allPointTypes',
 
 		pontoBridgeModule = 'wikia.intMap.pontoBridge',
+		uiControlsPosition = 'bottomright',
 
 		// leaflet map object
 		map,
@@ -13,7 +15,7 @@
 		markers = new L.LayerGroup(),
 		// leaflet layer for drawing controls
 		drawControls = new L.Control.Draw({
-			position: 'bottomright',
+			position: uiControlsPosition,
 			draw: {
 				polyline: false,
 				polygon: false,
@@ -21,6 +23,7 @@
 				rectangle: false
 			}
 		}),
+		embedMapCodeButton,
 
 		// constants
 		popupWidthWithPhoto = 414,
@@ -37,12 +40,22 @@
 		config = window.mapSetup;
 
 	/**
+	 * @desc Translates message
+	 * @param {string} message
+	 * @returns {string}
+	 */
+	function msg(message) {
+		return config.i18n.hasOwnProperty(message) ? config.i18n[message] : message;
+	}
+
+	/**
 	 * @desc Build popup HTML
 	 * @param {object} point - POI object
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point) {
-		var editLink = '<a href="" title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">Edit</a>',
+		var editLink = '<a title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
+				msg('wikia-interactive-maps-edit-poi') + '</a>',
 			photoHtml = '',
 			titleHtml = '',
 			descriptionHtml = '';
@@ -54,7 +67,7 @@
 		}
 
 		if (point.name) {
-			titleHtml = '<h3>' + (point.link ? buildLinkHtml(point, point.name) : point.name) + '</h3>';
+			titleHtml = '<h3>' + (point.link ? buildLinkHtml(point, point.name, 'poi-article-link') : point.name) + '</h3>';
 		}
 
 		if (point.description) {
@@ -158,7 +171,10 @@
 			pointTypeIcon = new L.Icon.Default();
 			// this is the nicest way to do that I found
 			// we need to overwrite it here so in the filter box we have not broken image
-			pointType.marker = pointTypeIcon._getIconUrl( 'icon' );
+			pointType.marker = pointTypeIcon._getIconUrl('icon');
+
+			// we need this one for edit POI categories popup
+			pointType.no_marker = true;
 		}
 
 		L.setOptions(pointTypeIcon, {
@@ -174,10 +190,10 @@
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
 	function loadPointsToCache(pointType) {
-		pointCache[pointType] = document.getElementsByClassName(
+		pointCache[pointType] = document.querySelectorAll(
 			(pointType === 0) ?
-			'leaflet-marker-icon' :
-			'point-type-' + pointType
+			'.leaflet-marker-icon, .leaflet-marker-shadow' :
+			'.point-type-' + pointType
 		);
 
 		return pointCache[pointType];
@@ -225,6 +241,13 @@
 	function togglePointTypeFilter(filterClicked) {
 		var filterEnabled = filterClicked.classList.contains('enabled');
 
+		Tracker.track(
+			'map',
+			Tracker.ACTIONS.CLICK,
+			'poi-category-filter',
+			parseInt(filterClicked.getAttribute('data-point-type'), 10)
+		);
+
 		toggleClass(filterClicked, 'enabled', (filterEnabled) ? 'remove' : 'add');
 	}
 
@@ -254,6 +277,8 @@
 
 		toggleAllPointTypesFilter();
 		togglePoints(allPointTypesFilter);
+
+		Tracker.track('map', Tracker.ACTIONS.CLICK, 'poi-category-filter', 0);
 	}
 
 	/**
@@ -291,6 +316,46 @@
 	}
 
 	/**
+	 * Create Point types filter container
+	 * @param {object} container
+	 * @returns {object}
+	 */
+	function createPointTypeFiltersContainer(container) {
+		var div = document.createElement('div'),
+			header = document.createElement('div'),
+			headerTitle = document.createElement('span'),
+			headerEdit = document.createElement('span'),
+			ul = document.createElement('ul'),
+			li = document.createElement('li');
+
+		div.setAttribute('class', 'filter-menu');
+
+		header.setAttribute('class', 'filter-menu-header');
+
+		headerTitle.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
+		header.appendChild(headerTitle);
+
+		headerEdit.setAttribute('id', editPointTypesButtonId);
+		headerEdit.setAttribute('class', 'edit-point-types');
+		headerEdit.appendChild(document.createTextNode(msg('wikia-interactive-maps-edit-pin-types')));
+		header.appendChild(headerEdit);
+
+		div.appendChild(header);
+
+		ul.setAttribute('id', pointTypeFiltersContainerId);
+		ul.setAttribute('class', 'point-types');
+
+		li.setAttribute('id', 'allPointTypes');
+		li.setAttribute('class', 'enabled');
+		li.setAttribute('data-point-type', '0');
+		li.appendChild(document.createTextNode(msg('wikia-interactive-maps-all-pin-types')));
+		ul.appendChild(li);
+		div.appendChild(ul);
+		container.appendChild(div);
+		return ul;
+	}
+
+	/**
 	 * @desc Create points and filters for them
 	 */
 	function setupPoints() {
@@ -303,7 +368,7 @@
 			pointTypeFiltersHtml += buildPointTypeFilterHtml(pointType);
 		});
 
-		pointTypeFiltersContainer = document.getElementById(pointTypeFiltersContainerId);
+		pointTypeFiltersContainer = createPointTypeFiltersContainer(document.body);
 		pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
 
 		config.points.forEach(addPointOnMap);
@@ -380,7 +445,7 @@
 		params.data.mapId = mapSetup.id;
 		params.data.categories = mapSetup.types;
 
-		Ponto.invoke(pontoBridgeModule, 'processData', params, function(point) {
+		Ponto.invoke(pontoBridgeModule, 'processData', params, function (point) {
 			// removes old marker from layer group
 			if (markers.hasLayer(marker)) {
 				markers.removeLayer(marker);
@@ -393,11 +458,29 @@
 	}
 
 	/**
+	 * @desc invokes Wikia Client edit POI category action
+	 */
+	function editPointTypes() {
+		var mapSetup = window.mapSetup,
+			params = {
+				action: 'poiCategories',
+				data: {
+					mapId: mapSetup.id,
+					poiCategories: mapSetup.types,
+					mode: 'edit'
+				}
+			};
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, function () {
+			window.location.href = window.location.href;
+		}, showPontoError, true);
+	}
+
+	/**
 	 * @desc shows error message for ponto communication
 	 * @param {string} message - error message
 	 * @todo figure out were to display them
 	 */
-
 	function showPontoError(message) {
 		console.log(message);
 		console.log('error!!!');
@@ -410,6 +493,8 @@
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, false);
+		} else {
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed', parseInt(mapSetup.id, 10));
 		}
 	}
 
@@ -419,29 +504,72 @@
 	 */
 	function setUpEditOptions(isWikia) {
 		var doc = window.document,
+			editPointTypesButton = doc.getElementById(editPointTypesButtonId),
 			mapContainer = doc.getElementById(mapContainerId);
 
 		if (isWikia) {
 			// add POI handler
-			map.on('draw:created', function(event) {
+			map.on('draw:created', function (event) {
 				editMarker(addTempMarker(event));
 			});
 
 			// edit POI handler
-			mapContainer.addEventListener('click', function(event) {
+			mapContainer.addEventListener('click', function (event) {
 				var target = event.target;
 
 				if (target.classList.contains('edit-poi-link')) {
 					event.preventDefault();
-
 					editMarker(getMarker(target.getAttribute('data-marker-id')));
 				}
 			}, false);
 
+			// edit POI categories handler
+			editPointTypesButton.addEventListener('click', editPointTypes, false);
+
 			// show edit UI elements
-			mapContainer.classList.add('enable-edit');
+			doc.body.classList.add('enable-edit');
 			map.addControl(drawControls);
+			map.addControl(embedMapCodeButton);
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(mapSetup.id, 10));
 		}
+	}
+
+	/**
+	 * @desc sends data to Wikia Client via ponto to show embed map code modal
+	 */
+	function embedMapCode() {
+		var params = {
+			action: 'embedMapCode',
+			data: {
+				mapId: window.mapSetup.id
+			}
+		};
+
+		Ponto.invoke(pontoBridgeModule, 'processData', params, null, showPontoError, true);
+	}
+
+	/**
+	 * @desc Sets up the interface translations
+	 */
+	function setupInterfaceTranslations() {
+		L.drawLocal.draw.handlers.marker.tooltip.start = msg('wikia-interactive-maps-create-marker-handler');
+		L.drawLocal.draw.toolbar.buttons.marker = msg('wikia-interactive-maps-create-marker-tooltip');
+		L.drawLocal.draw.toolbar.actions.text = msg('wikia-interactive-maps-create-marker-cancel');
+	}
+
+	/**
+	 * @desc Sets up click tracking for service
+	 */
+	function setupClickTracking() {
+		map.on('popupopen', function() {
+			Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_IMAGE, 'poi');
+		});
+
+		window.document.addEventListener('click', function (event) {
+			if(event.target.classList.contains('poi-article-link')) {
+				Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article')
+			}
+		});
 	}
 
 	/**
@@ -449,7 +577,10 @@
 	 */
 	function createMap() {
 		var zoomControl,
-			defaultMinZoom;
+			defaultMinZoom,
+			zoom;
+
+		setupInterfaceTranslations();
 
 		defaultMinZoom = getMinZoomLevel(
 			config.layer.maxZoom,
@@ -469,6 +600,9 @@
 			maxZoom: config.layer.maxZoom,
 			zoomControl: false
 		});
+
+		map.attributionControl.setPrefix(false);
+
 		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
 		if (config.hasOwnProperty('boundaries')) {
@@ -480,21 +614,34 @@
 			);
 		}
 
+		zoom = Math.max(config.zoom, defaultMinZoom);
+		if (config.type !== 'custom') {
+			zoom = config.defaultZoomForRealMap;
+		}
 		map.setView(
 			L.latLng(config.latitude, config.longitude),
-			Math.max(config.zoom, defaultMinZoom)
+			zoom
 		);
 
 		zoomControl = L.control.zoom({
-			position: 'bottomright'
+			position: uiControlsPosition
+		});
+
+		embedMapCodeButton = new L.Control.EmbedMapCode({
+			position: uiControlsPosition,
+			//TODO fix icon
+			title: '< >',
+			onClick: embedMapCode
 		});
 
 		map.addControl(zoomControl);
 		setupPontoWikiaClient();
 		setupPoints();
+		setupClickTracking();
 		markers.addTo(map);
+
 	}
 
 	createMap();
 
-})(window, window.L, window.Ponto);
+})(window, window.L, window.Ponto, window.Tracker);

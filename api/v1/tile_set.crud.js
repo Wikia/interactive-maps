@@ -91,6 +91,11 @@ module.exports = function createCRUD() {
 				query.select().then(
 						function (collection) {
 							collection.forEach(function (value) {
+								value.image = utils.imageUrl(
+									config.dfsHost,
+									utils.getBucketName(config.bucketPrefix, value.name),
+									value.image
+								);
 								value.url = utils.responseUrl(req, req.route.path, value.id);
 							});
 
