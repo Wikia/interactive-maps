@@ -353,7 +353,7 @@ describe('utils', function () {
 				height: 256,
 				maxZoom: 0,
 				expected: {
-					north: 90,
+					north: 85.0511287798066,
 					east: 180,
 					south: -90,
 					west: -180
