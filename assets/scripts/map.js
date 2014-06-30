@@ -202,6 +202,14 @@
 	}
 
 	/**
+	 * @desc Deletes points from point cache
+	 * @param {number} pointType - Id of point type
+	 */
+	function invalidatePointsCache(pointType) {
+		delete pointCache[pointType];
+	}
+
+	/**
 	 * @desc Return DOM elements for given point type
 	 * @param {number} pointType - Id of point type, 0 for all types
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
@@ -446,14 +454,28 @@
 		params.data.mapId = config.id;
 		params.data.categories = config.types;
 
+		invalidatePointsCache(marker.point.poi_category_id);
+
 		Ponto.invoke(pontoBridgeModule, 'processData', params, function (point) {
+			var markerObject,
+				filter;
+
 			// removes old marker from layer group
 			if (markers.hasLayer(marker)) {
 				markers.removeLayer(marker);
 			}
 			// adds new marker to layer group
 			if (point) {
-				addPointOnMap(point).openPopup();
+				invalidatePointsCache(point.poi_category_id);
+				markerObject = addPointOnMap(point);
+
+				filter = pointTypeFiltersContainer.querySelector('[data-point-type="' + point.poi_category_id + '"]');
+				if (filter.classList.contains('enabled')) {
+					markerObject.openPopup();
+				} else {
+					markerObject._icon.classList.add('hidden');
+					markerObject._shadow.classList.add('hidden');
+				}
 			}
 		}, showPontoError, true);
 	}
