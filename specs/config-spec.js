@@ -18,6 +18,9 @@ var proxyquire = require('proxyquire').noCallThru(),
 				port: 123,
 				token: 'XYZ'
 			}
+		},
+		db: {
+			test: {}
 		}
 	},
 	config = proxyquire('../lib/config', {
