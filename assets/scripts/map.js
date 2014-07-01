@@ -484,7 +484,6 @@
 	 * @desc invokes Wikia Client edit POI category action
 	 */
 	function editPointTypes() {
-		//Do not allow editing on the default category
 		var editableTypes = config.types.filter(function(type) {
 			return type.id !== config.catchAllCategoryId;
 		});
