@@ -3,9 +3,9 @@
 	<head>
 		<title>Map</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-		<link rel="stylesheet" href="/vendor/leaflet/styles/leaflet.css">
-		<link rel="stylesheet" href="/styles/leaflet-wikia.css">
-		<link rel="stylesheet" href="/vendor/leafletDraw/leaflet.draw.css">
+		<link rel="stylesheet" href="{{cacheBuster}}/vendor/leaflet/styles/leaflet.css">
+		<link rel="stylesheet" href="{{cacheBuster}}/styles/leaflet-wikia.css">
+		<link rel="stylesheet" href="{{cacheBuster}}/vendor/leafletDraw/leaflet.draw.css">
 		<style>
 			body {
 				margin: 0;
@@ -23,19 +23,17 @@
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 					m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-	
-			ga('create', 'UA-52252305-1', 'auto');
+			ga('create', window.mapSetup.gaUser, 'auto');
 			ga('send', 'pageview');
 		</script>
 	</head>
 	<body>
 		<div id="map" class="int-map"></div>
-		<script src="/vendor/leaflet/scripts/leaflet.js"></script>
-		<script src="/vendor/leafletDraw/leaflet.draw.js"></script>
-		<script src="/vendor/ponto.js"></script>
-		<script src="/vendor/tracker.js"></script>
-		<script src="/scripts/leaflet.embedMapCode.js"></script>
-		<script src="/scripts/map.js"></script>
+		<script src="{{cacheBuster}}/vendor/leaflet/scripts/leaflet.js"></script>
+		<script src="{{cacheBuster}}/vendor/leafletDraw/leaflet.draw.js"></script>
+		<script src="{{cacheBuster}}/scripts/leaflet.embedMapCode.js"></script>
+		<script src="{{cacheBuster}}/vendor/ponto.js"></script>
+		<script src="{{cacheBuster}}/vendor/tracker.js"></script>
+		<script src="{{cacheBuster}}/scripts/map.js"></script>
 	</body>
 </html>
-

@@ -10,6 +10,7 @@ var express = require('express'),
 	rawBody = require('./lib/rawBody'),
 	errorHandler = require('./lib/errorHandler'),
 	heartBeatHandler = require('./lib/healthCheck').heartBeatHandler,
+	cachingUtils = require('./lib/cachingUtils'),
 
 	// API entry points modules
 	getCRUDs = require('./lib/getCRUDs'),
@@ -17,14 +18,17 @@ var express = require('express'),
 	renderMap = require('./lib/renderMap'),
 
 	// other local variables
-	port = require('./lib/config').api.port,
+	config = require('./lib/config'),
+	port = config.api.port,
 	app = express(),
 	router = detour(),
 
 	// Interactive Maps API Version 1
 	apiPath = '/api/v1/',
 	apiAbsolutePath = __dirname + apiPath,
-	crudModules = getCRUDs.requireCruds(getCRUDs.getCruds(apiAbsolutePath));
+	crudModules = getCRUDs.requireCruds(getCRUDs.getCruds(apiAbsolutePath)),
+	// express divides passed maxAge by 1000
+	staticMaxAge = cachingUtils.cacheShort * 1000;
 
 //build routes for Version 1
 routeBuilder(router, crudModules, apiPath);
@@ -32,12 +36,16 @@ routeBuilder(router, crudModules, apiPath);
 app.use(guard);
 app.use(logger.middleware);
 app.use(rawBody);
+// add default HTTP request headers
+app.use(cachingUtils.middleware);
 app.use(router.middleware);
 renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
 
-// FIXME: Probably we won't serve the assets the API server, but this can be used for debugging right now
-app.use(express.static(__dirname + '/assets'));
+// assets' cachebusting
+app.use( config.getCachebusterUrlPart() + '/', express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
+// for assets required in leaflet-wikia.css
+app.use( express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
 
 app.use(errorHandler.middleware);
 

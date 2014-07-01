@@ -11,20 +11,21 @@
     "url": "http://github.com/Wikia/interactive-maps.git"
   },
   "dependencies": {
-    "kue": "0.7.x",
-    "image-size": "0.2.x",
-    "q": "1.0.x",
-    "glob": "3.2.x",
-    "knex": "0.5.x",
-    "express": "4.x",
     "JSV": "4.0.x",
-    "detour": "1.0.x",
     "cluster": "0.7.x",
-    "js-yaml": "3.0.x",
-    "node-syslog": "1.1.x",
-    "newrelic": "1.5.x",
     "colors": "0.6.x",
-    "mysql": "~2.3.2"
+    "detour": "1.0.x",
+    "express": "4.x",
+    "glob": "3.2.x",
+    "image-size": "0.2.x",
+    "js-yaml": "3.0.x",
+    "knex": "0.5.x",
+    "kue": "0.7.x",
+    "mysql": "~2.3.2",
+    "newrelic": "1.5.x",
+    "node-syslog": "1.1.x",
+    "q": "1.0.x",
+    "scribe": "0.0.9"
   },
   "devDependencies": {
     "gulp": "3.6.x",
