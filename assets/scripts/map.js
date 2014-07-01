@@ -484,11 +484,15 @@
 	 * @desc invokes Wikia Client edit POI category action
 	 */
 	function editPointTypes() {
+		//Do not allow editing on the default category
+		var editableTypes = config.types.filter(function(type) {
+			return type.id !== config.catchAllCategoryId;
+		});
 		var params = {
 				action: 'poiCategories',
 				data: {
 					mapId: config.id,
-					poiCategories: config.types,
+					poiCategories: editableTypes,
 					mode: 'edit'
 				}
 			};
@@ -504,8 +508,7 @@
 	 * @todo figure out were to display them
 	 */
 	function showPontoError(message) {
-		console.log(message);
-		console.log('error!!!');
+		console.error('Ponto Error', message);
 	}
 
 	/**
