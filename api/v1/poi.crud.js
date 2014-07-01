@@ -190,7 +190,7 @@ module.exports = function createCRUD() {
 									mapId = reqBody.map_id;
 								changeMapUpdatedOn(mapId).then(
 									function () {
-										squidUpdate.purgeKey('map-' + mapId, 'mapPoiCreated');
+										squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
 										res.send(201, response);
 										res.end();
 									},
@@ -222,7 +222,7 @@ module.exports = function createCRUD() {
 										function () {
 											changeMapUpdatedOn(mapId).then(
 												function () {
-													squidUpdate.purgeKey('map-' + mapId, 'mapPoiDeleted');
+													squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiDeleted');
 													res.send(204, {});
 													res.end();
 												},
@@ -297,7 +297,7 @@ module.exports = function createCRUD() {
 												};
 												changeMapUpdatedOn(mapId).then(
 													function () {
-														squidUpdate.purgeKey('map-' + mapId, 'mapPoiUpdated');
+														squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiUpdated');
 														res.send(303, response);
 														res.end();
 													},

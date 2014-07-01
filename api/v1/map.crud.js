@@ -199,7 +199,7 @@ module.exports = function createCRUD() {
 						.then(
 							function (affectedRows) {
 								if (affectedRows > 0) {
-									squidUpdate.purgeKey('map-' + id, 'mapDeleted');
+									squidUpdate.purgeKey(utils.surrogateKeyPrefix + id, 'mapDeleted');
 									res.send(204, {
 										message: 'Map successfully deleted',
 										id: id

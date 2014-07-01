@@ -181,7 +181,7 @@ module.exports = function createCRUD() {
 								if (reqBody.marker) {
 									poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
 								}
-								squidUpdate.purgeKey('map-' + mapId, 'poiCategoryCreated');
+								squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
 								res.send(201, response);
 								res.end();
 							},
@@ -208,7 +208,7 @@ module.exports = function createCRUD() {
 								.then(
 								function (affectedRows) {
 									if (affectedRows > 0) {
-										squidUpdate.purgeKey('map-' + mapId, 'poiCategoryDeleted');
+										squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
 										res.send(204, {});
 										res.end();
 									} else {
@@ -307,7 +307,7 @@ module.exports = function createCRUD() {
 												if (reqBody.marker) {
 													poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
 												}
-												squidUpdate.purgeKey('map-' + mapId, 'poiCategoryUpdated');
+												squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
 												res.send(303, response);
 												res.end();
 											} else {
