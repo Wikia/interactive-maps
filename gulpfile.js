@@ -24,7 +24,20 @@ gulp.task('dev', function () {
 	require('./kueServer');
 });
 
-gulp.task('test', function (cb) {
+gulp.task('test', [], function () {
+	/**
+	 * gulp-jasmine in version 0.2.0 does not propagate the error if any of the test fails. There is open PR on
+	 * GitHub for that: https://github.com/sindresorhus/gulp-jasmine/pull/12
+	*/
+	return gulp
+		.src('specs/**')
+		.pipe(jasmine())
+		.on('error', function () {
+			process.exit(1);
+		});
+});
+
+gulp.task('coverage', function (cb) {
 	gulp
 		.src(['lib/*.js'])
 		.pipe(istanbul()) // Covering files
@@ -32,7 +45,7 @@ gulp.task('test', function (cb) {
 			gulp
 				.src('specs/**')
 				.pipe(jasmine())
-				.pipe(istanbul.writeReports()) // Creating the reports after tests runned
+				.pipe(istanbul.writeReports()) // Creating the reports after tests were executed
 				.on('end', cb);
 		});
 });
