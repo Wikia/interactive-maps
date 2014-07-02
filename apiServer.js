@@ -43,9 +43,10 @@ renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
 
 // assets' cachebusting
-app.use( config.getCachebusterUrlPart() + '/', express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
+app.use('/assets', cachingUtils.filterCachebuster);
+app.use('/assets', express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
 // for assets required in leaflet-wikia.css
-app.use( express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
+app.use(express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
 
 app.use(errorHandler.middleware);
 
