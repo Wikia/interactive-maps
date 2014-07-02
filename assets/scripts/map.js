@@ -564,7 +564,8 @@
 		var params = {
 			action: 'embedMapCode',
 			data: {
-				mapId: config.id
+				mapId: config.id,
+				mapHost: config.mapHost
 			}
 		};
 
