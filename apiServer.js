@@ -50,5 +50,9 @@ app.use(express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
 
 app.use(errorHandler.middleware);
 
+// remove expressjs headers
+app.disable('etag');
+app.disable('x-powered-by');
+
 app.listen(port);
 logger.notice('Server started on port: ' + port);
