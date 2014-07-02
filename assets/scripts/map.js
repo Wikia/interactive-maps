@@ -37,7 +37,8 @@
 		pointIcons = {},
 		pointCache = {},
 		pointTypes = {},
-		config = window.mapSetup;
+		config = window.mapSetup,
+		editableTypes;
 
 	/**
 	 * @desc Translates message
@@ -481,12 +482,24 @@
 	}
 
 	/**
+	 * Filters out POI types that should not be edited and caches the result
+	 * uses editablePinTypes for caching
+	 * @param {array} types
+	 * @returns {array}
+	 */
+	function getEditableTypes(types) {
+		return (editablePinTypes) ?
+			editableTypes :
+			editableTypes = types.filter(function(type) {
+				return type.id !== config.catchAllCategoryId;
+			});
+	}
+
+	/**
 	 * @desc invokes Wikia Client edit POI category action
 	 */
 	function editPointTypes() {
-		var editableTypes = config.types.filter(function(type) {
-			return type.id !== config.catchAllCategoryId;
-		});
+		var editableTypes = getEditableTypes(config.types);
 		var params = {
 				action: 'poiCategories',
 				data: {
