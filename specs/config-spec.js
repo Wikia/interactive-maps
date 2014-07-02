@@ -21,7 +21,11 @@ var proxyquire = require('proxyquire').noCallThru(),
 		},
 		db: {
 			test: {}
+		},
+		client: {
+			test: {}
 		}
+		
 	},
 	config = proxyquire('../lib/config', {
 		'js-yaml': {
