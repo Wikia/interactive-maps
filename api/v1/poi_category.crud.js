@@ -182,9 +182,14 @@ module.exports = function createCRUD() {
 								if (reqBody.marker) {
 									poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
 								}
-								squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
-								res.send(201, response);
-								res.end();
+								utils.changeMapUpdatedOn(dbCon, mapId).then(
+									function () {
+										squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
+										res.send(201, response);
+										res.end();
+									},
+									next
+								);
 							},
 							next
 					);
@@ -209,9 +214,14 @@ module.exports = function createCRUD() {
 								.then(
 								function (affectedRows) {
 									if (affectedRows > 0) {
-										squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
-										res.send(204, {});
-										res.end();
+										utils.changeMapUpdatedOn(dbCon, mapId).then(
+											function () {
+												squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
+												res.send(204, {});
+												res.end();
+											},
+											next
+										);
 									} else {
 										next(errorHandler.elementNotFoundError(dbTable, id));
 									}
@@ -311,9 +321,14 @@ module.exports = function createCRUD() {
 												if (reqBody.marker) {
 													poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
 												}
-												squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
-												res.send(303, response);
-												res.end();
+												utils.changeMapUpdatedOn(dbCon, mapId).then(
+													function () {
+														squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
+														res.send(303, response);
+														res.end();
+													},
+													next
+												);
 											} else {
 												next(errorHandler.elementNotFoundError(dbTable, id));
 											}
