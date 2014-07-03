@@ -37,7 +37,8 @@
 		pointIcons = {},
 		pointCache = {},
 		pointTypes = {},
-		config = window.mapSetup;
+		config = window.mapSetup,
+		editablePointTypes;
 
 	/**
 	 * @desc Translates message
@@ -481,6 +482,20 @@
 	}
 
 	/**
+	 * Filters out POI types that should not be edited and caches the result
+	 * uses editablePinTypes for caching
+	 * @param {array} types
+	 * @returns {array}
+	 */
+	function getEditablePointTypes(types) {
+		return (editablePointTypes) ?
+			editablePointTypes :
+			editablePointTypes = types.filter(function(type) {
+				return type.id !== config.catchAllCategoryId;
+			});
+	}
+
+	/**
 	 * @desc invokes Wikia Client edit POI category action
 	 */
 	function editPointTypes() {
@@ -488,7 +503,7 @@
 				action: 'poiCategories',
 				data: {
 					mapId: config.id,
-					poiCategories: config.types,
+					poiCategories: getEditablePointTypes(config.types),
 					mode: 'edit'
 				}
 			};
@@ -504,8 +519,7 @@
 	 * @todo figure out were to display them
 	 */
 	function showPontoError(message) {
-		console.log(message);
-		console.log('error!!!');
+		console.error('Ponto Error', message);
 	}
 
 	/**
