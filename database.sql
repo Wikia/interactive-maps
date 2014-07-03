@@ -1,5 +1,7 @@
 -- DROP DATABASE IF EXISTS interactive_maps;
 
+SET NAMES 'utf8';
+
 START TRANSACTION;
 
 CREATE DATABASE IF NOT EXISTS interactive_maps CHARACTER SET utf8 COLLATE utf8_general_ci;
@@ -23,13 +25,13 @@ CREATE TABLE tile_set (
   subdomains VARCHAR(15) NOT NULL DEFAULT "",
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   created_by VARCHAR(255) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE tile_set_search (
   id INT UNSIGNED PRIMARY KEY NOT NULL,
   name VARCHAR(255) NOT NULL,
   FULLTEXT (name)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE map (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -44,7 +46,7 @@ CREATE TABLE map (
 
   FOREIGN KEY (tile_set_id)
     REFERENCES tile_set(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE poi_category (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -59,7 +61,7 @@ CREATE TABLE poi_category (
 
   FOREIGN KEY (parent_poi_category_id)
     REFERENCES poi_category(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE poi (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -81,7 +83,7 @@ CREATE TABLE poi (
   FOREIGN KEY (map_id)
     REFERENCES map(id)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- TODO: figure out proper indexes
 CREATE INDEX tile_set ON tile_set ( id );
