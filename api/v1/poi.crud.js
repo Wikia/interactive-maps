@@ -119,22 +119,6 @@ var dbCon = require('./../../lib/db_connector'),
 	};
 
 /**
- * @desc Helper function to update map's updated_on field
- *
- * @param {number} mapId
- * @returns {object}
- */
-function changeMapUpdatedOn(mapId) {
-	return dbCon.update(
-		'map', {
-			updated_on: dbCon.raw('CURRENT_TIMESTAMP')
-		}, {
-			id: mapId
-		}
-	);
-}
-
-/**
  * @desc Helper function to get map_id from poi_id
  *
  * @param {number} poiId
@@ -188,7 +172,7 @@ module.exports = function createCRUD() {
 										url: utils.responseUrl(req, req.route.path, id)
 									},
 									mapId = reqBody.map_id;
-								changeMapUpdatedOn(mapId).then(
+								utils.changeMapUpdatedOn(dbCon, mapId).then(
 									function () {
 										squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
 										res.send(201, response);
@@ -220,7 +204,7 @@ module.exports = function createCRUD() {
 									.destroy(dbTable, filter)
 									.then(
 										function () {
-											changeMapUpdatedOn(mapId).then(
+											utils.changeMapUpdatedOn(dbCon, mapId).then(
 												function () {
 													squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiDeleted');
 													res.send(204, {});
@@ -295,7 +279,7 @@ module.exports = function createCRUD() {
 													id: id,
 													url: utils.responseUrl(req, '/api/v1/poi', id)
 												};
-												changeMapUpdatedOn(mapId).then(
+												utils.changeMapUpdatedOn(dbCon, mapId).then(
 													function () {
 														squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiUpdated');
 														res.send(303, response);
