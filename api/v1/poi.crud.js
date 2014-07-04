@@ -34,7 +34,8 @@ var dbCon = require('./../../lib/db_connector'),
 			description: {
 				description: 'POI description',
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: 500
 			},
 			link: {
 				description: 'Link to article connected with this POI',
@@ -206,7 +207,10 @@ module.exports = function createCRUD() {
 										function () {
 											utils.changeMapUpdatedOn(dbCon, mapId).then(
 												function () {
-													squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiDeleted');
+													squidUpdate.purgeKey(
+														utils.surrogateKeyPrefix + mapId,
+														'mapPoiDeleted'
+													);
 													res.send(204, {});
 													res.end();
 												},
@@ -281,7 +285,10 @@ module.exports = function createCRUD() {
 												};
 												utils.changeMapUpdatedOn(dbCon, mapId).then(
 													function () {
-														squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiUpdated');
+														squidUpdate.purgeKey(
+															utils.surrogateKeyPrefix + mapId,
+															'mapPoiUpdated'
+														);
 														res.send(303, response);
 														res.end();
 													},
