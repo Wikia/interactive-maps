@@ -521,7 +521,9 @@
 	 * @todo figure out were to display them
 	 */
 	function showPontoError(message) {
-		window.console.error('Ponto Error', message);
+		if (window.console) {
+			window.console.error('Ponto Error', message);
+		}
 	}
 
 	/**
