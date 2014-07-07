@@ -38,7 +38,10 @@
 		pointCache = {},
 		pointTypes = {},
 		config = window.mapSetup,
-		editablePointTypes;
+		editablePointTypes,
+		// @todo Remove these once Ponto is fixed
+		isWikiaSet = false,
+		pontoTimeout = 500;
 
 	/**
 	 * @desc Translates message
@@ -523,12 +526,25 @@
 	}
 
 	/**
+	 * @desc This is temporary function to handle Ponto, not error-ing when there is no Ponto on the other side
+	 * @todo Remove this once Ponto errors on missing pair
+	 */
+	function setupPontoTimeout() {
+		setTimeout(function () {
+			if (!isWikiaSet) {
+				showAttributionStripe();
+			}
+		}, pontoTimeout);
+	}
+
+	/**
 	 * @desc setup Ponto communication for Wikia Client
 	 */
 	function setupPontoWikiaClient() {
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, false);
+			setupPontoTimeout();
 		} else {
 			showAttributionStripe();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
@@ -555,6 +571,10 @@
 			mapContainer = doc.getElementById(mapContainerId);
 
 		if (isWikia) {
+
+			// @todo Remove this, once Ponto errors on missing pair
+			isWikiaSet = true;
+
 			// add POI handler
 			map.on('draw:created', function (event) {
 				editMarker(addTempMarker(event));
