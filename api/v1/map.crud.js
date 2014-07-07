@@ -30,6 +30,20 @@ var dbCon = require('./../../lib/db_connector'),
 				type: 'integer',
 				required: true
 			},
+			city_title: {
+				description: 'Name of the Wikia this map instance belongs to',
+				type: 'string',
+				required: true,
+				minLength: 1,
+				maxLength: 255
+			},
+			city_url: {
+				description: 'URL of the Wikia this map instance belongs to',
+				type: 'string',
+				required: true,
+				minLength: 1,
+				maxLength: 255
+			},
 			created_by: {
 				description: 'creator user name',
 				type: 'string',
@@ -52,6 +66,18 @@ var dbCon = require('./../../lib/db_connector'),
 			deleted: {
 				description: 'Map deleted flag',
 				type: 'bool'
+			},
+			city_title: {
+				description: 'Name of the Wikia this map instance belongs to',
+				type: 'string',
+				minLength: 1,
+				maxLength: 255
+			},
+			city_url: {
+				description: 'URL of the Wikia this map instance belongs to',
+				type: 'string',
+				minLength: 1,
+				maxLength: 255
 			}
 		},
 		additionalProperties: false

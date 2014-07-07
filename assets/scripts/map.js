@@ -530,9 +530,19 @@
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, false);
 		} else {
+			showAttributionStripe();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 				parseInt(config.id, 10));
 		}
+	}
+
+	function showAttributionStripe() {
+		var doc = window.document,
+			wrapper = doc.querySelector('#wrapper'),
+			attribution = doc.querySelector('#attr');
+		[wrapper, attribution].forEach(function (element) {
+			element.setAttribute('class', 'embed');
+		});
 	}
 
 	/**
@@ -568,6 +578,8 @@
 			map.addControl(drawControls);
 			map.addControl(embedMapCodeButton);
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
+		} else {
+			showAttributionStripe();
 		}
 	}
 
