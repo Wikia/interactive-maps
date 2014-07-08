@@ -7,7 +7,7 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 
-	urlPattern = jsonValidator.getUrlPattern(),
+	urlPattern = jsonValidator.getOptionalUrlPattern(),
 
 	dbTable = 'poi',
 	createSchema = {
@@ -40,6 +40,10 @@ var dbCon = require('./../../lib/db_connector'),
 				description: 'Link to article connected with this POI',
 				type: 'string',
 				pattern: urlPattern
+			},
+			link_title: {
+				description: 'Title of the article connected with this POI',
+				type: 'string'
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
@@ -91,6 +95,10 @@ var dbCon = require('./../../lib/db_connector'),
 				type: 'string',
 				pattern: urlPattern,
 				format: 'uri'
+			},
+			link_title: {
+				description: 'Title of the article connected with this POI',
+				type: 'string'
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
@@ -226,7 +234,7 @@ module.exports = function createCRUD() {
 				}
 			},
 			GET: function (req, res, next) {
-				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'photo', 'lat', 'lon',
+				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'link_title', 'photo', 'lat', 'lon',
 						'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
 					],
 					id = parseInt(req.pathVar.id),
