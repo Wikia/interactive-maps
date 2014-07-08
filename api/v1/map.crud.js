@@ -97,7 +97,7 @@ module.exports = function createCRUD() {
 			GET: function (req, res, next) {
 				var cityId = parseInt(req.query.city_id, 10) || 0,
 					filter = {
-						deleted: false
+						deleted: 0
 					},
 					sort = buildSort(req.query.sort),
 					limit = parseInt(req.query.limit, 10) || false,
@@ -106,6 +106,10 @@ module.exports = function createCRUD() {
 
 				if (cityId !== 0) {
 					filter.city_id = cityId;
+				}
+
+				if (typeof req.query.deleted !== 'undefined') {
+					filter.deleted = 1;
 				}
 
 				filter.status = utils.tileSetStatus.ok;
