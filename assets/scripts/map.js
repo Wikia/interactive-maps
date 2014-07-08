@@ -532,7 +532,7 @@
 	function setupPontoWikiaClient() {
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
-			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, false);
+			Ponto.invoke(pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions, showPontoError, false);
 		} else {
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 				parseInt(config.id, 10));
@@ -540,39 +540,46 @@
 	}
 
 	/**
-	 * @desc setup edit options for Wikia only
-	 * @param {bool} isWikia - true if iframe is displayed on Wikia page
+	 * @desc setup map options available only when map displayed on Wikia page
+	 * @param {object} options - {enableEdit: bool, skin: string}
 	 */
-	function setUpEditOptions(isWikia) {
+	function setupWikiaOnlyOptions(options) {
+		if (options.enableEdit) {
+			setUpEditOptions();
+		}
+	}
+
+	/**
+	 * @desc setup edit options
+	 */
+	function setUpEditOptions() {
 		var doc = window.document,
 			editPointTypesButton = doc.getElementById(editPointTypesButtonId),
 			mapContainer = doc.getElementById(mapContainerId);
 
-		if (isWikia) {
-			// add POI handler
-			map.on('draw:created', function (event) {
-				editMarker(addTempMarker(event));
-			});
+		// add POI handler
+		map.on('draw:created', function (event) {
+			editMarker(addTempMarker(event));
+		});
 
-			// edit POI handler
-			mapContainer.addEventListener('click', function (event) {
-				var target = event.target;
+		// edit POI handler
+		mapContainer.addEventListener('click', function (event) {
+			var target = event.target;
 
-				if (target.classList.contains('edit-poi-link')) {
-					event.preventDefault();
-					editMarker(getMarker(target.getAttribute('data-marker-id')));
-				}
-			}, false);
+			if (target.classList.contains('edit-poi-link')) {
+				event.preventDefault();
+				editMarker(getMarker(target.getAttribute('data-marker-id')));
+			}
+		}, false);
 
-			// edit POI categories handler
-			editPointTypesButton.addEventListener('click', editPointTypes, false);
+		// edit POI categories handler
+		editPointTypesButton.addEventListener('click', editPointTypes, false);
 
-			// show edit UI elements
-			doc.body.classList.add('enable-edit');
-			map.addControl(drawControls);
-			map.addControl(embedMapCodeButton);
-			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
-		}
+		// show edit UI elements
+		doc.body.classList.add('enable-edit');
+		map.addControl(drawControls);
+		map.addControl(embedMapCodeButton);
+		Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
 	}
 
 	/**
