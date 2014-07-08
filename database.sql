@@ -69,6 +69,7 @@ CREATE TABLE poi (
   poi_category_id INT UNSIGNED NOT NULL,
   description TEXT,
   link TEXT,
+  link_title VARCHAR(255),
   photo VARCHAR(255),
   lat FLOAT(10,6) NOT NULL,
   lon FLOAT(10,6) NOT NULL,
