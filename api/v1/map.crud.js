@@ -220,11 +220,20 @@ module.exports = function createCRUD() {
 				}
 			},
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'title', 'tile_set_id', 'city_id', 'created_by', 'created_on', 'updated_on'],
+				var dbColumns = [
+						'id',
+						'title',
+						'tile_set_id',
+						'city_id',
+						'created_by',
+						'created_on',
+						'updated_on',
+						'deleted'
+
+					],
 					id = parseInt(req.pathVar.id, 10),
 					filter = {
-						id: id,
-						deleted: false
+						id: id
 					};
 
 				if (isFinite(id)) {
