@@ -33,6 +33,8 @@
 		pointIconWidth = 32,
 		pointIconHeight = 32,
 
+		autoZoomPadding = 0.01,
+
 		pointTypeFiltersContainer,
 		pointIcons = {},
 		pointCache = {},
@@ -490,7 +492,7 @@
 	function getEditablePointTypes(types) {
 		return (editablePointTypes) ?
 			editablePointTypes :
-			editablePointTypes = types.filter(function(type) {
+			editablePointTypes = types.filter(function (type) {
 				return type.id !== config.catchAllCategoryId;
 			});
 	}
@@ -519,7 +521,9 @@
 	 * @todo figure out were to display them
 	 */
 	function showPontoError(message) {
-		console.error('Ponto Error', message);
+		if (window.console) {
+			window.console.error('Ponto Error', message);
+		}
 	}
 
 	/**
@@ -599,12 +603,12 @@
 	 * @desc Sets up click tracking for service
 	 */
 	function setupClickTracking() {
-		map.on('popupopen', function() {
+		map.on('popupopen', function () {
 			Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_IMAGE, 'poi');
 		});
 
 		window.document.addEventListener('click', function (event) {
-			if(event.target.classList.contains('poi-article-link')) {
+			if (event.target.classList.contains('poi-article-link')) {
 				Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article');
 			}
 		});
@@ -617,7 +621,8 @@
 		var zoomControl,
 			defaultMinZoom,
 			zoom,
-			mapBounds;
+			mapBounds,
+			pointsList;
 
 		setupInterfaceTranslations();
 
@@ -651,7 +656,7 @@
 			);
 
 			map.setMaxBounds(mapBounds);
-			map.on('popupclose', function() {
+			map.on('popupclose', function () {
 				map.panInsideBounds(mapBounds);
 			});
 		}
@@ -682,6 +687,18 @@
 		setupClickTracking();
 		markers.addTo(map);
 
+		// Collect all the markers from the markers layer
+		pointsList = Object.keys(markers._layers).map(function (k) {
+			return markers._layers[k];
+		});
+
+		if (pointsList.length > 0) {
+			// This is called as async because leaflet freezes when map.fitBounds is called directly
+			setTimeout(function () {
+				var group = new L.featureGroup(pointsList);
+				map.fitBounds(group.getBounds().pad(autoZoomPadding));
+			}, 1);
+		}
 	}
 
 	createMap();
