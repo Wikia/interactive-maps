@@ -60,12 +60,12 @@
 	padding: 10px;
 	position: absolute;
 	top: 0;
-	width: 320px;
+	width: 245px;
 	z-index: 1;
 }
 
 .filter-menu-header {
-	background: rgba(0, 0, 0, 0.8);
+	background: rgba(51, 51, 51, 0.8);
 	border-top-left-radius: 3px;
 	border-top-right-radius: 3px;
 	-ms-flex-negative: 0;
@@ -92,7 +92,9 @@
 }
 
 .point-types {
-	background: rgba(0, 0, 0, 0.7);
+	background: rgba(102, 102, 102, 0.6);
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
 	-ms-flex-negative: 1;
 	list-style: none;
 	margin: 0;
@@ -101,10 +103,20 @@
 	padding: 0;
 }
 
+#allPointTypes {
+	padding: 15px 10px;
+}
+
 .point-types li {
 	cursor: pointer;
-	height: 44px;
-	padding: 0 10px 1px 10px;
+	line-height: 14px;
+	padding: 7px 10px 7px 0;
+	margin: 0 0 0 10px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.point-types li:last-child {
+	border: 0;
 }
 
 .point-types li.enabled {
@@ -113,14 +125,14 @@
 }
 
 .point-type img {
-	margin: 0 10px 0 5px;
+	margin: 0 5px 0 10px;
 	vertical-align: middle;
 }
 
 .point-type span {
 	display: inline-block;
 	vertical-align: middle;
-	width: 210px;
+	width: 155px;
 	word-wrap: break-word;
 }
 
