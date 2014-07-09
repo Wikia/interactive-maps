@@ -65,29 +65,29 @@
 }
 
 .filter-menu-header {
-    background: rgba(0, 0, 0, 0.8);
-    -ms-flex-negative: 0;
-    -webkit-flex-shrink: 0;
-    -moz-flex-shrink: 0;
-    -ms-flex-shrink: 0;
-    -o-flex-shrink: 0;
-    flex-shrink: 0;
-    font-weight: bold;
-    height: 44px;
-    line-height: 50px;
-    margin: 0;
-    padding: 0 15px;
+	background: rgba(0, 0, 0, 0.8);
+	-ms-flex-negative: 0;
+	-webkit-flex-shrink: 0;
+	-moz-flex-shrink: 0;
+	-ms-flex-shrink: 0;
+	-o-flex-shrink: 0;
+	flex-shrink: 0;
+	font-weight: bold;
+	height: 44px;
+	line-height: 50px;
+	margin: 0;
+	padding: 0 15px;
 }
 
 .edit-point-types {
-    cursor: pointer;
-    display: none;
-    float: right;
+	cursor: pointer;
+	display: none;
+	float: right;
 	font-size: 13px;
 }
 
 .enable-edit .edit-point-types {
-    display: inline;
+	display: inline;
 }
 
 .point-types {
