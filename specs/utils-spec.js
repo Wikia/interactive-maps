@@ -471,5 +471,20 @@ describe('utils', function () {
 		});
 	});
 
-
+	it('escapes HTML correctly', function () {
+		var testSet = [
+			{
+				input: '<script>alert(\'xss\')</script>',
+				expected: '&lt;script&gt;alert(&#39;xss&#39;)&lt;&#x2F;script&gt;'
+			},
+			{
+				input: '"Everything is AWESOME & whatnot!"',
+				expected: '&quot;Everything is AWESOME &amp; whatnot!&quot;'
+			}
+		];
+		testSet.forEach(function (testCase) {
+			expect(utils.escapeHtml(testCase.input))
+				.toBe(testCase.expected);
+		});
+	});
 });
