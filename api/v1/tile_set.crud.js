@@ -93,7 +93,10 @@ module.exports = function createCRUD() {
 							collection.forEach(function (value) {
 								value.image = utils.imageUrl(
 									config.dfsHost,
-									utils.getBucketName(config.bucketPrefix, value.name),
+									utils.getBucketName(
+										config.bucketPrefix + config.tileSetPrefix,
+										value.id
+									),
 									value.image
 								);
 								value.url = utils.responseUrl(req, req.route.path, value.id);
@@ -167,7 +170,10 @@ module.exports = function createCRUD() {
 									// TODO: fix hardcoded DFS host
 									obj.image = utils.imageUrl(
 										config.dfsHost,
-										utils.getBucketName(config.bucketPrefix, obj.name),
+										utils.getBucketName(
+											config.bucketPrefix + config.tileSetPrefix,
+											id
+										),
 										obj.image
 									);
 									obj.max_zoom = utils.binToMaxZoomLevel(obj.max_zoom);

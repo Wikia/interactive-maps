@@ -115,10 +115,10 @@ module.exports = function createCRUD() {
 					.column([
 						'map.id',
 						'map.title',
-						'tile_set.name',
 						'tile_set.image',
 						'map.updated_on',
-						'tile_set.status'
+						'tile_set.status',
+						'tile_set.id as tile_set_id'
 					])
 					.where(filter)
 					.orderBy(sort.column, sort.direction)
@@ -140,12 +140,15 @@ module.exports = function createCRUD() {
 									collection.forEach(function (value) {
 										value.image = utils.imageUrl(
 											config.dfsHost,
-											utils.getBucketName(config.bucketPrefix, value.name),
+											utils.getBucketName(
+												config.bucketPrefix + config.tileSetPrefix,
+												value.tile_set_id
+											),
 											value.image
 										);
 										value.url = utils.responseUrl(req, req.route.path, value.id);
 
-										delete value.name;
+										delete value.tile_set_id;
 									});
 
 									res.send(200, {

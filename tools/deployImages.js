@@ -7,10 +7,13 @@
 var dfs = require('../lib/dfs'),
 	utils = require('../lib/utils'),
 	config = require('../lib/config'),
-	mapName = 'Geo Map',
+	mapId = config.client['geo-tileset-id'],
 	dataDir = __dirname + '/../assets/images/',
 	fileName = 'default-geo.jpg',
-	bucketName = utils.getBucketName(config.bucketPrefix, mapName);
+	bucketName = utils.getBucketName(
+		config.bucketPrefix + config.tileSetPrefix,
+		mapId
+	);
 
 console.log('Upload ' + dataDir + fileName + ' to bucket ' + bucketName);
 
