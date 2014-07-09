@@ -3,6 +3,7 @@
 var utils = require('../lib/utils'),
 	dbCon = require('../lib/db_connector'),
 	dfs = require('../lib/dfs'),
+	logger = require('../lib/logger'),
 	exec = require('child_process').exec,
 	conversionList = [];
 	//bucketName = utils.getBucketName(config.bucketPrefix, mapName);
@@ -10,6 +11,27 @@ var utils = require('../lib/utils'),
 function getOldBucketName(bucketPrefix, mapName) {
 	return encodeURIComponent(bucketPrefix + mapName.trim().replace(/[ \/]/g, '_'));
 }
+
+//set up the logger with console transport
+logger.set({
+	console: {
+		enabled: true,
+		level: logger.level.DEBUG,
+		raw: true
+	},
+	file: {
+		enabled: true,
+		level: logger.level.DEBUG,
+		raw: true,
+		path: 'intMaps.log'
+	},
+	syslog: {
+		enabled: true,
+		level: logger.level.DEBUG,
+		tag: 'intMaps',
+		dev: true
+	}
+});
 
 dbCon
 	.select('tile_set', ['id', 'name'])
