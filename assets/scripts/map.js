@@ -225,16 +225,23 @@
 	 * @desc Adds or removes class of DOM element
 	 * @param {Element} element - DOM element
 	 * @param {string} className - Name of class to toggle
-	 * @param {string} operation - 'add' or 'remove' class
 	 */
 	function toggleClass(element, className) {
 		var classList = element.className;
 		if (classList.indexOf(className) !== -1) {
-			var regexp = new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g');
-			element.className = element.className.replace(regexp, '');
+			removeClass(element, className);
 		} else {
-			element.className += ' ' + className;
+			addClass(element, className)
 		}
+	}
+
+	function removeClass(element, className) {
+		var regexp = new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g');
+		element.className = element.className.replace(regexp, '');
+	}
+
+	function addClass(element, className) {
+		element.className += ' ' + className;
 	}
 
 	/**
@@ -249,7 +256,7 @@
 			i;
 
 		for (i = 0; i < pointsLength; i++) {
-			toggleClass(points[i], 'hidden', (filterEnabled) ? 'remove' : 'add');
+			toggleClass(points[i], 'hidden');
 		}
 	}
 
@@ -267,7 +274,7 @@
 			parseInt(filterClicked.getAttribute('data-point-type'), 10)
 		);
 
-		toggleClass(filterClicked, 'enabled', (filterEnabled) ? 'remove' : 'add');
+		toggleClass(filterClicked, 'enabled');
 	}
 
 	/**
@@ -277,7 +284,7 @@
 		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
 			filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
 
-		toggleClass(allPointTypesFilter, 'enabled', (pointTypes.length === filtersEnabledLength) ? 'add' : 'remove');
+		toggleClass(allPointTypesFilter, 'enabled');
 	}
 
 	/**
@@ -291,7 +298,7 @@
 			i;
 
 		for (i = 0; i < filtersLength; i++) {
-			toggleClass(filters[i], 'enabled', (filterEnabled) ? 'remove' : 'add');
+			toggleClass(filters[i], 'enabled');
 		}
 
 		toggleAllPointTypesFilter();
@@ -393,7 +400,7 @@
 		config.points.forEach(addPointOnMap);
 
 		pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
-		document.querySelector('.filter-menu').addEventListener('click', toggleFilterBox);
+		document.querySelector('.filter-menu-header').addEventListener('click', toggleFilterBox);
 	}
 
 	/**
@@ -490,22 +497,10 @@
 		}, showPontoError, true);
 	}
 
-	function showFilterBox(box) {
-		box.classList.add('shown');
-		box.classList.remove('hidden');
-	}
-
-	function hideFilterBox(box) {
-		box.classList.remove('shown');
-		box.classList.add('hidden');
-	}
-
 	function toggleFilterBox(event) {
-		if ( event.currentTarget.className.match('shown') ) {
-			hideFilterBox( event.currentTarget );
-		} else {
-			showFilterBox( event.currentTarget );
-		}
+		var filterBox = event.currentTarget.parentElement;
+		toggleClass(filterBox, 'shown');
+		toggleClass(filterBox, 'hidden');
 	}
 
 	/**
@@ -599,7 +594,7 @@
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
 
 			//Expand the filter box
-			showFilterBox(document.querySelector('.filter-box'));
+			toggleFilterBox(document.querySelector('.filter-box'));
 		}
 	}
 
