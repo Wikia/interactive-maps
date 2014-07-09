@@ -54,6 +54,8 @@
 	-ms-flex-direction: column;
 	-o-flex-direction: column;
 	flex-direction: column;
+	font-family: Helvetica Neue, helvetica, arial, sans-serif;
+	font-size: 16px;
 	max-height: 100%;
 	padding: 10px;
 	position: absolute;
@@ -71,7 +73,7 @@
     -o-flex-shrink: 0;
     flex-shrink: 0;
     font-weight: bold;
-    height: 50px;
+    height: 44px;
     line-height: 50px;
     margin: 0;
     padding: 0 15px;
@@ -81,6 +83,7 @@
     cursor: pointer;
     display: none;
     float: right;
+	font-size: 13px;
 }
 
 .enable-edit .edit-point-types {
@@ -98,7 +101,9 @@
 }
 
 .point-types li {
-	padding: 10px 10px 10px 15px;
+	cursor: pointer;
+	height: 44px;
+	padding: 0 10px 1px 10px;
 }
 
 .point-types li.enabled {
@@ -107,10 +112,8 @@
 }
 
 .point-type img {
-	height: 20px;
 	margin: 0 10px 0 5px;
 	vertical-align: middle;
-	width: 20px;
 }
 
 .point-type span {
