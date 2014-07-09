@@ -78,15 +78,19 @@
 
 .hidden {
 	max-height: 0;
-	-webkit-transition: max-height 0.3s ease-in, width 0.3s 0.3s ease-in;
-	transition: max-height 0.3s ease-in, width 0.3s 0.3s ease-in;
+	-webkit-transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
+	transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
 	width: 94px;
+}
+
+.hidden .edit-point-types {
+	display: none;
 }
 
 .shown {
 	max-height: 100%;
-	-webkit-transition: max-height 0.3s 0.3s ease-in, width 0.3s ease-in;
-	transition: max-height 0.3s 0.3s ease-in, width 0.3s ease-in;
+	-webkit-transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
+	transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
 	width: 320px;
 }
 

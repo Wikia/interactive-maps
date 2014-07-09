@@ -235,11 +235,21 @@
 		}
 	}
 
+	/**
+	 * @desc Removes a class from an element
+	 * @param {HTMLElement} element
+	 * @param {string} className
+	 */
 	function removeClass(element, className) {
 		var regexp = new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g');
 		element.className = element.className.replace(regexp, '');
 	}
 
+	/**
+	 * @desc Adds a class to an element
+	 * @param {HTMLElement} element
+	 * @param {string} className
+	 */
 	function addClass(element, className) {
 		element.className += ' ' + className;
 	}
@@ -400,7 +410,7 @@
 		config.points.forEach(addPointOnMap);
 
 		pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
-		document.querySelector('.filter-menu-header').addEventListener('click', toggleFilterBox);
+		document.querySelector('.filter-menu-header').addEventListener('click', handleBoxHeaderClick);
 	}
 
 	/**
@@ -497,10 +507,22 @@
 		}, showPontoError, true);
 	}
 
-	function toggleFilterBox(event) {
-		var filterBox = event.currentTarget.parentElement;
+	/**
+	 * @desc Expands / folds the filter box
+	 * @param {HTMLElement} filterBox
+	 */
+	function toggleFilterBox(filterBox) {
 		toggleClass(filterBox, 'shown');
 		toggleClass(filterBox, 'hidden');
+	}
+
+	/**
+	 * @desc Handles click event on the filterBox header
+	 * @param {event} event
+	 */
+	function handleBoxHeaderClick(event) {
+		var filterBox = event.currentTarget.parentElement;
+		toggleFilterBox(filterBox);
 	}
 
 	/**
