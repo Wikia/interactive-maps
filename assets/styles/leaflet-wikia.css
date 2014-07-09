@@ -66,6 +66,8 @@
 
 .filter-menu-header {
 	background: rgba(0, 0, 0, 0.8);
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
 	-ms-flex-negative: 0;
 	-webkit-flex-shrink: 0;
 	-moz-flex-shrink: 0;
@@ -73,10 +75,9 @@
 	-o-flex-shrink: 0;
 	flex-shrink: 0;
 	font-weight: bold;
-	height: 44px;
-	line-height: 50px;
+	height: 14px;
 	margin: 0;
-	padding: 0 15px;
+	padding: 15px;
 }
 
 .edit-point-types {
