@@ -30,8 +30,8 @@
 		popupWidthWithoutPhoto = 314,
 		photoWidth = 90,
 		photoHeight = 90,
-		pointIconWidth = 32,
-		pointIconHeight = 32,
+		pointIconWidth = 30,
+		pointIconHeight = 30,
 
 		autoZoomPadding = 0.01,
 
