@@ -521,8 +521,10 @@
 	 * @param {event} event
 	 */
 	function handleBoxHeaderClick(event) {
-		var filterBox = event.currentTarget.parentElement;
-		toggleFilterBox(filterBox);
+		if (event.target.id !== editPointTypesButtonId) {
+			var filterBox = event.currentTarget.parentElement;
+			toggleFilterBox(filterBox);
+		}
 	}
 
 	/**
