@@ -227,8 +227,14 @@
 	 * @param {string} className - Name of class to toggle
 	 * @param {string} operation - 'add' or 'remove' class
 	 */
-	function toggleClass(element, className, operation) {
-		element.classList[operation](className);
+	function toggleClass(element, className) {
+		var classList = element.className;
+		if (classList.indexOf(className) !== -1) {
+			var regexp = new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g');
+			element.className = element.className.replace(regexp, '');
+		} else {
+			element.className += ' ' + className;
+		}
 	}
 
 	/**
@@ -341,7 +347,7 @@
 			ul = document.createElement('ul'),
 			li = document.createElement('li');
 
-		div.setAttribute('class', 'filter-menu');
+		div.setAttribute('class', 'filter-menu hidden');
 
 		header.setAttribute('class', 'filter-menu-header');
 
@@ -387,6 +393,7 @@
 		config.points.forEach(addPointOnMap);
 
 		pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
+		document.querySelector('.filter-menu').addEventListener('click', toggleFilterBox);
 	}
 
 	/**
@@ -483,6 +490,24 @@
 		}, showPontoError, true);
 	}
 
+	function showFilterBox(box) {
+		box.classList.add('shown');
+		box.classList.remove('hidden');
+	}
+
+	function hideFilterBox(box) {
+		box.classList.remove('shown');
+		box.classList.add('hidden');
+	}
+
+	function toggleFilterBox(event) {
+		if ( event.currentTarget.className.match('shown') ) {
+			hideFilterBox( event.currentTarget );
+		} else {
+			showFilterBox( event.currentTarget );
+		}
+	}
+
 	/**
 	 * Filters out POI types that should not be edited and caches the result
 	 * uses editablePinTypes for caching
@@ -572,6 +597,9 @@
 			map.addControl(drawControls);
 			map.addControl(embedMapCodeButton);
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
+
+			//Expand the filter box
+			showFilterBox(document.querySelector('.filter-box'));
 		}
 	}
 
