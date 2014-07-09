@@ -225,10 +225,33 @@
 	 * @desc Adds or removes class of DOM element
 	 * @param {Element} element - DOM element
 	 * @param {string} className - Name of class to toggle
-	 * @param {string} operation - 'add' or 'remove' class
 	 */
-	function toggleClass(element, className, operation) {
-		element.classList[operation](className);
+	function toggleClass(element, className) {
+		var classList = element.className;
+		if (classList.indexOf(className) !== -1) {
+			removeClass(element, className);
+		} else {
+			addClass(element, className)
+		}
+	}
+
+	/**
+	 * @desc Removes a class from an element
+	 * @param {HTMLElement} element
+	 * @param {string} className
+	 */
+	function removeClass(element, className) {
+		var regexp = new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g');
+		element.className = element.className.replace(regexp, '');
+	}
+
+	/**
+	 * @desc Adds a class to an element
+	 * @param {HTMLElement} element
+	 * @param {string} className
+	 */
+	function addClass(element, className) {
+		element.className += ' ' + className;
 	}
 
 	/**
@@ -243,7 +266,7 @@
 			i;
 
 		for (i = 0; i < pointsLength; i++) {
-			toggleClass(points[i], 'hidden', (filterEnabled) ? 'remove' : 'add');
+			toggleClass(points[i], 'hidden');
 		}
 	}
 
@@ -261,7 +284,7 @@
 			parseInt(filterClicked.getAttribute('data-point-type'), 10)
 		);
 
-		toggleClass(filterClicked, 'enabled', (filterEnabled) ? 'remove' : 'add');
+		toggleClass(filterClicked, 'enabled');
 	}
 
 	/**
@@ -271,7 +294,7 @@
 		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
 			filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
 
-		toggleClass(allPointTypesFilter, 'enabled', (pointTypes.length === filtersEnabledLength) ? 'add' : 'remove');
+		toggleClass(allPointTypesFilter, 'enabled');
 	}
 
 	/**
@@ -285,7 +308,7 @@
 			i;
 
 		for (i = 0; i < filtersLength; i++) {
-			toggleClass(filters[i], 'enabled', (filterEnabled) ? 'remove' : 'add');
+			toggleClass(filters[i], 'enabled');
 		}
 
 		toggleAllPointTypesFilter();
@@ -341,7 +364,7 @@
 			ul = document.createElement('ul'),
 			li = document.createElement('li');
 
-		div.setAttribute('class', 'filter-menu');
+		div.setAttribute('class', 'filter-menu hidden');
 
 		header.setAttribute('class', 'filter-menu-header');
 
@@ -387,6 +410,7 @@
 		config.points.forEach(addPointOnMap);
 
 		pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
+		document.querySelector('.filter-menu-header').addEventListener('click', handleBoxHeaderClick);
 	}
 
 	/**
@@ -484,6 +508,26 @@
 	}
 
 	/**
+	 * @desc Expands / folds the filter box
+	 * @param {HTMLElement} filterBox
+	 */
+	function toggleFilterBox(filterBox) {
+		toggleClass(filterBox, 'shown');
+		toggleClass(filterBox, 'hidden');
+	}
+
+	/**
+	 * @desc Handles click event on the filterBox header
+	 * @param {event} event
+	 */
+	function handleBoxHeaderClick(event) {
+		if (event.target.id !== editPointTypesButtonId) {
+			var filterBox = event.currentTarget.parentElement;
+			toggleFilterBox(filterBox);
+		}
+	}
+
+	/**
 	 * Filters out POI types that should not be edited and caches the result
 	 * uses editablePinTypes for caching
 	 * @param {array} types
@@ -572,6 +616,9 @@
 			map.addControl(drawControls);
 			map.addControl(embedMapCodeButton);
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
+
+			//Expand the filter box
+			toggleFilterBox(document.querySelector('.filter-box'));
 		}
 	}
 
