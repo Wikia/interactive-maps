@@ -40,7 +40,10 @@
 		pointCache = {},
 		pointTypes = {},
 		config = window.mapSetup,
-		editablePointTypes;
+		editablePointTypes,
+		// @todo Remove these once Ponto is fixed
+		isWikiaSet = false,
+		pontoTimeout = 500;
 
 	/**
 	 * @desc Translates message
@@ -571,12 +574,25 @@
 	}
 
 	/**
+	 * @desc This is temporary function to handle Ponto, not error-ing when there is no Ponto on the other side
+	 * @todo Remove this once Ponto errors on missing pair
+	 */
+	function setupPontoTimeout() {
+		setTimeout(function () {
+			if (!isWikiaSet) {
+				setUpHideButton();
+			}
+		}, pontoTimeout);
+	}
+
+	/**
 	 * @desc setup Ponto communication for Wikia Client
 	 */
 	function setupPontoWikiaClient() {
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
-			Ponto.invoke(pontoBridgeModule, 'isWikia', null, setUpEditOptions, showPontoError, false);
+			Ponto.invoke(pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions, showPontoError, false);
+			setupPontoTimeout();
 		} else {
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 				parseInt(config.id, 10));
@@ -584,42 +600,61 @@
 	}
 
 	/**
-	 * @desc setup edit options for Wikia only
-	 * @param {bool} isWikia - true if iframe is displayed on Wikia page
+	 * @desc setup map options available only when map displayed on Wikia page
+	 * @param {object} options - {enableEdit: bool, skin: string}
 	 */
-	function setUpEditOptions(isWikia) {
+	function setupWikiaOnlyOptions(options) {
+		if (options.enableEdit) {
+			setUpEditOptions();
+		}
+		if (options.skin === 'wikiamobile') {
+			setUpHideButton();
+		} else {
+			toggleFilterBox(document.querySelector('.filter-menu'));
+		}
+	}
+
+	function setUpHideButton() {
+		var hide = document.createElement('a');
+		hide.innerHTML = msg('wikia-interactive-maps-hide-filter');
+		hide.className = 'hide-button';
+		document.querySelector('.filter-menu-header').appendChild(hide);
+	}
+
+	/**
+	 * @desc setup edit options
+	 */
+	function setUpEditOptions() {
 		var doc = window.document,
 			editPointTypesButton = doc.getElementById(editPointTypesButtonId),
 			mapContainer = doc.getElementById(mapContainerId);
 
-		if (isWikia) {
-			// add POI handler
-			map.on('draw:created', function (event) {
-				editMarker(addTempMarker(event));
-			});
+		// @todo Remove this, once Ponto errors on missing pair
+		isWikiaSet = true;
 
-			// edit POI handler
-			mapContainer.addEventListener('click', function (event) {
-				var target = event.target;
+		// add POI handler
+		map.on('draw:created', function (event) {
+			editMarker(addTempMarker(event));
+		});
 
-				if (target.classList.contains('edit-poi-link')) {
-					event.preventDefault();
-					editMarker(getMarker(target.getAttribute('data-marker-id')));
-				}
-			}, false);
+		// edit POI handler
+		mapContainer.addEventListener('click', function (event) {
+			var target = event.target;
 
-			// edit POI categories handler
-			editPointTypesButton.addEventListener('click', editPointTypes, false);
+			if (target.classList.contains('edit-poi-link')) {
+				event.preventDefault();
+				editMarker(getMarker(target.getAttribute('data-marker-id')));
+			}
+		}, false);
 
-			// show edit UI elements
-			doc.body.classList.add('enable-edit');
-			map.addControl(drawControls);
-			map.addControl(embedMapCodeButton);
-			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
+		// edit POI categories handler
+		editPointTypesButton.addEventListener('click', editPointTypes, false);
 
-			//Expand the filter box
-			toggleFilterBox(document.querySelector('.filter-box'));
-		}
+		// show edit UI elements
+		addClass(doc.body, 'enable-edit');
+		map.addControl(drawControls);
+		map.addControl(embedMapCodeButton);
+		Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
 	}
 
 	/**
@@ -749,5 +784,4 @@
 	}
 
 	createMap();
-
 })(window, window.L, window.Ponto, window.Tracker);
