@@ -81,6 +81,25 @@
 	padding: 15px;
 }
 
+.hide-button {
+	float: right;
+}
+
+.hide-button, .edit-point-types {
+	-webkit-transition: opacity 0.2s ease-in;
+	transition: opacity 0.2s ease-in;
+}
+
+.hidden .hide-button, .hidden .edit-point-types {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.shown .hide-button, .shown .edit-point-types {
+	opacity: 1;
+	pointer-events: auto;
+}
+
 .hidden {
 	max-height: 0;
 	-webkit-transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
@@ -88,8 +107,9 @@
 	width: 94px;
 }
 
-.hidden #editPointTypes {
-	display: none;
+.hidden .filter-menu-header {
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
 }
 
 .shown {
