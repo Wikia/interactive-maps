@@ -84,9 +84,29 @@
 	-o-flex-shrink: 0;
 	flex-shrink: 0;
 	font-weight: bold;
-	height: 14px;
+	height: 16px;
 	margin: 0;
 	padding: 15px;
+}
+
+.hide-button {
+	float: right;
+	font-size: 13px;
+}
+
+.hide-button, .edit-point-types {
+	-webkit-transition: opacity 0.2s ease-in;
+	transition: opacity 0.2s ease-in;
+}
+
+.hidden .hide-button, .hidden .edit-point-types {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.shown .hide-button, .shown .edit-point-types {
+	opacity: 1;
+	pointer-events: auto;
 }
 
 .hidden {
@@ -96,8 +116,9 @@
 	width: 94px;
 }
 
-.hidden #editPointTypes {
-	display: none;
+.hidden .filter-menu-header {
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
 }
 
 .shown {

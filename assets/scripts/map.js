@@ -43,7 +43,9 @@
 		pointTypes = {},
 		config = window.mapSetup,
 		editablePointTypes,
-		isWikia = false;
+		// @todo Remove these once Ponto is fixed
+		isWikiaSet = false,
+		pontoTimeout = 500;
 
 	/**
 	 * @desc Translates message
@@ -569,12 +571,26 @@
 	}
 
 	/**
+	 * @desc This is temporary function to handle Ponto, not error-ing when there is no Ponto on the other side
+	 * @todo Remove this once Ponto errors on missing pair
+	 */
+	function setupPontoTimeout() {
+		setTimeout(function () {
+			if (!isWikiaSet) {
+				setUpHideButton();
+			}
+		}, pontoTimeout);
+	}
+
+	/**
 	 * @desc setup Ponto communication for Wikia Client
 	 */
 	function setupPontoWikiaClient() {
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions, showPontoError, false);
+			setupPontoTimeout();
+		} else {
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 				parseInt(config.id, 10));
 		}
@@ -585,15 +601,24 @@
 	 * @param {object} options - {enableEdit: bool, skin: string}
 	 */
 	function setupWikiaOnlyOptions(options) {
-		isWikia = true;
-
 		if (options.enableEdit) {
 			setUpEditOptions();
 		}
-
 		if (options.skin === 'wikiamobile') {
-			body.classList.add('wikia-mobile');
+			setUpHideButton();
+		} else {
+			toggleFilterBox(document.querySelector('.filter-menu'));
 		}
+	}
+
+	/**
+	 * @desc adds hide button when on wikia mobile or embed code
+	 */
+	function setUpHideButton() {
+		var hide = document.createElement('a');
+		hide.innerHTML = msg('wikia-interactive-maps-hide-filter');
+		hide.className = 'hide-button';
+		document.querySelector('.filter-menu-header').appendChild(hide);
 	}
 
 	/**
@@ -602,6 +627,9 @@
 	function setUpEditOptions() {
 		var editPointTypesButton = doc.getElementById(editPointTypesButtonId),
 			mapContainer = doc.getElementById(mapContainerId);
+
+		// @todo Remove this, once Ponto errors on missing pair
+		isWikiaSet = true;
 
 		// add POI handler
 		map.on('draw:created', function (event) {
@@ -622,13 +650,10 @@
 		editPointTypesButton.addEventListener('click', editPointTypes, false);
 
 		// show edit UI elements
-		body.classList.add('enable-edit');
+		addClass(body, 'enable-edit');
 		map.addControl(drawControls);
 		map.addControl(embedMapCodeButton);
 		Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
-
-		//Expand the filter box
-		toggleFilterBox(doc.querySelector('.filter-box'));
 	}
 
 	/**
@@ -759,5 +784,4 @@
 	}
 
 	createMap();
-
 })(window, window.L, window.Ponto, window.Tracker);
