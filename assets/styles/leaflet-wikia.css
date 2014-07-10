@@ -59,7 +59,13 @@
 	position: absolute;
 	top: 0;
 	width: 320px;
-	z-index: 1;
+	z-index: 1001;
+}
+
+.wikia-mobile .filter-menu {
+    bottom: 0;
+    padding: 0;
+    width: 100%;
 }
 
 .filter-menu-header {
@@ -95,6 +101,10 @@
 	overflow-x: hidden;
 	overflow-y: auto;
 	padding: 0;
+}
+
+.wikia-mobile .point-types {
+    height: 100%;
 }
 
 .point-types li {
