@@ -616,7 +616,7 @@
 
 	function setUpHideButton() {
 		var hide = document.createElement('a');
-		hide.innerHTML = 'Hide';
+		hide.innerHTML = msg('wikia-interactive-maps-hide-filter');
 		hide.className = 'hide-button';
 		document.querySelector('.filter-menu-header').appendChild(hide);
 	}
