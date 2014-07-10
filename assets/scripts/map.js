@@ -32,8 +32,8 @@
 		popupWidthWithoutPhoto = 314,
 		photoWidth = 90,
 		photoHeight = 90,
-		pointIconWidth = 32,
-		pointIconHeight = 32,
+		pointIconWidth = 30,
+		pointIconHeight = 30,
 
 		autoZoomPadding = 0.01,
 
@@ -228,10 +228,33 @@
 	 * @desc Adds or removes class of DOM element
 	 * @param {Element} element - DOM element
 	 * @param {string} className - Name of class to toggle
-	 * @param {string} operation - 'add' or 'remove' class
 	 */
-	function toggleClass(element, className, operation) {
-		element.classList[operation](className);
+	function toggleClass(element, className) {
+		var classList = element.className;
+		if (classList.indexOf(className) !== -1) {
+			removeClass(element, className);
+		} else {
+			addClass(element, className);
+		}
+	}
+
+	/**
+	 * @desc Removes a class from an element
+	 * @param {HTMLElement} element
+	 * @param {string} className
+	 */
+	function removeClass(element, className) {
+		var regexp = new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g');
+		element.className = element.className.replace(regexp, '');
+	}
+
+	/**
+	 * @desc Adds a class to an element
+	 * @param {HTMLElement} element
+	 * @param {string} className
+	 */
+	function addClass(element, className) {
+		element.className += ' ' + className;
 	}
 
 	/**
@@ -242,11 +265,10 @@
 		var pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10),
 			points = getPointsByType(pointType),
 			pointsLength = points.length,
-			filterEnabled = filterClicked.classList.contains('enabled'),
 			i;
 
 		for (i = 0; i < pointsLength; i++) {
-			toggleClass(points[i], 'hidden', (filterEnabled) ? 'remove' : 'add');
+			toggleClass(points[i], 'hidden');
 		}
 	}
 
@@ -255,8 +277,6 @@
 	 * @param {Element} filterClicked - Filter element that was clicked
 	 */
 	function togglePointTypeFilter(filterClicked) {
-		var filterEnabled = filterClicked.classList.contains('enabled');
-
 		Tracker.track(
 			'map',
 			Tracker.ACTIONS.CLICK,
@@ -264,17 +284,16 @@
 			parseInt(filterClicked.getAttribute('data-point-type'), 10)
 		);
 
-		toggleClass(filterClicked, 'enabled', (filterEnabled) ? 'remove' : 'add');
+		toggleClass(filterClicked, 'enabled');
 	}
 
 	/**
 	 * @desc Toggles state of "All pin types" filter
 	 */
 	function toggleAllPointTypesFilter() {
-		var allPointTypesFilter = doc.getElementById(allPointTypesFilterId),
-			filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
+		var allPointTypesFilter = doc.getElementById(allPointTypesFilterId);
 
-		toggleClass(allPointTypesFilter, 'enabled', (pointTypes.length === filtersEnabledLength) ? 'add' : 'remove');
+		toggleClass(allPointTypesFilter, 'enabled');
 	}
 
 	/**
@@ -282,13 +301,12 @@
 	 */
 	function allPointTypesFilterClickHandler() {
 		var allPointTypesFilter = doc.getElementById(allPointTypesFilterId),
-			filterEnabled = allPointTypesFilter.classList.contains('enabled'),
 			filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
 			filtersLength = filters.length,
 			i;
 
 		for (i = 0; i < filtersLength; i++) {
-			toggleClass(filters[i], 'enabled', (filterEnabled) ? 'remove' : 'add');
+			toggleClass(filters[i], 'enabled');
 		}
 
 		toggleAllPointTypesFilter();
@@ -344,7 +362,7 @@
 			ul = doc.createElement('ul'),
 			li = doc.createElement('li');
 
-		div.setAttribute('class', 'filter-menu');
+		div.setAttribute('class', 'filter-menu hidden');
 
 		header.setAttribute('class', 'filter-menu-header');
 
@@ -390,6 +408,7 @@
 		config.points.forEach(addPointOnMap);
 
 		pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
+		document.querySelector('.filter-menu-header').addEventListener('click', handleBoxHeaderClick);
 	}
 
 	/**
@@ -484,6 +503,26 @@
 				}
 			}
 		}, showPontoError, true);
+	}
+
+	/**
+	 * @desc Expands / folds the filter box
+	 * @param {HTMLElement} filterBox
+	 */
+	function toggleFilterBox(filterBox) {
+		toggleClass(filterBox, 'shown');
+		toggleClass(filterBox, 'hidden');
+	}
+
+	/**
+	 * @desc Handles click event on the filterBox header
+	 * @param {event} event
+	 */
+	function handleBoxHeaderClick(event) {
+		if (event.target.id !== editPointTypesButtonId) {
+			var filterBox = event.currentTarget.parentElement;
+			toggleFilterBox(filterBox);
+		}
 	}
 
 	/**
@@ -587,6 +626,9 @@
 		map.addControl(drawControls);
 		map.addControl(embedMapCodeButton);
 		Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
+
+		//Expand the filter box
+		toggleFilterBox(doc.querySelector('.filter-box'));
 	}
 
 	/**
