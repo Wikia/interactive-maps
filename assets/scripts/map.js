@@ -1,7 +1,9 @@
 (function (window, L, Ponto, Tracker) {
 	'use strict';
 
-	var mapContainerId = 'map',
+	var doc = window.document,
+		body = doc.body,
+		mapContainerId = 'map',
 		pointTypeFiltersContainerId = 'pointTypes',
 		editPointTypesButtonId = 'editPointTypes',
 		allPointTypesFilterId = 'allPointTypes',
@@ -198,7 +200,7 @@
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
 	function loadPointsToCache(pointType) {
-		pointCache[pointType] = document.querySelectorAll(
+		pointCache[pointType] = doc.querySelectorAll(
 			(pointType === 0) ?
 			'.leaflet-marker-icon, .leaflet-marker-shadow' :
 			'.point-type-' + pointType
@@ -234,7 +236,7 @@
 		if (classList.indexOf(className) !== -1) {
 			removeClass(element, className);
 		} else {
-			addClass(element, className)
+			addClass(element, className);
 		}
 	}
 
@@ -265,7 +267,6 @@
 		var pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10),
 			points = getPointsByType(pointType),
 			pointsLength = points.length,
-			filterEnabled = filterClicked.classList.contains('enabled'),
 			i;
 
 		for (i = 0; i < pointsLength; i++) {
@@ -278,8 +279,6 @@
 	 * @param {Element} filterClicked - Filter element that was clicked
 	 */
 	function togglePointTypeFilter(filterClicked) {
-		var filterEnabled = filterClicked.classList.contains('enabled');
-
 		Tracker.track(
 			'map',
 			Tracker.ACTIONS.CLICK,
@@ -294,8 +293,7 @@
 	 * @desc Toggles state of "All pin types" filter
 	 */
 	function toggleAllPointTypesFilter() {
-		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
-			filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
+		var allPointTypesFilter = doc.getElementById(allPointTypesFilterId);
 
 		toggleClass(allPointTypesFilter, 'enabled');
 	}
@@ -304,8 +302,7 @@
 	 * @desc Handles click on "All pin types" filter
 	 */
 	function allPointTypesFilterClickHandler() {
-		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
-			filterEnabled = allPointTypesFilter.classList.contains('enabled'),
+		var allPointTypesFilter = doc.getElementById(allPointTypesFilterId),
 			filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
 			filtersLength = filters.length,
 			i;
@@ -360,23 +357,23 @@
 	 * @returns {object}
 	 */
 	function createPointTypeFiltersContainer(container) {
-		var div = document.createElement('div'),
-			header = document.createElement('div'),
-			headerTitle = document.createElement('span'),
-			headerEdit = document.createElement('span'),
-			ul = document.createElement('ul'),
-			li = document.createElement('li');
+		var div = doc.createElement('div'),
+			header = doc.createElement('div'),
+			headerTitle = doc.createElement('span'),
+			headerEdit = doc.createElement('span'),
+			ul = doc.createElement('ul'),
+			li = doc.createElement('li');
 
 		div.setAttribute('class', 'filter-menu hidden');
 
 		header.setAttribute('class', 'filter-menu-header');
 
-		headerTitle.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
+		headerTitle.appendChild(doc.createTextNode(msg('wikia-interactive-maps-filters')));
 		header.appendChild(headerTitle);
 
 		headerEdit.setAttribute('id', editPointTypesButtonId);
 		headerEdit.setAttribute('class', 'edit-point-types');
-		headerEdit.appendChild(document.createTextNode(msg('wikia-interactive-maps-edit-pin-types')));
+		headerEdit.appendChild(doc.createTextNode(msg('wikia-interactive-maps-edit-pin-types')));
 		header.appendChild(headerEdit);
 
 		div.appendChild(header);
@@ -387,7 +384,7 @@
 		li.setAttribute('id', 'allPointTypes');
 		li.setAttribute('class', 'enabled');
 		li.setAttribute('data-point-type', '0');
-		li.appendChild(document.createTextNode(msg('wikia-interactive-maps-all-pin-types')));
+		li.appendChild(doc.createTextNode(msg('wikia-interactive-maps-all-pin-types')));
 		ul.appendChild(li);
 		div.appendChild(ul);
 		container.appendChild(div);
@@ -407,7 +404,7 @@
 			pointTypeFiltersHtml += buildPointTypeFilterHtml(pointType);
 		});
 
-		pointTypeFiltersContainer = createPointTypeFiltersContainer(document.body);
+		pointTypeFiltersContainer = createPointTypeFiltersContainer(body);
 		pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
 
 		config.points.forEach(addPointOnMap);
@@ -614,6 +611,9 @@
 		}
 	}
 
+	/**
+	 * @desc adds hide button when on wikia mobile or embed code
+	 */
 	function setUpHideButton() {
 		var hide = document.createElement('a');
 		hide.innerHTML = msg('wikia-interactive-maps-hide-filter');
@@ -625,8 +625,7 @@
 	 * @desc setup edit options
 	 */
 	function setUpEditOptions() {
-		var doc = window.document,
-			editPointTypesButton = doc.getElementById(editPointTypesButtonId),
+		var editPointTypesButton = doc.getElementById(editPointTypesButtonId),
 			mapContainer = doc.getElementById(mapContainerId);
 
 		// @todo Remove this, once Ponto errors on missing pair
@@ -651,7 +650,7 @@
 		editPointTypesButton.addEventListener('click', editPointTypes, false);
 
 		// show edit UI elements
-		addClass(doc.body, 'enable-edit');
+		addClass(body, 'enable-edit');
 		map.addControl(drawControls);
 		map.addControl(embedMapCodeButton);
 		Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
@@ -689,7 +688,7 @@
 			Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_IMAGE, 'poi');
 		});
 
-		window.document.addEventListener('click', function (event) {
+		doc.addEventListener('click', function (event) {
 			if (event.target.classList.contains('poi-article-link')) {
 				Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article');
 			}
@@ -712,8 +711,8 @@
 			config.layer.maxZoom,
 			Math.max(config.width, config.height),
 			Math.max(
-				Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
-				Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+				Math.max(doc.documentElement.clientWidth, window.innerWidth || 0),
+				Math.max(doc.documentElement.clientHeight, window.innerHeight || 0)
 			)
 		);
 
@@ -764,6 +763,7 @@
 		});
 
 		map.addControl(zoomControl);
+
 		setupPontoWikiaClient();
 		setupPoints();
 		setupClickTracking();
