@@ -784,5 +784,4 @@
 	}
 
 	createMap();
-	debugger;
 })(window, window.L, window.Ponto, window.Tracker);
