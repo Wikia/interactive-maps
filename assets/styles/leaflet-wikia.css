@@ -66,6 +66,9 @@
 .wikia-mobile .filter-menu {
     bottom: 0;
     padding: 0;
+}
+
+.wikia-mobile .filter-menu.shown {
     width: 100%;
 }
 
