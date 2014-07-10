@@ -83,6 +83,7 @@
 
 .hide-button {
 	float: right;
+	font-size: 13px;
 }
 
 .hide-button, .edit-point-types {
