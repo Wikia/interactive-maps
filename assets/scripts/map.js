@@ -497,11 +497,11 @@
 				markerObject = addPointOnMap(point);
 
 				filter = pointTypeFiltersContainer.querySelector('[data-point-type="' + point.poi_category_id + '"]');
-				if (filter.classList.contains('enabled')) {
+				if (filter.className.indexOf('enabled') !== -1) {
 					markerObject.openPopup();
 				} else {
-					markerObject._icon.classList.add('hidden');
-					markerObject._shadow.classList.add('hidden');
+					addClass(markerObject._icon, 'hidden');
+					addClass(markerObject._shadow, 'hidden');
 				}
 			}
 		}, showPontoError, true);
@@ -641,7 +641,7 @@
 		mapContainer.addEventListener('click', function (event) {
 			var target = event.target;
 
-			if (target.classList.contains('edit-poi-link')) {
+			if (target.className.indexOf('edit-poi-link') !== -1) {
 				event.preventDefault();
 				editMarker(getMarker(target.getAttribute('data-marker-id')));
 			}
@@ -690,7 +690,7 @@
 		});
 
 		doc.addEventListener('click', function (event) {
-			if (event.target.classList.contains('poi-article-link')) {
+			if (event.target.className.indexOf('poi-article-link') !== -1) {
 				Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article');
 			}
 		});
