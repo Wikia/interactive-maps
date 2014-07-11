@@ -98,29 +98,29 @@
 	transition: opacity 0.2s ease-in;
 }
 
-.hidden .hide-button, .hidden .edit-point-types {
+.hiddenBox .hide-button, .hiddenBox .edit-point-types {
 	opacity: 0;
 	pointer-events: none;
 }
 
-.shown .hide-button, .shown .edit-point-types {
+.shownBox .hide-button, .shownBox .edit-point-types {
 	opacity: 1;
 	pointer-events: auto;
 }
 
-.hidden {
+.hiddenBox {
 	max-height: 0;
 	-webkit-transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
 	transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
 	width: 94px;
 }
 
-.hidden .filter-menu-header {
+.hiddenBox .filter-menu-header {
 	border-bottom-left-radius: 3px;
 	border-bottom-right-radius: 3px;
 }
 
-.shown {
+.shownBox {
 	max-height: 100%;
 	-webkit-transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
 	transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;

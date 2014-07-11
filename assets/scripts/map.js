@@ -512,8 +512,8 @@
 	 * @param {HTMLElement} filterBox
 	 */
 	function toggleFilterBox(filterBox) {
-		toggleClass(filterBox, 'shown');
-		toggleClass(filterBox, 'hidden');
+		toggleClass(filterBox, 'shownBox');
+		toggleClass(filterBox, 'hiddenBox');
 	}
 
 	/**
