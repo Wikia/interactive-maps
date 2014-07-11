@@ -1,7 +1,9 @@
 (function (window, L, Ponto, Tracker) {
 	'use strict';
 
-	var mapContainerId = 'map',
+	var doc = window.document,
+		body = doc.body,
+		mapContainerId = 'map',
 		pointTypeFiltersContainerId = 'pointTypes',
 		editPointTypesButtonId = 'editPointTypes',
 		allPointTypesFilterId = 'allPointTypes',
@@ -30,8 +32,8 @@
 		popupWidthWithoutPhoto = 314,
 		photoWidth = 90,
 		photoHeight = 90,
-		pointIconWidth = 32,
-		pointIconHeight = 32,
+		pointIconWidth = 30,
+		pointIconHeight = 30,
 
 		autoZoomPadding = 0.01,
 
@@ -40,7 +42,10 @@
 		pointCache = {},
 		pointTypes = {},
 		config = window.mapSetup,
-		editablePointTypes;
+		editablePointTypes,
+		// @todo Remove these once Ponto is fixed
+		isWikiaSet = false,
+		pontoTimeout = 500;
 
 	/**
 	 * @desc Translates message
@@ -195,7 +200,7 @@
 	 * @returns {NodeList} - List of DOM elements corresponding with given point type
 	 */
 	function loadPointsToCache(pointType) {
-		pointCache[pointType] = document.querySelectorAll(
+		pointCache[pointType] = doc.querySelectorAll(
 			(pointType === 0) ?
 			'.leaflet-marker-icon, .leaflet-marker-shadow' :
 			'.point-type-' + pointType
@@ -225,10 +230,33 @@
 	 * @desc Adds or removes class of DOM element
 	 * @param {Element} element - DOM element
 	 * @param {string} className - Name of class to toggle
-	 * @param {string} operation - 'add' or 'remove' class
 	 */
-	function toggleClass(element, className, operation) {
-		element.classList[operation](className);
+	function toggleClass(element, className) {
+		var classList = element.className;
+		if (classList.indexOf(className) !== -1) {
+			removeClass(element, className);
+		} else {
+			addClass(element, className);
+		}
+	}
+
+	/**
+	 * @desc Removes a class from an element
+	 * @param {HTMLElement} element
+	 * @param {string} className
+	 */
+	function removeClass(element, className) {
+		var regexp = new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g');
+		element.className = element.className.replace(regexp, '');
+	}
+
+	/**
+	 * @desc Adds a class to an element
+	 * @param {HTMLElement} element
+	 * @param {string} className
+	 */
+	function addClass(element, className) {
+		element.className += ' ' + className;
 	}
 
 	/**
@@ -239,11 +267,10 @@
 		var pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10),
 			points = getPointsByType(pointType),
 			pointsLength = points.length,
-			filterEnabled = filterClicked.classList.contains('enabled'),
 			i;
 
 		for (i = 0; i < pointsLength; i++) {
-			toggleClass(points[i], 'hidden', (filterEnabled) ? 'remove' : 'add');
+			toggleClass(points[i], 'hidden');
 		}
 	}
 
@@ -252,8 +279,6 @@
 	 * @param {Element} filterClicked - Filter element that was clicked
 	 */
 	function togglePointTypeFilter(filterClicked) {
-		var filterEnabled = filterClicked.classList.contains('enabled');
-
 		Tracker.track(
 			'map',
 			Tracker.ACTIONS.CLICK,
@@ -261,31 +286,37 @@
 			parseInt(filterClicked.getAttribute('data-point-type'), 10)
 		);
 
-		toggleClass(filterClicked, 'enabled', (filterEnabled) ? 'remove' : 'add');
+		toggleClass(filterClicked, 'enabled');
 	}
 
 	/**
 	 * @desc Toggles state of "All pin types" filter
 	 */
 	function toggleAllPointTypesFilter() {
-		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
+		var allPointTypesFilter = doc.getElementById(allPointTypesFilterId),
+			enabled = 'enabled',
 			filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
 
-		toggleClass(allPointTypesFilter, 'enabled', (pointTypes.length === filtersEnabledLength) ? 'add' : 'remove');
+		toggleClass(allPointTypesFilter, enabled);
+		if (pointTypes.length === filtersEnabledLength){
+			addClass(allPointTypesFilter, enabled);
+		} else {
+			removeClass(allPointTypesFilter, enabled);
+		}
+
 	}
 
 	/**
 	 * @desc Handles click on "All pin types" filter
 	 */
 	function allPointTypesFilterClickHandler() {
-		var allPointTypesFilter = document.getElementById(allPointTypesFilterId),
-			filterEnabled = allPointTypesFilter.classList.contains('enabled'),
+		var allPointTypesFilter = doc.getElementById(allPointTypesFilterId),
 			filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
 			filtersLength = filters.length,
 			i;
 
 		for (i = 0; i < filtersLength; i++) {
-			toggleClass(filters[i], 'enabled', (filterEnabled) ? 'remove' : 'add');
+			toggleClass(filters[i], 'enabled');
 		}
 
 		toggleAllPointTypesFilter();
@@ -334,23 +365,23 @@
 	 * @returns {object}
 	 */
 	function createPointTypeFiltersContainer(container) {
-		var div = document.createElement('div'),
-			header = document.createElement('div'),
-			headerTitle = document.createElement('span'),
-			headerEdit = document.createElement('span'),
-			ul = document.createElement('ul'),
-			li = document.createElement('li');
+		var div = doc.createElement('div'),
+			header = doc.createElement('div'),
+			headerTitle = doc.createElement('span'),
+			headerEdit = doc.createElement('span'),
+			ul = doc.createElement('ul'),
+			li = doc.createElement('li');
 
-		div.setAttribute('class', 'filter-menu');
+		div.setAttribute('class', 'filter-menu hidden-box');
 
 		header.setAttribute('class', 'filter-menu-header');
 
-		headerTitle.appendChild(document.createTextNode(msg('wikia-interactive-maps-filters')));
+		headerTitle.appendChild(doc.createTextNode(msg('wikia-interactive-maps-filters')));
 		header.appendChild(headerTitle);
 
 		headerEdit.setAttribute('id', editPointTypesButtonId);
 		headerEdit.setAttribute('class', 'edit-point-types');
-		headerEdit.appendChild(document.createTextNode(msg('wikia-interactive-maps-edit-pin-types')));
+		headerEdit.appendChild(doc.createTextNode(msg('wikia-interactive-maps-edit-pin-types')));
 		header.appendChild(headerEdit);
 
 		div.appendChild(header);
@@ -361,7 +392,7 @@
 		li.setAttribute('id', 'allPointTypes');
 		li.setAttribute('class', 'enabled');
 		li.setAttribute('data-point-type', '0');
-		li.appendChild(document.createTextNode(msg('wikia-interactive-maps-all-pin-types')));
+		li.appendChild(doc.createTextNode(msg('wikia-interactive-maps-all-pin-types')));
 		ul.appendChild(li);
 		div.appendChild(ul);
 		container.appendChild(div);
@@ -381,12 +412,13 @@
 			pointTypeFiltersHtml += buildPointTypeFilterHtml(pointType);
 		});
 
-		pointTypeFiltersContainer = createPointTypeFiltersContainer(document.body);
+		pointTypeFiltersContainer = createPointTypeFiltersContainer(body);
 		pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
 
 		config.points.forEach(addPointOnMap);
 
 		pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
+		document.querySelector('.filter-menu-header').addEventListener('click', handleBoxHeaderClick);
 	}
 
 	/**
@@ -473,14 +505,34 @@
 				markerObject = addPointOnMap(point);
 
 				filter = pointTypeFiltersContainer.querySelector('[data-point-type="' + point.poi_category_id + '"]');
-				if (filter.classList.contains('enabled')) {
+				if (filter.className.indexOf('enabled') !== -1) {
 					markerObject.openPopup();
 				} else {
-					markerObject._icon.classList.add('hidden');
-					markerObject._shadow.classList.add('hidden');
+					addClass(markerObject._icon, 'hidden');
+					addClass(markerObject._shadow, 'hidden');
 				}
 			}
 		}, showPontoError, true);
+	}
+
+	/**
+	 * @desc Expands / folds the filter box
+	 * @param {HTMLElement} filterBox
+	 */
+	function toggleFilterBox(filterBox) {
+		toggleClass(filterBox, 'shown-box');
+		toggleClass(filterBox, 'hidden-box');
+	}
+
+	/**
+	 * @desc Handles click event on the filterBox header
+	 * @param {event} event
+	 */
+	function handleBoxHeaderClick(event) {
+		if (event.target.id !== editPointTypesButtonId) {
+			var filterBox = event.currentTarget.parentElement;
+			toggleFilterBox(filterBox);
+		}
 	}
 
 	/**
@@ -527,12 +579,25 @@
 	}
 
 	/**
+	 * @desc This is temporary function to handle Ponto, not error-ing when there is no Ponto on the other side
+	 * @todo Remove this once Ponto errors on missing pair
+	 */
+	function setupPontoTimeout() {
+		setTimeout(function () {
+			if (!isWikiaSet) {
+				setUpHideButton();
+			}
+		}, pontoTimeout);
+	}
+
+	/**
 	 * @desc setup Ponto communication for Wikia Client
 	 */
 	function setupPontoWikiaClient() {
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions, showPontoError, false);
+			setupPontoTimeout();
 		} else {
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 				parseInt(config.id, 10));
@@ -544,17 +609,35 @@
 	 * @param {object} options - {enableEdit: bool, skin: string}
 	 */
 	function setupWikiaOnlyOptions(options) {
+		// @todo Remove this, once Ponto errors on missing pair
+		isWikiaSet = true;
+
 		if (options.enableEdit) {
 			setUpEditOptions();
 		}
+		if (options.skin === 'wikiamobile') {
+			addClass(body, 'wikia-mobile');
+			setUpHideButton();
+		} else {
+			toggleFilterBox(document.querySelector('.filter-menu'));
+		}
+	}
+
+	/**
+	 * @desc adds hide button when on wikia mobile or embed code
+	 */
+	function setUpHideButton() {
+		var hide = document.createElement('a');
+		hide.innerHTML = msg('wikia-interactive-maps-hide-filter');
+		hide.className = 'hide-button';
+		document.querySelector('.filter-menu-header').appendChild(hide);
 	}
 
 	/**
 	 * @desc setup edit options
 	 */
 	function setUpEditOptions() {
-		var doc = window.document,
-			editPointTypesButton = doc.getElementById(editPointTypesButtonId),
+		var editPointTypesButton = doc.getElementById(editPointTypesButtonId),
 			mapContainer = doc.getElementById(mapContainerId);
 
 		// add POI handler
@@ -566,7 +649,7 @@
 		mapContainer.addEventListener('click', function (event) {
 			var target = event.target;
 
-			if (target.classList.contains('edit-poi-link')) {
+			if (target.className.indexOf('edit-poi-link') !== -1) {
 				event.preventDefault();
 				editMarker(getMarker(target.getAttribute('data-marker-id')));
 			}
@@ -576,7 +659,7 @@
 		editPointTypesButton.addEventListener('click', editPointTypes, false);
 
 		// show edit UI elements
-		doc.body.classList.add('enable-edit');
+		addClass(body, 'enable-edit');
 		map.addControl(drawControls);
 		map.addControl(embedMapCodeButton);
 		Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
@@ -614,8 +697,8 @@
 			Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_IMAGE, 'poi');
 		});
 
-		window.document.addEventListener('click', function (event) {
-			if (event.target.classList.contains('poi-article-link')) {
+		doc.addEventListener('click', function (event) {
+			if (event.target.className.indexOf('poi-article-link') !== -1) {
 				Tracker.track('map', Tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article');
 			}
 		});
@@ -637,8 +720,8 @@
 			config.layer.maxZoom,
 			Math.max(config.width, config.height),
 			Math.max(
-				Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
-				Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+				Math.max(doc.documentElement.clientWidth, window.innerWidth || 0),
+				Math.max(doc.documentElement.clientHeight, window.innerHeight || 0)
 			)
 		);
 
@@ -689,6 +772,7 @@
 		});
 
 		map.addControl(zoomControl);
+
 		setupPontoWikiaClient();
 		setupPoints();
 		setupClickTracking();
@@ -709,5 +793,4 @@
 	}
 
 	createMap();
-
 })(window, window.L, window.Ponto, window.Tracker);

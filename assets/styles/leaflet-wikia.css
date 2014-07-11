@@ -54,41 +54,94 @@
 	-ms-flex-direction: column;
 	-o-flex-direction: column;
 	flex-direction: column;
+	font-family: Helvetica Neue, helvetica, arial, sans-serif;
+	font-size: 16px;
 	max-height: 100%;
 	padding: 10px;
 	position: absolute;
 	top: 0;
-	width: 320px;
-	z-index: 1;
+	z-index: 1001;
+}
+
+.wikia-mobile .filter-menu {
+	bottom: 0;
+}
+
+.wikia-mobile .filter-menu.shown-box {
+	width: 100%;
 }
 
 .filter-menu-header {
-    background: rgba(0, 0, 0, 0.8);
-    -ms-flex-negative: 0;
-    -webkit-flex-shrink: 0;
-    -moz-flex-shrink: 0;
-    -ms-flex-shrink: 0;
-    -o-flex-shrink: 0;
-    flex-shrink: 0;
-    font-weight: bold;
-    height: 50px;
-    line-height: 50px;
-    margin: 0;
-    padding: 0 15px;
+	background: rgba(51, 51, 51, 0.8);
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+	cursor: pointer;
+	-ms-flex-negative: 0;
+	-webkit-flex-shrink: 0;
+	-moz-flex-shrink: 0;
+	-ms-flex-shrink: 0;
+	-o-flex-shrink: 0;
+	flex-shrink: 0;
+	font-weight: bold;
+	height: 16px;
+	margin: 0;
+	padding: 15px;
+}
+
+.hide-button {
+	float: right;
+	font-size: 13px;
+}
+
+.hide-button, .edit-point-types {
+	-webkit-transition: opacity 0.2s ease-in;
+	transition: opacity 0.2s ease-in;
+}
+
+.hidden-box .hide-button, .hidden-box .edit-point-types {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.shown-box .hide-button, .shown-box .edit-point-types {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.hidden-box {
+	max-height: 0;
+	-webkit-transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
+	transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
+	width: 94px;
+}
+
+.hidden-box .filter-menu-header {
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+
+.shown-box {
+	max-height: 100%;
+	-webkit-transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
+	transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
+	width: 245px;
 }
 
 .edit-point-types {
-    cursor: pointer;
-    display: none;
-    float: right;
+	cursor: pointer;
+	display: none;
+	float: right;
+	font-size: 13px;
 }
 
 .enable-edit .edit-point-types {
-    display: inline;
+	display: inline;
 }
 
 .point-types {
-	background: rgba(0, 0, 0, 0.7);
+	background: rgba(102, 102, 102, 0.6);
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
 	-ms-flex-negative: 1;
 	list-style: none;
 	margin: 0;
@@ -97,26 +150,40 @@
 	padding: 0;
 }
 
+
+.wikia-mobile .point-types {
+	height: 100%;
+}
+#allPointTypes {
+	padding: 15px 10px;
+}
+
 .point-types li {
-	padding: 10px 10px 10px 15px;
+	cursor: pointer;
+	line-height: 14px;
+	padding: 7px 10px 7px 0;
+	margin: 0 0 0 10px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.point-types li:last-child {
+	border: 0;
 }
 
 .point-types li.enabled {
-	background: url('/images/selected.png') right center no-repeat;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSIyMXB4IiBoZWlnaHQ9IjIxcHgiIHZpZXdCb3g9IjAgMCAzMDAgMzAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAzMDAgMzAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cG9seWdvbiBwb2ludHM9IjEwNy4wOTcsMjUwLjY0NiAyMCwxNzEuNzMyIDQ3LjI0NiwxNDEuNjU4IDEwNS41NjIsMTk0LjQ4OSAyNDkuMTU2LDQ5LjM1NCAyNzguMDA3LDc3Ljg5NyIgc3R5bGU9ImZpbGw6IzQzOTJkMiIvPjwvc3ZnPg==) right center no-repeat;
 	background-origin: content-box;
 }
 
 .point-type img {
-	height: 20px;
-	margin: 0 10px 0 5px;
+	margin: 0 5px 0 10px;
 	vertical-align: middle;
-	width: 20px;
 }
 
 .point-type span {
 	display: inline-block;
 	vertical-align: middle;
-	width: 210px;
+	width: 155px;
 	word-wrap: break-word;
 }
 
