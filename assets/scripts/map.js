@@ -364,7 +364,7 @@
 			ul = doc.createElement('ul'),
 			li = doc.createElement('li');
 
-		div.setAttribute('class', 'filter-menu hiddenBox');
+		div.setAttribute('class', 'filter-menu hidden-box');
 
 		header.setAttribute('class', 'filter-menu-header');
 
@@ -512,8 +512,8 @@
 	 * @param {HTMLElement} filterBox
 	 */
 	function toggleFilterBox(filterBox) {
-		toggleClass(filterBox, 'shownBox');
-		toggleClass(filterBox, 'hiddenBox');
+		toggleClass(filterBox, 'shown-box');
+		toggleClass(filterBox, 'hidden-box');
 	}
 
 	/**
