@@ -364,7 +364,7 @@
 			ul = doc.createElement('ul'),
 			li = doc.createElement('li');
 
-		div.setAttribute('class', 'filter-menu hidden');
+		div.setAttribute('class', 'filter-menu hiddenBox');
 
 		header.setAttribute('class', 'filter-menu-header');
 
