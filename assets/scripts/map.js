@@ -601,10 +601,14 @@
 	 * @param {object} options - {enableEdit: bool, skin: string}
 	 */
 	function setupWikiaOnlyOptions(options) {
+		// @todo Remove this, once Ponto errors on missing pair
+		isWikiaSet = true;
+
 		if (options.enableEdit) {
 			setUpEditOptions();
 		}
 		if (options.skin === 'wikiamobile') {
+			addClass(body, 'wikia-mobile');
 			setUpHideButton();
 		} else {
 			toggleFilterBox(document.querySelector('.filter-menu'));
@@ -627,9 +631,6 @@
 	function setUpEditOptions() {
 		var editPointTypesButton = doc.getElementById(editPointTypesButtonId),
 			mapContainer = doc.getElementById(mapContainerId);
-
-		// @todo Remove this, once Ponto errors on missing pair
-		isWikiaSet = true;
 
 		// add POI handler
 		map.on('draw:created', function (event) {

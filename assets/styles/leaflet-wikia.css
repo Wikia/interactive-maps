@@ -65,7 +65,6 @@
 
 .wikia-mobile .filter-menu {
     bottom: 0;
-    padding: 0;
 }
 
 .wikia-mobile .filter-menu.shown {
@@ -125,7 +124,7 @@
 	max-height: 100%;
 	-webkit-transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
 	transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
-	width: 320px;
+	width: 245px;
 }
 
 .edit-point-types {
