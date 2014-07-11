@@ -281,7 +281,7 @@ module.exports = function createCRUD() {
 					};
 
 					if (isFinite(id)) {
-						dbCon.getConnection(dbCon.connType.all, function (conn) {
+						dbCon.getConnection(dbCon.connType.master, function (conn) {
 							getMapIdByPoiId(conn, id).then(
 								function (rows) {
 									if (rows.length > 0) {
