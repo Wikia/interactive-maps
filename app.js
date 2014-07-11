@@ -19,6 +19,10 @@ config.setRoot(__dirname);
 
 jobs = kue.createQueue(config);
 
+/**
+ * Default value here is 5 and it was slowing down uploading to DFS.
+ * With this setting which changes max concurrent connections it's about 10 times faster.
+ */
 http.globalAgent.maxSockets = 100; // speed up DFS upload
 
 //set up the logger with console transport
