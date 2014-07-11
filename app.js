@@ -10,7 +10,8 @@ var logger = require('./lib/logger'),
 	fs = require('fs'),
 	config,
 	kue = require('kue'),
-	jobs;
+	jobs,
+	http = require('http');
 
 config = require('./lib/config');
 
@@ -18,6 +19,7 @@ config.setRoot(__dirname);
 
 jobs = kue.createQueue(config);
 
+http.globalAgent.maxSockets = 100; // speed up DFS upload
 
 //set up the logger with console transport
 logger.set({
