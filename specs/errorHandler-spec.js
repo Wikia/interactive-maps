@@ -107,65 +107,101 @@ describe('errorHandler module', function () {
 		});
 	});
 
-	it('should handle foreign key errors in sql', function () {
-		errorHandler.middleware({
+	it('should handle sql errors', function () {
+		var testCases = [
+			{
 				clientError: {
 					name: 'RejectionError',
-					cause: {
+						cause: {
 						code: 'ER_NO_REFERENCED_ROW'
 					}
+				},
+				expected: {
+					code: 500,
+					message: 'Cannot create reference to non-existing value'
 				}
 			},
-			stubReq(),
-			stubRes(500, {
-				message: 'Cannot create reference to non-existing value'
-			})
-		);
-	});
-
-	it('should handle duplicate unique key error in database', function () {
-		errorHandler.middleware({
+			{
 				clientError: {
 					name: 'RejectionError',
 					cause: {
 						code: 'ER_DUP_ENTRY'
 					}
+				},
+				expected: {
+					code: 500,
+					message: 'Name needs to be unique'
 				}
 			},
-			stubReq(),
-			stubRes(500, {
-				message: 'Name needs to be unique'
-			})
-		);
-	});
-
-	it('should handle delete referred', function () {
-		errorHandler.middleware({
+			{
 				clientError: {
 					name: 'RejectionError',
 					cause: {
 						code: 'ER_ROW_IS_REFERENCED_'
 					}
+				},
+				expected: {
+					code: 500,
+					message: 'Trying to delete row which is referenced'
 				}
 			},
-			stubReq(),
-			stubRes(500, {
-				message: 'Trying to delete row which is referenced'
-			})
-		);
-	});
-
-	it('should handle general sql errors', function () {
-		errorHandler.middleware({
+			{
+				clientError: {
+					name: 'OperationalError',
+					cause: {
+						code: 'ER_NO_REFERENCED_ROW'
+					}
+				},
+				expected: {
+					code: 500,
+					message: 'Cannot create reference to non-existing value'
+				}
+			},
+			{
+				clientError: {
+					name: 'OperationalError',
+					cause: {
+						code: 'ER_DUP_ENTRY'
+					}
+				},
+				expected: {
+					code: 500,
+					message: 'Name needs to be unique'
+				}
+			},
+			{
+				clientError: {
+					name: 'OperationalError',
+					cause: {
+						code: 'ER_ROW_IS_REFERENCED_'
+					}
+				},
+				expected: {
+					code: 500,
+					message: 'Trying to delete row which is referenced'
+				}
+			},
+			{
 				clientError: {
 					name: 'SQL Error'
+				},
+				expected: {
+					code:500,
+					message: 'General database error'
 				}
-			},
-			stubReq(),
-			stubRes(500, {
-				message: 'General database error'
-			})
-		);
+			}
+		];
+		testCases.forEach(function(testCase) {
+			errorHandler.middleware({
+					clientError: testCase.clientError
+				},
+				stubReq(),
+				stubRes(testCase.expected.code, {
+					message: testCase.expected.message
+				})
+			);
+		});
+
 	});
 
 	it('generates valid error messages', function () {
@@ -211,6 +247,24 @@ describe('errorHandler module', function () {
 			).toBe(
 				JSON.stringify(testCase.result)
 			);
+		});
+	});
+
+	it('checks correctly which errors are handled', function () {
+		var testCases = [
+			{
+				errorName: 'OperationalError',
+				expected: true
+			} , {
+				errorName: 'RejectionError',
+				expected: true
+			} , {
+				errorName: 'WhateverError',
+				expected: false
+			}
+		];
+		testCases.forEach(function (testCase) {
+			expect(errorHandler.isHandledSQLError(testCase.errorName)).toBe(testCase.expected);
 		});
 	});
 

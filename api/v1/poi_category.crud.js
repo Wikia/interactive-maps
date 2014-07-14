@@ -206,7 +206,7 @@ module.exports = function createCRUD() {
 					};
 				if (isFinite(id)) {
 					getMapId(id).then(
-						function(collection) {
+						function (collection) {
 							var mapId = parseInt(collection[0].map_id, 10);
 
 							dbCon
@@ -231,11 +231,8 @@ module.exports = function createCRUD() {
 									// (caused by non able to delete foreign key) and handle this case by calling
 									// the handleUsedCategories function, otherwise handle the error as regular error
 									var errorNames = ['OperationalError', 'RejectionError'];
-									if (
-										err.hasOwnProperty('clientError') &&
-											errorNames.indexOf(err.clientError.name) !== -1 &&
-											err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_'
-										) {
+									if (errorHandler.isHandledSQLError(err.clientError.name) &&
+										err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_') {
 										handleUsedCategories(id, res, next);
 									} else {
 										next(err);
@@ -306,7 +303,7 @@ module.exports = function createCRUD() {
 					}
 					if (isFinite(id)) {
 						getMapId(id).then(
-							function(collection) {
+							function (collection) {
 								var mapId = parseInt(collection[0].map_id, 10);
 								dbCon
 									.update(dbTable, reqBody, filter)
