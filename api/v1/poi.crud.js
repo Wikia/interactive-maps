@@ -169,7 +169,7 @@ module.exports = function createCRUD() {
 					reqBody.created_on = dbCon.knex.raw('CURRENT_TIMESTAMP');
 					dbCon.getConnection(dbCon.connType.master, function (conn) {
 						dbCon
-							.insert(dbTable, reqBody)
+							.insert(conn, dbTable, reqBody)
 							.then(
 								function (data) {
 									var id = data[0],
