@@ -112,7 +112,7 @@ describe('errorHandler module', function () {
 			{
 				clientError: {
 					name: 'RejectionError',
-						cause: {
+					cause: {
 						code: 'ER_NO_REFERENCED_ROW'
 					}
 				},
@@ -186,12 +186,12 @@ describe('errorHandler module', function () {
 					name: 'SQL Error'
 				},
 				expected: {
-					code:500,
+					code: 500,
 					message: 'General database error'
 				}
 			}
 		];
-		testCases.forEach(function(testCase) {
+		testCases.forEach(function (testCase) {
 			errorHandler.middleware({
 					clientError: testCase.clientError
 				},
@@ -206,7 +206,7 @@ describe('errorHandler module', function () {
 
 	it('generates valid error messages', function () {
 		var testCases = [{
-			function: 'badNumberError',
+			testFunction: 'badNumberError',
 			params: ['as'],
 			result: {
 				status: 400,
@@ -216,7 +216,7 @@ describe('errorHandler module', function () {
 				}
 			}
 		}, {
-			function: 'badRequestError',
+			testFunction: 'badRequestError',
 			params: [
 				[1, 2, 3]
 			],
@@ -230,7 +230,7 @@ describe('errorHandler module', function () {
 				}
 			}
 		}, {
-			function: 'elementNotFoundError',
+			testFunction: 'elementNotFoundError',
 			params: ['name', 'id'],
 			result: {
 				status: 404,
@@ -241,9 +241,9 @@ describe('errorHandler module', function () {
 			}
 		}];
 		testCases.forEach(function (testCase) {
-			var funct = errorHandler[testCase.function];
+			var testFunction = errorHandler[testCase.testFunction];
 			expect(
-				JSON.stringify(funct.apply(funct, testCase.params))
+				JSON.stringify(testFunction.apply(testFunction, testCase.params))
 			).toBe(
 				JSON.stringify(testCase.result)
 			);
@@ -255,10 +255,10 @@ describe('errorHandler module', function () {
 			{
 				errorName: 'OperationalError',
 				expected: true
-			} , {
+			}, {
 				errorName: 'RejectionError',
 				expected: true
-			} , {
+			}, {
 				errorName: 'WhateverError',
 				expected: false
 			}
