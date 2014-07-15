@@ -100,7 +100,7 @@
 	 * @returns {string} - HTML markup for photo
 	 */
 	function buildImageHtml(imageUrl, alt, imageWidth, imageHeight) {
-		return '<img src="' + imageUrl + '" alt="' + alt + 'width="' + imageWidth + '" height='+ imageHeight + '">';
+		return '<img src="' + imageUrl + '" alt="' + alt + '" width="' + imageWidth + '" height="'+ imageHeight + '">';
 	}
 
 	/**
