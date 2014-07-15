@@ -99,8 +99,18 @@
 	 * @param {number} imageHeight
 	 * @returns {string} - HTML markup for photo
 	 */
-	function buildImageHtml(imageUrl, alt) {
-		return '<div class="point-type-icon"><img src="' + imageUrl + '" alt="' + alt + '"></div>';
+	function buildImageHtml(imageUrl, alt, imageWidth, imageHeight) {
+		return '<img src="' + imageUrl + '" alt="' + alt + 'width="' + imageWidth + '" height='+ imageHeight + '">';
+	}
+
+	/**
+	 * @desc Builds filter html
+	 * @param imageUrl
+	 * @param alt
+	 * @returns {string}
+	 */
+	function buildFilterHtml(imageUrl, alt) {
+		return '<div class="filter-icon"><img src="' + imageUrl + '" alt="' + alt + '"></div>';
 	}
 
 	/**
@@ -160,7 +170,7 @@
 	 */
 	function buildPointTypeFilterHtml(pointType) {
 		return '<li class="point-type enabled" data-point-type="' + pointType.id + '">' +
-			buildImageHtml(pointType.marker, pointType.name) +
+			buildFilterHtml(pointType.marker, pointType.name) +
 			'<span>' + pointType.name + '</span>' +
 			'</li>';
 	}

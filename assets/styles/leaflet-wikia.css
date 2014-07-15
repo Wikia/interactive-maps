@@ -177,7 +177,7 @@
 	background-origin: content-box;
 }
 
-.point-type-icon {
+.filter-icon {
 	display: inline-block;
 	height: 25px;
 	margin: 0 5px 0 10px;
@@ -185,7 +185,7 @@
 	width: 25px;
 }
 
-.point-type-icon img {
+.filter-icon img {
 	height: auto;
 	max-height: 25px;
 	max-width: 25px;
