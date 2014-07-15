@@ -563,7 +563,7 @@
 			};
 
 		Ponto.invoke(pontoBridgeModule, 'processData', params, function () {
-			window.location.reload();
+			window.location = window.location + '&cb=' + (new Date()).getTime();
 		}, showPontoError, true);
 	}
 
