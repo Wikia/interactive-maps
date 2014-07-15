@@ -1,4 +1,3 @@
-use interactive_maps;
 INSERT INTO tile_set SET
 id = 1,
 name = 'Geo Map',

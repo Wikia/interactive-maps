@@ -297,6 +297,7 @@
 			enabled = 'enabled',
 			filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
 
+		toggleClass(allPointTypesFilter, enabled);
 		if (pointTypes.length === filtersEnabledLength){
 			addClass(allPointTypesFilter, enabled);
 		} else {
