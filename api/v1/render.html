@@ -26,17 +26,15 @@
 			}
 
 			#wrapper.embed {
-				bottom: 43px;
+				bottom: 70px;
 			}
 
 			#attr.embed {
-				background: #000;
-				font-size: 0.9em;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+				background: #092140;
 				color: #b9b9b9;
-				height: 30px;
 				bottom: 0;
 				left: 0;
-				padding-top: 13px;
 				position: fixed;
 				right: 0;
 				text-align: center;
@@ -44,25 +42,41 @@
 			}
 
 			#attr.embed a {
-				color: #b9b9b9;
-				float: left;
-				margin: -5px 5px 0;
+				color: #fff;
+                font-size: 23px;
+                text-decoration: none;
 			}
-
-			.logo {
-				background: transparent url(http://wikia.com/skins/oasis/images/sprite.png) no-repeat -269px 0px;
-				height: 26px;
-				width: 90px;
+			.sprite {
+				background: transparent url('/assets/{{cacheBuster}}/images/sprite.png') no-repeat;
 			}
+            .logo {
+                float:left;
+                margin: 18px 0 0 33px;
+            }
+            .logo img {
+                background-position: 0 0;
+                width: 220px;
+                height: 38px;
+            }
 
+            #attr.embed #edit {
+                background-color: #0a5fa3;
+                font-size: 29px;
+                float: right;
+                height: 70px;
+            }
 			#attr.embed a.edit {
-				border: 1px solid #b9b9b9;
-				border-radius: 4px;
-				float: right;
-				font-weight: bold;
-				padding: 5px 7px;
+                background-position: -230px 0;
+                display: block;
+                float: none;
+                margin: 20px 20px 0 22px;
+                padding: 2px 0 13px 44px;
 				text-decoration: none;
 			}
+            .comm {
+                display: inline-block;
+                margin-top: 24px;
+            }
 		</style>
 		<script>
 			window.mapSetup = {{{mapSetup}}};
@@ -81,7 +95,6 @@
 		    <div id="map" class="int-map"></div>
         </div>
         <div id="attr">
-            <a href="http://www.wikia.com" target="_blank"><img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" class="logo" height="23" width="91" /></a>
             {{{attribution}}}
         </div>
 		<script src="/assets/{{cacheBuster}}/vendor/leaflet/scripts/leaflet.js"></script>
