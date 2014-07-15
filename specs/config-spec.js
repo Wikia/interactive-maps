@@ -10,7 +10,7 @@ process.env = {
 var proxyquire = require('proxyquire').noCallThru(),
 	configuration = {
 		tmp: '/tmp/',
-		wgFSSwiftConfig: {
+		wgFSSwiftDC: {
 			test: ''
 		},
 		api: {
