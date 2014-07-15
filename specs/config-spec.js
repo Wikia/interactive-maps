@@ -11,7 +11,7 @@ var proxyquire = require('proxyquire').noCallThru(),
 	configuration = {
 		tmp: '/tmp/',
 		wgFSSwiftDC: {
-			test: ''
+			dev: ''
 		},
 		api: {
 			test: {
@@ -25,7 +25,6 @@ var proxyquire = require('proxyquire').noCallThru(),
 		client: {
 			test: {}
 		}
-		
 	},
 	config = proxyquire('../lib/config', {
 		'js-yaml': {
