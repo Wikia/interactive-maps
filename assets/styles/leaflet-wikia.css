@@ -19,6 +19,11 @@
 	word-wrap: break-word;
 }
 
+/* TODO: temporary fix - to be removed ones the UI for map on mobile is properly designed */
+.wikia-mobile .leaflet-popup .description {
+    width: auto;
+}
+
 .leaflet-popup h3 {
 	color: #0078A8;
 	margin: 0;
