@@ -55,7 +55,8 @@
 	-o-flex-direction: column;
 	flex-direction: column;
 	font-family: Helvetica Neue, helvetica, arial, sans-serif;
-	font-size: 16px;
+	font-size: 14px;
+	line-height: 21px;
 	max-height: 100%;
 	padding: 10px;
 	position: absolute;
@@ -82,6 +83,7 @@
 	-ms-flex-shrink: 0;
 	-o-flex-shrink: 0;
 	flex-shrink: 0;
+	font-size: 15px;
 	font-weight: bold;
 	height: 16px;
 	margin: 0;
@@ -175,9 +177,24 @@
 	background-origin: content-box;
 }
 
-.point-type img {
+.point-type-icon {
+	display: inline-block;
+	width: 25px;
+	height: 25px;
 	margin: 0 5px 0 10px;
+	/*vertical-align: middle;*/
+	/*background-size: auto 30px;*/
+	/*background-position: center;*/
+	/*background-repeat: no-repeat;*/
+}
+
+.point-type-icon img {
+	height: auto;
+	max-height: 25px;
+	max-width: 25px;
+	width: auto;
 	vertical-align: middle;
+	text-align: center;
 }
 
 .point-type span {
