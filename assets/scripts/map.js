@@ -563,7 +563,8 @@
 			};
 
 		Ponto.invoke(pontoBridgeModule, 'processData', params, function () {
-			window.location.reload();
+			// TODO this is hotfix to display updated poi categories after editing. not elegant at all
+			window.location = window.location + '&cb=' + (new Date()).getTime();
 		}, showPontoError, true);
 	}
 
