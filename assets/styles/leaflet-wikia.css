@@ -179,22 +179,18 @@
 
 .point-type-icon {
 	display: inline-block;
-	width: 25px;
 	height: 25px;
 	margin: 0 5px 0 10px;
-	/*vertical-align: middle;*/
-	/*background-size: auto 30px;*/
-	/*background-position: center;*/
-	/*background-repeat: no-repeat;*/
+	text-align: center;
+	width: 25px;
 }
 
 .point-type-icon img {
 	height: auto;
 	max-height: 25px;
 	max-width: 25px;
-	width: auto;
 	vertical-align: middle;
-	text-align: center;
+	width: auto;
 }
 
 .point-type span {
