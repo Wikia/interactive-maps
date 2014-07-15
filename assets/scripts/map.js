@@ -256,7 +256,9 @@
 	 * @param {string} className
 	 */
 	function addClass(element, className) {
-		element.className += ' ' + className;
+		if (element.className.indexOf(className) === -1) {
+			element.className += ' ' + className;
+		}
 	}
 
 	/**
@@ -297,8 +299,8 @@
 			enabled = 'enabled',
 			filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
 
-		toggleClass(allPointTypesFilter, enabled);
-		if (pointTypes.length === filtersEnabledLength){
+		if (pointTypes.length === filtersEnabledLength &&
+			allPointTypesFilter.className.indexOf(enabled) === -1){
 			addClass(allPointTypesFilter, enabled);
 		} else {
 			removeClass(allPointTypesFilter, enabled);
@@ -313,10 +315,15 @@
 		var allPointTypesFilter = doc.getElementById(allPointTypesFilterId),
 			filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
 			filtersLength = filters.length,
+			enabled = allPointTypesFilter.className.indexOf('enabled') === -1,
 			i;
 
 		for (i = 0; i < filtersLength; i++) {
-			toggleClass(filters[i], 'enabled');
+			if (enabled) {
+				addClass(filters[i], 'enabled');
+			} else {
+				removeClass(filters[i], 'enabled');
+			}
 		}
 
 		toggleAllPointTypesFilter();
