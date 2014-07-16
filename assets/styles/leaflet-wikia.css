@@ -208,3 +208,7 @@
 .enable-edit .edit-poi-link {
 	display: inline;
 }
+
+.enable-edit .hide-button {
+	display: none;
+}
