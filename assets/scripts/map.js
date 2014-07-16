@@ -110,7 +110,7 @@
 	 * @returns {string}
 	 */
 	function buildFilterHtml(imageUrl, alt) {
-		return '<div class="filter-icon"><img src="' + imageUrl + '" alt="' + alt + '"></div>';
+		return '<div class="point-types-thumbnail"><img src="' + imageUrl + '" alt="' + alt + '"></div>';
 	}
 
 	/**
@@ -630,9 +630,9 @@
 		// @todo Remove this, once Ponto errors on missing pair
 		isWikiaSet = true;
 
-		if (options.enableEdit) {
+		//if (options.enableEdit) {
 			setUpEditOptions();
-		}
+		//}
 		if (options.skin === 'wikiamobile') {
 			addClass(body, 'wikia-mobile');
 			setUpHideButton();

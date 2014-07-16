@@ -177,7 +177,7 @@
 	background-origin: content-box;
 }
 
-.filter-icon {
+.point-types-thumbnail {
 	display: inline-block;
 	height: 25px;
 	margin: 0 5px 0 10px;
@@ -185,7 +185,7 @@
 	width: 25px;
 }
 
-.filter-icon img {
+.point-types-thumbnail img {
 	height: auto;
 	max-height: 25px;
 	max-width: 25px;
