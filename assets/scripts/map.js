@@ -105,9 +105,9 @@
 
 	/**
 	 * @desc Builds filter html
-	 * @param imageUrl
-	 * @param alt
-	 * @returns {string}
+	 * @param {string} imageUrl
+	 * @param {string} alt
+	 * @returns {string} HTML markup for filter box icon
 	 */
 	function buildFilterHtml(imageUrl, alt) {
 		return '<div class="point-type-icon"><img src="' + imageUrl + '" alt="' + alt + '"></div>';
