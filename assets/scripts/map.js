@@ -706,7 +706,7 @@
 	}
 
 	/**
-	 * @desc helper function that checks if the size of the screen the popup size
+	 * @desc helper function that checks if the size of the screen smaller then popup size
 	 * @TODO temporary fix to be removed ones mobile UI for map will be properly designed
 	 * @returns {boolean}
 	 */
