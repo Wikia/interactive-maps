@@ -7,7 +7,7 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 
-	urlPattern = jsonValidator.getUrlPattern(),
+	urlPattern = jsonValidator.getOptionalUrlPattern(),
 
 	dbTable = 'poi',
 	createSchema = {
@@ -34,12 +34,17 @@ var dbCon = require('./../../lib/db_connector'),
 			description: {
 				description: 'POI description',
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: 500
 			},
 			link: {
 				description: 'Link to article connected with this POI',
 				type: 'string',
 				pattern: urlPattern
+			},
+			link_title: {
+				description: 'Title of the article connected with this POI',
+				type: 'string'
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
@@ -91,6 +96,10 @@ var dbCon = require('./../../lib/db_connector'),
 				type: 'string',
 				pattern: urlPattern,
 				format: 'uri'
+			},
+			link_title: {
+				description: 'Title of the article connected with this POI',
+				type: 'string'
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
@@ -206,7 +215,10 @@ module.exports = function createCRUD() {
 										function () {
 											utils.changeMapUpdatedOn(dbCon, mapId).then(
 												function () {
-													squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiDeleted');
+													squidUpdate.purgeKey(
+														utils.surrogateKeyPrefix + mapId,
+														'mapPoiDeleted'
+													);
 													res.send(204, {});
 													res.end();
 												},
@@ -226,7 +238,7 @@ module.exports = function createCRUD() {
 				}
 			},
 			GET: function (req, res, next) {
-				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'photo', 'lat', 'lon',
+				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'link_title', 'photo', 'lat', 'lon',
 						'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
 					],
 					id = parseInt(req.pathVar.id),
@@ -281,7 +293,10 @@ module.exports = function createCRUD() {
 												};
 												utils.changeMapUpdatedOn(dbCon, mapId).then(
 													function () {
-														squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiUpdated');
+														squidUpdate.purgeKey(
+															utils.surrogateKeyPrefix + mapId,
+															'mapPoiUpdated'
+														);
 														res.send(303, response);
 														res.end();
 													},

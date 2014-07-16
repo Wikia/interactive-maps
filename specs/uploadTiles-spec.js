@@ -27,11 +27,12 @@ describe('Upload Tiles', function () {
 				'./dfs': dfsStub,
 				'./config': {
 					minZoom: 0,
-					bucketPrefix: 'bucketPrefix'
+					bucketPrefix: 'bucketPrefix_',
+					tileSetPrefix: 'tile_set_'
 				}
 			}),
 			data = {
-				name: 'name with spaces',
+				tileSetId: 1,
 				dir: 'dir',
 				minZoom: 0,
 				maxZoom: 3,
@@ -40,7 +41,7 @@ describe('Upload Tiles', function () {
 				}
 			},
 			expected = {
-				bucketName: 'bucketPrefixname_with_spaces',
+				bucketName: 'bucketPrefix_tile_set_1',
 				dir: 'dir',
 				filePaths: '{0..3}/*/*.png'
 			};

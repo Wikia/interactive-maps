@@ -256,19 +256,15 @@ describe('utils', function () {
 	it('generates valid bucket name', function () {
 		var testSet = [{
 			prefix: 'prefix1_',
-			name: 'test',
-			expect: 'prefix1_test'
+			id: 1,
+			expect: 'prefix1_1'
 		}, {
 			prefix: 'prefix2_',
-			name: ' a sample name ',
-			expect: 'prefix2_a_sample_name'
-		}, {
-			prefix: 'префикс_',
-			name: ' пример ',
-			expect: '%D0%BF%D1%80%D0%B5%D1%84%D0%B8%D0%BA%D1%81_%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80'
+			id: '3',
+			expect: 'prefix2_3'
 		}];
 		testSet.forEach(function (testCase) {
-			expect(utils.getBucketName(testCase.prefix, testCase.name)).toBe(testCase.expect);
+			expect(utils.getBucketName(testCase.prefix, testCase.id)).toBe(testCase.expect);
 		});
 	});
 
@@ -471,5 +467,20 @@ describe('utils', function () {
 		});
 	});
 
-
+	it('escapes HTML correctly', function () {
+		var testSet = [
+			{
+				input: '<script>alert(\'xss\')</script>',
+				expected: '&lt;script&gt;alert(&#39;xss&#39;)&lt;&#x2F;script&gt;'
+			},
+			{
+				input: '"Everything is AWESOME & whatnot!"',
+				expected: '&quot;Everything is AWESOME &amp; whatnot!&quot;'
+			}
+		];
+		testSet.forEach(function (testCase) {
+			expect(utils.escapeHtml(testCase.input))
+				.toBe(testCase.expected);
+		});
+	});
 });

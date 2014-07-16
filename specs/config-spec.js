@@ -10,8 +10,8 @@ process.env = {
 var proxyquire = require('proxyquire').noCallThru(),
 	configuration = {
 		tmp: '/tmp/',
-		wgFSSwiftConfig: {
-			test: ''
+		wgFSSwiftDC: {
+			dev: ''
 		},
 		api: {
 			test: {
@@ -25,7 +25,6 @@ var proxyquire = require('proxyquire').noCallThru(),
 		client: {
 			test: {}
 		}
-		
 	},
 	config = proxyquire('../lib/config', {
 		'js-yaml': {

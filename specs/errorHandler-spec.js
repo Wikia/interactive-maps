@@ -107,70 +107,124 @@ describe('errorHandler module', function () {
 		});
 	});
 
-	it('should handle foreign key errors in sql', function () {
-		errorHandler.middleware({
+	it('should handle sql errors', function () {
+		var testCases = [
+			{
 				clientError: {
 					name: 'RejectionError',
 					cause: {
 						code: 'ER_NO_REFERENCED_ROW'
 					}
+				},
+				expected: {
+					code: 500,
+					message: {
+						message: 'Cannot create reference to non-existing value',
+						code: 'ER_NO_REFERENCED_ROW'
+					}
 				}
 			},
-			stubReq(),
-			stubRes(500, {
-				message: 'Cannot create reference to non-existing value'
-			})
-		);
-	});
-
-	it('should handle duplicate unique key error in database', function () {
-		errorHandler.middleware({
+			{
 				clientError: {
 					name: 'RejectionError',
 					cause: {
 						code: 'ER_DUP_ENTRY'
 					}
+				},
+				expected: {
+					code: 500,
+					message: {
+						message: 'Name needs to be unique',
+						code: 'ER_DUP_ENTRY'
+					}
 				}
 			},
-			stubReq(),
-			stubRes(500, {
-				message: 'Name needs to be unique'
-			})
-		);
-	});
-
-	it('should handle delete referred', function () {
-		errorHandler.middleware({
+			{
 				clientError: {
 					name: 'RejectionError',
 					cause: {
 						code: 'ER_ROW_IS_REFERENCED_'
 					}
+				},
+				expected: {
+					code: 500,
+					message: {
+						message: 'Trying to delete row which is referenced',
+						code: 'ER_ROW_IS_REFERENCED_'
+					}
 				}
 			},
-			stubReq(),
-			stubRes(500, {
-				message: 'Trying to delete row which is referenced'
-			})
-		);
-	});
-
-	it('should handle general sql errors', function () {
-		errorHandler.middleware({
+			{
+				clientError: {
+					name: 'OperationalError',
+					cause: {
+						code: 'ER_NO_REFERENCED_ROW'
+					}
+				},
+				expected: {
+					code: 500,
+					message: {
+						message: 'Cannot create reference to non-existing value',
+						code: 'ER_NO_REFERENCED_ROW'
+					}
+				}
+			},
+			{
+				clientError: {
+					name: 'OperationalError',
+					cause: {
+						code: 'ER_DUP_ENTRY'
+					}
+				},
+				expected: {
+					code: 500,
+					message: {
+						message: 'Name needs to be unique',
+						code: 'ER_DUP_ENTRY'
+					}
+				}
+			},
+			{
+				clientError: {
+					name: 'OperationalError',
+					cause: {
+						code: 'ER_ROW_IS_REFERENCED_'
+					}
+				},
+				expected: {
+					code: 500,
+					message: {
+						message: 'Trying to delete row which is referenced',
+						code: 'ER_ROW_IS_REFERENCED_'
+					}
+				}
+			},
+			{
 				clientError: {
 					name: 'SQL Error'
+				},
+				expected: {
+					code: 500,
+					message: {
+						message: 'General database error'
+					}
 				}
-			},
-			stubReq(),
-			stubRes(500, {
-				message: 'General database error'
-			})
-		);
+			}
+		];
+		testCases.forEach(function (testCase) {
+			errorHandler.middleware({
+					clientError: testCase.clientError
+				},
+				stubReq(),
+				stubRes(testCase.expected.code, testCase.expected.message)
+			);
+		});
+
 	});
 
 	it('generates valid error messages', function () {
 		var testCases = [{
-			function: 'badNumberError',
+			testFunction: 'badNumberError',
 			params: ['as'],
 			result: {
 				status: 400,
@@ -180,7 +234,7 @@ describe('errorHandler module', function () {
 				}
 			}
 		}, {
-			function: 'badRequestError',
+			testFunction: 'badRequestError',
 			params: [
 				[1, 2, 3]
 			],
@@ -194,7 +248,7 @@ describe('errorHandler module', function () {
 				}
 			}
 		}, {
-			function: 'elementNotFoundError',
+			testFunction: 'elementNotFoundError',
 			params: ['name', 'id'],
 			result: {
 				status: 404,
@@ -205,12 +259,30 @@ describe('errorHandler module', function () {
 			}
 		}];
 		testCases.forEach(function (testCase) {
-			var funct = errorHandler[testCase.function];
+			var testFunction = errorHandler[testCase.testFunction];
 			expect(
-				JSON.stringify(funct.apply(funct, testCase.params))
+				JSON.stringify(testFunction.apply(testFunction, testCase.params))
 			).toBe(
 				JSON.stringify(testCase.result)
 			);
+		});
+	});
+
+	it('checks correctly which errors are handled', function () {
+		var testCases = [
+			{
+				errorName: 'OperationalError',
+				expected: true
+			}, {
+				errorName: 'RejectionError',
+				expected: true
+			}, {
+				errorName: 'WhateverError',
+				expected: false
+			}
+		];
+		testCases.forEach(function (testCase) {
+			expect(errorHandler.isHandledSQLError(testCase.errorName)).toBe(testCase.expected);
 		});
 	});
 

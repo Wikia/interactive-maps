@@ -5,10 +5,14 @@ describe('DFS', function () {
 		dfs = proxyquire('../lib/dfs', {
 			'./config': {
 				swift: {
-					swiftHost: '',
-					swiftAuthUrl: '',
-					swiftUser: '',
-					swiftKey: ''
+					servers: [
+						''
+					],
+					config: {
+						swiftAuthUrl: '',
+						swiftUser: '',
+						swiftKey: ''
+					}
 				}
 			},
 			'./logger': {
