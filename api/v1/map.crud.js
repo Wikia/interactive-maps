@@ -112,6 +112,7 @@ module.exports = function createCRUD() {
 
 				query = dbCon.knex(dbTable)
 					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+					.join('poi', 'poi.map_id', '=', 'map.id', 'left')
 					.column([
 						'map.id',
 						'map.title',
@@ -122,7 +123,8 @@ module.exports = function createCRUD() {
 					])
 					.where(filter)
 					.orderBy(sort.column, sort.direction)
-					.select();
+					.groupBy('poi.map_id')
+					.count('poi.map_id as poi_count');
 
 				if (limit) {
 					query.limit(limit);
