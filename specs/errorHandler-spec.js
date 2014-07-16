@@ -118,7 +118,10 @@ describe('errorHandler module', function () {
 				},
 				expected: {
 					code: 500,
-					message: 'Cannot create reference to non-existing value'
+					message: {
+						message: 'Cannot create reference to non-existing value',
+						code: 'ER_NO_REFERENCED_ROW'
+					}
 				}
 			},
 			{
@@ -130,7 +133,10 @@ describe('errorHandler module', function () {
 				},
 				expected: {
 					code: 500,
-					message: 'Name needs to be unique'
+					message: {
+						message: 'Name needs to be unique',
+						code: 'ER_DUP_ENTRY'
+					}
 				}
 			},
 			{
@@ -142,7 +148,10 @@ describe('errorHandler module', function () {
 				},
 				expected: {
 					code: 500,
-					message: 'Trying to delete row which is referenced'
+					message: {
+						message: 'Trying to delete row which is referenced',
+						code: 'ER_ROW_IS_REFERENCED_'
+					}
 				}
 			},
 			{
@@ -154,7 +163,10 @@ describe('errorHandler module', function () {
 				},
 				expected: {
 					code: 500,
-					message: 'Cannot create reference to non-existing value'
+					message: {
+						message: 'Cannot create reference to non-existing value',
+						code: 'ER_NO_REFERENCED_ROW'
+					}
 				}
 			},
 			{
@@ -166,7 +178,10 @@ describe('errorHandler module', function () {
 				},
 				expected: {
 					code: 500,
-					message: 'Name needs to be unique'
+					message: {
+						message: 'Name needs to be unique',
+						code: 'ER_DUP_ENTRY'
+					}
 				}
 			},
 			{
@@ -178,7 +193,10 @@ describe('errorHandler module', function () {
 				},
 				expected: {
 					code: 500,
-					message: 'Trying to delete row which is referenced'
+					message: {
+						message: 'Trying to delete row which is referenced',
+						code: 'ER_ROW_IS_REFERENCED_'
+					}
 				}
 			},
 			{
@@ -187,7 +205,9 @@ describe('errorHandler module', function () {
 				},
 				expected: {
 					code: 500,
-					message: 'General database error'
+					message: {
+						message: 'General database error'
+					}
 				}
 			}
 		];
@@ -196,9 +216,7 @@ describe('errorHandler module', function () {
 					clientError: testCase.clientError
 				},
 				stubReq(),
-				stubRes(testCase.expected.code, {
-					message: testCase.expected.message
-				})
+				stubRes(testCase.expected.code, testCase.expected.message)
 			);
 		});
 
