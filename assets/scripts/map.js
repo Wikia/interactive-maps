@@ -110,7 +110,7 @@
 	 * @returns {string}
 	 */
 	function buildFilterHtml(imageUrl, alt) {
-		return '<div class="point-types-thumbnail"><img src="' + imageUrl + '" alt="' + alt + '"></div>';
+		return '<div class="point-type-icon"><img src="' + imageUrl + '" alt="' + alt + '"></div>';
 	}
 
 	/**
