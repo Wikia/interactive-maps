@@ -629,7 +629,7 @@
 			wrapper = doc.querySelector('#wrapper'),
 			attribution = doc.querySelector('#attr');
 		[wrapper, attribution].forEach(function (element) {
-			element.setAttribute('class', 'embed');
+			addClass(element, 'embed');
 		});
 	}
 

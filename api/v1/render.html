@@ -6,79 +6,6 @@
 		<link rel="stylesheet" href="/assets/{{cacheBuster}}/vendor/leaflet/styles/leaflet.css">
 		<link rel="stylesheet" href="/assets/{{cacheBuster}}/styles/leaflet-wikia.css">
 		<link rel="stylesheet" href="/assets/{{cacheBuster}}/vendor/leafletDraw/leaflet.draw.css">
-		<style>
-			body {
-				margin: 0;
-				padding: 0;
-			}
-
-			html, body, .int-map {
-				height: 100%;
-				font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
-			}
-
-			#wrapper {
-				bottom: 0;
-				left: 0;
-				position: fixed;
-				right: 0;
-				top: 0;
-			}
-
-			#wrapper.embed {
-				bottom: 70px;
-			}
-
-			#attr.embed {
-                font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-				background: #092140;
-				color: #b9b9b9;
-				bottom: 0;
-                height: 70px;
-				left: 0;
-				position: fixed;
-				right: 0;
-				text-align: center;
-				z-index: 1;
-			}
-
-			#attr.embed a {
-				color: #fff;
-                font-size: 23px;
-                text-decoration: none;
-			}
-			.sprite {
-				background: transparent url('/assets/{{cacheBuster}}/images/sprite.png') no-repeat;
-			}
-            .logo {
-                float:left;
-                margin: 18px 0 0 33px;
-            }
-            .logo img {
-                background-position: 0 0;
-                width: 220px;
-                height: 38px;
-            }
-
-            #attr.embed #edit {
-                background-color: #0a5fa3;
-                font-size: 29px;
-                float: right;
-                height: 70px;
-            }
-			#attr.embed a.edit {
-                background-position: -230px 0;
-                display: block;
-                float: none;
-                margin: 20px 20px 0 22px;
-                padding: 2px 0 13px 44px;
-				text-decoration: none;
-			}
-            .comm {
-                display: inline-block;
-                margin-top: 24px;
-            }
-		</style>
 		<script>
 			window.mapSetup = {{{mapSetup}}};
 		</script>
@@ -92,12 +19,12 @@
 		</script>
 	</head>
 	<body>
-        <div id="wrapper">
-		    <div id="map" class="int-map"></div>
-        </div>
-        <div id="attr">
-            {{{attribution}}}
-        </div>
+		<div class="wrapper" id="wrapper">
+	        <div id="map" class="int-map"></div>
+		</div>
+		<div class="attr" id="attr">
+			{{{attribution}}}
+		</div>
 		<script src="/assets/{{cacheBuster}}/vendor/leaflet/scripts/leaflet.js"></script>
 		<script src="/assets/{{cacheBuster}}/vendor/leafletDraw/leaflet.draw.js"></script>
 		<script src="/assets/{{cacheBuster}}/scripts/leaflet.embedMapCode.js"></script>
