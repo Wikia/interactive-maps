@@ -50,8 +50,8 @@ html,
 	margin: 9px 0 0 13px;
 	overflow: hidden;
 	text-indent: 100%;
-	width: 111px;
 	white-space: nowrap;
+	width: 111px;
 }
 
 .comm {
@@ -100,7 +100,7 @@ html,
 
 /* TODO: temporary fix - to be removed ones the UI for map on mobile is properly designed */
 .wikia-mobile .leaflet-popup .description {
-    width: auto;
+	width: auto;
 }
 
 .leaflet-popup h3 {
@@ -245,11 +245,11 @@ html,
 }
 
 .point-types li {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 	cursor: pointer;
 	line-height: 14px;
-	padding: 7px 10px 7px 0;
 	margin: 0 0 0 10px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+	padding: 7px 10px 7px 0;
 }
 
 .point-types li:last-child {
