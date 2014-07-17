@@ -30,6 +30,7 @@
 		// constants
 		popupWidthWithPhoto = 414,
 		popupWidthWithoutPhoto = 314,
+		mobilePopupWidth = 310,
 		photoWidth = 90,
 		photoHeight = 90,
 		pointIconWidth = 30,
@@ -723,6 +724,15 @@
 	}
 
 	/**
+	 * @desc helper function that checks if the size of the screen smaller then popup size
+	 * @TODO temporary fix to be removed ones mobile UI for map will be properly designed
+	 * @returns {boolean}
+	 */
+	function isMobileScreenSize() {
+		return window.outerWidth < 430 || (window.outerHeight < 430 && window.outerHeight < window.outerWidth);
+	}
+
+	/**
 	 * @desc Create new map
 	 */
 	function createMap() {
@@ -790,6 +800,12 @@
 		});
 
 		map.addControl(zoomControl);
+
+		// Change popup size for small mobile screens
+		if (isMobileScreenSize()) {
+			popupWidthWithPhoto = mobilePopupWidth;
+			popupWidthWithoutPhoto = mobilePopupWidth;
+		}
 
 		setupPontoWikiaClient();
 		setupPoints();
