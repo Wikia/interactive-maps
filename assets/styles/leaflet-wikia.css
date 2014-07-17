@@ -1,6 +1,78 @@
-.leaflet-popup-content-wrapper {
-	border-radius: 0;
+body {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	margin: 0;
 	padding: 0;
+}
+
+body,
+html,
+.int-map {
+	height: 100%;
+}
+
+.attr {
+	background: #092140;
+	bottom: 0;
+	color: #b9b9b9;
+	display: none;
+	height: 38px;
+	position: fixed;
+	text-align: center;
+	width: 100%;
+	z-index: 1;
+}
+
+.attr.embed {
+	display: block;
+}
+
+.attr a {
+	color: #fff;
+	font-size: 12px;
+	text-decoration: none;
+}
+
+.attr .edit {
+	background-color: #0a5fa3;
+	background-position: -114px 10px;
+	display: block;
+	float: right;
+	font-size: 14px;
+	font-weight: 400;
+	height: 35px;
+	padding: 12px 13px 12px 32px;
+}
+
+.attr .logo {
+	background-position: 0 0;
+	float:left;
+	height: 19px;
+	margin: 9px 0 0 13px;
+	overflow: hidden;
+	text-indent: 100%;
+	white-space: nowrap;
+	width: 111px;
+}
+
+.comm {
+	display: inline-block;
+	font-weight: 200;
+	margin-top: 12px;
+}
+
+.sprite {
+	background: transparent url('/images/sprite.png') no-repeat;
+}
+
+.wrapper {
+	bottom: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+}
+
+.wrapper.embed {
+	bottom: 38px;
 }
 
 .leaflet-popup-content {
@@ -8,7 +80,14 @@
 	overflow: hidden;
 }
 
-.leaflet-popup a.photo, .leaflet-popup img, .leaflet-popup .description {
+.leaflet-popup-content-wrapper {
+	border-radius: 0;
+	padding: 0;
+}
+
+.leaflet-popup a.photo,
+.leaflet-popup img,
+.leaflet-popup .description {
 	display: inline-block;
 	vertical-align: top;
 }
@@ -21,7 +100,7 @@
 
 /* TODO: temporary fix - to be removed ones the UI for map on mobile is properly designed */
 .wikia-mobile .leaflet-popup .description {
-    width: auto;
+	width: auto;
 }
 
 .leaflet-popup h3 {
@@ -166,11 +245,11 @@
 }
 
 .point-types li {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 	cursor: pointer;
 	line-height: 14px;
-	padding: 7px 10px 7px 0;
 	margin: 0 0 0 10px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+	padding: 7px 10px 7px 0;
 }
 
 .point-types li:last-child {

@@ -605,6 +605,7 @@
 		setTimeout(function () {
 			if (!isWikiaSet) {
 				setUpHideButton();
+				showAttributionStripe();
 			}
 		}, pontoTimeout);
 	}
@@ -618,9 +619,19 @@
 			Ponto.invoke(pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions, showPontoError, false);
 			setupPontoTimeout();
 		} else {
+			showAttributionStripe();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 				parseInt(config.id, 10));
 		}
+	}
+
+	function showAttributionStripe() {
+		var doc = window.document,
+			wrapper = doc.querySelector('#wrapper'),
+			attribution = doc.querySelector('#attr');
+		[wrapper, attribution].forEach(function (element) {
+			addClass(element, 'embed');
+		});
 	}
 
 	/**
