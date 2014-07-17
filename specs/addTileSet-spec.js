@@ -2,6 +2,7 @@
 
 var proxyquire = require('proxyquire').noCallThru(),
 	stubs = require('./stubs'),
+	conn = {},
 	kue = {
 		createQueue: function () {
 			return {
@@ -64,7 +65,7 @@ var proxyquire = require('proxyquire').noCallThru(),
 describe('addTileSet', function () {
 
 	it('should return promise', function () {
-		var promise = addMap('test', {
+		var promise = addMap(conn, 'test', {
 			url: 'http://test.url',
 			name: 'test name',
 			created_by: 'user'
@@ -82,7 +83,7 @@ describe('addTileSet', function () {
 			shouldAddMap = proxyquire('../lib/addTileSet', {
 				'q': q,
 				'./db_connector': {
-					insert: function (table, object) {
+					insert: function (conn, table, object) {
 						expect(table).toEqual('test');
 						expect(object).toEqual({
 							name: 'test name',
@@ -117,7 +118,7 @@ describe('addTileSet', function () {
 				}
 			});
 
-		shouldAddMap('test', data);
+		shouldAddMap(conn, 'test', data);
 	});
 
 	it('should add map to processing', function () {
@@ -159,6 +160,6 @@ describe('addTileSet', function () {
 				'./config': {}
 			});
 
-		shouldProcessMap('test', data);
+		shouldProcessMap(conn, 'test', data);
 	});
 });

@@ -483,4 +483,36 @@ describe('utils', function () {
 				.toBe(testCase.expected);
 		});
 	});
+
+	it('checks functions correctly', function () {
+		var testSet = [
+			{
+				input: true,
+				expected: false
+			},
+			{
+				input: 1,
+				expected: false
+			},
+			{
+				input: 0x3,
+				expected: false
+			},
+			{
+				input: "as",
+				expected: false
+			},
+			{
+				input: {},
+				expected: false
+			},
+			{
+				input: function(){},
+				expected: true
+			}
+		];
+		testSet.forEach(function (testCase) {
+			expect(utils.isFunction(testCase.input)).toBe(testCase.expected);
+		});
+	});
 });
