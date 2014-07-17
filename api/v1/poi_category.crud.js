@@ -79,8 +79,9 @@ var dbCon = require('./../../lib/db_connector'),
  * @param {object} res
  * @param {function} next
  */
-function handleUsedCategories(id, res, next) {
+function handleUsedCategories(conn, id, res, next) {
 	dbCon.update(
+		conn,
 		'poi', {
 			poi_category_id: config.catchAllCategoryId
 		}, {
@@ -89,7 +90,7 @@ function handleUsedCategories(id, res, next) {
 	).then(
 		function (rowsAffected) {
 			if (rowsAffected > 0) {
-				dbCon.destroy(dbTable, {
+				dbCon.destroy(conn, dbTable, {
 					id: id
 				}).then(
 					function (affectedRows) {
@@ -115,11 +116,13 @@ function handleUsedCategories(id, res, next) {
 /**
  * @desc Gets map id for a POI category
  *
+ * @param {object} conn Database connection
  * @param {integer} poiCategoryId
  */
-function getMapId(poiCategoryId) {
+function getMapId(conn, poiCategoryId) {
 	var query = dbCon.knex(dbTable)
 			.column(['map_id'])
+			.connection(conn)
 			.where({
 				id: poiCategoryId
 			});
@@ -136,63 +139,69 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name', 'marker', 'map_id', 'status'],
-					query = dbCon.knex(dbTable).column(dbColumns),
+				dbCon.getConnection(dbCon.connType.all, function (conn) {
+					var dbColumns = ['id', 'name', 'marker', 'map_id', 'status'],
+						query = dbCon.knex(dbTable).column(dbColumns),
 
 					// check for parameter parentsOnly in URL
-					parentsOnly = req.query.hasOwnProperty('parentsOnly');
+						parentsOnly = req.query.hasOwnProperty('parentsOnly');
 
-				if (parentsOnly) {
-					query.where({
-						parent_poi_category_id: null
-					});
-				}
+					if (parentsOnly) {
+						query.where({
+							parent_poi_category_id: null
+						});
+					}
+					query.connection(conn);
 
-				query.select().then(
-					function (collection) {
-						utils.handleDefaultMarker(collection);
-						utils.convertMarkersNamesToUrls(
-							collection,
-							config.dfsHost,
-							config.bucketPrefix,
-							config.markersPrefix
-						);
-						res.send(200, collection);
-						res.end();
-					},
-					next
-				);
+					query.select().then(
+						function (collection) {
+							utils.handleDefaultMarker(collection);
+							utils.convertMarkersNamesToUrls(
+								collection,
+								config.dfsHost,
+								config.bucketPrefix,
+								config.markersPrefix
+							);
+							res.send(200, collection);
+							res.end();
+						},
+						next
+					);
+				}, next);
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
-					dbCon
-						.insert(dbTable, reqBody)
-						.then(
-							function (data) {
-								var id = data[0],
-									response = {
-										message: 'POI category successfully created',
-										id: id,
-										url: utils.responseUrl(req, req.route.path, id)
-									},
-									mapId = reqBody.map_id;
-								if (reqBody.marker) {
-									poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
-								}
-								utils.changeMapUpdatedOn(dbCon, mapId).then(
-									function () {
-										squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
-										res.send(201, response);
-										res.end();
-									},
-									next
-								);
-							},
-							next
-					);
+					dbCon.getConnection(dbCon.connType.master, function (conn) {
+						dbCon
+							.insert(conn, dbTable, reqBody)
+							.then(
+								function (data) {
+									var id = data[0],
+										response = {
+											message: 'POI category successfully created',
+											id: id,
+											url: utils.responseUrl(req, req.route.path, id)
+										},
+										mapId = reqBody.map_id;
+									if (reqBody.marker) {
+										poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
+									}
+									utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
+										function () {
+											squidUpdate.purgeKey(
+												utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
+											res.send(201, response);
+											res.end();
+										},
+										next
+									);
+								},
+								next
+						);
+					}, next);
 				} else {
 					next(errorHandler.badRequestError(errors));
 				}
@@ -205,43 +214,46 @@ module.exports = function createCRUD() {
 						id: id
 					};
 				if (isFinite(id)) {
-					getMapId(id).then(
-						function (collection) {
-							var mapId = parseInt(collection[0].map_id, 10);
+					dbCon.getConnection(dbCon.connType.master, function (conn) {
+						getMapId(conn, id).then(
+							function (collection) {
+								var mapId = parseInt(collection[0].map_id, 10);
 
-							dbCon
-								.destroy(dbTable, filter)
-								.then(
-								function (affectedRows) {
-									if (affectedRows > 0) {
-										utils.changeMapUpdatedOn(dbCon, mapId).then(
-											function () {
-												squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
-												res.send(204, {});
-												res.end();
-											},
-											next
-										);
-									} else {
-										next(errorHandler.elementNotFoundError(dbTable, id));
+								dbCon
+									.destroy(conn, dbTable, filter)
+									.then(
+									function (affectedRows) {
+										if (affectedRows > 0) {
+											utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
+												function () {
+													squidUpdate.purgeKey(
+														utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
+													res.send(204, {});
+													res.end();
+												},
+												next
+											);
+										} else {
+											next(errorHandler.elementNotFoundError(dbTable, id));
+										}
+									},
+									function (err) {
+										// If the delete request results an error, check if the error is reference error
+										// (caused by non able to delete foreign key) and handle this case by calling
+										// the handleUsedCategories function, otherwise handle the error as regular
+										// error
+										if (errorHandler.isHandledSQLError(err.clientError.name) &&
+											err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_') {
+											handleUsedCategories(conn, id, res, next);
+										} else {
+											next(err);
+										}
 									}
-								},
-								function (err) {
-									// If the delete request results an error, check if the error is reference error
-									// (caused by non able to delete foreign key) and handle this case by calling
-									// the handleUsedCategories function, otherwise handle the error as regular error
-									var errorNames = ['OperationalError', 'RejectionError'];
-									if (errorHandler.isHandledSQLError(err.clientError.name) &&
-										err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_') {
-										handleUsedCategories(id, res, next);
-									} else {
-										next(err);
-									}
-								}
-							);
-						},
-						next
-					);
+								);
+							},
+							next
+						);
+					}, next);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
 				}
@@ -262,26 +274,28 @@ module.exports = function createCRUD() {
 					};
 
 				if (isFinite(id)) {
-					dbCon
-						.select(dbTable, dbColumns, filter)
-						.then(
-							function (collection) {
-								utils.handleDefaultMarker(collection);
-								utils.convertMarkersNamesToUrls(
-									collection,
-									config.dfsHost,
-									config.bucketPrefix,
-									config.markersPrefix
-								);
-								if (collection[0]) {
-									res.send(200, collection[0]);
-									res.end();
-								} else {
-									next(errorHandler.elementNotFoundError(dbTable, id));
-								}
-							},
-							next
-					);
+					dbCon.getConnection(dbCon.connType.all, function (conn) {
+						dbCon
+							.select(conn, dbTable, dbColumns, filter)
+							.then(
+								function (collection) {
+									utils.handleDefaultMarker(collection);
+									utils.convertMarkersNamesToUrls(
+										collection,
+										config.dfsHost,
+										config.bucketPrefix,
+										config.markersPrefix
+									);
+									if (collection[0]) {
+										res.send(200, collection[0]);
+										res.end();
+									} else {
+										next(errorHandler.elementNotFoundError(dbTable, id));
+									}
+								},
+								next
+						);
+					}, next);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
 				}
@@ -302,39 +316,42 @@ module.exports = function createCRUD() {
 						reqBody.status = 0;
 					}
 					if (isFinite(id)) {
-						getMapId(id).then(
-							function (collection) {
-								var mapId = parseInt(collection[0].map_id, 10);
-								dbCon
-									.update(dbTable, reqBody, filter)
-									.then(
-										function (affectedRows) {
-											if (affectedRows > 0) {
-												var response = {
-													message: 'POI category successfully updated',
-													id: id,
-													url: utils.responseUrl(req, '/api/v1/poi_category', id)
-												};
-												if (reqBody.marker) {
-													poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
+						dbCon.getConnection(dbCon.connType.master, function (conn) {
+							getMapId(conn, id).then(
+								function (collection) {
+									var mapId = parseInt(collection[0].map_id, 10);
+									dbCon
+										.update(conn, dbTable, reqBody, filter)
+										.then(
+											function (affectedRows) {
+												if (affectedRows > 0) {
+													var response = {
+														message: 'POI category successfully updated',
+														id: id,
+														url: utils.responseUrl(req, '/api/v1/poi_category', id)
+													};
+													if (reqBody.marker) {
+														poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
+													}
+													utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
+														function () {
+															squidUpdate.purgeKey(
+																utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
+															res.send(303, response);
+															res.end();
+														},
+														next
+													);
+												} else {
+													next(errorHandler.elementNotFoundError(dbTable, id));
 												}
-												utils.changeMapUpdatedOn(dbCon, mapId).then(
-													function () {
-														squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
-														res.send(303, response);
-														res.end();
-													},
-													next
-												);
-											} else {
-												next(errorHandler.elementNotFoundError(dbTable, id));
-											}
-										},
-										next
-									);
-							},
-							next
-						);
+											},
+											next
+										);
+								},
+								next
+							);
+						}, next);
 					} else {
 						next(errorHandler.badNumberError(req.pathVar.id));
 					}
