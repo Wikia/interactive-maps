@@ -30,7 +30,7 @@
 		// constants
 		popupWidthWithPhoto = 414,
 		popupWidthWithoutPhoto = 314,
-		mobilePopupSize = 310,
+		mobilePopupWidth = 310,
 		photoWidth = 90,
 		photoHeight = 90,
 		pointIconWidth = 30,
@@ -785,8 +785,8 @@
 
 		// Change popup size for small mobile screens
 		if (isMobileScreenSize()) {
-			popupWidthWithPhoto = mobilePopupSize;
-			popupWidthWithoutPhoto = mobilePopupSize;
+			popupWidthWithPhoto = mobilePopupWidth;
+			popupWidthWithoutPhoto = mobilePopupWidth;
 		}
 
 		setupPontoWikiaClient();
