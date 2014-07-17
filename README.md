@@ -11,10 +11,10 @@ npm install
 ```
 then export some env variables
 ```Shell
-export WIKIA_CONFIG_ROOT="Path/To/ConfigFile"
-export WIKIA_SWIFT_YML="Path/To/SwiftConfigFile"
-export WIKIA_PROD_DATACENTER="datacenter"
-export NODE_ENV="devbox|production"
+export WIKIA_CONFIG_ROOT="<Path/To/ConfigFile>"
+export WIKIA_SWIFT_YML="<Path/To/SwiftConfigFile>"
+export WIKIA_PROD_DATACENTER="<datacenter>"
+export NODE_ENV="<devbox|production>"
 ```
 then you can run it
 ```Shell

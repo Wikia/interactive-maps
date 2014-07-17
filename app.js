@@ -10,7 +10,8 @@ var logger = require('./lib/logger'),
 	fs = require('fs'),
 	config,
 	kue = require('kue'),
-	jobs;
+	jobs,
+	http = require('http');
 
 config = require('./lib/config');
 
@@ -18,6 +19,11 @@ config.setRoot(__dirname);
 
 jobs = kue.createQueue(config);
 
+/**
+ * This value controls the number of simultaneous HTTP connections in the application.
+ * Node's default is 5, which leads to slow DFS uploads. Adjust the value if any DFS issues are spotted.
+ */
+http.globalAgent.maxSockets = 100;
 
 //set up the logger with console transport
 logger.set({

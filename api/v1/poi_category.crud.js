@@ -79,8 +79,9 @@ var dbCon = require('./../../lib/db_connector'),
  * @param {object} res
  * @param {function} next
  */
-function handleUsedCategories(id, res, next) {
+function handleUsedCategories(conn, id, res, next) {
 	dbCon.update(
+		conn,
 		'poi', {
 			poi_category_id: config.catchAllCategoryId
 		}, {
@@ -89,7 +90,7 @@ function handleUsedCategories(id, res, next) {
 	).then(
 		function (rowsAffected) {
 			if (rowsAffected > 0) {
-				dbCon.destroy(dbTable, {
+				dbCon.destroy(conn, dbTable, {
 					id: id
 				}).then(
 					function (affectedRows) {
@@ -241,13 +242,9 @@ module.exports = function createCRUD() {
 										// (caused by non able to delete foreign key) and handle this case by calling
 										// the handleUsedCategories function, otherwise handle the error as regular
 										// error
-										var errorNames = ['OperationalError', 'RejectionError'];
-										if (
-											err.hasOwnProperty('clientError') &&
-												errorNames.indexOf(err.clientError.name) !== -1 &&
-												err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_'
-											) {
-											handleUsedCategories(id, res, next);
+										if (errorHandler.isHandledSQLError(err.clientError.name) &&
+											err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_') {
+											handleUsedCategories(conn, id, res, next);
 										} else {
 											next(err);
 										}
