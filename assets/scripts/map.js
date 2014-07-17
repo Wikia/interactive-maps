@@ -626,12 +626,9 @@
 	}
 
 	function showAttributionStripe() {
-		var doc = window.document,
-			wrapper = doc.querySelector('#wrapper'),
-			attribution = doc.querySelector('#attr');
-		[wrapper, attribution].forEach(function (element) {
-			addClass(element, 'embed');
-		});
+		var doc = window.document;
+		addClass(doc.getElementById('wrapper'), 'embed');
+		addClass(doc.getElementById('attr'), 'embed');
 	}
 
 	/**
