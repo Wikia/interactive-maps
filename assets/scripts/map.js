@@ -711,8 +711,7 @@
 	 * @returns {boolean}
 	 */
 	function isMobileScreenSize() {
-		return !window.matchMedia('(min-device-width: 430px)').matches ||
-			!window.matchMedia('(min-device-height: 430px)').matches;
+		return window.outerWidth < 430 || (window.outerHeight < 430 && window.outerHeight < window.outerWidth);
 	}
 
 	/**
