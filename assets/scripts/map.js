@@ -773,8 +773,6 @@
 
 		map.attributionControl.setPrefix(false);
 
-		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
-
 		if (config.hasOwnProperty('boundaries')) {
 			mapBounds = new L.LatLngBounds(
 				L.latLng(config.boundaries.south, config.boundaries.west),
@@ -785,7 +783,10 @@
 			map.on('popupclose', function () {
 				map.panInsideBounds(mapBounds);
 			});
+			config.layer.bounds = mapBounds;
 		}
+
+		L.tileLayer(config.pathTemplate, config.layer).addTo(map);
 
 		zoom = Math.max(config.zoom, defaultMinZoom);
 		if (config.type !== 'custom') {
