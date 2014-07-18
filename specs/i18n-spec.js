@@ -5,7 +5,8 @@ var proxyquire = require('proxyquire').noCallThru(),
 		messages: {
 			en: {
 				test1: 'en_test1',
-				test2: 'en_test2'
+				test2: 'en_test2',
+				test3: 'en_test3 $1'
 			},
 			de: {
 				test1: 'de_test1'
@@ -56,9 +57,14 @@ describe('i18n', function () {
 			key: 'test_key',
 			language: 'qqx',
 			expected: 'test_key'
+		},{
+			key: 'test3',
+			language: 'en',
+			params: ['param'],
+			expected: 'en_test3 param'
 		}];
 		testCases.forEach(function (testCase) {
-			expect(i18n.msg(testCase.key, testCase.language)).toEqual(testCase.expected);
+			expect(i18n.msg(testCase.key, testCase.language, testCase.params)).toEqual(testCase.expected);
 		});
 	});
 

@@ -7,7 +7,7 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 
-	urlPattern = jsonValidator.getUrlPattern(),
+	urlPattern = jsonValidator.getOptionalUrlPattern(),
 
 	dbTable = 'poi',
 	createSchema = {
@@ -41,6 +41,10 @@ var dbCon = require('./../../lib/db_connector'),
 				description: 'Link to article connected with this POI',
 				type: 'string',
 				pattern: urlPattern
+			},
+			link_title: {
+				description: 'Title of the article connected with this POI',
+				type: 'string'
 			},
 			photo: {
 				description: 'Link photo connected with this POI',
@@ -93,6 +97,10 @@ var dbCon = require('./../../lib/db_connector'),
 				pattern: urlPattern,
 				format: 'uri'
 			},
+			link_title: {
+				description: 'Title of the article connected with this POI',
+				type: 'string'
+			},
 			photo: {
 				description: 'Link photo connected with this POI',
 				type: 'string',
@@ -122,12 +130,16 @@ var dbCon = require('./../../lib/db_connector'),
 /**
  * @desc Helper function to get map_id from poi_id
  *
+ * @param {object} conn
  * @param {number} poiId
  * @returns {object}
  */
-function getMapIdByPoiId(poiId) {
+function getMapIdByPoiId(conn, poiId) {
 	return dbCon.select(
-		'poi', ['map_id'], {
+		conn,
+		'poi',
+		['map_id'],
+		{
 			id: poiId
 		}
 	);
@@ -143,15 +155,17 @@ module.exports = function createCRUD() {
 		handler: {
 			GET: function (req, res, next) {
 				var dbColumns = ['id', 'name'];
-				dbCon
-					.select(dbTable, dbColumns)
-					.then(
+				dbCon.getConnection(dbCon.connType.all, function (conn) {
+					dbCon
+						.select(conn, dbTable, dbColumns)
+						.then(
 						function (collection) {
 							res.send(200, collection);
 							res.end();
 						},
 						next
-				);
+					);
+				}, next);
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
@@ -161,29 +175,30 @@ module.exports = function createCRUD() {
 					// extend data object
 					reqBody.updated_by = reqBody.created_by;
 					reqBody.created_on = dbCon.knex.raw('CURRENT_TIMESTAMP');
-
-					dbCon
-						.insert(dbTable, reqBody)
-						.then(
-							function (data) {
-								var id = data[0],
-									response = {
-										message: 'POI successfully created',
-										id: id,
-										url: utils.responseUrl(req, req.route.path, id)
-									},
-									mapId = reqBody.map_id;
-								utils.changeMapUpdatedOn(dbCon, mapId).then(
-									function () {
-										squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
-										res.send(201, response);
-										res.end();
-									},
-									next
-								);
-							},
-							next
-					);
+					dbCon.getConnection(dbCon.connType.master, function (conn) {
+						dbCon
+							.insert(conn, dbTable, reqBody)
+							.then(
+								function (data) {
+									var id = data[0],
+										response = {
+											message: 'POI successfully created',
+											id: id,
+											url: utils.responseUrl(req, req.route.path, id)
+										},
+										mapId = reqBody.map_id;
+									utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
+										function () {
+											squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
+											res.send(201, response);
+											res.end();
+										},
+										next
+									);
+								},
+								next
+						);
+					}, next);
 				} else {
 					next(errorHandler.badRequestError(errors));
 				}
@@ -196,41 +211,43 @@ module.exports = function createCRUD() {
 						id: id
 					};
 				if (isFinite(id)) {
-					getMapIdByPoiId(id).then(
-						function (rows) {
-							if (rows.length > 0) {
-								var mapId = rows[0].map_id;
+					dbCon.getConnection(dbCon.connType.master, function (conn) {
+						getMapIdByPoiId(conn, id).then(
+							function (rows) {
+								if (rows.length > 0) {
+									var mapId = rows[0].map_id;
 
-								dbCon
-									.destroy(dbTable, filter)
-									.then(
-										function () {
-											utils.changeMapUpdatedOn(dbCon, mapId).then(
-												function () {
-													squidUpdate.purgeKey(
-														utils.surrogateKeyPrefix + mapId,
-														'mapPoiDeleted'
-													);
-													res.send(204, {});
-													res.end();
-												},
-												next
-											);
-										},
-										next
-								);
-							} else {
-								next(errorHandler.elementNotFoundError(dbTable, id));
-							}
-						},
-						next
-					);
+									dbCon
+										.destroy(conn, dbTable, filter)
+										.then(
+											function () {
+												utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
+													function () {
+														squidUpdate.purgeKey(
+															utils.surrogateKeyPrefix + mapId,
+															'mapPoiDeleted'
+														);
+														res.send(204, {});
+														res.end();
+													},
+													next
+												);
+											},
+											next
+									);
+								} else {
+									next(errorHandler.elementNotFoundError(dbTable, id));
+								}
+							},
+							next
+						);
+					}, next);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
 				}
 			},
 			GET: function (req, res, next) {
-				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'photo', 'lat', 'lon',
+				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'link_title', 'photo', 'lat', 'lon',
 						'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
 					],
 					id = parseInt(req.pathVar.id),
@@ -239,9 +256,10 @@ module.exports = function createCRUD() {
 					};
 
 				if (isFinite(id)) {
-					dbCon
-						.select(dbTable, dbColumns, filter)
-						.then(
+					dbCon.getConnection(dbCon.connType.all, function (conn) {
+						dbCon
+							.select(conn, dbTable, dbColumns, filter)
+							.then(
 							function (collection) {
 								if (collection[0]) {
 									res.send(200, collection[0]);
@@ -251,7 +269,8 @@ module.exports = function createCRUD() {
 								}
 							},
 							next
-					);
+						);
+					}, next);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
 				}
@@ -270,39 +289,41 @@ module.exports = function createCRUD() {
 					};
 
 					if (isFinite(id)) {
-						getMapIdByPoiId(id).then(
-							function (rows) {
-								if (rows.length > 0) {
-									mapId = rows[0].map_id;
-									dbCon
-										.update(dbTable, reqBody, filter)
-										.then(
-											function () {
-												var response = {
-													message: 'POI successfully updated',
-													id: id,
-													url: utils.responseUrl(req, '/api/v1/poi', id)
-												};
-												utils.changeMapUpdatedOn(dbCon, mapId).then(
-													function () {
-														squidUpdate.purgeKey(
-															utils.surrogateKeyPrefix + mapId,
-															'mapPoiUpdated'
-														);
-														res.send(303, response);
-														res.end();
-													},
-													next
-												);
-											},
-											next
-									);
-								} else {
-									next(errorHandler.elementNotFoundError(dbTable, id));
-								}
-							},
-							next
-						);
+						dbCon.getConnection(dbCon.connType.master, function (conn) {
+							getMapIdByPoiId(conn, id).then(
+								function (rows) {
+									if (rows.length > 0) {
+										mapId = rows[0].map_id;
+										dbCon
+											.update(conn, dbTable, reqBody, filter)
+											.then(
+												function () {
+													var response = {
+														message: 'POI successfully updated',
+														id: id,
+														url: utils.responseUrl(req, '/api/v1/poi', id)
+													};
+													utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
+														function () {
+															squidUpdate.purgeKey(
+																utils.surrogateKeyPrefix + mapId,
+																'mapPoiUpdated'
+															);
+															res.send(303, response);
+															res.end();
+														},
+														next
+													);
+												},
+												next
+										);
+									} else {
+										next(errorHandler.elementNotFoundError(dbTable, id));
+									}
+								},
+								next
+							);
+						}, next);
 					} else {
 						next(errorHandler.badNumberError(req.pathVar.id));
 					}

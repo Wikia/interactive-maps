@@ -87,13 +87,17 @@ module.exports = function createCRUD() {
 					query.limit(limit).offset(0);
 					query.orderBy('created_on', 'desc');
 				}
-
-				query.select().then(
+				dbCon.getConnection(dbCon.connType.all, function (conn) {
+					query.connection(conn);
+					query.select().then(
 						function (collection) {
 							collection.forEach(function (value) {
 								value.image = utils.imageUrl(
 									config.dfsHost,
-									utils.getBucketName(config.bucketPrefix, value.name),
+									utils.getBucketName(
+										config.bucketPrefix + config.tileSetPrefix,
+										value.id
+									),
 									value.image
 								);
 								value.url = utils.responseUrl(req, req.route.path, value.id);
@@ -103,15 +107,17 @@ module.exports = function createCRUD() {
 							res.end();
 						},
 						next
-				);
+					);
+				}, next);
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, createSchema);
 
 				if (errors.length === 0) {
-					addTileSet(dbTable, reqBody)
-						.then(
+					dbCon.getConnection(dbCon.connType.master, function (conn) {
+						addTileSet(conn, dbTable, reqBody)
+							.then(
 							function (data) {
 								var id = data.id,
 									responseCode = 201,
@@ -128,7 +134,8 @@ module.exports = function createCRUD() {
 								res.end();
 							},
 							next
-					);
+						);
+					}, next);
 				} else {
 					next(errorHandler.badRequestError(errors));
 				}
@@ -157,28 +164,33 @@ module.exports = function createCRUD() {
 					};
 
 				if (isFinite(id)) {
-					dbCon
-						.select(dbTable, dbColumns, filter)
-						.then(
-							function (collection) {
-								var obj = collection[0];
+					dbCon.getConnection(dbCon.connType.all, function (conn) {
+						dbCon
+							.select(conn, dbTable, dbColumns, filter)
+							.then(
+								function (collection) {
+									var obj = collection[0];
 
-								if (obj) {
-									// TODO: fix hardcoded DFS host
-									obj.image = utils.imageUrl(
-										config.dfsHost,
-										utils.getBucketName(config.bucketPrefix, obj.name),
-										obj.image
-									);
-									obj.max_zoom = utils.binToMaxZoomLevel(obj.max_zoom);
-									res.send(200, obj);
-									res.end();
-								} else {
-									next(errorHandler.elementNotFoundError(dbTable, id));
-								}
-							},
-							next
-					);
+									if (obj) {
+										// TODO: fix hardcoded DFS host
+										obj.image = utils.imageUrl(
+											config.dfsHost,
+											utils.getBucketName(
+												config.bucketPrefix + config.tileSetPrefix,
+												id
+											),
+											obj.image
+										);
+										obj.max_zoom = utils.binToMaxZoomLevel(obj.max_zoom);
+										res.send(200, obj);
+										res.end();
+									} else {
+										next(errorHandler.elementNotFoundError(dbTable, id));
+									}
+								},
+								next
+						);
+					}, next);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
 				}

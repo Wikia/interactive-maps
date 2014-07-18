@@ -36,6 +36,8 @@ CREATE TABLE tile_set_search (
 CREATE TABLE map (
   id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
   city_id INT UNSIGNED NOT NULL,
+  city_title VARCHAR(255) NOT NULL,
+  city_url VARCHAR(255) NOT NULL,
   tile_set_id INT UNSIGNED NOT NULL,
   title VARCHAR(255) NOT NULL,
   locked TINYINT DEFAULT FALSE NOT NULL,
@@ -69,6 +71,7 @@ CREATE TABLE poi (
   poi_category_id INT UNSIGNED NOT NULL,
   description TEXT,
   link TEXT,
+  link_title VARCHAR(255),
   photo VARCHAR(255),
   lat FLOAT(10,6) NOT NULL,
   lon FLOAT(10,6) NOT NULL,

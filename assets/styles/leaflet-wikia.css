@@ -1,6 +1,78 @@
-.leaflet-popup-content-wrapper {
-	border-radius: 0;
+body {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	margin: 0;
 	padding: 0;
+}
+
+body,
+html,
+.int-map {
+	height: 100%;
+}
+
+.attr {
+	background: #092140;
+	bottom: 0;
+	color: #b9b9b9;
+	display: none;
+	height: 38px;
+	position: fixed;
+	text-align: center;
+	width: 100%;
+	z-index: 1;
+}
+
+.attr.embed {
+	display: block;
+}
+
+.attr a {
+	color: #fff;
+	font-size: 12px;
+	text-decoration: none;
+}
+
+.attr .edit {
+	background-color: #0a5fa3;
+	background-position: -114px 10px;
+	display: block;
+	float: right;
+	font-size: 14px;
+	font-weight: 400;
+	height: 35px;
+	padding: 12px 13px 12px 32px;
+}
+
+.attr .logo {
+	background-position: 0 0;
+	float:left;
+	height: 19px;
+	margin: 9px 0 0 13px;
+	overflow: hidden;
+	text-indent: 100%;
+	white-space: nowrap;
+	width: 111px;
+}
+
+.comm {
+	display: inline-block;
+	font-weight: 200;
+	margin-top: 12px;
+}
+
+.sprite {
+	background: transparent url('/images/sprite.png') no-repeat;
+}
+
+.wrapper {
+	bottom: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+}
+
+.wrapper.embed {
+	bottom: 38px;
 }
 
 .leaflet-popup-content {
@@ -8,7 +80,14 @@
 	overflow: hidden;
 }
 
-.leaflet-popup a.photo, .leaflet-popup img, .leaflet-popup .description {
+.leaflet-popup-content-wrapper {
+	border-radius: 0;
+	padding: 0;
+}
+
+.leaflet-popup a.photo,
+.leaflet-popup img,
+.leaflet-popup .description {
 	display: inline-block;
 	vertical-align: top;
 }
@@ -17,6 +96,11 @@
 	padding: 15px 20px;
 	width: 285px;
 	word-wrap: break-word;
+}
+
+/* TODO: temporary fix - to be removed ones the UI for map on mobile is properly designed */
+.wikia-mobile .leaflet-popup .description {
+	width: auto;
 }
 
 .leaflet-popup h3 {
@@ -54,41 +138,96 @@
 	-ms-flex-direction: column;
 	-o-flex-direction: column;
 	flex-direction: column;
+	font-family: Helvetica Neue, helvetica, arial, sans-serif;
+	font-size: 14px;
+	line-height: 21px;
 	max-height: 100%;
 	padding: 10px;
 	position: absolute;
 	top: 0;
-	width: 320px;
-	z-index: 1;
+	z-index: 1001;
+}
+
+.wikia-mobile .filter-menu {
+	bottom: 0;
+}
+
+.wikia-mobile .filter-menu.shown-box {
+	width: 100%;
 }
 
 .filter-menu-header {
-    background: rgba(0, 0, 0, 0.8);
-    -ms-flex-negative: 0;
-    -webkit-flex-shrink: 0;
-    -moz-flex-shrink: 0;
-    -ms-flex-shrink: 0;
-    -o-flex-shrink: 0;
-    flex-shrink: 0;
-    font-weight: bold;
-    height: 50px;
-    line-height: 50px;
-    margin: 0;
-    padding: 0 15px;
+	background: rgba(51, 51, 51, 0.8);
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+	cursor: pointer;
+	-ms-flex-negative: 0;
+	-webkit-flex-shrink: 0;
+	-moz-flex-shrink: 0;
+	-ms-flex-shrink: 0;
+	-o-flex-shrink: 0;
+	flex-shrink: 0;
+	font-size: 15px;
+	font-weight: bold;
+	height: 16px;
+	margin: 0;
+	padding: 15px;
+}
+
+.hide-button {
+	float: right;
+	font-size: 13px;
+}
+
+.hide-button, .edit-point-types {
+	-webkit-transition: opacity 0.2s ease-in;
+	transition: opacity 0.2s ease-in;
+}
+
+.hidden-box .hide-button, .hidden-box .edit-point-types {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.shown-box .hide-button, .shown-box .edit-point-types {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.hidden-box {
+	max-height: 0;
+	-webkit-transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
+	transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
+	width: 94px;
+}
+
+.hidden-box .filter-menu-header {
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+
+.shown-box {
+	max-height: 100%;
+	-webkit-transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
+	transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
+	width: 245px;
 }
 
 .edit-point-types {
-    cursor: pointer;
-    display: none;
-    float: right;
+	cursor: pointer;
+	display: none;
+	float: right;
+	font-size: 13px;
 }
 
 .enable-edit .edit-point-types {
-    display: inline;
+	display: inline;
 }
 
 .point-types {
-	background: rgba(0, 0, 0, 0.7);
+	background: rgba(102, 102, 102, 0.6);
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
 	-ms-flex-negative: 1;
 	list-style: none;
 	margin: 0;
@@ -97,26 +236,51 @@
 	padding: 0;
 }
 
+
+.wikia-mobile .point-types {
+	height: 100%;
+}
+#allPointTypes {
+	padding: 15px 10px;
+}
+
 .point-types li {
-	padding: 10px 10px 10px 15px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+	cursor: pointer;
+	line-height: 14px;
+	margin: 0 0 0 10px;
+	padding: 7px 10px 7px 0;
+}
+
+.point-types li:last-child {
+	border: 0;
 }
 
 .point-types li.enabled {
-	background: url('/images/selected.png') right center no-repeat;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSIyMXB4IiBoZWlnaHQ9IjIxcHgiIHZpZXdCb3g9IjAgMCAzMDAgMzAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAzMDAgMzAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cG9seWdvbiBwb2ludHM9IjEwNy4wOTcsMjUwLjY0NiAyMCwxNzEuNzMyIDQ3LjI0NiwxNDEuNjU4IDEwNS41NjIsMTk0LjQ4OSAyNDkuMTU2LDQ5LjM1NCAyNzguMDA3LDc3Ljg5NyIgc3R5bGU9ImZpbGw6IzQzOTJkMiIvPjwvc3ZnPg==) right center no-repeat;
 	background-origin: content-box;
 }
 
-.point-type img {
-	height: 20px;
-	margin: 0 10px 0 5px;
+.point-type-icon {
+	display: inline-block;
+	height: 25px;
+	margin: 0 5px 0 10px;
+	text-align: center;
+	width: 25px;
+}
+
+.point-type-icon img {
+	height: auto;
+	max-height: 25px;
+	max-width: 25px;
 	vertical-align: middle;
-	width: 20px;
+	width: auto;
 }
 
 .point-type span {
 	display: inline-block;
 	vertical-align: middle;
-	width: 210px;
+	width: 135px;
 	word-wrap: break-word;
 }
 
@@ -127,4 +291,8 @@
 
 .enable-edit .edit-poi-link {
 	display: inline;
+}
+
+.enable-edit .hide-button {
+	display: none;
 }

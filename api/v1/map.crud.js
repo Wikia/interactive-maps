@@ -30,6 +30,20 @@ var dbCon = require('./../../lib/db_connector'),
 				type: 'integer',
 				required: true
 			},
+			city_title: {
+				description: 'Name of the Wikia this map instance belongs to',
+				type: 'string',
+				required: true,
+				minLength: 1,
+				maxLength: 255
+			},
+			city_url: {
+				description: 'URL of the Wikia this map instance belongs to',
+				type: 'string',
+				required: true,
+				minLength: 1,
+				maxLength: 255
+			},
 			created_by: {
 				description: 'creator user name',
 				type: 'string',
@@ -52,6 +66,18 @@ var dbCon = require('./../../lib/db_connector'),
 			deleted: {
 				description: 'Map deleted flag',
 				type: 'bool'
+			},
+			city_title: {
+				description: 'Name of the Wikia this map instance belongs to',
+				type: 'string',
+				minLength: 1,
+				maxLength: 255
+			},
+			city_url: {
+				description: 'URL of the Wikia this map instance belongs to',
+				type: 'string',
+				minLength: 1,
+				maxLength: 255
 			}
 		},
 		additionalProperties: false
@@ -113,43 +139,48 @@ module.exports = function createCRUD() {
 				}
 
 				filter.status = utils.tileSetStatus.ok;
+				dbCon.getConnection(dbCon.connType.all, function (conn) {
+					query = dbCon.knex(dbTable)
+						.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+						.column([
+							'map.id',
+							'map.title',
+							'tile_set.image',
+							'map.updated_on',
+							'tile_set.status',
+							'tile_set.id as tile_set_id'
+						])
+						.where(filter)
+						.orderBy(sort.column, sort.direction)
+						.connection(conn)
+						.select();
 
-				query = dbCon.knex(dbTable)
-					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-					.column([
-						'map.id',
-						'map.title',
-						'tile_set.name',
-						'tile_set.image',
-						'map.updated_on',
-						'tile_set.status'
-					])
-					.where(filter)
-					.orderBy(sort.column, sort.direction)
-					.select();
+					if (limit) {
+						query.limit(limit);
+						query.offset(offset);
+					}
 
-				if (limit) {
-					query.limit(limit);
-					query.offset(offset);
-				}
-
-				query.then(
-					function (collection) {
-						dbCon.knex(dbTable)
-							.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-							.count('* as cntr')
-							.where(filter)
-							.then(
+					query.then(
+						function (collection) {
+							dbCon.knex(dbTable)
+								.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+								.count('* as cntr')
+								.where(filter)
+								.connection(conn)
+								.then(
 								function (count) {
 									collection.forEach(function (value) {
 										value.image = utils.imageUrl(
 											config.dfsHost,
-											utils.getBucketName(config.bucketPrefix, value.name),
+											utils.getBucketName(
+												config.bucketPrefix + config.tileSetPrefix,
+												value.tile_set_id
+											),
 											value.image
 										);
 										value.url = utils.responseUrl(req, req.route.path, value.id);
 
-										delete value.name;
+										delete value.tile_set_id;
 									});
 
 									res.send(200, {
@@ -159,10 +190,11 @@ module.exports = function createCRUD() {
 									res.end();
 								},
 								next
-						);
-					},
-					next
-				);
+							);
+						},
+						next
+					);
+				}, next);
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
@@ -170,22 +202,24 @@ module.exports = function createCRUD() {
 
 				if (errors.length === 0) {
 					reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
-					dbCon
-						.insert(dbTable, reqBody)
-						.then(
-							function (data) {
-								var id = data[0],
-									response = {
-										message: 'Map successfully created',
-										id: id,
-										url: utils.responseUrl(req, req.route.path, id)
-									};
+					dbCon.getConnection(dbCon.connType.master, function (conn) {
+						dbCon
+							.insert(conn, dbTable, reqBody)
+							.then(
+								function (data) {
+									var id = data[0],
+										response = {
+											message: 'Map successfully created',
+											id: id,
+											url: utils.responseUrl(req, req.route.path, id)
+										};
 
-								res.send(201, response);
-								res.end();
-							},
-							next
-					);
+									res.send(201, response);
+									res.end();
+								},
+								next
+						);
+					}, next);
 				} else {
 					next(errorHandler.badRequestError(errors));
 				}
@@ -198,23 +232,25 @@ module.exports = function createCRUD() {
 						id: id
 					};
 				if (isFinite(id)) {
-					dbCon
-						.destroy(dbTable, filter)
-						.then(
-							function (affectedRows) {
-								if (affectedRows > 0) {
-									squidUpdate.purgeKey(utils.surrogateKeyPrefix + id, 'mapDeleted');
-									res.send(204, {
-										message: 'Map successfully deleted',
-										id: id
-									});
-									res.end();
-								} else {
-									next(errorHandler.elementNotFoundError(dbTable, id));
-								}
-							},
-							next
-					);
+					dbCon.getConnection(dbCon.connType.master, function (conn) {
+						dbCon
+							.destroy(conn, dbTable, filter)
+							.then(
+								function (affectedRows) {
+									if (affectedRows > 0) {
+										squidUpdate.purgeKey(utils.surrogateKeyPrefix + id, 'mapDeleted');
+										res.send(204, {
+											message: 'Map successfully deleted',
+											id: id
+										});
+										res.end();
+									} else {
+										next(errorHandler.elementNotFoundError(dbTable, id));
+									}
+								},
+								next
+						);
+					}, next);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
 				}
@@ -237,22 +273,24 @@ module.exports = function createCRUD() {
 					};
 
 				if (isFinite(id)) {
-					dbCon
-						.select(dbTable, dbColumns, filter)
-						.then(
-							function (collection) {
-								var obj = collection[0];
+					dbCon.getConnection(dbCon.connType.all, function (conn) {
+						dbCon
+							.select(conn, dbTable, dbColumns, filter)
+							.then(
+								function (collection) {
+									var obj = collection[0];
 
-								if (obj) {
-									obj.tile_set_url = utils.responseUrl(req, '/api/v1/tile_set', obj.tile_set_id);
-									res.send(200, obj);
-									res.end();
-								} else {
-									next(errorHandler.elementNotFoundError(dbTable, id));
-								}
-							},
-							next
-					);
+									if (obj) {
+										obj.tile_set_url = utils.responseUrl(req, '/api/v1/tile_set', obj.tile_set_id);
+										res.send(200, obj);
+										res.end();
+									} else {
+										next(errorHandler.elementNotFoundError(dbTable, id));
+									}
+								},
+								next
+						);
+					}, next);
 				} else {
 					next(errorHandler.badNumberError(req.pathVar.id));
 				}
@@ -271,25 +309,27 @@ module.exports = function createCRUD() {
 
 					if (isFinite(id)) {
 						reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
-						dbCon
-							.update(dbTable, reqBody, filter)
-							.then(
-								function (affectedRows) {
-									if (affectedRows > 0) {
-										var response = {
-											message: 'Map successfully updated',
-											id: id,
-											url: utils.responseUrl(req, '/api/v1/map', id)
-										};
+						dbCon.getConnection(dbCon.connType.master, function (conn) {
+							dbCon
+								.update(conn, dbTable, reqBody, filter)
+								.then(
+									function (affectedRows) {
+										if (affectedRows > 0) {
+											var response = {
+												message: 'Map successfully updated',
+												id: id,
+												url: utils.responseUrl(req, '/api/v1/map', id)
+											};
 
-										res.send(303, response);
-										res.end();
-									} else {
-										next(errorHandler.elementNotFoundError(dbTable, id));
-									}
-								},
-								next
-						);
+											res.send(303, response);
+											res.end();
+										} else {
+											next(errorHandler.elementNotFoundError(dbTable, id));
+										}
+									},
+									next
+							);
+						}, next);
 					} else {
 						next(errorHandler.badNumberError(req.pathVar.id));
 					}
