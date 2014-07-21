@@ -326,9 +326,13 @@
 		var allPointTypesFilter = doc.getElementById(allPointTypesFilterId),
 			filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
 			filtersLength = filters.length,
+			points = getPointsByType(0),
+			pointsLength = points.length,
 			enabled = allPointTypesFilter.className.indexOf('enabled') === -1,
 			i;
 
+		// enabled/disable all filters
+		pointTypeFiltersContainer.getElementsByClassName('point-type');
 		for (i = 0; i < filtersLength; i++) {
 			if (enabled) {
 				addClass(filters[i], 'enabled');
@@ -337,8 +341,16 @@
 			}
 		}
 
+		// show/hide all points
+		for ( i = 0; i < pointsLength; i++ ) {
+			if (enabled) {
+				removeClass(points[i], 'hidden');
+			} else {
+				addClass(points[i], 'hidden');
+			}
+		}
+
 		toggleAllPointTypesFilter();
-		togglePoints(allPointTypesFilter);
 
 		Tracker.track('map', Tracker.ACTIONS.CLICK, 'poi-category-filter', 0);
 	}
