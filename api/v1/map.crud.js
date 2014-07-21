@@ -134,6 +134,7 @@ module.exports = function createCRUD() {
 					filter.city_id = cityId;
 				}
 
+				// If deleted parameter is passed in the request, return only deleted maps
 				if (typeof req.query.deleted !== 'undefined') {
 					filter.deleted = 1;
 				}
