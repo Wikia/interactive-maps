@@ -332,7 +332,6 @@
 			i;
 
 		// enabled/disable all filters
-		pointTypeFiltersContainer.getElementsByClassName('point-type');
 		for (i = 0; i < filtersLength; i++) {
 			if (enabled) {
 				addClass(filters[i], 'enabled');
