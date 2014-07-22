@@ -123,7 +123,7 @@ module.exports = function createCRUD() {
 			GET: function (req, res, next) {
 				var cityId = parseInt(req.query.city_id, 10) || 0,
 					filter = {
-						deleted: false
+						deleted: 0
 					},
 					sort = buildSort(req.query.sort),
 					limit = parseInt(req.query.limit, 10) || false,
@@ -132,6 +132,11 @@ module.exports = function createCRUD() {
 
 				if (cityId !== 0) {
 					filter.city_id = cityId;
+				}
+
+				// If deleted parameter is passed in the request, return only deleted maps
+				if (typeof req.query.deleted !== 'undefined') {
+					filter.deleted = 1;
 				}
 
 				filter.status = utils.tileSetStatus.ok;
@@ -252,11 +257,20 @@ module.exports = function createCRUD() {
 				}
 			},
 			GET: function (req, res, next) {
-				var dbColumns = ['id', 'title', 'tile_set_id', 'city_id', 'created_by', 'created_on', 'updated_on'],
+				var dbColumns = [
+						'id',
+						'title',
+						'tile_set_id',
+						'city_id',
+						'created_by',
+						'created_on',
+						'updated_on',
+						'deleted'
+
+					],
 					id = parseInt(req.pathVar.id, 10),
 					filter = {
-						id: id,
-						deleted: false
+						id: id
 					};
 
 				if (isFinite(id)) {
