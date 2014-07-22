@@ -1043,7 +1043,7 @@ L.DomUtil = {
 		// makes animation smoother as it ensures HW accel is used. Firefox 13 doesn't care
 		// (same speed either way), Opera 12 doesn't support translate3d
 
-		var is3d = L.Browser.webkit3d,
+		var is3d = !window.L_DISABLE_TRANSLATE_3D && L.Browser.webkit3d,
 		    open = 'translate' + (is3d ? '3d' : '') + '(',
 		    close = (is3d ? ',0' : '') + ')';
 
@@ -3593,7 +3593,7 @@ L.Marker = L.Class.extend({
 			if (options.title) {
 				icon.title = options.title;
 			}
-			
+
 			if (options.alt) {
 				icon.alt = options.alt;
 			}
@@ -8124,7 +8124,7 @@ L.Control.Attribution = L.Control.extend({
 				this.addAttribution(map._layers[i].getAttribution());
 			}
 		}
-		
+
 		map
 		    .on('layeradd', this._onLayerAdd, this)
 		    .on('layerremove', this._onLayerRemove, this);
