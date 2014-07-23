@@ -9,6 +9,12 @@ var dbCon = require('./../../lib/db_connector'),
 
 	urlPattern = jsonValidator.getOptionalUrlPattern(),
 
+	poiOperations = {
+		insert: 'insert',
+		update: 'update',
+		delete: 'delete'
+	},
+
 	dbTable = 'poi',
 	createSchema = {
 		description: 'Schema for creating POI',
@@ -145,6 +151,58 @@ function getMapIdByPoiId(conn, poiId) {
 	);
 }
 
+function collectPoiData(conn, poiId) {
+	return dbCon.knex('poi')
+		.select(
+			'poi.id',
+			'poi.name',
+			'poi.description',
+			'poi.link',
+			'poi.photo',
+			'poi.lat',
+			'poi.lon',
+			dbCon.raw('UNIX_TIMESTAMP(poi.created_on) AS created_on'),
+			'poi.created_by',
+			dbCon.raw('UNIX_TIMESTAMP(poi.updated_on) AS updated_on'),
+			'poi.updated_by',
+			'poi.link_title',
+			'poi.poi_category_id',
+			'poi_category.name AS poi_category_name',
+			'poi_category.parent_poi_category_id',
+			'poi.map_id',
+			'map.city_id',
+			'map.tile_set_id',
+			dbCon.raw('UNIX_TIMESTAMP(map.created_on) AS map_created_on'),
+			'map.created_by AS map_created_by'
+		)
+		.join('poi_category', 'poi.poi_category_id', '=', 'poi_category.id')
+		.join('map', 'poi.map_id', '=', 'map.id')
+		.connection(conn)
+		.where('poi.id', poiId);
+}
+
+function addPoiDataToQueue(conn, operation, poiId) {
+	if (operation === poiOperations.delete) {
+		var payload = {
+			operation: operation,
+			data: [
+				{
+					id: poiId
+				}
+			]
+		};
+		console.log(JSON.stringify(payload));
+	} else {
+		collectPoiData(conn, poiId).then(function (poiData) {
+			var payload = {
+				operation: operation,
+				data: poiData
+			};
+			console.log(JSON.stringify(payload));
+		});
+	}
+}
+
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
@@ -190,6 +248,7 @@ module.exports = function createCRUD() {
 									utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
 										function () {
 											squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
+											addPoiDataToQueue(conn, poiOperations.insert, id);
 											res.send(201, response);
 											res.end();
 										},
@@ -227,6 +286,7 @@ module.exports = function createCRUD() {
 															utils.surrogateKeyPrefix + mapId,
 															'mapPoiDeleted'
 														);
+														addPoiDataToQueue(conn, poiOperations.delete, id);
 														res.send(204, {});
 														res.end();
 													},
@@ -309,6 +369,7 @@ module.exports = function createCRUD() {
 																utils.surrogateKeyPrefix + mapId,
 																'mapPoiUpdated'
 															);
+															addPoiDataToQueue(conn, poiOperations.update, id);
 															res.send(303, response);
 															res.end();
 														},
