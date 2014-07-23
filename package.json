@@ -25,7 +25,8 @@
     "newrelic": "1.5.x",
     "node-syslog": "1.1.x",
     "q": "1.0.x",
-    "scribe": "0.0.9"
+    "scribe": "0.0.9",
+    "node-celery": "~0.2.2"
   },
   "devDependencies": {
     "gulp": "3.6.x",
