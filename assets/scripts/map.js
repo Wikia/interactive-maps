@@ -845,7 +845,7 @@
 			}, 1);
 		}
 
-		// THIS IS HACK! We disable translate3d because it causes bugs on Safari
+		// Workaround for Safari translate3D bug with map panning and popups set to 'keep in view' 
 		L.Browser.webkit3d = false;
 	}
 
