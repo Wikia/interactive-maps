@@ -100,6 +100,7 @@ html,
 
 /* TODO: temporary fix - to be removed ones the UI for map on mobile is properly designed */
 .wikia-mobile .leaflet-popup .description {
+	display: block;
 	width: auto;
 }
 
