@@ -844,6 +844,9 @@
 				map.fitBounds(group.getBounds().pad(autoZoomPadding));
 			}, 1);
 		}
+
+		// THIS IS HACK! We disable translate3d because it causes bugs on Safari
+		L.Browser.webkit3d = false;
 	}
 
 	createMap();
