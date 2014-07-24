@@ -301,7 +301,7 @@ module.exports = function createCRUD() {
 													var response = {
 														message: 'POI successfully updated',
 														id: id,
-														url: utils.responseUrl(req, '/api/v1/poi', id)
+														url: utils.responseUrl(req, '/api/v1/poi/', id)
 													};
 													utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
 														function () {

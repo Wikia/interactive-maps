@@ -328,7 +328,7 @@ module.exports = function createCRUD() {
 													var response = {
 														message: 'POI category successfully updated',
 														id: id,
-														url: utils.responseUrl(req, '/api/v1/poi_category', id)
+														url: utils.responseUrl(req, '/api/v1/poi_category/', id)
 													};
 													if (reqBody.marker) {
 														poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
