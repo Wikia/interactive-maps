@@ -174,7 +174,7 @@ module.exports = function createCRUD() {
 											),
 											value.image
 										);
-										value.url = utils.responseUrl(req, req.route.path, value.id);
+										value.url = utils.responseUrl(req, utils.addTrailingSlash(req.route.path), value.id);
 
 										delete value.tile_set_id;
 									});
@@ -207,7 +207,7 @@ module.exports = function createCRUD() {
 										response = {
 											message: 'Map successfully created',
 											id: id,
-											url: utils.responseUrl(req, req.route.path, id)
+											url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
 										};
 
 									res.send(201, response);
