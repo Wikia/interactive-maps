@@ -700,7 +700,7 @@
 			action: 'embedMapCode',
 			data: {
 				mapId: config.id,
-				mapHost: config.mapHost
+				iframeSrc: config.iframeSrc
 			}
 		};
 

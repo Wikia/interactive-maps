@@ -183,7 +183,7 @@ module.exports = function createCRUD() {
 										response = {
 											message: 'POI category successfully created',
 											id: id,
-											url: utils.responseUrl(req, req.route.path, id)
+											url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
 										},
 										mapId = reqBody.map_id;
 									if (reqBody.marker) {
@@ -328,7 +328,7 @@ module.exports = function createCRUD() {
 													var response = {
 														message: 'POI category successfully updated',
 														id: id,
-														url: utils.responseUrl(req, '/api/v1/poi_category', id)
+														url: utils.responseUrl(req, '/api/v1/poi_category/', id)
 													};
 													if (reqBody.marker) {
 														poiCategoryMarker(id, mapId, reqBody.marker, dbTable);
