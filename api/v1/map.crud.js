@@ -174,7 +174,7 @@ module.exports = function createCRUD() {
 											),
 											value.image
 										);
-										value.url = utils.responseUrl(req, req.route.path, value.id);
+										value.url = utils.responseUrl(req, utils.addTrailingSlash(req.route.path), value.id);
 
 										delete value.tile_set_id;
 									});
@@ -207,7 +207,7 @@ module.exports = function createCRUD() {
 										response = {
 											message: 'Map successfully created',
 											id: id,
-											url: utils.responseUrl(req, req.route.path, id)
+											url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
 										};
 
 									res.send(201, response);
@@ -268,7 +268,7 @@ module.exports = function createCRUD() {
 									var obj = collection[0];
 
 									if (obj) {
-										obj.tile_set_url = utils.responseUrl(req, '/api/v1/tile_set', obj.tile_set_id);
+										obj.tile_set_url = utils.responseUrl(req, '/api/v1/tile_set/', obj.tile_set_id);
 										res.send(200, obj);
 										res.end();
 									} else {
@@ -305,7 +305,7 @@ module.exports = function createCRUD() {
 											var response = {
 												message: 'Map successfully updated',
 												id: id,
-												url: utils.responseUrl(req, '/api/v1/map', id)
+												url: utils.responseUrl(req, '/api/v1/map/', id)
 											};
 
 											res.send(303, response);

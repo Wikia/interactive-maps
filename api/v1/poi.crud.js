@@ -184,7 +184,7 @@ module.exports = function createCRUD() {
 										response = {
 											message: 'POI successfully created',
 											id: id,
-											url: utils.responseUrl(req, req.route.path, id)
+											url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
 										},
 										mapId = reqBody.map_id;
 									utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
@@ -301,7 +301,7 @@ module.exports = function createCRUD() {
 													var response = {
 														message: 'POI successfully updated',
 														id: id,
-														url: utils.responseUrl(req, '/api/v1/poi', id)
+														url: utils.responseUrl(req, '/api/v1/poi/', id)
 													};
 													utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
 														function () {
