@@ -6,6 +6,8 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 	squidUpdate = require('./../../lib/squidUpdate'),
+	taskQueue = require('./../../lib/taskQueue'),
+
 
 	urlPattern = jsonValidator.getOptionalUrlPattern(),
 
@@ -151,6 +153,13 @@ function getMapIdByPoiId(conn, poiId) {
 	);
 }
 
+/**
+ * @desc Collect poi data for search indexing
+ *
+ * @param {object} conn Database connection
+ * @param {number} poiId Poi id
+ * @returns {object}
+ */
 function collectPoiData(conn, poiId) {
 	return dbCon.knex('poi')
 		.select(
@@ -181,9 +190,18 @@ function collectPoiData(conn, poiId) {
 		.where('poi.id', poiId);
 }
 
+/**
+ * @desc Send poi data to search processing queue
+ *
+ * @param {object} conn Database connection
+ * @param {string} operation POI Operation defined in poiOperations
+ * @param {number] poiId Poi id
+ */
 function addPoiDataToQueue(conn, operation, poiId) {
+	var workId = operation + poiId,
+		context;
 	if (operation === poiOperations.delete) {
-		var payload = {
+		context = {
 			operation: operation,
 			data: [
 				{
@@ -191,14 +209,28 @@ function addPoiDataToQueue(conn, operation, poiId) {
 				}
 			]
 		};
-		console.log(JSON.stringify(payload));
+		taskQueue.publish(taskQueue.payload(
+			taskQueue.tasks.poiUpdate,
+			'',
+			workId,
+			context
+		));
 	} else {
 		collectPoiData(conn, poiId).then(function (poiData) {
-			var payload = {
-				operation: operation,
-				data: poiData
-			};
-			console.log(JSON.stringify(payload));
+			var row;
+			if (poiData.length > 0) {
+				row = poiData[0];
+				context = {
+					operation: operation,
+					data: poiData
+				};
+				taskQueue.publish(taskQueue.payload(
+					taskQueue.tasks.poiUpdate,
+					poiOperations.insert === operation ? row.created_by : row.updated_by,
+					workId,
+					context
+				));
+			}
 		});
 	}
 }

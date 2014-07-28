@@ -26,7 +26,9 @@
     "node-syslog": "1.1.x",
     "q": "1.0.x",
     "scribe": "0.0.9",
-    "node-celery": "~0.2.2"
+    "node-uuid": "~1.4.1",
+    "amqplib": "~0.2.0",
+    "when": "~3.4.2"
   },
   "devDependencies": {
     "gulp": "3.6.x",

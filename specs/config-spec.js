@@ -13,6 +13,9 @@ var proxyquire = require('proxyquire').noCallThru(),
 		wgFSSwiftDC: {
 			dev: ''
 		},
+		wgTaskBroker: {
+			dev: ''
+		},
 		api: {
 			test: {
 				port: 123,
