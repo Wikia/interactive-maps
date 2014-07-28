@@ -196,9 +196,9 @@ html,
 }
 
 .hidden-box {
-	max-height: 0;
-	-webkit-transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
-	transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
+	height: 0;
+	-webkit-transition: height 0.2s ease-in, width 0.1s 0.2s ease-in;
+	transition: height 0.2s ease-in, width 0.1s 0.2s ease-in;
 	width: 94px;
 }
 
@@ -208,9 +208,9 @@ html,
 }
 
 .shown-box {
-	max-height: 100%;
-	-webkit-transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
-	transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
+	height: 100%;
+	-webkit-transition: height 0.2s 0.1s ease-in, width 0.1s ease-in;
+	transition: height 0.2s 0.1s ease-in, width 0.1s ease-in;
 	width: 245px;
 }
 
