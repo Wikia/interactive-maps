@@ -7,7 +7,7 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	taskQueue = require('./../../lib/taskQueue'),
-
+	logger = require('./../../lib/logger'),
 
 	urlPattern = jsonValidator.getOptionalUrlPattern(),
 
@@ -195,7 +195,7 @@ function collectPoiData(conn, poiId) {
  *
  * @param {object} conn Database connection
  * @param {string} operation POI Operation defined in poiOperations
- * @param {number] poiId Poi id
+ * @param {number} poiId Poi id
  */
 function addPoiDataToQueue(conn, operation, poiId) {
 	var workId = operation + poiId,
@@ -230,6 +230,8 @@ function addPoiDataToQueue(conn, operation, poiId) {
 					workId,
 					context
 				));
+			} else {
+				logger.error('POI ' + poiId + ' not found in database');
 			}
 		});
 	}
