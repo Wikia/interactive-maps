@@ -279,17 +279,30 @@ describe('utils', function () {
 		},
 			testSet = [{
 				req: newReq('http', 'localhost'),
-				path: '/test',
+				path: '/test/',
 				id: 1,
 				url: 'http://localhost/test/1'
 			}, {
 				req: newReq('https', 'lolcathost'),
-				path: '/testorium/test/fest',
+				path: '/testorium/test/fest/',
 				id: '3',
 				url: 'https://lolcathost/testorium/test/fest/3'
 			}];
 		testSet.forEach(function (testCase) {
 			expect(utils.responseUrl(testCase.req, testCase.path, testCase.id)).toBe(testCase.url);
+		});
+	});
+
+	it('adds correctly trailing slashes', function () {
+		var testSet = [{
+				path: '/api/v1',
+				expected: '/api/v1/'
+			}, {
+				path: '/api/v1/',
+				expected: '/api/v1/'
+			}];
+		testSet.forEach(function (testCase) {
+			expect(utils.addTrailingSlash(testCase.path)).toBe(testCase.expected);
 		});
 	});
 

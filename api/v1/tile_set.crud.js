@@ -100,7 +100,7 @@ module.exports = function createCRUD() {
 									),
 									value.image
 								);
-								value.url = utils.responseUrl(req, req.route.path, value.id);
+								value.url = utils.responseUrl(req, utils.addTrailingSlash(req.route.path), value.id);
 							});
 
 							res.send(200, collection);
@@ -124,7 +124,7 @@ module.exports = function createCRUD() {
 									response = {
 										message: 'Tile set added to processing queue',
 										id: id,
-										url: utils.responseUrl(req, req.route.path, id)
+										url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
 									};
 								if (data.exists) {
 									response.message = 'This tile set already exists';
