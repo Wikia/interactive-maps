@@ -8,11 +8,7 @@ var config = require('../lib/config'),
 
 function count() {
 	jobs.inactiveCount(function (err, val) {
-		if (err) {
-			value = 'ERROR';
-		} else {
-			value = val;
-		}
+		value = err ? 'ERROR': val;
 		console.log(new Date().toISOString() + '\t' + value);
 	});
 }
