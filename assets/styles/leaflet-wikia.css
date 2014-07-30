@@ -194,7 +194,7 @@ html,
 .hidden-box {
 	max-height: 0;
 	width: auto;
-	min-width: 0px;
+	min-width: 0;
 	transition: min-width .2s .2s, max-height .2s;
 }
 
