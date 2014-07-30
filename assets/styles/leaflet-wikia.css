@@ -194,31 +194,38 @@ html,
 .hidden-box {
 	max-height: 0;
 	width: auto;
-	min-width: 94px;
+	min-width: 0px;
 	transition: min-width .2s .2s, max-height .2s;
 }
 
 .hidden-box .hide-button, .hidden-box .edit-point-types {
+	visibility: hidden;
 	pointer-events: none;
-	visibility:hidden;
-	opacity: 0;
 	width:0;
-	transition: opacity .2s;
+}
+
+.filter-menu-header {
+	transition: width .2s;
 }
 
 .hidden-box .point-types {
-	width: 0;
 	transition: width .2s .2s;
+	width: 0;
 }
 
 .shown-box .point-types {
+	transition: width .2s;
 	width: 225px;
 }
 
+.wikia-mobile .shown-box .point-types {
+	width: 100%;
+}
+
 .shown-box .hide-button, .shown-box .edit-point-types {
+	display: inline;
 	pointer-events: auto;
-	opacity: 1;
-	transition: opacity .2s;
+	visibility: visible;
 }
 
 .hidden-box .filter-menu-header {
@@ -229,7 +236,6 @@ html,
 .shown-box {
 	max-height: 100%;
 	min-width: 245px;
-	width: 245px;
 	transition: min-width .2s, max-height .2s .2s;
 }
 
@@ -256,8 +262,7 @@ html,
 	overflow-x: hidden;
 	overflow-y: auto;
 	padding: 0;
-	width:100%;
-	transition: width .2s;
+	width: 100%;
 }
 
 
