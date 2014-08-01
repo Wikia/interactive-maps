@@ -36,7 +36,7 @@ function checkImage(tileSetId, imageName) {
 			method: 'HEAD'
 		}, function (response) {
 			if (response.statusCode  !== 200) {
-				console.log('\nTile Set id: ' + imageName + ' returned code: ' +
+				console.log('\nTile Set id: ' + tileSetId + ' returned code: ' +
 					response.statusCode + ' for image: ' + imageUrl);
 			} else {
 				process.stdout.write('.');
