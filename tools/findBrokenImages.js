@@ -8,7 +8,7 @@ var http = require('http'),
 	utils = require('../lib/utils');
 
 /**
- * Increase the HTTP pool size
+ * Increase the HTTP pool size because the default 5 makes the process too slow
  * @type {number}
  */
 http.globalAgent.maxSockets = 10;
@@ -36,8 +36,8 @@ function checkImage(tileSetId, imageName) {
 			method: 'HEAD'
 		}, function (response) {
 			if (response.statusCode  !== 200) {
-				console.log('\nMap id: ' + imageName + ' returned code: ' +
-					response.statusCode + ' for image ' + imageUrl);
+				console.log('\nTile Set id: ' + imageName + ' returned code: ' +
+					response.statusCode + ' for image: ' + imageUrl);
 			} else {
 				process.stdout.write('.');
 			}
