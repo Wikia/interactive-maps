@@ -11,9 +11,10 @@ var logger = require('./lib/logger'),
 	config,
 	kue = require('kue'),
 	jobs,
+	worker,
 	http = require('http');
 
-config = require('./lib/config');
+	config = require('./lib/config');
 
 config.setRoot(__dirname);
 
@@ -90,10 +91,15 @@ if (cluster.isMaster) {
 	logger.debug('Started master process, pid: ' + process.pid);
 	// Fork workers.
 	for (var i = 0; i < numCPUs; i++) {
-		cluster.fork({
-			'IM_WORKER_ID': i
-		});
+		worker = cluster.fork().process;
+		logger.debug('Started worker# ' + i + ' process, pid: ' + worker.pid);
 	}
+
+	// Handle dying workers (so cruel)
+	cluster.on('exit', function (worker) {
+		logger.error('worker ' + worker.process.pid + ' died. restart...');
+		cluster.fork();
+	});
 
 	//setup folders
 	if (!fs.existsSync(config.tmp)) {
@@ -110,6 +116,5 @@ if (cluster.isMaster) {
 
 	require('./apiServer');
 } else {
-	logger.debug('Started worker# ' + process.env.IM_WORKER_ID + ' process, pid: ' + process.pid);
 	require('./lib/jobProcessors');
 }
