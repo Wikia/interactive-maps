@@ -7,11 +7,12 @@ var Canvas = require('canvas'),
 	Image = Canvas.Image,
 	dir = __dirname + '/images/',
 	mapImages = ['test.jpg', 'millenium_falcon.jpg', 'westeros.jpg', 'avatar.jpg', 'one_world.jpg'],
-	mapImage = gm(dir + mapImages[0]).options({imageMagick: true}),
+	mapImageName = mapImages[3],
+	mapImage = gm(dir + mapImageName).options({imageMagick: true}),
 	canvas,
 	ctx,
 	img,
-	pixels = new Array();
+	pixels = [];
 
 function pixelArrayToRgbArray(pixels) {
 	var result = [],
@@ -30,8 +31,10 @@ function pixelArrayToRgbArray(pixels) {
 }
 
 mapImage.size(function (err,res) {
-	var pixelData;
-	console.log('Getting the size...');
+	var pixelData,
+		results;
+
+	console.log('Getting the size of ' + mapImageName + '...');
 
 	if (err) {
 		throw err;
@@ -39,7 +42,7 @@ mapImage.size(function (err,res) {
 
 	console.log('Creating image and canvas with it...');
 	img = new Image;
-	img.src = dir + mapImages[0];
+	img.src = dir + mapImageName;
 
 	canvas = new Canvas(res.width, res.height);
 	ctx = canvas.getContext('2d');
@@ -63,6 +66,18 @@ mapImage.size(function (err,res) {
 	pixelData = ctx.getImageData(0, 0, 1, img.height - 1);
 	pixels.push(pixelArrayToRgbArray(pixelData));
 
-	console.log(_.flatten(pixels));
-	console.log('Done!');
+	results = _.countBy(_.flatten(pixels), function (pixel) {
+		return 'rgba(' + pixel.red + ',' + pixel.green + ',' + pixel.blue + ',' + pixel.alpha + ')';
+	});
+
+	var sortedResults = [];
+	_.each(results, function (key, value) {
+		sortedResults.push({
+			color: value,
+			count: key
+		})
+	});
+
+	results = _.sortBy(sortedResults, 'count');
+	console.log('The most used color is: ' + results[results.length-1].color);
 });
