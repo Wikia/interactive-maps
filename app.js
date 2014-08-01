@@ -49,7 +49,7 @@ logger.set({
 /**
  * @desc Called on exit to cleanup kue and close it
  */
-function shutdown(){
+function shutdown() {
 	jobs.shutdown(function () {
 		logger.debug('Jobs cleaned up and set to delayed states');
 		logger.close();
@@ -87,10 +87,12 @@ function onDie() {
 }
 
 if (cluster.isMaster) {
-
+	logger.debug('Started master process, pid: ' + process.pid);
 	// Fork workers.
 	for (var i = 0; i < numCPUs; i++) {
-		cluster.fork();
+		cluster.fork({
+			'IM_WORKER_ID': i
+		});
 	}
 
 	//setup folders
@@ -108,5 +110,6 @@ if (cluster.isMaster) {
 
 	require('./apiServer');
 } else {
+	logger.debug('Started worker# ' + process.env.IM_WORKER_ID + ' process, pid: ' + process.pid);
 	require('./lib/jobProcessors');
 }
