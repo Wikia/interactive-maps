@@ -6,12 +6,13 @@ if (process.env.NEW_RELIC_ENABLED === 'true') {
 
 var logger = require('./lib/logger'),
 	cluster = require('cluster'),
-	numCPUs = require('os').cpus().length,
+	workers = process.env.WORKERS || require('os').cpus().length - 1,
 	fs = require('fs'),
 	config,
 	kue = require('kue'),
 	jobs,
 	worker,
+	gracefulShutdown = false,
 	http = require('http');
 
 	config = require('./lib/config');
@@ -62,6 +63,7 @@ function shutdown() {
  * @desc called on SIGINT or SIGTERM to deactivate jobs
  */
 function onDie() {
+	gracefulShutdown = true;
 	//when terminating: mark all active jobs as delayed
 	//so kue can pick them up after restart
 	jobs.active(function (err, ids) {
@@ -89,16 +91,18 @@ function onDie() {
 
 if (cluster.isMaster) {
 	logger.debug('Started master process, pid: ' + process.pid);
-	// Fork workers.
-	for (var i = 0; i < numCPUs; i++) {
+	// Fork workers
+	for (var i = 0; i < workers; i++) {
 		worker = cluster.fork().process;
 		logger.debug('Started worker# ' + i + ' process, pid: ' + worker.pid);
 	}
 
 	// Handle dying workers (so cruel)
 	cluster.on('exit', function (worker) {
-		logger.error('worker ' + worker.process.pid + ' died. restart...');
-		cluster.fork();
+		if (!gracefulShutdown) {
+			logger.error('worker ' + worker.process.pid + ' died. restart...');
+			cluster.fork();
+		}
 	});
 
 	//setup folders
@@ -118,3 +122,10 @@ if (cluster.isMaster) {
 } else {
 	require('./lib/jobProcessors');
 }
+
+process.on('uncaughtException', function (err) {
+	logger.critical('uncaughtException:', err.message, {
+		stack: err.stack
+	});
+	process.exit(1);
+});
