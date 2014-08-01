@@ -17,6 +17,7 @@
     "detour": "1.0.x",
     "express": "4.x",
     "glob": "3.2.x",
+    "gm": "1.16.0",
     "image-size": "0.2.x",
     "js-yaml": "3.0.x",
     "knex": "0.5.x",
