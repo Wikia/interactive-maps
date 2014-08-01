@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 
+/**
+ * This is part of MOB-2330
+ *
+ * The script loops through all tile sets with status OK, and makes HTTP HEAD request for the tile set image
+ * Failed images are logged along with the tile set id to the console.
+ */
+
 var http = require('http'),
 	url = require('url'),
 	dbCon = require('../lib/db_connector'),
