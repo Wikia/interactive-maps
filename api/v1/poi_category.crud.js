@@ -217,39 +217,42 @@ module.exports = function createCRUD() {
 					dbCon.getConnection(dbCon.connType.master, function (conn) {
 						getMapId(conn, id).then(
 							function (collection) {
-								var mapId = parseInt(collection[0].map_id, 10);
+								var mapId;
+								if (collection) {
+									mapId = parseInt(collection[0].map_id, 10);
 
-								dbCon
-									.destroy(conn, dbTable, filter)
-									.then(
-									function (affectedRows) {
-										if (affectedRows > 0) {
-											utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
-												function () {
-													squidUpdate.purgeKey(
-														utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
-													res.send(204, {});
-													res.end();
-												},
-												next
-											);
-										} else {
-											next(errorHandler.elementNotFoundError(dbTable, id));
+									dbCon
+										.destroy(conn, dbTable, filter)
+										.then(
+										function (affectedRows) {
+											if (affectedRows > 0) {
+												utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
+													function () {
+														squidUpdate.purgeKey(
+															utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
+														res.send(204, {});
+														res.end();
+													},
+													next
+												);
+											} else {
+												next(errorHandler.elementNotFoundError(dbTable, id));
+											}
+										},
+										function (err) {
+											// If the delete request results an error, check if the error is reference error
+											// (caused by non able to delete foreign key) and handle this case by calling
+											// the handleUsedCategories function, otherwise handle the error as regular
+											// error
+											if (errorHandler.isHandledSQLError(err.clientError.name) &&
+												err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_') {
+												handleUsedCategories(conn, id, res, next);
+											} else {
+												next(err);
+											}
 										}
-									},
-									function (err) {
-										// If the delete request results an error, check if the error is reference error
-										// (caused by non able to delete foreign key) and handle this case by calling
-										// the handleUsedCategories function, otherwise handle the error as regular
-										// error
-										if (errorHandler.isHandledSQLError(err.clientError.name) &&
-											err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_') {
-											handleUsedCategories(conn, id, res, next);
-										} else {
-											next(err);
-										}
-									}
-								);
+									);
+								}
 							},
 							next
 						);
