@@ -15,8 +15,7 @@ var logger = require('./lib/logger'),
 	gracefulShutdown = false,
 	http = require('http');
 
-	config = require('./lib/config');
-
+config = require('./lib/config');
 config.setRoot(__dirname);
 
 jobs = kue.createQueue(config);
