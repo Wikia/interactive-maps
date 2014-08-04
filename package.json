@@ -12,11 +12,11 @@
   },
   "dependencies": {
     "JSV": "4.0.x",
-    "canvas": "^1.1.5",
     "cluster": "0.7.x",
     "colors": "0.6.x",
     "detour": "1.0.x",
     "express": "4.x",
+    "get-pixels": "^1.1.0",
     "glob": "3.2.x",
     "image-size": "0.2.x",
     "js-yaml": "3.0.x",
