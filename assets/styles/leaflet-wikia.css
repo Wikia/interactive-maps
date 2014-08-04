@@ -100,6 +100,7 @@ html,
 
 /* TODO: temporary fix - to be removed ones the UI for map on mobile is properly designed */
 .wikia-mobile .leaflet-popup .description {
+	display: block;
 	width: auto;
 }
 
@@ -124,15 +125,21 @@ html,
 }
 
 .filter-menu {
+	-webkit-box-sizing: border-box;
+	-webkit-box-align: stretch;
+	box-align: stretch;
+	-webkit-box-orient: vertical;
+	box-orient: vertical;
 	box-sizing: border-box;
 	color: #fff;
+	display: -webkit-box;
+	display: box;
 	display: -ms-flexbox;
 	display: -webkit-flex;
 	display: -moz-flex;
 	display: -ms-flex;
 	display: -o-flex;
 	display: flex;
-	left: 0;
 	-webkit-flex-direction: column;
 	-moz-flex-direction: column;
 	-ms-flex-direction: column;
@@ -140,6 +147,7 @@ html,
 	flex-direction: column;
 	font-family: Helvetica Neue, helvetica, arial, sans-serif;
 	font-size: 14px;
+	left: 0;
 	line-height: 21px;
 	max-height: 100%;
 	padding: 10px;
@@ -160,6 +168,8 @@ html,
 	background: rgba(0, 0, 0, 0.8);
 	border-top-left-radius: 3px;
 	border-top-right-radius: 3px;
+	-webkit-box-flex: 0;
+	box-flex: 0;
 	cursor: pointer;
 	-ms-flex-negative: 0;
 	-webkit-flex-shrink: 0;
@@ -195,9 +205,9 @@ html,
 }
 
 .hidden-box {
-	max-height: 0;
-	-webkit-transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
-	transition: max-height 0.2s ease-in, width 0.1s 0.2s ease-in;
+	height: 0;
+	-webkit-transition: height 0.2s ease-in, width 0.1s 0.2s ease-in;
+	transition: height 0.2s ease-in, width 0.1s 0.2s ease-in;
 	width: 94px;
 }
 
@@ -207,9 +217,9 @@ html,
 }
 
 .shown-box {
-	max-height: 100%;
-	-webkit-transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
-	transition: max-height 0.2s 0.1s ease-in, width 0.1s ease-in;
+	height: 100%;
+	-webkit-transition: height 0.2s 0.1s ease-in, width 0.1s ease-in;
+	transition: height 0.2s 0.1s ease-in, width 0.1s ease-in;
 	width: 245px;
 }
 
@@ -228,6 +238,8 @@ html,
 	background: rgba(0, 0, 0, 0.6);
 	border-bottom-left-radius: 3px;
 	border-bottom-right-radius: 3px;
+	-webkit-box-flex: 1;
+	box-flex: 1;
 	-ms-flex-negative: 1;
 	list-style: none;
 	margin: 0;
@@ -240,6 +252,7 @@ html,
 .wikia-mobile .point-types {
 	height: 100%;
 }
+
 #allPointTypes {
 	padding: 15px 10px;
 }
