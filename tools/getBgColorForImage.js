@@ -6,8 +6,8 @@ var Canvas = require('canvas'),
 
 	Image = Canvas.Image,
 	dir = __dirname + '/images/',
-	mapImages = ['test.jpg', 'millenium_falcon.jpg', 'westeros.jpg', 'avatar.jpg', 'one_world.jpg'],
-	mapImageName = mapImages[3],
+	mapImages = ['test.png', 'millenium_falcon.jpg', 'westeros.jpg', 'avatar.jpg', 'one_world.jpg'],
+	mapImageName = mapImages[0],
 	mapImage = gm(dir + mapImageName).options({imageMagick: true}),
 	canvas,
 	ctx,
@@ -51,11 +51,11 @@ mapImage.size(function (err,res) {
 	console.log('Getting pixels data...');
 
 	// top border
-	pixelData = ctx.getImageData(0, 0, img.width - 1, 1);
+	pixelData = ctx.getImageData(0, 0, img.width, 1);
 	pixels.push(pixelArrayToRgbArray(pixelData));
 
 	// right border
-	pixelData = ctx.getImageData(img.width - 1, 0, 1, img.height - 1);
+	pixelData = ctx.getImageData(img.width - 1, 0, 1, img.height);
 	pixels.push(pixelArrayToRgbArray(pixelData));
 
 	// bottom border
@@ -63,7 +63,7 @@ mapImage.size(function (err,res) {
 	pixels.push(pixelArrayToRgbArray(pixelData));
 
 	// left border
-	pixelData = ctx.getImageData(0, 0, 1, img.height - 1);
+	pixelData = ctx.getImageData(0, 0, 1, img.height);
 	pixels.push(pixelArrayToRgbArray(pixelData));
 
 	results = _.countBy(_.flatten(pixels), function (pixel) {
