@@ -20,16 +20,23 @@
 	</head>
 	<body>
 		<div class="wrapper" id="wrapper">
-	        	<div id="map" class="int-map"></div>
+			<div id="map" class="int-map"></div>
 		</div>
 		<div class="attr" id="attr">
 			{{{attribution}}}
 		</div>
-		<script src="/assets/{{cacheBuster}}/vendor/leaflet/scripts/leaflet.js"></script>
+		<script src="/assets/{{cacheBuster}}/vendor/leaflet/scripts/leaflet-src.js"></script>
 		<script src="/assets/{{cacheBuster}}/vendor/leafletDraw/leaflet.draw.js"></script>
 		<script src="/assets/{{cacheBuster}}/scripts/leaflet.embedMapCode.js"></script>
+		<script>
+			// need to load leaflet before modil.js cause leaflet define doesn't have id and throws error
+			// TODO: we need to figure out how to fix it
+		</script>
+		<script src="/assets/{{cacheBuster}}/vendor/modil.js"></script>
 		<script src="/assets/{{cacheBuster}}/vendor/ponto.js"></script>
 		<script src="/assets/{{cacheBuster}}/vendor/tracker.js"></script>
+		<script src="/assets/{{cacheBuster}}/scripts/im.i18n.js"></script>
+		<script src="/assets/{{cacheBuster}}/scripts/im.renderUI.js"></script>
 		<script src="/assets/{{cacheBuster}}/scripts/map.js"></script>
 	</body>
 </html>
