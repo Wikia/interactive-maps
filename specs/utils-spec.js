@@ -484,11 +484,11 @@ describe('utils', function () {
 		var testSet = [
 			{
 				input: '<script>alert(\'xss\')</script>',
-				expected: '&lt;script&gt;alert(&#39;xss&#39;)&lt;&#x2F;script&gt;'
+				expected: '&lt;script&gt;alert(\'xss\')&lt;/script&gt;'
 			},
 			{
 				input: '"Everything is AWESOME & whatnot!"',
-				expected: '&quot;Everything is AWESOME &amp; whatnot!&quot;'
+				expected: '"Everything is AWESOME &amp; whatnot!"'
 			}
 		];
 		testSet.forEach(function (testCase) {
@@ -512,7 +512,7 @@ describe('utils', function () {
 				expected: false
 			},
 			{
-				input: "as",
+				input: 'as',
 				expected: false
 			},
 			{
@@ -520,7 +520,7 @@ describe('utils', function () {
 				expected: false
 			},
 			{
-				input: function(){},
+				input: function () {},
 				expected: true
 			}
 		];
