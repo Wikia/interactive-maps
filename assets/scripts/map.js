@@ -101,7 +101,7 @@
 	 * @returns {string} - HTML markup for photo
 	 */
 	function buildImageHtml(imageUrl, alt, imageWidth, imageHeight) {
-		return '<img src="' + imageUrl + '" alt="' + alt + '" width="' + imageWidth + '" height="'+ imageHeight + '">';
+		return '<img src="' + imageUrl + '" alt="' + alt + '" width="' + imageWidth + '" height="' + imageHeight + '">';
 	}
 
 	/**
@@ -147,8 +147,7 @@
 			popup =  L.popup({
 				closeButton: false,
 				minWidth: popupWidth,
-				maxWidth: popupWidth,
-				keepInView: true
+				maxWidth: popupWidth
 			});
 
 		// extend point data with marker leaflet id - need to be done after adding marker to the map layer group !!!
@@ -778,11 +777,6 @@
 				L.latLng(config.boundaries.south, config.boundaries.west),
 				L.latLng(config.boundaries.north, config.boundaries.east)
 			);
-
-			map.setMaxBounds(mapBounds);
-			map.on('popupclose', function () {
-				map.panInsideBounds(mapBounds);
-			});
 			config.layer.bounds = mapBounds;
 		}
 
@@ -833,9 +827,6 @@
 				map.fitBounds(group.getBounds().pad(autoZoomPadding));
 			}, 1);
 		}
-
-		// Workaround for Safari translate3D bug with map panning and popups set to 'keep in view'
-		L.Browser.webkit3d = false;
 	}
 
 	createMap();
