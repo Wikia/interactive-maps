@@ -1,6 +1,6 @@
 'use strict';
 
-require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker, renderUI, i18n) {
+require(['ponto', 'tracker', 'im.renderUI', 'im.i18n', 'im.utils'], function (ponto, tracker, renderUI, i18n, utils) {
 
 	var L = window.L,
 
@@ -151,41 +151,6 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 	}
 
 	/**
-	 * @desc Adds or removes class of DOM element
-	 * @param {Element} element - DOM element
-	 * @param {string} className - Name of class to toggle
-	 */
-	function toggleClass(element, className) {
-		var classList = element.className;
-		if (classList.indexOf(className) !== -1) {
-			removeClass(element, className);
-		} else {
-			addClass(element, className);
-		}
-	}
-
-	/**
-	 * @desc Removes a class from an element
-	 * @param {HTMLElement} element
-	 * @param {string} className
-	 */
-	function removeClass(element, className) {
-		var regexp = new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g');
-		element.className = element.className.replace(regexp, '');
-	}
-
-	/**
-	 * @desc Adds a class to an element
-	 * @param {HTMLElement} element
-	 * @param {string} className
-	 */
-	function addClass(element, className) {
-		if (element.className.indexOf(className) === -1) {
-			element.className += ' ' + className;
-		}
-	}
-
-	/**
 	 * @desc Toggles visibility of points corresponding with clicked filter
 	 * @param {Element} filterClicked - Filter element that was clicked
 	 */
@@ -196,7 +161,7 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 			i;
 
 		for (i = 0; i < pointsLength; i++) {
-			toggleClass(points[i], 'hidden');
+			utils.toggleClass(points[i], 'hidden');
 		}
 	}
 
@@ -212,7 +177,7 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 			parseInt(filterClicked.getAttribute('data-point-type'), 10)
 		);
 
-		toggleClass(filterClicked, 'enabled');
+		utils.toggleClass(filterClicked, 'enabled');
 	}
 
 	/**
@@ -225,9 +190,9 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 
 		if (pointTypes.length === filtersEnabledLength &&
 			allPointTypesFilter.className.indexOf(enabled) === -1){
-			addClass(allPointTypesFilter, enabled);
+			utils.addClass(allPointTypesFilter, enabled);
 		} else {
-			removeClass(allPointTypesFilter, enabled);
+			utils.removeClass(allPointTypesFilter, enabled);
 		}
 
 	}
@@ -244,9 +209,9 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 
 		for (i = 0; i < filtersLength; i++) {
 			if (enabled) {
-				addClass(filters[i], 'enabled');
+				utils.addClass(filters[i], 'enabled');
 			} else {
-				removeClass(filters[i], 'enabled');
+				utils.removeClass(filters[i], 'enabled');
 			}
 		}
 
@@ -355,35 +320,6 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 	}
 
 	/**
-	 * @desc Converts size to maximal zoom level
-	 * @param {number} size - maximal size length
-	 * @returns {number} - maximal zoom level
-	 */
-	function sizeToZoomLevel(size) {
-		return Math.ceil(Math.log(size) / Math.log(2)) - 8;
-	}
-
-	/**
-	 * @desc Calculates minimum zoom level for map given the max viewport size
-	 *
-	 * Because generally map images are downscaled from the original image, which is rarely with the "correct" size,
-	 * This function takes into account this fact and calculates the ratio between the original and ideal image size
-	 * then multiplies the ratio to the maximal viewport size and gets the minimum zoom level for the compensated
-	 * vieport size
-	 *
-	 * @param {number} maxZoom - maximal zoom level for the map
-	 * @param {number} maxSize - max size of the image
-	 * @param {number} maxViewPortSize - maximum viewport size
-	 * @returns {number} - minimal zoom level
-	 */
-	function getMinZoomLevel(maxZoom, maxSize, maxViewPortSize) {
-		var maxSizeForZoom = Math.pow(2, maxZoom + 8),
-			ratio = maxSize / maxSizeForZoom,
-			compensatedViewPortSize = maxViewPortSize / ratio;
-		return Math.min(sizeToZoomLevel(compensatedViewPortSize), maxZoom);
-	}
-
-	/**
 	 * @desc adds temporary marker
 	 * @param {Event} event
 	 * @returns {object} temp marker object
@@ -441,8 +377,8 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 				if (filter.className.indexOf('enabled') !== -1) {
 					markerObject.openPopup();
 				} else {
-					addClass(markerObject._icon, 'hidden');
-					addClass(markerObject._shadow, 'hidden');
+					utils.addClass(markerObject._icon, 'hidden');
+					utils.addClass(markerObject._shadow, 'hidden');
 				}
 			}
 		}, showPontoError, true);
@@ -453,8 +389,8 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 	 * @param {HTMLElement} filterBox
 	 */
 	function toggleFilterBox(filterBox) {
-		toggleClass(filterBox, 'shown-box');
-		toggleClass(filterBox, 'hidden-box');
+		utils.toggleClass(filterBox, 'shown-box');
+		utils.toggleClass(filterBox, 'hidden-box');
 	}
 
 	/**
@@ -547,8 +483,8 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 
 	function showAttributionStripe() {
 		var doc = window.document;
-		addClass(doc.getElementById('wrapper'), 'embed');
-		addClass(doc.getElementById('attr'), 'embed');
+		utils.addClass(doc.getElementById('wrapper'), 'embed');
+		utils.addClass(doc.getElementById('attr'), 'embed');
 	}
 
 	/**
@@ -563,7 +499,7 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 			setUpEditOptions();
 		}
 		if (options.skin === 'wikiamobile') {
-			addClass(body, 'wikia-mobile');
+			utils.addClass(body, 'wikia-mobile');
 			setUpHideButton();
 		} else {
 			toggleFilterBox(doc.querySelector('.filter-menu'));
@@ -604,7 +540,7 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 		}, false);
 
 		// show edit UI elements
-		addClass(body, 'enable-edit');
+		utils.addClass(body, 'enable-edit');
 		map.addControl(drawControls);
 		map.addControl(embedMapCodeButton);
 		tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
@@ -671,7 +607,7 @@ require(['ponto', 'tracker', 'im.renderUI', 'im.i18n'], function (ponto, tracker
 
 		setupInterfaceTranslations();
 
-		defaultMinZoom = getMinZoomLevel(
+		defaultMinZoom = utils.getMinZoomLevel(
 			config.layer.maxZoom,
 			Math.max(config.width, config.height),
 			Math.max(
