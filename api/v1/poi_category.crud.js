@@ -218,7 +218,7 @@ module.exports = function createCRUD() {
 						getMapId(conn, id).then(
 							function (collection) {
 								var mapId;
-								if (collection) {
+								if (collection[0]) {
 									mapId = parseInt(collection[0].map_id, 10);
 
 									dbCon
