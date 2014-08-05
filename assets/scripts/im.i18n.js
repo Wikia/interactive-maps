@@ -1,4 +1,5 @@
 'use strict';
+
 define('im.i18n', function () {
 	/**
 	 * @desc Translates message
