@@ -193,8 +193,10 @@ require(
 
 		/**
 		 * @desc Create points and filters for them
+		 * @param {array} types - poi categories
+		 * @param {boolean} isExpanded - flag that indicates if filter box should be initially expanded
 		 */
-		function setupPoints(types, isExpanded) {
+		function setupPoisAndFilters(types, isExpanded) {
 			var pointTypeFiltersHtml = '';
 
 			pointTypes = types;
@@ -294,7 +296,7 @@ require(
 				map.removeLayer(markers);
 
 				markers = new L.LayerGroup();
-				setupPoints(types, true);
+				setupPoisAndFilters(types, true);
 				markers.addTo(map);
 
 			}, showPontoError, true);
@@ -523,7 +525,7 @@ require(
 			}
 
 			setupPontoWikiaClient();
-			setupPoints(mapConfig.types);
+			setupPoisAndFilters(mapConfig.types);
 			setupClickTracking();
 			markers.addTo(map);
 
