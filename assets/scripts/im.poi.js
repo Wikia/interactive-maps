@@ -1,14 +1,6 @@
 'use strict';
 
-define('im.poi', ['im.renderUI', 'im.i18n'], function (renderUI, i18n) {
-
-	var L = window.L,
-		messages = window.mapSetup.i18n,
-
-		// consts
-		popupWidthWithPhoto = 414,
-		popupWidthWithoutPhoto = 314;
-
+define('im.poi', ['im.leafletWrapper', 'im.config', 'im.renderUI', 'im.i18n'], function (L, config, renderUI, i18n) {
 	/**
 	 * @desc Creates POI marker
 	 * @param {object} poi - POI object
@@ -54,7 +46,7 @@ define('im.poi', ['im.renderUI', 'im.i18n'], function (renderUI, i18n) {
 			keepInView: true
 		});
 
-		popup.setContent(renderUI.buildPopupHtml(poi, i18n.msg(messages, 'wikia-interactive-maps-edit-poi')));
+		popup.setContent(renderUI.buildPopupHtml(poi, i18n.msg('wikia-interactive-maps-edit-poi')));
 
 		return popup;
 	}
@@ -67,7 +59,7 @@ define('im.poi', ['im.renderUI', 'im.i18n'], function (renderUI, i18n) {
 	 * @returns {object} - marker object
 	 */
 	function addPoiToMap(poi, icon, markers) {
-		var popupWidth = (poi.photo) ? popupWidthWithPhoto : popupWidthWithoutPhoto,
+		var popupWidth = (poi.photo) ? config.popupWidthWithPhoto : config.popupWidthWithoutPhoto,
 			marker = createPoiMarker(poi, icon),
 			popup =  createPoiPopup(poi, popupWidth);
 
