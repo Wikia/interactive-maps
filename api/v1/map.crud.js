@@ -128,10 +128,13 @@ module.exports = function createCRUD() {
 					sort = buildSort(req.query.sort),
 					limit = parseInt(req.query.limit, 10) || false,
 					offset = parseInt(req.query.offset, 10) || 0,
+					tileSetStatuses = [utils.tileSetStatus.ok],
 					query;
 
 				if (cityId !== 0) {
 					filter.city_id = cityId;
+					// Add private maps for single wiki maps list
+					tileSetStatuses.push(utils.tileSetStatus.private);
 				}
 
 				// If deleted parameter is passed in the request, return only deleted maps
@@ -139,7 +142,6 @@ module.exports = function createCRUD() {
 					filter.deleted = 1;
 				}
 
-				filter.status = utils.tileSetStatus.ok;
 				dbCon.getConnection(dbCon.connType.all, function (conn) {
 					query = dbCon.knex(dbTable)
 						.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
@@ -152,6 +154,7 @@ module.exports = function createCRUD() {
 							'tile_set.id as tile_set_id'
 						])
 						.where(filter)
+						.whereIn('tile_set.status', tileSetStatuses)
 						.orderBy(sort.column, sort.direction)
 						.connection(conn)
 						.select();
@@ -167,6 +170,7 @@ module.exports = function createCRUD() {
 								.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
 								.count('* as cntr')
 								.where(filter)
+								.whereIn('tile_set.status', tileSetStatuses)
 								.connection(conn)
 								.then(
 								function (count) {
@@ -179,7 +183,11 @@ module.exports = function createCRUD() {
 											),
 											value.image
 										);
-										value.url = utils.responseUrl(req, utils.addTrailingSlash(req.route.path), value.id);
+										value.url = utils.responseUrl(
+											req,
+											utils.addTrailingSlash(req.route.path),
+											value.id
+										);
 
 										delete value.tile_set_id;
 									});
