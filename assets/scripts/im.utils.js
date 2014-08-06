@@ -1,6 +1,6 @@
 'use strict';
 
-define('im.utils', function () {
+define('im.utils', ['im.window', 'im.config'], function (w, config) {
 	/**
 	 * @desc Adds a class to an element
 	 * @param {HTMLElement} element
@@ -65,11 +65,22 @@ define('im.utils', function () {
 		return Math.min(sizeToZoomLevel(compensatedViewPortSize), maxZoom);
 	}
 
+	/**
+	 * @desc helper function that checks if the size of the screen smaller then popup size
+	 * @TODO temporary fix to be removed ones mobile UI for map will be properly designed
+	 * @returns {boolean}
+	 */
+	function isMobileScreenSize() {
+		return w.outerWidth < config.mobileMaxWidth ||
+			(w.outerHeight < config.mobileMaxWidth && w.outerHeight < w.outerWidth);
+	}
+
 	return {
 		addClass: addClass,
 		removeClass: removeClass,
 		toggleClass: toggleClass,
 		sizeToZoomLevel: sizeToZoomLevel,
-		getMinZoomLevel: getMinZoomLevel
+		getMinZoomLevel: getMinZoomLevel,
+		isMobileScreenSize: isMobileScreenSize
 	};
 });
