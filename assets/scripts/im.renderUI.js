@@ -1,11 +1,6 @@
 'use strict';
 
-define('im.renderUI', function () {
-
-	// consts
-	var photoWidth = 90,
-		photoHeight = 90;
-
+define('im.renderUI', ['im.config'], function (config) {
 	/**
 	 * @desc Build link HTML
 	 * @param {object} point - POI object
@@ -60,9 +55,10 @@ define('im.renderUI', function () {
 				editLinkMsg + '</a>';
 
 		if (point.photo && point.link) {
-			photoHtml = buildLinkHTML(point, buildImageHTML(point.photo, point.name, photoWidth, photoHeight), 'photo');
+			photoHtml = buildLinkHTML(point, buildImageHTML(point.photo, point.name, config.photoWidth,
+				config.photoHeight), 'photo');
 		} else if (point.photo) {
-			photoHtml = buildImageHTML(point.photo, point.name, photoWidth, photoHeight);
+			photoHtml = buildImageHTML(point.photo, point.name, config.photoWidth, config.photoHeight);
 		}
 
 		return photoHtml + '<div class="description">' + titleHtml + editLink + descriptionHtml + '</div>';
