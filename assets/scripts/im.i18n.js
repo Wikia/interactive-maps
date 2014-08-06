@@ -1,13 +1,14 @@
 'use strict';
 
-define('im.i18n', function () {
+define('im.i18n', ['im.config'], function (config) {
+	var messages = config.messages;
+
 	/**
 	 * @desc Translates message
-	 * @param {object} messages - JSON object with messages
 	 * @param {string} msgKey - message key
 	 * @returns {string}
 	 */
-	function msg(messages, msgKey) {
+	function msg(msgKey) {
 		return messages.hasOwnProperty(msgKey) ? messages[msgKey] : msgKey;
 	}
 
