@@ -1,23 +1,23 @@
 'use strict';
 
 require(
-	['ponto', 'tracker', 'im.renderUI', 'im.i18n', 'im.utils', 'im.poi'],
-	function (ponto, tracker, renderUI, i18n, utils, poi) {
+	[
+		'ponto',
+		'tracker',
+		'im.window',
+		'im.leafletWrapper',
+		'im.config',
+		'im.renderUI',
+		'im.i18n',
+		'im.utils',
+		'im.poi',
+		'im.poiCategory',
+		'im.poiCollection'
+	],
+	function (ponto, tracker, w, L, config, renderUI, i18n, utils, poi, poiCategory, poiCollection) {
 
-		var L = window.L,
-
-			doc = window.document,
+		var doc = w.document,
 			body = doc.body,
-
-			mapContainerId = 'map',
-			pointTypeFiltersContainerId = 'pointTypes',
-			editPointTypesButtonId = 'editPointTypes',
-			allPointTypesFilterId = 'allPointTypes',
-
-			pontoBridgeModule = 'wikia.intMap.pontoBridge',
-
-			uiControlsPosition = 'bottomright',
-
 			wrapper = doc.getElementById('wrapper'),
 
 		// leaflet map object
@@ -26,7 +26,7 @@ require(
 			markers = new L.LayerGroup(),
 		// leaflet layer for drawing controls
 			drawControls = new L.Control.Draw({
-				position: uiControlsPosition,
+				position: config.uiControlsPosition,
 				draw: {
 					polyline: false,
 					polygon: false,
@@ -35,89 +35,14 @@ require(
 				}
 			}),
 
+			mapConfig = config.mapConfig,
 			embedMapCodeButton,
-
-		// constants
-			popupWidthWithPhoto = 414,
-			popupWidthWithoutPhoto = 314,
-			mobilePopupWidth = 310,
-			pointIconWidth = 30,
-			pointIconHeight = 30,
-			autoZoomPadding = 0.01,
-
 			pointTypeFiltersContainer,
 			pointIcons = {},
-			pointCache = {},
 			pointTypes = {},
 
-			config = window.mapSetup,
-			messages = config.i18n,
-
-			editablePointTypes,
 		// @todo Remove these once Ponto is fixed
-			isWikiaSet = false,
-			pontoTimeout = 500;
-
-		/**
-		 * @desc Setup icon for markers with given point type
-		 * @param {object} pointType - POI type object
-		 */
-		function setupPointTypeIcon(pointType) {
-			var pointTypeIcon;
-
-			if (pointType.marker !== null) {
-				pointTypeIcon = L.icon({
-					iconUrl: pointType.marker,
-					iconSize: [pointIconWidth, pointIconHeight]
-				});
-			} else {
-				pointTypeIcon = new L.Icon.Default();
-				// this is the nicest way to do that I found
-				// we need to overwrite it here so in the filter box we have not broken image
-				pointType.marker = pointTypeIcon._getIconUrl('icon');
-
-				// we need this one for edit POI categories popup
-				pointType.no_marker = true;
-			}
-
-			L.setOptions(pointTypeIcon, {
-				className: 'point-type-' + pointType.id
-			});
-
-			pointIcons[pointType.id] = pointTypeIcon;
-		}
-
-		/**
-		 * @desc Loads points of given type to cache and returns them
-		 * @param {number} pointType - Id of point type, 0 for all types
-		 * @returns {NodeList} - List of DOM elements corresponding with given point type
-		 */
-		function loadPointsToCache(pointType) {
-			pointCache[pointType] = doc.querySelectorAll(
-				(pointType === 0) ?
-					'.leaflet-marker-icon, .leaflet-marker-shadow' :
-					'.point-type-' + pointType
-			);
-
-			return pointCache[pointType];
-		}
-
-		/**
-		 * @desc Deletes points from point cache
-		 * @param {number} pointType - Id of point type
-		 */
-		function invalidatePointsCache(pointType) {
-			delete pointCache[pointType];
-		}
-
-		/**
-		 * @desc Return DOM elements for given point type
-		 * @param {number} pointType - Id of point type, 0 for all types
-		 * @returns {NodeList} - List of DOM elements corresponding with given point type
-		 */
-		function getPointsByType(pointType) {
-			return (pointCache.hasOwnProperty(pointType)) ? pointCache[pointType] : loadPointsToCache(pointType);
-		}
+			isWikiaSet = false;
 
 		/**
 		 * @desc Toggles visibility of points corresponding with clicked filter
@@ -125,7 +50,7 @@ require(
 		 */
 		function togglePoints(filterClicked) {
 			var pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10),
-				points = getPointsByType(pointType),
+				points = poiCollection.getPoiByCategory(pointType),
 				pointsLength = points.length,
 				i;
 
@@ -153,7 +78,7 @@ require(
 		 * @desc Toggles state of "All pin types" filter
 		 */
 		function toggleAllPointTypesFilter() {
-			var allPointTypesFilter = doc.getElementById(allPointTypesFilterId),
+			var allPointTypesFilter = doc.getElementById(config.allPointTypesFilterId),
 				enabled = 'enabled',
 				filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
 
@@ -170,7 +95,7 @@ require(
 		 * @desc Handles click on "All pin types" filter
 		 */
 		function allPointTypesFilterClickHandler() {
-			var allPointTypesFilter = doc.getElementById(allPointTypesFilterId),
+			var allPointTypesFilter = doc.getElementById(config.allPointTypesFilterId),
 				filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
 				filtersLength = filters.length,
 				enabled = allPointTypesFilter.className.indexOf('enabled') === -1,
@@ -243,23 +168,23 @@ require(
 
 			header.setAttribute('class', 'filter-menu-header');
 
-			headerTitle.appendChild(doc.createTextNode(i18n.msg(messages, 'wikia-interactive-maps-filters')));
+			headerTitle.appendChild(doc.createTextNode(i18n.msg('wikia-interactive-maps-filters')));
 			header.appendChild(headerTitle);
 
-			headerEdit.setAttribute('id', editPointTypesButtonId);
+			headerEdit.setAttribute('id', config.editPointTypesButtonId);
 			headerEdit.setAttribute('class', 'edit-point-types');
-			headerEdit.appendChild(doc.createTextNode(i18n.msg(messages, 'wikia-interactive-maps-edit-pin-types')));
+			headerEdit.appendChild(doc.createTextNode(i18n.msg('wikia-interactive-maps-edit-pin-types')));
 			header.appendChild(headerEdit);
 
 			div.appendChild(header);
 
-			ul.setAttribute('id', pointTypeFiltersContainerId);
+			ul.setAttribute('id', config.pointTypeFiltersContainerId);
 			ul.setAttribute('class', 'point-types');
 
 			li.setAttribute('id', 'allPointTypes');
 			li.setAttribute('class', 'enabled');
 			li.setAttribute('data-point-type', '0');
-			li.appendChild(doc.createTextNode(i18n.msg(messages, 'wikia-interactive-maps-all-pin-types')));
+			li.appendChild(doc.createTextNode(i18n.msg('wikia-interactive-maps-all-pin-types')));
 			ul.appendChild(li);
 			div.appendChild(ul);
 			container.appendChild(div);
@@ -275,14 +200,14 @@ require(
 			pointTypes = types;
 
 			pointTypes.forEach(function (pointType) {
-				setupPointTypeIcon(pointType);
+				poiCategory.setupPoiCategoryIcon(pointType, pointIcons);
 				pointTypeFiltersHtml += renderUI.buildPointTypeFilterHtml(pointType);
 			});
 
 			pointTypeFiltersContainer = createPointTypeFiltersContainer(wrapper, isExpanded);
 			pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
 
-			config.points.forEach(function(point) {
+			mapConfig.points.forEach(function(point) {
 				poi.addPoiToMap(point, pointIcons[point.poi_category_id], markers);
 			});
 
@@ -293,6 +218,7 @@ require(
 		/**
 		 * @desc sends data to Wikia Client via ponto to add / edit POI
 		 * @param {object} marker - marker object
+		 * @todo: should be moved to im.poi.js
 		 */
 		function editMarker(marker) {
 			var params = {
@@ -300,12 +226,12 @@ require(
 				data: marker.point
 			};
 
-			params.data.mapId = config.id;
-			params.data.categories = config.types;
+			params.data.mapId = mapConfig.id;
+			params.data.categories = mapConfig.types;
 
-			invalidatePointsCache(marker.point.poi_category_id);
+			poiCollection.invalidatePoiCache(marker.point.poi_category_id);
 
-			ponto.invoke(pontoBridgeModule, 'processData', params, function (point) {
+			ponto.invoke(config.pontoBridgeModule, 'processData', params, function (point) {
 				var markerObject,
 					filter;
 
@@ -315,10 +241,11 @@ require(
 				}
 				// adds new marker to layer group
 				if (point) {
-					invalidatePointsCache(point.poi_category_id);
+					poiCollection.invalidatePoiCache(point.poi_category_id);
 					markerObject = poi.addPoiToMap(point, pointIcons[point.poi_category_id], markers);
 
-					filter = pointTypeFiltersContainer.querySelector('[data-point-type="' + point.poi_category_id + '"]');
+					filter = pointTypeFiltersContainer.querySelector('[data-point-type="' + point.poi_category_id +
+						'"]');
 					if (filter.className.indexOf('enabled') !== -1) {
 						markerObject.openPopup();
 					} else {
@@ -343,24 +270,10 @@ require(
 		 * @param {event} event
 		 */
 		function handleBoxHeaderClick(event) {
-			if (event.target.id !== editPointTypesButtonId) {
+			if (event.target.id !== config.editPointTypesButtonId) {
 				var filterBox = event.currentTarget.parentElement;
 				toggleFilterBox(filterBox);
 			}
-		}
-
-		/**
-		 * Filters out POI types that should not be edited and caches the result
-		 * uses editablePinTypes for caching
-		 * @param {array} types
-		 * @returns {array}
-		 */
-		function getEditablePointTypes(types) {
-			return (editablePointTypes) ?
-				editablePointTypes :
-				editablePointTypes = types.filter(function (type) {
-					return type.id !== config.catchAllCategoryId;
-				});
 		}
 
 		/**
@@ -370,13 +283,13 @@ require(
 			var params = {
 				action: 'poiCategories',
 				data: {
-					mapId: config.id,
-					poiCategories: getEditablePointTypes(config.types),
+					mapId: mapConfig.id,
+					poiCategories: poiCategory.getEditablePoiCategories(mapConfig.types),
 					mode: 'edit'
 				}
 			};
 
-			ponto.invoke(pontoBridgeModule, 'processData', params, function (types) {
+			ponto.invoke(config.pontoBridgeModule, 'processData', params, function (types) {
 				wrapper.removeChild(doc.getElementById('filterMenu'));
 				map.removeLayer(markers);
 
@@ -393,8 +306,8 @@ require(
 		 * @todo figure out were to display them
 		 */
 		function showPontoError(message) {
-			if (window.console) {
-				window.console.error('Ponto Error', message);
+			if (w.console) {
+				w.console.error('Ponto Error', message);
 			}
 		}
 
@@ -408,26 +321,29 @@ require(
 					setUpHideButton();
 					showAttributionStripe();
 				}
-			}, pontoTimeout);
+			}, config.pontoTimeout);
 		}
 
 		/**
 		 * @desc setup Ponto communication for Wikia Client
 		 */
 		function setupPontoWikiaClient() {
-			if (window.self !== window.top) {
+			if (w.self !== w.top) {
 				ponto.setTarget(ponto.TARGET_IFRAME_PARENT, '*');
-				ponto.invoke(pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions, showPontoError, false);
+				ponto.invoke(config.pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions,
+					showPontoError, false);
 				setupPontoTimeout();
 			} else {
 				showAttributionStripe();
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
-					parseInt(config.id, 10));
+					parseInt(mapConfig.id, 10));
 			}
 		}
 
+		/**
+		 * @desc shows attribution stripe at the bottom of the map
+		 */
 		function showAttributionStripe() {
-			var doc = window.document;
 			utils.addClass(doc.getElementById('wrapper'), 'embed');
 			utils.addClass(doc.getElementById('attr'), 'embed');
 		}
@@ -456,7 +372,7 @@ require(
 		 */
 		function setUpHideButton() {
 			var hide = document.createElement('a');
-			hide.innerHTML = i18n.msg(messages, 'wikia-interactive-maps-hide-filter');
+			hide.innerHTML = i18n.msg('wikia-interactive-maps-hide-filter');
 			hide.className = 'hide-button';
 			document.querySelector('.filter-menu-header').appendChild(hide);
 		}
@@ -479,7 +395,7 @@ require(
 					editMarker(poi.getPoiMarker(target.getAttribute('data-marker-id')));
 				}
 
-				if (target.id === editPointTypesButtonId) {
+				if (target.id === config.editPointTypesButtonId) {
 					editPointTypes();
 				}
 			}, false);
@@ -488,7 +404,7 @@ require(
 			utils.addClass(body, 'enable-edit');
 			map.addControl(drawControls);
 			map.addControl(embedMapCodeButton);
-			tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
+			tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(mapConfig.id, 10));
 		}
 
 		/**
@@ -498,22 +414,21 @@ require(
 			var params = {
 				action: 'embedMapCode',
 				data: {
-					mapId: config.id,
-					iframeSrc: config.iframeSrc
+					mapId: mapConfig.id,
+					iframeSrc: mapConfig.iframeSrc
 				}
 			};
 
-			ponto.invoke(pontoBridgeModule, 'processData', params, null, showPontoError, true);
+			ponto.invoke(config.pontoBridgeModule, 'processData', params, null, showPontoError, true);
 		}
 
 		/**
 		 * @desc Sets up the interface translations
 		 */
 		function setupInterfaceTranslations() {
-			L.drawLocal.draw.handlers.marker.tooltip.start = i18n.msg(messages,
-				'wikia-interactive-maps-create-marker-handler');
-			L.drawLocal.draw.toolbar.buttons.marker = i18n.msg(messages, 'wikia-interactive-maps-create-marker-tooltip');
-			L.drawLocal.draw.toolbar.actions.text = i18n.msg(messages, 'wikia-interactive-maps-create-marker-cancel');
+			L.drawLocal.draw.handlers.marker.tooltip.start = i18n.msg('wikia-interactive-maps-create-marker-handler');
+			L.drawLocal.draw.toolbar.buttons.marker = i18n.msg('wikia-interactive-maps-create-marker-tooltip');
+			L.drawLocal.draw.toolbar.actions.text = i18n.msg('wikia-interactive-maps-create-marker-cancel');
 		}
 
 		/**
@@ -532,15 +447,6 @@ require(
 		}
 
 		/**
-		 * @desc helper function that checks if the size of the screen smaller then popup size
-		 * @TODO temporary fix to be removed ones mobile UI for map will be properly designed
-		 * @returns {boolean}
-		 */
-		function isMobileScreenSize() {
-			return window.outerWidth < 430 || (window.outerHeight < 430 && window.outerHeight < window.outerWidth);
-		}
-
-		/**
 		 * @desc Create new map
 		 */
 		function createMap() {
@@ -553,56 +459,56 @@ require(
 			setupInterfaceTranslations();
 
 			defaultMinZoom = utils.getMinZoomLevel(
-				config.layer.maxZoom,
-				Math.max(config.width, config.height),
+				mapConfig.layer.maxZoom,
+				Math.max(mapConfig.width, mapConfig.height),
 				Math.max(
-					Math.max(doc.documentElement.clientWidth, window.innerWidth || 0),
-					Math.max(doc.documentElement.clientHeight, window.innerHeight || 0)
+					Math.max(doc.documentElement.clientWidth, w.innerWidth || 0),
+					Math.max(doc.documentElement.clientHeight, w.innerHeight || 0)
 				)
 			);
 
-			if (config.imagesPath) {
-				L.Icon.Default.imagePath = config.imagesPath;
+			if (mapConfig.imagesPath) {
+				L.Icon.Default.imagePath = mapConfig.imagesPath;
 			}
 
-			map = L.map(mapContainerId, {
-				minZoom: config.layer.minZoom,
-				maxZoom: config.layer.maxZoom,
+			map = L.map(config.mapContainerId, {
+				minZoom: mapConfig.layer.minZoom,
+				maxZoom: mapConfig.layer.maxZoom,
 				zoomControl: false
 			});
 
 			map.attributionControl.setPrefix(false);
 
-			if (config.hasOwnProperty('boundaries')) {
+			if (mapConfig.hasOwnProperty('boundaries')) {
 				mapBounds = new L.LatLngBounds(
-					L.latLng(config.boundaries.south, config.boundaries.west),
-					L.latLng(config.boundaries.north, config.boundaries.east)
+					L.latLng(mapConfig.boundaries.south, mapConfig.boundaries.west),
+					L.latLng(mapConfig.boundaries.north, mapConfig.boundaries.east)
 				);
 
 				map.setMaxBounds(mapBounds);
 				map.on('popupclose', function () {
 					map.panInsideBounds(mapBounds);
 				});
-				config.layer.bounds = mapBounds;
+				mapConfig.layer.bounds = mapBounds;
 			}
 
-			L.tileLayer(config.pathTemplate, config.layer).addTo(map);
+			L.tileLayer(mapConfig.pathTemplate, mapConfig.layer).addTo(map);
 
-			zoom = Math.max(config.zoom, defaultMinZoom);
-			if (config.type !== 'custom') {
-				zoom = config.defaultZoomForRealMap;
+			zoom = Math.max(mapConfig.zoom, defaultMinZoom);
+			if (mapConfig.type !== 'custom') {
+				zoom = mapConfig.defaultZoomForRealMap;
 			}
 			map.setView(
-				L.latLng(config.latitude, config.longitude),
+				L.latLng(mapConfig.latitude, mapConfig.longitude),
 				zoom
 			);
 
 			zoomControl = L.control.zoom({
-				position: uiControlsPosition
+				position: config.uiControlsPosition
 			});
 
 			embedMapCodeButton = new L.Control.EmbedMapCode({
-				position: uiControlsPosition,
+				position: config.uiControlsPosition,
 				//TODO fix icon
 				title: '< >',
 				onClick: embedMapCode
@@ -611,13 +517,13 @@ require(
 			map.addControl(zoomControl);
 
 			// Change popup size for small mobile screens
-			if (isMobileScreenSize()) {
-				popupWidthWithPhoto = mobilePopupWidth;
-				popupWidthWithoutPhoto = mobilePopupWidth;
+			if (utils.isMobileScreenSize()) {
+				config.popupWidthWithPhoto = config.mobilePopupWidth;
+				config.popupWidthWithoutPhoto = config.mobilePopupWidth;
 			}
 
 			setupPontoWikiaClient();
-			setupPoints(config.types);
+			setupPoints(mapConfig.types);
 			setupClickTracking();
 			markers.addTo(map);
 
@@ -630,7 +536,7 @@ require(
 				// This is called as async because leaflet freezes when map.fitBounds is called directly
 				setTimeout(function () {
 					var group = new L.featureGroup(pointsList);
-					map.fitBounds(group.getBounds().pad(autoZoomPadding));
+					map.fitBounds(group.getBounds().pad(config.autoZoomPadding));
 				}, 1);
 			}
 
