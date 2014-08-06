@@ -20,12 +20,12 @@ describe('imageBackground', function () {
 	});
 
 	it('returns correct color channels object', function () {
-		expect(imageBackground.getColorObject(1, 1, pixels)).toEqual({
-			red: 123,
-			green: 123,
-			blue: 123,
-			alpha: 123
-		});
+		expect(imageBackground.getColorObject(1, 1, pixels)).toEqual([
+			123,
+			123,
+			123,
+			123
+		]);
 	});
 
 });
