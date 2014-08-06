@@ -9,7 +9,7 @@ describe('imageBackground', function () {
 		pixels.get.andReturn(123);
 	});
 
-	it('it calls get() method 4 times with right parameters', function () {
+	it('calls get() method 4 times with right parameters', function () {
 		imageBackground.getColorObject(1, 2, pixels);
 		expect(pixels.get).toHaveBeenCalled();
 		expect(pixels.get).toHaveBeenCalledWith(2, 1, 0);
