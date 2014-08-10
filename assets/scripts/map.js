@@ -7,6 +7,7 @@ require(
 		'im.window',
 		'im.leafletWrapper',
 		'im.config',
+		'im.pontoWikiaBridge',
 		'im.renderUI',
 		'im.i18n',
 		'im.utils',
@@ -14,7 +15,7 @@ require(
 		'im.poiCategory',
 		'im.poiCollection'
 	],
-	function (ponto, tracker, w, L, config, renderUI, i18n, utils, poi, poiCategory, poiCollection) {
+	function (ponto, tracker, w, L, config, pontoWikiaBridge, renderUI, i18n, utils, poi, poiCategory, poiCollection) {
 
 		var doc = w.document,
 			body = doc.body,
@@ -38,7 +39,6 @@ require(
 			mapConfig = config.mapConfig,
 			embedMapCodeButton,
 			pointTypeFiltersContainer,
-			pointIcons = {},
 			pointTypes = {},
 
 		// @todo Remove these once Ponto is fixed
@@ -193,69 +193,35 @@ require(
 
 		/**
 		 * @desc Create points and filters for them
-		 * @param {array} types - poi categories
-		 * @param {boolean} isExpanded - flag that indicates if filter box should be initially expanded
+		 * @param {Array} pois
+		 * @param {Array} categories - poi categories
+		 * @param {Boolean=} isFilterBoxExpanded - flag that indicates if filter box should be initially expanded
 		 */
-		function setupPoisAndFilters(types, isExpanded) {
+		function setupPoisAndFilters(pois, categories, isFilterBoxExpanded) {
 			var pointTypeFiltersHtml = '';
 
-			pointTypes = types;
+			pointTypes = categories;
 
-			pointTypes.forEach(function (pointType) {
-				poiCategory.setupPoiCategoryIcon(pointType, pointIcons);
-				pointTypeFiltersHtml += renderUI.buildPointTypeFilterHtml(pointType);
+			// create filter box
+			pointTypeFiltersContainer = createPointTypeFiltersContainer(wrapper, isFilterBoxExpanded);
+
+			// create filters
+			categories.forEach(function (category) {
+				poiCategory.setupPoiCategoryIcon(category);
+				pointTypeFiltersHtml += renderUI.buildPointTypeFilterHtml(category);
 			});
 
-			pointTypeFiltersContainer = createPointTypeFiltersContainer(wrapper, isExpanded);
+			// add filters to filter box
 			pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
 
-			mapConfig.points.forEach(function(point) {
-				poi.addPoiToMap(point, pointIcons[point.poi_category_id], markers);
-			});
-
+			// attach filter box event handlers
 			pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
 			document.querySelector('.filter-menu-header').addEventListener('click', handleBoxHeaderClick);
-		}
 
-		/**
-		 * @desc sends data to Wikia Client via ponto to add / edit POI
-		 * @param {object} marker - marker object
-		 * @todo: should be moved to im.poi.js
-		 */
-		function editMarker(marker) {
-			var params = {
-				action: 'editPOI',
-				data: marker.point
-			};
-
-			params.data.mapId = mapConfig.id;
-			params.data.categories = mapConfig.types;
-
-			poiCollection.invalidatePoiCache(marker.point.poi_category_id);
-
-			ponto.invoke(config.pontoBridgeModule, 'processData', params, function (point) {
-				var markerObject,
-					filter;
-
-				// removes old marker from layer group
-				if (markers.hasLayer(marker)) {
-					markers.removeLayer(marker);
-				}
-				// adds new marker to layer group
-				if (point) {
-					poiCollection.invalidatePoiCache(point.poi_category_id);
-					markerObject = poi.addPoiToMap(point, pointIcons[point.poi_category_id], markers);
-
-					filter = pointTypeFiltersContainer.querySelector('[data-point-type="' + point.poi_category_id +
-						'"]');
-					if (filter.className.indexOf('enabled') !== -1) {
-						markerObject.openPopup();
-					} else {
-						utils.addClass(markerObject._icon, 'hidden');
-						utils.addClass(markerObject._shadow, 'hidden');
-					}
-				}
-			}, showPontoError, true);
+			// create poi markers
+			pois.forEach(function(point) {
+				poi.addPoiToMap(point, poiCategory.getPoiCategoryIcon(point.poi_category_id), markers);
+			});
 		}
 
 		/**
@@ -279,6 +245,58 @@ require(
 		}
 
 		/**
+		 * @desc adds hide button when on wikia mobile or embed code
+		 */
+		function setUpHideButton() {
+			var hide = document.createElement('a');
+			hide.innerHTML = i18n.msg('wikia-interactive-maps-hide-filter');
+			hide.className = 'hide-button';
+			document.querySelector('.filter-menu-header').appendChild(hide);
+		}
+
+		/**
+		 * @desc sends data to Wikia Client via ponto to add / edit POI
+		 * @param {object} marker - marker object
+		 * @todo: should be moved to im.poi.js
+		 */
+		function editMarker(marker) {
+			var params = {
+				action: 'editPOI',
+				data: marker.point
+			};
+
+			params.data.mapId = mapConfig.id;
+			params.data.categories = mapConfig.types;
+
+			poiCollection.invalidatePoiCache(marker.point.poi_category_id);
+
+			pontoWikiaBridge.postMessage('processData', params, function (point) {
+				var markerObject,
+					filter;
+
+				// removes old marker from layer group
+				if (markers.hasLayer(marker)) {
+					markers.removeLayer(marker);
+				}
+				// adds new marker to layer group
+				if (point) {
+					poiCollection.invalidatePoiCache(point.poi_category_id);
+					markerObject = poi.addPoiToMap(point, poiCategory.getPoiCategoryIcon(point.poi_category_id),
+						markers);
+
+					filter = pointTypeFiltersContainer.querySelector('[data-point-type="' + point.poi_category_id +
+						'"]');
+					if (filter.className.indexOf('enabled') !== -1) {
+						markerObject.openPopup();
+					} else {
+						utils.addClass(markerObject._icon, 'hidden');
+						utils.addClass(markerObject._shadow, 'hidden');
+					}
+				}
+			}, true);
+		}
+
+		/**
 		 * @desc invokes Wikia Client edit POI category action
 		 */
 		function editPointTypes() {
@@ -291,26 +309,22 @@ require(
 				}
 			};
 
-			ponto.invoke(config.pontoBridgeModule, 'processData', params, function (types) {
+			pontoWikiaBridge.postMessage('processData', params, function (updatedPoiCategories) {
+				poiCategory.updateEditablePoiCategories(updatedPoiCategories);
+
+				//extend categories with uneditable ones that need to be rendered in filter box
+				updatedPoiCategories = updatedPoiCategories.concat(poiCategory.getUnEditablePoiCategories());
+
+				// remove old filter box
 				wrapper.removeChild(doc.getElementById('filterMenu'));
+				// remove poi markers
 				map.removeLayer(markers);
 
+				// recreate poi markers and filter box
 				markers = new L.LayerGroup();
-				setupPoisAndFilters(types, true);
+				setupPoisAndFilters(poiCollection.getPois(), updatedPoiCategories, true);
 				markers.addTo(map);
-
-			}, showPontoError, true);
-		}
-
-		/**
-		 * @desc shows error message for ponto communication
-		 * @param {string} message - error message
-		 * @todo figure out were to display them
-		 */
-		function showPontoError(message) {
-			if (w.console) {
-				w.console.error('Ponto Error', message);
-			}
+			}, true);
 		}
 
 		/**
@@ -332,8 +346,7 @@ require(
 		function setupPontoWikiaClient() {
 			if (w.self !== w.top) {
 				ponto.setTarget(ponto.TARGET_IFRAME_PARENT, '*');
-				ponto.invoke(config.pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions,
-					showPontoError, false);
+				pontoWikiaBridge.postMessage('getWikiaSettings', null, setupWikiaOnlyOptions, false);
 				setupPontoTimeout();
 			} else {
 				showAttributionStripe();
@@ -367,16 +380,6 @@ require(
 			} else {
 				toggleFilterBox(doc.querySelector('.filter-menu'));
 			}
-		}
-
-		/**
-		 * @desc adds hide button when on wikia mobile or embed code
-		 */
-		function setUpHideButton() {
-			var hide = document.createElement('a');
-			hide.innerHTML = i18n.msg('wikia-interactive-maps-hide-filter');
-			hide.className = 'hide-button';
-			document.querySelector('.filter-menu-header').appendChild(hide);
 		}
 
 		/**
@@ -421,7 +424,7 @@ require(
 				}
 			};
 
-			ponto.invoke(config.pontoBridgeModule, 'processData', params, null, showPontoError, true);
+			pontoWikiaBridge.postMessage('processData', params, null, true);
 		}
 
 		/**
@@ -525,7 +528,8 @@ require(
 			}
 
 			setupPontoWikiaClient();
-			setupPoisAndFilters(mapConfig.types);
+			poiCollection.setPois(mapConfig.points);
+			setupPoisAndFilters(mapConfig.points, mapConfig.types);
 			setupClickTracking();
 			markers.addTo(map);
 
