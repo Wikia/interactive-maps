@@ -322,7 +322,7 @@ require(
 
 				// recreate poi markers and filter box
 				markers = new L.LayerGroup();
-				setupPoisAndFilters(poiCollection.getPois(), updatedPoiCategories, true);
+				setupPoisAndFilters(mapConfig.points, updatedPoiCategories, true);
 				markers.addTo(map);
 			}, true);
 		}
@@ -528,7 +528,6 @@ require(
 			}
 
 			setupPontoWikiaClient();
-			poiCollection.setPois(mapConfig.points);
 			setupPoisAndFilters(mapConfig.points, mapConfig.types);
 			setupClickTracking();
 			markers.addTo(map);
