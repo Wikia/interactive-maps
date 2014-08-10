@@ -1,17 +1,19 @@
 'use strict';
 
 define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config) {
-	var editablePoiCategories;
+	var catchAllCategoryId = config.mapConfig.catchAllCategoryId,
+		editablePoiCategories,
+		unEditablePoiCategories,
+		poiCategoryIcons = {};
 
 	/**
 	 * @desc Setup icon for markers with given point type
 	 * @param {object} poiCategory - POI type object
-	 * @param {object} poiCategoryIcons - object with leaflet marker icons
 	 */
-	function setupPoiCategoryIcon(poiCategory, poiCategoryIcons) {
+	function setupPoiCategoryIcon(poiCategory) {
 		var poiCategoryIcon;
 
-		if (poiCategory.marker !== null) {
+		if (poiCategory.marker !== null && !poiCategory.no_marker) {
 			poiCategoryIcon = L.icon({
 				iconUrl: poiCategory.marker,
 				iconSize: [config.poiIconWidth, config.poiIconHeight]
@@ -34,20 +36,52 @@ define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config
 	}
 
 	/**
-	 * @desc Filters out POI categories that should not be edited and caches the result uses editablePinTypes for caching
+	 * @desc returns poi category icon
+	 * @param {number} id - poi category id
+	 * @returns {string} - icon URL
+	 */
+	function getPoiCategoryIcon(id) {
+		return poiCategoryIcons[id];
+	}
+
+	/**
+	 * @desc Filters out POI categories that should not be edited and caches the result to editablePoiCategories
 	 * @param {array} poiCategories
 	 * @returns {array} - editable poi categories
 	 */
 	function getEditablePoiCategories(poiCategories) {
 		return (editablePoiCategories) ?
 			editablePoiCategories :
-			editablePoiCategories = poiCategories.filter(function (cat) {
-				return cat.id !== window.mapSetup.catchAllCategoryId;
+			editablePoiCategories = poiCategories.filter(function (category) {
+				return category.id !== catchAllCategoryId;
 			});
+	}
+
+	/**
+	 * @desc updates editable pos categories
+	 * @param {araay} poiCategories
+	 */
+	function updateEditablePoiCategories(poiCategories) {
+		editablePoiCategories = poiCategories;
+	}
+
+	/**
+	 * @desc Filters POI categories that should not be edited and caches the result to unEditablePoiCategories
+	 * @returns {array} - editable poi categories
+	 */
+	function getUnEditablePoiCategories() {
+		return (unEditablePoiCategories) ?
+			unEditablePoiCategories :
+			unEditablePoiCategories = config.mapConfig.types.filter(function (category) {
+			return category.id === catchAllCategoryId;
+		});
 	}
 
 	return {
 		setupPoiCategoryIcon: setupPoiCategoryIcon,
-		getEditablePoiCategories: getEditablePoiCategories
+		getEditablePoiCategories: getEditablePoiCategories,
+		getUnEditablePoiCategories: getUnEditablePoiCategories,
+		updateEditablePoiCategories: updateEditablePoiCategories,
+		getPoiCategoryIcon: getPoiCategoryIcon
 	};
 });
