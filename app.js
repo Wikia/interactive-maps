@@ -6,7 +6,8 @@ if (process.env.NEW_RELIC_ENABLED === 'true') {
 
 var logger = require('./lib/logger'),
 	cluster = require('cluster'),
-	workers = process.env.WORKERS || require('os').cpus().length - 1,
+	coresCount = require('os').cpus().length,
+	workersCount = process.env.WIKIA_IM_WORKERS,
 	fs = require('fs'),
 	config,
 	kue = require('kue'),
@@ -59,6 +60,15 @@ function shutdown() {
 }
 
 /**
+ * @desc Get number of workers depending on number of cores
+ * @param {number} coresCount Number of CPU cores
+ * @returns {number}
+ */
+function getWorkersCount(coresCount) {
+	return (coresCount * 2) - 1;
+}
+
+/**
  * @desc called on SIGINT or SIGTERM to deactivate jobs
  */
 function onDie() {
@@ -88,10 +98,14 @@ function onDie() {
 	});
 }
 
+if (typeof workersCount === 'undefined') {
+	workersCount = getWorkersCount(coresCount);
+}
+
 if (cluster.isMaster) {
 	logger.debug('Started master process, pid: ' + process.pid);
 	// Fork workers
-	for (var i = 0; i < workers; i++) {
+	for (var i = 0; i < workersCount; i++) {
 		worker = cluster.fork().process;
 		logger.debug('Started worker# ' + i + ' process, pid: ' + worker.pid);
 	}
