@@ -7,7 +7,7 @@ if (process.env.NEW_RELIC_ENABLED === 'true') {
 var logger = require('./lib/logger'),
 	cluster = require('cluster'),
 	coresCount = require('os').cpus().length,
-	workersCount = process.env.IM_WORKERS,
+	workersCount = process.env.WIKIA_IM_WORKERS,
 	fs = require('fs'),
 	config,
 	kue = require('kue'),
