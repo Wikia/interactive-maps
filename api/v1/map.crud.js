@@ -113,6 +113,107 @@ function buildSort(sort) {
 }
 
 /**
+ * @desc Builds maps collection list
+ * @param {array} collection List of maps
+ * @param {object} req Express request object
+ * @returns {array}
+ */
+function buildMapCollectionResult(collection, req) {
+	collection.forEach(function (value) {
+		value.image = utils.imageUrl(
+			config.dfsHost,
+			utils.getBucketName(
+				config.bucketPrefix + config.tileSetPrefix,
+				value.tile_set_id
+			),
+			value.image
+		);
+		value.url = utils.responseUrl(
+			req,
+			utils.addTrailingSlash(req.route.path),
+			value.id
+		);
+
+		delete value.tile_set_id;
+	});
+	return collection;
+}
+
+/**
+ * @desc Get Maps express handler
+ * @param {object} req Express request object
+ * @param {object} res Express response object
+ * @param {function} next Next function
+ */
+function getMapsHandler(req, res, next) {
+	var cityId = parseInt(req.query.city_id, 10) || 0,
+		filter = {
+			deleted: 0
+		},
+		sort = buildSort(req.query.sort),
+		limit = parseInt(req.query.limit, 10) || false,
+		offset = parseInt(req.query.offset, 10) || 0,
+		tileSetStatuses = [utils.tileSetStatus.ok],
+		query;
+
+	if (cityId !== 0) {
+		filter.city_id = cityId;
+		// Add private maps for single wiki maps list
+		tileSetStatuses.push(utils.tileSetStatus.private);
+	}
+
+	// If deleted parameter is passed in the request, return only deleted maps
+	if (typeof req.query.deleted !== 'undefined') {
+		filter.deleted = 1;
+	}
+
+	dbCon.getConnection(dbCon.connType.all, function (conn) {
+		query = dbCon.knex(dbTable)
+			.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+			.column([
+				'map.id',
+				'map.title',
+				'tile_set.image',
+				'map.updated_on',
+				'tile_set.status',
+				'tile_set.id as tile_set_id'
+			])
+			.where(filter)
+			.whereIn('tile_set.status', tileSetStatuses)
+			.orderBy(sort.column, sort.direction)
+			.connection(conn)
+			.select();
+
+		if (limit) {
+			query.limit(limit);
+			query.offset(offset);
+		}
+
+		query.then(
+			function (collection) {
+				dbCon.knex(dbTable)
+					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+					.count('* as cntr')
+					.where(filter)
+					.whereIn('tile_set.status', tileSetStatuses)
+					.connection(conn)
+					.then(
+					function (count) {
+						res.send(200, {
+							total: count[0].cntr,
+							items: buildMapCollectionResult(collection, req)
+						});
+						res.end();
+					},
+					next
+				);
+			},
+			next
+		);
+	}, next);
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -120,83 +221,7 @@ function buildSort(sort) {
 module.exports = function createCRUD() {
 	return {
 		handler: {
-			GET: function (req, res, next) {
-				var cityId = parseInt(req.query.city_id, 10) || 0,
-					filter = {
-						deleted: 0
-					},
-					sort = buildSort(req.query.sort),
-					limit = parseInt(req.query.limit, 10) || false,
-					offset = parseInt(req.query.offset, 10) || 0,
-					query;
-
-				if (cityId !== 0) {
-					filter.city_id = cityId;
-				}
-
-				// If deleted parameter is passed in the request, return only deleted maps
-				if (typeof req.query.deleted !== 'undefined') {
-					filter.deleted = 1;
-				}
-
-				filter.status = utils.tileSetStatus.ok;
-				dbCon.getConnection(dbCon.connType.all, function (conn) {
-					query = dbCon.knex(dbTable)
-						.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-						.column([
-							'map.id',
-							'map.title',
-							'tile_set.image',
-							'map.updated_on',
-							'tile_set.status',
-							'tile_set.id as tile_set_id'
-						])
-						.where(filter)
-						.orderBy(sort.column, sort.direction)
-						.connection(conn)
-						.select();
-
-					if (limit) {
-						query.limit(limit);
-						query.offset(offset);
-					}
-
-					query.then(
-						function (collection) {
-							dbCon.knex(dbTable)
-								.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-								.count('* as cntr')
-								.where(filter)
-								.connection(conn)
-								.then(
-								function (count) {
-									collection.forEach(function (value) {
-										value.image = utils.imageUrl(
-											config.dfsHost,
-											utils.getBucketName(
-												config.bucketPrefix + config.tileSetPrefix,
-												value.tile_set_id
-											),
-											value.image
-										);
-										value.url = utils.responseUrl(req, utils.addTrailingSlash(req.route.path), value.id);
-
-										delete value.tile_set_id;
-									});
-
-									res.send(200, {
-										total: count[0].cntr,
-										items: collection
-									});
-									res.end();
-								},
-								next
-							);
-						},
-						next
-					);
-				}, next);
-			},
+			GET: getMapsHandler,
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, createSchema);
