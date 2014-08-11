@@ -528,4 +528,20 @@ describe('utils', function () {
 			expect(utils.isFunction(testCase.input)).toBe(testCase.expected);
 		});
 	});
+
+	it('returns correct unix timestamp', function () {
+		var testCases = [
+			{
+				date: new Date(1),
+				expected: 1
+			}, {
+				date: new Date('2014-12-12 01:01:01'),
+				expected: 1418342461
+			}
+		];
+		testCases.forEach(function (testCase) {
+			expect(utils.unixTimestamp(testCase.date)).toBe(testCase.expected);
+		});
+
+	});
 });
