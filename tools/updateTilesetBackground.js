@@ -47,7 +47,8 @@ dbCon.getConnection(dbCon.connType.master)
 			'status': utils.tileSetStatus.ok,
 			'background_color': '#ddd'
 		}).then(function (data) {
-			console.log('Found ' + data.length + ' tiles\' sets...');
+			var found = data.length;
+			console.log('Found ' + found + ' tiles\' sets...');
 
 			data.forEach(function (row) {
 				imageBackground.getBgColorForImage({
@@ -56,7 +57,12 @@ dbCon.getConnection(dbCon.connType.master)
 					dir: tmpDir
 				})
 				.then(function (data) {
+					found--;
 					return updateBackgroundColor(data, conn);
+				}).then(function () {
+					if (found === 1) {
+						process.exit();
+					}
 				})
 				.catch(function (err) {
 					console.log(err);
