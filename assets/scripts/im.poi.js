@@ -61,16 +61,18 @@ define('im.poi', ['im.leafletWrapper', 'im.config', 'im.renderUI', 'im.i18n'], f
 	function addPoiToMap(poi, icon, markers) {
 		var popupWidth = (poi.photo) ? config.popupWidthWithPhoto : config.popupWidthWithoutPhoto,
 			marker = createPoiMarker(poi, icon),
-			popup =  createPoiPopup(poi, popupWidth);
+			popup;
 
 		// adding marker to markers layer group creates leaflet id for a marker
 		marker.addTo(markers);
+
 		// extend point data with marker leaflet id
 		poi.leafletId = marker._leaflet_id;
+		popup = createPoiPopup(poi, popupWidth);
+		marker.bindPopup(popup);
+
 		// extend marker object with point data;
 		marker.point = poi;
-
-		marker.bindPopup(popup);
 
 		return marker;
 	}
