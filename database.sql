@@ -18,6 +18,7 @@ CREATE TABLE tile_set (
   image VARCHAR(255) NOT NULL,
   width MEDIUMINT UNSIGNED NOT NULL,
   height MEDIUMINT UNSIGNED NOT NULL,
+  background_color VARCHAR( 26 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '#ddd' COMMENT 'color of map background (MOB-2275)',
   min_zoom INT UNSIGNED NOT NULL,
   max_zoom INT UNSIGNED NOT NULL, -- zoom levels saved in binary format 1011 - > zoom levels 4,2,1 so max that we can show is 2
   status TINYINT DEFAULT 0 NOT NULL,
