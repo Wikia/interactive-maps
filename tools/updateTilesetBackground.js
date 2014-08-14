@@ -31,6 +31,17 @@ function updateBackgroundColor(data, conn) {
 	console.log('Updating background color for tiles\' set with id #' + data.id + '...');
 	console.log('Setting its color to: ' + data.bgColor + '...');
 
+	// there are some race condition we solved partially
+	// by creating next() function, however some anomalies
+	// still happens and this simple condition is a workaround
+	//
+	// if we're going to use this script more than once
+	// we'll have to trace down the issue and then remove
+	// this workaround
+	if (data.bgColor.substring(0,4) !== 'rgba') {
+		data.bgColor = '#ddd';
+	}
+
 	return dbCon.update(
 		conn,
 		tableName,
@@ -91,6 +102,7 @@ function updateTileset(row, conn) {
 		})
 		.catch(function (err) {
 			console.log(err);
+			console.log(data);
 			next(conn);
 		});
 }
