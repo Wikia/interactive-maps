@@ -15,8 +15,8 @@ require(
 		'im.poiCategory',
 		'im.poiCollection'
 	],
-	function (ponto, tracker, w, L, config, pontoWikiaBridge, renderUI, i18n, utils, poiModule, poiCategory,
-			poiCollection) {
+	function (ponto, tracker, w, L, config, pontoWikiaBridge, renderUI, i18n, utils, poiModule, poiCategoryModule,
+			poiCollectionModule) {
 
 		var doc = w.document,
 			body = doc.body,
@@ -51,7 +51,7 @@ require(
 		 */
 		function togglePoints(filterClicked) {
 			var pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10),
-				points = poiCollection.getPoiByCategory(pointType),
+				points = poiCollectionModule.getPoiByCategory(pointType),
 				pointsLength = points.length,
 				i;
 
@@ -193,41 +193,6 @@ require(
 		}
 
 		/**
-		 * @desc Create points and filters for them
-		 * @param {object} pois
-		 * @param {Array} categories - poi categories
-		 * @param {Boolean=} isFilterBoxExpanded - flag that indicates if filter box should be initially expanded
-		 */
-		function setupPoisAndFilters(pois, categories, isFilterBoxExpanded) {
-			var pointTypeFiltersHtml = '';
-
-			pointTypes = categories;
-
-			// create filter box
-			pointTypeFiltersContainer = createPointTypeFiltersContainer(wrapper, isFilterBoxExpanded);
-
-			// create filters
-			categories.forEach(function (category) {
-				poiCategory.setupPoiCategoryIcon(category);
-				pointTypeFiltersHtml += renderUI.buildPointTypeFilterHtml(category);
-			});
-
-			// add filters to filter box
-			pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
-
-			// attach filter box event handlers
-			pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
-			document.querySelector('.filter-menu-header').addEventListener('click', handleBoxHeaderClick);
-
-			// create poi markers
-			Object.keys(pois).forEach(function(id) {
-				var poi = pois[id];
-
-				poiModule.addPoiToMap(poi, poiCategory.getPoiCategoryIcon(poi.poi_category_id), markers);
-			});
-		}
-
-		/**
 		 * @desc Expands / folds the filter box
 		 * @param {HTMLElement} filterBox
 		 */
@@ -245,6 +210,41 @@ require(
 				var filterBox = event.currentTarget.parentElement;
 				toggleFilterBox(filterBox);
 			}
+		}
+
+		/**
+		 * @desc Create points and filters for them
+		 * @param {object} pois
+		 * @param {Array} categories - poi categories
+		 * @param {Boolean=} isFilterBoxExpanded - flag that indicates if filter box should be initially expanded
+		 */
+		function setupPoisAndFilters(pois, categories, isFilterBoxExpanded) {
+			var pointTypeFiltersHtml = '';
+
+			pointTypes = categories;
+
+			// create filter box
+			pointTypeFiltersContainer = createPointTypeFiltersContainer(wrapper, isFilterBoxExpanded);
+
+			// create filters
+			categories.forEach(function (category) {
+				poiCategoryModule.setupPoiCategoryIcon(category);
+				pointTypeFiltersHtml += renderUI.buildPointTypeFilterHtml(category);
+			});
+
+			// add filters to filter box
+			pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
+
+			// attach filter box event handlers
+			pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
+			document.querySelector('.filter-menu-header').addEventListener('click', handleBoxHeaderClick);
+
+			// create poi markers
+			Object.keys(pois).forEach(function(id) {
+				var poi = pois[id];
+
+				poiModule.addPoiToMap(poi, poiCategoryModule.getPoiCategoryIcon(poi.poi_category_id), markers);
+			});
 		}
 
 		/**
@@ -271,13 +271,13 @@ require(
 			params.data.mapId = mapConfig.id;
 			params.data.categories = mapConfig.types;
 
-			poiCollection.invalidatePoiCache(marker.point.poi_category_id);
+			poiCollectionModule.invalidatePoiCache(marker.point.poi_category_id);
 
 			pontoWikiaBridge.postMessage('processData', params, function (point) {
 				var markerObject,
 					filter;
 
-				poiCollection.removeFromState(marker.point.id);
+				poiCollectionModule.removeFromState(marker.point.id);
 
 				// removes old marker from layer group
 				if (markers.hasLayer(marker)) {
@@ -286,10 +286,10 @@ require(
 
 				// adds new poi marker to layer group and poi to state
 				if (point) {
-					poiCollection.invalidatePoiCache(point.poi_category_id);
-					poiCollection.addToState(point);
-					markerObject = poiModule.addPoiToMap(point, poiCategory.getPoiCategoryIcon(point.poi_category_id),
-						markers);
+					poiCollectionModule.invalidatePoiCache(point.poi_category_id);
+					poiCollectionModule.addToState(point);
+					markerObject = poiModule.addPoiToMap(
+						point, poiCategoryModule.getPoiCategoryIcon(point.poi_category_id), markers);
 
 					filter = pointTypeFiltersContainer.querySelector('[data-point-type="' + point.poi_category_id +
 						'"]');
@@ -311,16 +311,13 @@ require(
 				action: 'poiCategories',
 				data: {
 					mapId: mapConfig.id,
-					poiCategories: poiCategory.getEditablePoiCategories(mapConfig.types),
+					poiCategories: poiCategoryModule.getEditablePoiCategories(mapConfig.types),
 					mode: 'edit'
 				}
 			};
 
 			pontoWikiaBridge.postMessage('processData', params, function (updatedPoiCategories) {
-				poiCategory.updateEditablePoiCategories(updatedPoiCategories);
-
-				//extend categories with uneditable ones that need to be rendered in filter box
-				updatedPoiCategories = updatedPoiCategories.concat(poiCategory.getUnEditablePoiCategories());
+				poiCategoryModule.setEditablePoiCategories(updatedPoiCategories);
 
 				// remove old filter box
 				wrapper.removeChild(doc.getElementById('filterMenu'));
@@ -329,7 +326,7 @@ require(
 
 				// recreate poi markers and filter box
 				markers = new L.LayerGroup();
-				setupPoisAndFilters(poiCollection.getPoiState(), updatedPoiCategories, true);
+				setupPoisAndFilters(poiCollectionModule.getPoiState(), poiCategoryModule.getAllPoiCategories() , true);
 				markers.addTo(map);
 			}, true);
 		}
@@ -340,7 +337,7 @@ require(
 		 */
 		function setupInitialPoiState(pois) {
 			pois.forEach(function(poi) {
-				poiCollection.addToState(poi);
+				poiCollectionModule.addToState(poi);
 			});
 		}
 
@@ -546,7 +543,8 @@ require(
 
 			setupPontoWikiaClient();
 			setupInitialPoiState(mapConfig.points);
-			setupPoisAndFilters(poiCollection.getPoiState(), mapConfig.types);
+			poiCategoryModule.setupPoiCategories(mapConfig.types);
+			setupPoisAndFilters(poiCollectionModule.getPoiState(), poiCategoryModule.getAllPoiCategories());
 
 			setupClickTracking();
 			markers.addTo(map);
