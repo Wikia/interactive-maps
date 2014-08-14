@@ -4,7 +4,7 @@ define('im.i18n', ['im.config'], function (config) {
 	var messages = config.messages;
 
 	/**
-	 * @desc Translates message
+	 * @desc return message of given key
 	 * @param {string} msgKey - message key
 	 * @returns {string}
 	 */
