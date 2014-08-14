@@ -1,8 +1,11 @@
 'use strict';
 
 define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config) {
+	// id of uneditable poi category (Other)
 	var catchAllCategoryId = config.mapConfig.catchAllCategoryId,
+		// placeholder for array with editable poi categories
 		editablePoiCategories,
+		// placeholder for array with uneditable poi categories
 		unEditablePoiCategories,
 		poiCategoryIcons = {};
 
@@ -45,43 +48,65 @@ define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config
 	}
 
 	/**
-	 * @desc Filters out POI categories that should not be edited and caches the result to editablePoiCategories
-	 * @param {array} poiCategories
-	 * @returns {array} - editable poi categories
+	 * @desc initial setup of poi categories
+	 * @param {Array} poiCategories
 	 */
-	function getEditablePoiCategories(poiCategories) {
-		return (editablePoiCategories) ?
-			editablePoiCategories :
-			editablePoiCategories = poiCategories.filter(function (category) {
-				return category.id !== catchAllCategoryId;
-			});
+	function setupPoiCategories(poiCategories) {
+		setEditablePoiCategories(poiCategories);
+		setUnEditablePoiCategories(poiCategories);
 	}
 
 	/**
-	 * @desc updates editable pos categories
-	 * @param {araay} poiCategories
+	 * @desc sets editable poi categories
+	 * @param {Array} poiCategories
 	 */
-	function updateEditablePoiCategories(poiCategories) {
-		editablePoiCategories = poiCategories;
+	function setEditablePoiCategories(poiCategories) {
+		editablePoiCategories = poiCategories.filter(function (category) {
+			return category.id !== catchAllCategoryId;
+		});
+	}
+
+	/**
+	 * @desc Filters out POI categories that should not be edited and caches the result to editablePoiCategories
+	 * @returns {Array} - editable poi categories
+	 */
+	function getEditablePoiCategories() {
+		return editablePoiCategories;
+	}
+
+	/**
+	 * @desc sets uneditable poi categories
+	 * @param {Array} poiCategories
+	 */
+	function setUnEditablePoiCategories(poiCategories) {
+		unEditablePoiCategories = poiCategories.filter(function (category) {
+			return category.id === catchAllCategoryId;
+		});
 	}
 
 	/**
 	 * @desc Filters POI categories that should not be edited and caches the result to unEditablePoiCategories
-	 * @returns {array} - editable poi categories
+	 * @returns {Array} - editable poi categories
 	 */
 	function getUnEditablePoiCategories() {
-		return (unEditablePoiCategories) ?
-			unEditablePoiCategories :
-			unEditablePoiCategories = config.mapConfig.types.filter(function (category) {
-			return category.id === catchAllCategoryId;
-		});
+		return unEditablePoiCategories;
+	}
+
+	/**
+	 * @desc returns all poi categories
+	 * @returns {Array}
+	 */
+	function getAllPoiCategories() {
+		return getEditablePoiCategories().concat(getUnEditablePoiCategories());
 	}
 
 	return {
 		setupPoiCategoryIcon: setupPoiCategoryIcon,
 		getEditablePoiCategories: getEditablePoiCategories,
 		getUnEditablePoiCategories: getUnEditablePoiCategories,
-		updateEditablePoiCategories: updateEditablePoiCategories,
-		getPoiCategoryIcon: getPoiCategoryIcon
+		getPoiCategoryIcon: getPoiCategoryIcon,
+		getAllPoiCategories: getAllPoiCategories,
+		setEditablePoiCategories: setEditablePoiCategories,
+		setupPoiCategories: setupPoiCategories
 	};
 });
