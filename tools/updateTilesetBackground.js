@@ -65,7 +65,11 @@ dbCon.getConnection(dbCon.connType.master)
 					}
 				})
 				.catch(function (err) {
+					found--;
 					console.log(err);
+					if (found === 0) {
+						process.exit();
+					}
 				});
 			});
 		});
