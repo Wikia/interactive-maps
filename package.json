@@ -28,13 +28,16 @@
     "scribe": "0.0.9"
   },
   "devDependencies": {
+    "flightplan": "~0.4.0",
     "gulp": "3.6.x",
     "gulp-changed": "0.3.x",
-    "gulp-nodemon": "1.0.x",
-    "proxyquire": "0.6.x",
-    "gulp-jasmine": "0.2.x",
     "gulp-istanbul": "~0.1.1",
-    "flightplan": "~0.4.0"
+    "gulp-jasmine": "0.2.x",
+    "gulp-nodemon": "1.0.x",
+    "karma": "^0.12.21",
+    "karma-jasmine": "^0.1.5",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "proxyquire": "0.6.x"
   },
   "private": true
 }
