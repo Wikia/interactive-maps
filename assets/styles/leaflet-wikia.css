@@ -304,10 +304,12 @@ html,
 }
 
 .shown-box .point-types {
+	-webkit-transition: width 0.1s ease-in;
 	transition: width 0.1s ease-in;
 }
 
 .hidden-box .point-types {
+	-webkit-transition: width 0.1s 0.1s ease-in;
 	transition: width 0.1s 0.1s ease-in;
 	width: 0;
 }
