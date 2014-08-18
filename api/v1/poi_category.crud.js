@@ -8,6 +8,7 @@ var dbCon = require('./../../lib/db_connector'),
 	config = require('./../../lib/config'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 	squidUpdate = require('./../../lib/squidUpdate'),
+	Q = require('q'),
 
 	urlPattern = jsonValidator.getUrlPattern(),
 
@@ -116,18 +117,30 @@ function handleUsedCategories(conn, id, res, next) {
 /**
  * @desc Gets map id for a POI category
  *
- * @param {object} conn Database connection
+ * @param {object} conn - Database connection
  * @param {integer} poiCategoryId
+ * @returns {object} - promise
  */
 function getMapId(conn, poiCategoryId) {
-	var query = dbCon.knex(dbTable)
+	var deferred = Q.defer(),
+		query = dbCon.knex(dbTable)
 			.column(['map_id'])
 			.connection(conn)
 			.where({
 				id: poiCategoryId
 			});
 
-	return query.select();
+	query.select().then(
+		function (collection) {
+			if (collection[0]) {
+				deferred.resolve(parseInt(collection[0].map_id, 10));
+			} else {
+				deferred.reject();
+			}
+		}
+	);
+
+	return deferred.promise;
 }
 
 /**
@@ -216,43 +229,38 @@ module.exports = function createCRUD() {
 				if (isFinite(id)) {
 					dbCon.getConnection(dbCon.connType.master, function (conn) {
 						getMapId(conn, id).then(
-							function (collection) {
-								var mapId;
-								if (collection[0]) {
-									mapId = parseInt(collection[0].map_id, 10);
-
-									dbCon
-										.destroy(conn, dbTable, filter)
-										.then(
-										function (affectedRows) {
-											if (affectedRows > 0) {
-												utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
-													function () {
-														squidUpdate.purgeKey(
-															utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
-														res.send(204, {});
-														res.end();
-													},
-													next
-												);
-											} else {
-												next(errorHandler.elementNotFoundError(dbTable, id));
-											}
-										},
-										function (err) {
-											// If the delete request results an error, check if the error is reference error
-											// (caused by non able to delete foreign key) and handle this case by calling
-											// the handleUsedCategories function, otherwise handle the error as regular
-											// error
-											if (errorHandler.isHandledSQLError(err.clientError.name) &&
-												err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_') {
-												handleUsedCategories(conn, id, res, next);
-											} else {
-												next(err);
-											}
+							function (mapId) {
+								dbCon
+									.destroy(conn, dbTable, filter)
+									.then(
+									function (affectedRows) {
+										if (affectedRows > 0) {
+											utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
+												function () {
+													squidUpdate.purgeKey(
+														utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
+													res.send(204, {});
+													res.end();
+												},
+												next
+											);
+										} else {
+											next(errorHandler.elementNotFoundError(dbTable, id));
 										}
-									);
-								}
+									},
+									function (err) {
+										// If the delete request results an error, check if the error is reference error
+										// (caused by non able to delete foreign key) and handle this case by calling
+										// the handleUsedCategories function, otherwise handle the error as regular
+										// error
+										if (errorHandler.isHandledSQLError(err.clientError.name) &&
+											err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_') {
+											handleUsedCategories(conn, id, res, next);
+										} else {
+											next(err);
+										}
+									}
+								);
 							},
 							next
 						);
@@ -321,8 +329,7 @@ module.exports = function createCRUD() {
 					if (isFinite(id)) {
 						dbCon.getConnection(dbCon.connType.master, function (conn) {
 							getMapId(conn, id).then(
-								function (collection) {
-									var mapId = parseInt(collection[0].map_id, 10);
+								function (mapId) {
 									dbCon
 										.update(conn, dbTable, reqBody, filter)
 										.then(
