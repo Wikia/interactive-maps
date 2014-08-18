@@ -110,7 +110,7 @@ dbCon.getConnection(dbCon.connType.master)
 			.select()
 			.then(function (data) {
 				if (data.length > 0) {
-					console.log('Found a tile\'s set...');
+					console.log('Found a tile\'s set: # ' + data[0].id + '...');
 					updateTileset(data.pop(), conn);
 				} else {
 					console.log('No tiles sets with out-dated background color found.');
