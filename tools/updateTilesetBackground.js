@@ -4,12 +4,9 @@
 /**
  * This is part of MWEB-869
  *
- * The script loops through all tile sets with status OK,
- * calculates their background color by using lib/imageBackground.js
+ * The script gets first tiles' set with status OK and background-color set to #ddd,
+ * calculates its background color by using lib/imageBackground.js
  * and updates the field in tile_set table in DB.
- *
- * We did have to make it sequential because of race conditions
- * among modules (fetchImage, imageBackground).
  */
 
 var dbCon = require('../lib/db_connector'),
@@ -18,8 +15,7 @@ var dbCon = require('../lib/db_connector'),
 	fetchImage = require('../lib/fetchImage'),
 	imageBackground = require('../lib/imageBackground'),
 	tmpDir = config.tmp,
-	tableName = 'tile_set',
-	tileSets = [];
+	tableName = 'tile_set';
 
 /**
  * @desc Updates a tiles' set row in database
@@ -55,19 +51,6 @@ function updateBackgroundColor(data, conn) {
 }
 
 /**
- * @desc Helper function to call sequentially next tiles' set update
- * @param {object} conn connection object created by db_connector.getConnection()
- */
-function next(conn) {
-	if (tileSets.length > 0) {
-		updateTileset(tileSets.pop(), conn);
-	} else {
-		console.log('Done.');
-		process.exit();
-	}
-}
-
-/**
  * @desc Downloads the image, calculates bg color, updates DB and calls itself with different tileset's data
  * @param {object} row object with data from database
  * @param {object} conn connection object created by db_connector.getConnection()
@@ -98,12 +81,13 @@ function updateTileset(row, conn) {
 			return updateBackgroundColor(data, conn);
 		})
 		.then(function () {
-			next(conn);
+			console.log('Done.');
+			process.exit();
 		})
 		.catch(function (err) {
 			console.log(err);
 			console.log(data);
-			next(conn);
+			process.exit();
 		});
 }
 
@@ -112,18 +96,27 @@ function updateTileset(row, conn) {
  */
 dbCon.getConnection(dbCon.connType.master)
 	.then(function (conn) {
-		dbCon.select(conn, tableName, [
-			'id',
-			'image'
-		], {
-			'status': utils.tileSetStatus.ok,
-			'background_color': '#ddd'
-		}).then(function (data) {
-			var found = data.length;
-			console.log('Found ' + found + ' tiles\' sets...');
-			tileSets = data;
-			next(conn);
-		});
+		dbCon.knex(tableName)
+			.column([
+				'id',
+				'image'
+			])
+			.where({
+				'status': utils.tileSetStatus.ok,
+				'background_color': '#ddd'
+			})
+			.limit(1)
+			.connection(conn)
+			.select()
+			.then(function (data) {
+				if (data.length > 0) {
+					console.log('Found a tile\'s set...');
+					updateTileset(data.pop(), conn);
+				} else {
+					console.log('No tiles sets with out-dated background color found.');
+					process.exit();
+				}
+			});
 	})
 	.catch(function (err) {
 		console.log(err);
