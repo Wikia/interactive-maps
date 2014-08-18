@@ -191,8 +191,8 @@ html,
 
 .hide-button, .edit-point-types {
 	position: absolute;
-	top: 15px;
 	right: 15px;
+	top: 15px;
 }
 
 .hidden-box .hide-button, .hidden-box .edit-point-types {
@@ -209,8 +209,9 @@ html,
 
 .hidden-box {
 	height: 0;
+	min-width: 0;
+	-webkit-transition: height 0.1s ease-in, min-width 0.1s 0.1s ease-in;
 	transition: height 0.1s ease-in, min-width 0.1s 0.1s ease-in;
-	min-width: 94px;
 	width: auto;
 }
 
@@ -220,9 +221,10 @@ html,
 }
 
 .shown-box {
-	height: 100%;
-	transition: height 0.1s 0.1s ease-in, min-width 0.1s ease-in;
 	min-width: 245px;
+	height: 100%;
+	-webkit-transition: height 0.1s 0.1s ease-in, min-width 0.1s ease-in;
+	transition: height 0.1s 0.1s ease-in, min-width 0.1s ease-in;
 }
 
 .edit-point-types {
