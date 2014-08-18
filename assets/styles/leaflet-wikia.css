@@ -161,7 +161,7 @@ html,
 }
 
 .wikia-mobile .filter-menu.shown-box {
-	width: 100%;
+	min-width: 100%;
 }
 
 .filter-menu-header {
@@ -182,33 +182,36 @@ html,
 	height: 16px;
 	margin: 0;
 	padding: 15px;
+	position: relative;
 }
 
 .hide-button {
-	float: right;
 	font-size: 13px;
 }
 
 .hide-button, .edit-point-types {
-	-webkit-transition: opacity 0.2s ease-in;
-	transition: opacity 0.2s ease-in;
+	position: absolute;
+	top: 15px;
+	right: 15px;
 }
 
 .hidden-box .hide-button, .hidden-box .edit-point-types {
 	opacity: 0;
 	pointer-events: none;
+	width: 0;
 }
 
 .shown-box .hide-button, .shown-box .edit-point-types {
 	opacity: 1;
 	pointer-events: auto;
+	transition: opacity 0.1s ease-in;
 }
 
 .hidden-box {
 	height: 0;
-	-webkit-transition: height 0.2s ease-in, width 0.1s 0.2s ease-in;
-	transition: height 0.2s ease-in, width 0.1s 0.2s ease-in;
-	width: 94px;
+	transition: height 0.1s ease-in, min-width 0.1s 0.1s ease-in;
+	min-width: 94px;
+	width: auto;
 }
 
 .hidden-box .filter-menu-header {
@@ -218,9 +221,8 @@ html,
 
 .shown-box {
 	height: 100%;
-	-webkit-transition: height 0.2s 0.1s ease-in, width 0.1s ease-in;
-	transition: height 0.2s 0.1s ease-in, width 0.1s ease-in;
-	width: 245px;
+	transition: height 0.1s 0.1s ease-in, min-width 0.1s ease-in;
+	min-width: 245px;
 }
 
 .edit-point-types {
@@ -246,11 +248,13 @@ html,
 	overflow-x: hidden;
 	overflow-y: auto;
 	padding: 0;
+	width: 225px;
 }
 
 
 .wikia-mobile .point-types {
 	height: 100%;
+	width: 100%;
 }
 
 #allPointTypes {
@@ -295,6 +299,15 @@ html,
 	vertical-align: middle;
 	width: 135px;
 	word-wrap: break-word;
+}
+
+.shown-box .point-types {
+	transition: width 0.1s ease-in;
+}
+
+.hidden-box .point-types {
+	transition: width 0.1s 0.1s ease-in;
+	width: 0;
 }
 
 .edit-poi-link {
