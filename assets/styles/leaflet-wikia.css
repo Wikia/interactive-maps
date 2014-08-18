@@ -221,8 +221,8 @@ html,
 }
 
 .shown-box {
-	min-width: 245px;
 	height: 100%;
+	min-width: 245px;
 	-webkit-transition: height 0.1s 0.1s ease-in, min-width 0.1s ease-in;
 	transition: height 0.1s 0.1s ease-in, min-width 0.1s ease-in;
 }
