@@ -37,6 +37,16 @@ define('im.utils', ['im.window', 'im.config'], function (w, config) {
 	}
 
 	/**
+	 * @desc checks if element has class
+	 * @param {Node} element - DOM element
+	 * @param {string} classValue - class name
+	 * @returns {boolean}
+	 */
+	function hasClass(element, classValue) {
+		return element.className.indexOf(classValue) !== -1;
+	}
+
+	/**
 	 * @desc Converts size to maximal zoom level
 	 * @param {number} size - maximal size length
 	 * @returns {number} - maximal zoom level
@@ -79,6 +89,7 @@ define('im.utils', ['im.window', 'im.config'], function (w, config) {
 		addClass: addClass,
 		removeClass: removeClass,
 		toggleClass: toggleClass,
+		hasClass: hasClass,
 		sizeToZoomLevel: sizeToZoomLevel,
 		getMinZoomLevel: getMinZoomLevel,
 		isMobileScreenSize: isMobileScreenSize
