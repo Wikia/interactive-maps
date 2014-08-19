@@ -9,10 +9,7 @@ define('im.renderUI', ['im.config'], function (config) {
 	 * @returns {string} - HTMl markup for link
 	 */
 	function buildLinkHTML(point, innerHtml, className) {
-		var classString;
-
-		className = (typeof (className) !== 'undefined') ? className : null;
-		classString = (className) ? ' class="' + className + '"' : '';
+		var classString = (className) ? ' class="' + className + '"' : '';
 
 		return '<a href="' + point.link + '" title="' + point.name + '"' + classString + ' target="_blank">' +
 			innerHtml + '</a>';
