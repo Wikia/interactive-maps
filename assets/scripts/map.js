@@ -289,8 +289,11 @@ require(
 					markerObject = poiModule.addPoiToMap(
 						point, poiCategoryModule.getPoiCategoryIcon(point.poi_category_id), markers);
 
-					filter = pointTypeFiltersContainer.querySelector('[data-point-type="' + point.poi_category_id +
-						'"]');
+					filter = pointTypeFiltersContainer.querySelector(
+						'[data-point-type="' +
+						point.poi_category_id +
+						'"]'
+					);
 					if (filter.className.indexOf('enabled') !== -1) {
 						markerObject.openPopup();
 					} else {
