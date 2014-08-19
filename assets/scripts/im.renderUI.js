@@ -52,8 +52,11 @@ define('im.renderUI', ['im.config'], function (config) {
 				editLinkMsg + '</a>';
 
 		if (point.photo && point.link) {
-			photoHtml = buildLinkHTML(point, buildImageHTML(point.photo, point.name, config.photoWidth,
-				config.photoHeight), 'photo');
+			photoHtml = buildLinkHTML(
+				point,
+				buildImageHTML(point.photo, point.name, config.photoWidth, config.photoHeight),
+				'photo'
+			);
 		} else if (point.photo) {
 			photoHtml = buildImageHTML(point.photo, point.name, config.photoWidth, config.photoHeight);
 		}
