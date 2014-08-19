@@ -271,13 +271,12 @@ require(
 			params.data.mapId = mapConfig.id;
 			params.data.categories = mapConfig.types;
 
-			poiCollectionModule.invalidatePoiCache(marker.point.poi_category_id);
-
 			pontoWikiaBridge.postMessage('processData', params, function (point) {
 				var markerObject,
 					filter;
 
 				poiCollectionModule.removeFromState(marker.point.id);
+				poiCollectionModule.invalidatePoiCache(marker.point.poi_category_id);
 
 				// removes old marker from layer group
 				if (markers.hasLayer(marker)) {
@@ -286,7 +285,6 @@ require(
 
 				// adds new poi marker to layer group and poi to state
 				if (point) {
-					poiCollectionModule.invalidatePoiCache(point.poi_category_id);
 					poiCollectionModule.addToState(point);
 					markerObject = poiModule.addPoiToMap(
 						point, poiCategoryModule.getPoiCategoryIcon(point.poi_category_id), markers);
