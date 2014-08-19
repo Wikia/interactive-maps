@@ -311,7 +311,7 @@ require(
 				action: 'poiCategories',
 				data: {
 					mapId: mapConfig.id,
-					poiCategories: poiCategoryModule.getEditablePoiCategories(mapConfig.types),
+					poiCategories: poiCategoryModule.getEditablePoiCategories(),
 					mode: 'edit'
 				}
 			};
