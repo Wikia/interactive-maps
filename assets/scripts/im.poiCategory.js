@@ -17,25 +17,48 @@ define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config
 		var poiCategoryIcon;
 
 		if (poiCategory.marker !== null && !poiCategory.no_marker) {
-			poiCategoryIcon = L.icon({
-				iconUrl: poiCategory.marker,
-				iconSize: [config.poiIconWidth, config.poiIconHeight]
-			});
+			poiCategoryIcon = createCustomPoiCategoryIcon(poiCategory);
 		} else {
-			poiCategoryIcon = new L.Icon.Default();
-			// this is the nicest way to do that I found
-			// we need to overwrite it here so in the filter box we have not broken image
-			poiCategory.marker = poiCategoryIcon._getIconUrl('icon');
-
-			// we need this one for edit POI categories popup
-			poiCategory.no_marker = true;
+			poiCategoryIcon = createDefaultPoiCategoryIcon(poiCategory);
 		}
 
+		// extend poi category icon object
 		L.setOptions(poiCategoryIcon, {
 			className: 'point-type-' + poiCategory.id
 		});
 
+		// store icon object
 		poiCategoryIcons[poiCategory.id] = poiCategoryIcon;
+	}
+
+	/**
+	 * @desc creates custom poi category icon
+	 * @param {object} poiCategory
+	 * @returns {object} - leaflet icon object
+	 */
+	function createCustomPoiCategoryIcon(poiCategory) {
+		return L.icon({
+			iconUrl: poiCategory.marker,
+			iconSize: [config.poiIconWidth, config.poiIconHeight]
+		});
+	}
+
+	/**
+	 * @desc creates default poi category icon
+	 * @param {object} poiCategory
+	 * @returns {object} - leaflet icon object
+	 */
+	function createDefaultPoiCategoryIcon(poiCategory) {
+		var poiCategoryIcon = new L.Icon.Default();
+
+		// this is the nicest way to do that I found
+		// we need to overwrite it here so in the filter box we have not broken image
+		poiCategory.marker = poiCategoryIcon._getIconUrl('icon');
+
+		// we need this one for edit POI categories popup
+		poiCategory.no_marker = true;
+
+		return poiCategoryIcon;
 	}
 
 	/**
