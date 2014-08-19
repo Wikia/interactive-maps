@@ -236,7 +236,7 @@ require(
 
 			// attach filter box event handlers
 			pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
-			document.getElementsByClassName('.filter-menu-header')[0].addEventListener('click', handleBoxHeaderClick);
+			doc.getElementsByClassName('.filter-menu-header')[0].addEventListener('click', handleBoxHeaderClick);
 
 			// create poi markers
 			Object.keys(pois).forEach(function(id) {
@@ -250,10 +250,10 @@ require(
 		 * @desc adds hide button when on wikia mobile or embed code
 		 */
 		function setUpHideButton() {
-			var hide = document.createElement('a');
+			var hide = doc.createElement('a');
 			hide.innerHTML = i18n.msg('wikia-interactive-maps-hide-filter');
 			hide.className = 'hide-button';
-			document.getElementsByClassName('.filter-menu-header')[0].appendChild(hide);
+			doc.getElementsByClassName('.filter-menu-header')[0].appendChild(hide);
 		}
 
 		/**
