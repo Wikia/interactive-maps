@@ -392,7 +392,7 @@ require(
 				utils.addClass(body, 'wikia-mobile');
 				setUpHideButton();
 			} else {
-				toggleFilterBox(doc.querySelector('.filter-menu'));
+				toggleFilterBox(doc.getElementsByClassName('.filter-menu')[0]);
 			}
 		}
 
