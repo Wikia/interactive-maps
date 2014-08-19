@@ -42,8 +42,7 @@ define('im.poi', ['im.leafletWrapper', 'im.config', 'im.renderUI', 'im.i18n'], f
 		var popup = L.popup({
 			closeButton: false,
 			minWidth: popupWidth,
-			maxWidth: popupWidth,
-			keepInView: true
+			maxWidth: popupWidth
 		});
 
 		popup.setContent(renderUI.buildPopupHtml(poi, i18n.msg('wikia-interactive-maps-edit-poi')));

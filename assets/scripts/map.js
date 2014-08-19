@@ -504,10 +504,6 @@ require(
 					L.latLng(mapConfig.boundaries.north, mapConfig.boundaries.east)
 				);
 
-				map.setMaxBounds(mapBounds);
-				map.on('popupclose', function () {
-					map.panInsideBounds(mapBounds);
-				});
 				mapConfig.layer.bounds = mapBounds;
 			}
 
@@ -561,9 +557,6 @@ require(
 					map.fitBounds(group.getBounds().pad(config.autoZoomPadding));
 				}, 1);
 			}
-
-			// Workaround for Safari translate3D bug with map panning and popups set to 'keep in view'
-			L.Browser.webkit3d = false;
 		}
 
 		createMap();
