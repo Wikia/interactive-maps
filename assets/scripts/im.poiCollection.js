@@ -3,9 +3,9 @@
 define('im.poiCollection', ['im.window'], function (w) {
 	var doc = w.document,
 		// holds all poi objects currently displayed on map
-		poisState = {},
+		poiObjectsState = {},
 		// holds all pois DOM elements grouped by poi categories
-		poiCache = {};
+		poiCategoriesCache = {};
 
 	/**
 	 * @desc checks if poi is in state
@@ -13,7 +13,7 @@ define('im.poiCollection', ['im.window'], function (w) {
 	 * @returns {boolean}
 	 */
 	function isPoiInState(id) {
-		return poisState.hasOwnProperty(id);
+		return poiObjectsState.hasOwnProperty(id);
 	}
 
 	/**
@@ -28,7 +28,7 @@ define('im.poiCollection', ['im.window'], function (w) {
 			throw new Error('poi id:' + id + 'already exist in the poiState.');
 		}
 
-		poisState[id] = poi;
+		poiObjectsState[id] = poi;
 	}
 
 	/**
@@ -37,7 +37,7 @@ define('im.poiCollection', ['im.window'], function (w) {
 	 */
 	function removeFromState(id) {
 		if (isPoiInState(id)) {
-			delete poisState[id];
+			delete poiObjectsState[id];
 		}
 	}
 
@@ -46,7 +46,7 @@ define('im.poiCollection', ['im.window'], function (w) {
 	 * @returns {object} - poi state
 	 */
 	function getPoiState() {
-		return poisState;
+		return poiObjectsState;
 	}
 
 	/**
@@ -55,13 +55,13 @@ define('im.poiCollection', ['im.window'], function (w) {
 	 * @returns {NodeList} - List of DOM elements corresponding with given poi category
 	 */
 	function loadPoiToCache(poiCategory) {
-		poiCache[poiCategory] = doc.querySelectorAll(
+		poiCategoriesCache[poiCategory] = doc.querySelectorAll(
 			(poiCategory === 0) ?
 				'.leaflet-marker-icon, .leaflet-marker-shadow' :
 				'.point-type-' + poiCategory
 		);
 
-		return poiCache[poiCategory];
+		return poiCategoriesCache[poiCategory];
 	}
 
 	/**
@@ -69,7 +69,7 @@ define('im.poiCollection', ['im.window'], function (w) {
 	 * @param {number} poiCategory - Id of point type
 	 */
 	function invalidatePoiCache(poiCategory) {
-		delete poiCache[poiCategory];
+		delete poiCategoriesCache[poiCategory];
 	}
 
 	/**
@@ -78,7 +78,9 @@ define('im.poiCollection', ['im.window'], function (w) {
 	 * @returns {NodeList} - List of DOM elements corresponding with given poi category
 	 */
 	function getPoiByCategory(poiCategory) {
-		return (poiCache.hasOwnProperty(poiCategory)) ? poiCache[poiCategory] : loadPoiToCache(poiCategory);
+		return (poiCategoriesCache.hasOwnProperty(poiCategory)) ?
+			poiCategoriesCache[poiCategory] :
+			loadPoiToCache(poiCategory);
 	}
 
 	return {
