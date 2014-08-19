@@ -48,7 +48,7 @@ define('im.renderUI', ['im.config'], function (config) {
 			titleHtml = '<h3>' + (point.link ? buildLinkHTML(point, point.name, 'poi-article-link') : point.name) +
 				'</h3>',
 			descriptionHtml = (point.description ? '<p>' + point.description + '</p>' : ''),
-			editLink = '<a title="Edit" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
+			editLink = '<a title="' + editLinkMsg + '" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
 				editLinkMsg + '</a>';
 
 		if (point.photo && point.link) {
