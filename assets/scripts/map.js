@@ -83,8 +83,7 @@ require(
 				enabled = 'enabled',
 				filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
 
-			if (pointTypes.length === filtersEnabledLength &&
-				allPointTypesFilter.className.indexOf(enabled) === -1){
+			if (pointTypes.length === filtersEnabledLength && utils.hasClass(allPointTypesFilter, enabled)){
 				utils.addClass(allPointTypesFilter, enabled);
 			} else {
 				utils.removeClass(allPointTypesFilter, enabled);
@@ -99,11 +98,11 @@ require(
 			var allPointTypesFilter = doc.getElementById(config.allPointTypesFilterId),
 				filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
 				filtersLength = filters.length,
-				enabled = allPointTypesFilter.className.indexOf('enabled') === -1,
+				disabled = !utils.hasClass(allPointTypesFilter, 'enabled'),
 				i;
 
 			for (i = 0; i < filtersLength; i++) {
-				if (enabled) {
+				if (disabled) {
 					utils.addClass(filters[i], 'enabled');
 				} else {
 					utils.removeClass(filters[i], 'enabled');
@@ -294,7 +293,7 @@ require(
 						point.poi_category_id +
 						'"]'
 					);
-					if (filter.className.indexOf('enabled') !== -1) {
+					if (utils.hasClass(filter, 'enabled')) {
 						markerObject.openPopup();
 					} else {
 						utils.addClass(markerObject._icon, 'hidden');
@@ -410,7 +409,7 @@ require(
 			wrapper.addEventListener('click', function (event) {
 				var target = event.target;
 
-				if (target.className.indexOf('edit-poi-link') !== -1) {
+				if (utils.hasClass(target, 'edit-poi-link')) {
 					event.preventDefault();
 					editMarker(poiModule.getPoiMarker(markers, target.getAttribute('data-marker-id')));
 				}
@@ -460,7 +459,7 @@ require(
 			});
 
 			doc.addEventListener('click', function (event) {
-				if (event.target.className.indexOf('poi-article-link') !== -1) {
+				if (utils.hasClass(event.target, 'poi-article-link')) {
 					tracker.track('map', tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article');
 				}
 			});
