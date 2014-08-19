@@ -13,7 +13,7 @@ define('im.poiCollection', ['im.window'], function (w) {
 	 * @returns {boolean}
 	 */
 	function isPoiInState(id) {
-		return (poisState.hasOwnProperty(id) ? true : false);
+		return poisState.hasOwnProperty(id);
 	}
 
 	/**
