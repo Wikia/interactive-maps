@@ -16,7 +16,7 @@ define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config
 	function setupPoiCategoryIcon(poiCategory) {
 		var poiCategoryIcon;
 
-		if (poiCategory.marker !== null && !poiCategory.no_marker) {
+		if (!poiCategory.marker && !poiCategory.no_marker) {
 			poiCategoryIcon = createCustomPoiCategoryIcon(poiCategory);
 		} else {
 			poiCategoryIcon = createDefaultPoiCategoryIcon(poiCategory);
