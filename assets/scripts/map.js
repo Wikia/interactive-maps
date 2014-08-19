@@ -237,7 +237,7 @@ require(
 
 			// attach filter box event handlers
 			pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
-			document.querySelector('.filter-menu-header').addEventListener('click', handleBoxHeaderClick);
+			document.getElementsByClassName('.filter-menu-header')[0].addEventListener('click', handleBoxHeaderClick);
 
 			// create poi markers
 			Object.keys(pois).forEach(function(id) {
@@ -254,7 +254,7 @@ require(
 			var hide = document.createElement('a');
 			hide.innerHTML = i18n.msg('wikia-interactive-maps-hide-filter');
 			hide.className = 'hide-button';
-			document.querySelector('.filter-menu-header').appendChild(hide);
+			document.getElementsByClassName('.filter-menu-header')[0].appendChild(hide);
 		}
 
 		/**
