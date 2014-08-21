@@ -85,6 +85,24 @@ define('im.utils', ['im.window', 'im.config'], function (w, config) {
 			(w.outerHeight < config.mobileMaxWidth && w.outerHeight < w.outerWidth);
 	}
 
+	/**
+	 * @desc checks if variable is integer
+	 * @param {*} variable
+	 * @returns {boolean}
+	 */
+	function isInteger(variable) {
+		return typeof variable === 'number' && isFinite(variable) && variable % 1 === 0;
+	}
+
+	/**
+	 * @desc checks if variable is non empty string
+	 * @param {*} variable
+	 * @returns {boolean}
+	 */
+	function isNonEmptyString(variable) {
+		return typeof variable === 'string' && variable.trim().length !== 0;
+	}
+
 	return {
 		addClass: addClass,
 		removeClass: removeClass,
@@ -92,6 +110,8 @@ define('im.utils', ['im.window', 'im.config'], function (w, config) {
 		hasClass: hasClass,
 		sizeToZoomLevel: sizeToZoomLevel,
 		getMinZoomLevel: getMinZoomLevel,
-		isMobileScreenSize: isMobileScreenSize
+		isMobileScreenSize: isMobileScreenSize,
+		isInteger: isInteger,
+		isNonEmptyString: isNonEmptyString
 	};
 });

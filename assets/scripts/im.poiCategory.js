@@ -1,6 +1,6 @@
 'use strict';
 
-define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config) {
+define('im.poiCategory', ['im.leafletWrapper', 'im.config', 'im.utils'], function (L, config, utils) {
 	// id of uneditable poi category (Other)
 	var catchAllCategoryId = config.mapConfig.catchAllCategoryId,
 		// placeholder for array with editable poi categories
@@ -78,12 +78,12 @@ define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config
 	 * @returns {object}
 	 */
 	function createPoiCategory(id, name, marker) {
-		if (typeof id !== 'number' && !isFinite(id) && id % 1 !== 0) {
-			throw new Error('"id" argument must finite integer');
+		if (!utils.isInteger(id)) {
+			throw new Error('"id" argument must be finite integer');
 		}
 
-		if (typeof name !== 'string' && name.trim().length === 0) {
-			throw new Error('"name" attribute mast be non empty string');
+		if (!utils.isNonEmptyString(name)) {
+			throw new Error('"name" argument mast be non empty string');
 		}
 
 		return {
