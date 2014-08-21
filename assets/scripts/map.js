@@ -103,7 +103,7 @@ require(
 				disabled = !utils.hasClass(allPointTypesFilter, 'enabled'),
 				i;
 
-			// enabled/disable all filters
+			// enable/disable all filters
 			for (i = 0; i < filtersLength; i++) {
 				if (disabled) {
 					utils.addClass(filters[i], 'enabled');
@@ -113,7 +113,7 @@ require(
 			}
 
 			// show/hide all points
-			for ( i = 0; i < pointsLength; i++ ) {
+			for (i = 0; i < pointsLength; i++) {
 				if (disabled) {
 					utils.removeClass(points[i], 'hidden');
 				} else {
@@ -328,9 +328,9 @@ require(
 				}
 			};
 
-			pontoWikiaBridge.postMessage('processData', params, function (updatedPoiCategories) {
-				updatePoisFromDeletedCategories(updatedPoiCategories);
-				updatePoiCategories(updatedPoiCategories);
+			pontoWikiaBridge.postMessage('processData', params, function (categories) {
+				updatePoisFromDeletedCategories(categories);
+				updatePoiCategories(categories);
 				poiCollectionModule.resetPoiCache();
 
 				// remove old filter box
@@ -347,13 +347,13 @@ require(
 
 		/**
 		 * @desc helper function which updates category of pois that belongs to deleted category - to "other"
-		 * @param {Array} updatedPoiCategories - updated poi categories
+		 * @param {Array} categories - updated poi categories
 		 */
-		function updatePoisFromDeletedCategories(updatedPoiCategories) {
+		function updatePoisFromDeletedCategories(categories) {
 			var updatedCategoryIds = {},
 				pois = poiCollectionModule.getPoiState();
 
-			updatedPoiCategories.forEach(function (category) {
+			categories.forEach(function (category) {
 				updatedCategoryIds[category.id] = true;
 			});
 
@@ -369,9 +369,9 @@ require(
 
 		/**
 		 * @desc helper function which updates poi categories for this map
-		 * @param {Array} updatedPoiCategories - updated poi categories
+		 * @param {Array} categories - updated poi categories
 		 */
-		function updatePoiCategories(updatedPoiCategories) {
+		function updatePoiCategories(categories) {
 			var pois = poiCollectionModule.getPoiState(),
 				poiIds = Object.keys(pois),
 				length = poiIds.length,
@@ -380,7 +380,7 @@ require(
 			// check if other category should be added (any pois belongs to this category)
 			for (i = 0; i < length; i++) {
 				if (pois[poiIds[i]].poi_category_id === mapConfig.catchAllCategoryId) {
-					updatedPoiCategories.push(
+					categories.push(
 						poiCategoryModule.createPoiCategory(
 							mapConfig.catchAllCategoryId,
 							i18n.msg('wikia-interactive-maps-default-poi-category')
@@ -390,7 +390,7 @@ require(
 				}
 			}
 
-			poiCategoryModule.setupPoiCategories(updatedPoiCategories);
+			poiCategoryModule.setupPoiCategories(categories);
 		}
 
 		/**
