@@ -42,6 +42,15 @@ define('im.poiCollection', ['im.window'], function (w) {
 	}
 
 	/**
+	 * @desc update poi in state
+	 * @param {object} poi - poi object
+	 */
+	function updatePoiInState(poi) {
+		removeFromState(poi.id);
+		addToState(poi);
+	}
+
+	/**
 	 * @desc return poi state
 	 * @returns {object} - poi state
 	 */
@@ -73,6 +82,13 @@ define('im.poiCollection', ['im.window'], function (w) {
 	}
 
 	/**
+	 * @desc resets poi cache to initial state
+	 */
+	function resetPoiCache() {
+		poiCategoriesCache = {};
+	}
+
+	/**
 	 * @desc Return DOM elements for given poi category
 	 * @param {number} poiCategory - Id of poi category, 0 for all types
 	 * @returns {NodeList} - List of DOM elements corresponding with given poi category
@@ -89,6 +105,8 @@ define('im.poiCollection', ['im.window'], function (w) {
 		getPoiState: getPoiState,
 		removeFromState: removeFromState,
 		invalidatePoiCache: invalidatePoiCache,
-		getPoiByCategory: getPoiByCategory
+		getPoiByCategory: getPoiByCategory,
+		updatePoiInState: updatePoiInState,
+		resetPoiCache: resetPoiCache
 	};
 });

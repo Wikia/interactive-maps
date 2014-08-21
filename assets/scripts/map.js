@@ -83,7 +83,7 @@ require(
 				enabled = 'enabled',
 				filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
 
-			if (pointTypes.length === filtersEnabledLength && utils.hasClass(allPointTypesFilter, enabled)){
+			if (pointTypes.length === filtersEnabledLength && !utils.hasClass(allPointTypesFilter, enabled)){
 				utils.addClass(allPointTypesFilter, enabled);
 			} else {
 				utils.removeClass(allPointTypesFilter, enabled);
@@ -98,9 +98,12 @@ require(
 			var allPointTypesFilter = doc.getElementById(config.allPointTypesFilterId),
 				filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
 				filtersLength = filters.length,
+				points = poiCollectionModule.getPoiByCategory(0),
+				pointsLength = points.length,
 				disabled = !utils.hasClass(allPointTypesFilter, 'enabled'),
 				i;
 
+			// enable/disable all filters
 			for (i = 0; i < filtersLength; i++) {
 				if (disabled) {
 					utils.addClass(filters[i], 'enabled');
@@ -109,8 +112,16 @@ require(
 				}
 			}
 
+			// show/hide all points
+			for (i = 0; i < pointsLength; i++) {
+				if (disabled) {
+					utils.removeClass(points[i], 'hidden');
+				} else {
+					utils.addClass(points[i], 'hidden');
+				}
+			}
+
 			toggleAllPointTypesFilter();
-			togglePoints(allPointTypesFilter);
 
 			tracker.track('map', tracker.ACTIONS.CLICK, 'poi-category-filter', 0);
 		}
@@ -236,7 +247,7 @@ require(
 
 			// attach filter box event handlers
 			pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
-			doc.getElementsByClassName('.filter-menu-header')[0].addEventListener('click', handleBoxHeaderClick);
+			doc.getElementsByClassName('filter-menu-header')[0].addEventListener('click', handleBoxHeaderClick);
 
 			// create poi markers
 			Object.keys(pois).forEach(function(id) {
@@ -253,7 +264,7 @@ require(
 			var hide = doc.createElement('a');
 			hide.innerHTML = i18n.msg('wikia-interactive-maps-hide-filter');
 			hide.className = 'hide-button';
-			doc.getElementsByClassName('.filter-menu-header')[0].appendChild(hide);
+			doc.getElementsByClassName('filter-menu-header')[0].appendChild(hide);
 		}
 
 		/**
@@ -267,6 +278,7 @@ require(
 				data: marker.point
 			};
 
+			// extend data object
 			params.data.mapId = mapConfig.id;
 			params.data.categories = mapConfig.types;
 
@@ -316,8 +328,10 @@ require(
 				}
 			};
 
-			pontoWikiaBridge.postMessage('processData', params, function (updatedPoiCategories) {
-				poiCategoryModule.setEditablePoiCategories(updatedPoiCategories);
+			pontoWikiaBridge.postMessage('processData', params, function (categories) {
+				updatePoisFromDeletedCategories(categories);
+				updatePoiCategories(categories);
+				poiCollectionModule.resetPoiCache();
 
 				// remove old filter box
 				wrapper.removeChild(doc.getElementById('filterMenu'));
@@ -329,6 +343,54 @@ require(
 				setupPoisAndFilters(poiCollectionModule.getPoiState(), poiCategoryModule.getAllPoiCategories() , true);
 				markers.addTo(map);
 			}, true);
+		}
+
+		/**
+		 * @desc helper function which updates category of pois that belongs to deleted category - to "other"
+		 * @param {Array} categories - updated poi categories
+		 */
+		function updatePoisFromDeletedCategories(categories) {
+			var updatedCategoryIds = {},
+				pois = poiCollectionModule.getPoiState();
+
+			categories.forEach(function (category) {
+				updatedCategoryIds[category.id] = true;
+			});
+
+			Object.keys(pois).forEach(function (key) {
+				var categoryId = pois[key].poi_category_id;
+
+				if (!updatedCategoryIds.hasOwnProperty(categoryId)) {
+					pois[key].poi_category_id = mapConfig.catchAllCategoryId;
+					poiCollectionModule.updatePoiInState(pois[key]);
+				}
+			});
+		}
+
+		/**
+		 * @desc helper function which updates poi categories for this map
+		 * @param {Array} categories - updated poi categories
+		 */
+		function updatePoiCategories(categories) {
+			var pois = poiCollectionModule.getPoiState(),
+				poiIds = Object.keys(pois),
+				length = poiIds.length,
+				i;
+
+			// check if other category should be added (any pois belongs to this category)
+			for (i = 0; i < length; i++) {
+				if (pois[poiIds[i]].poi_category_id === mapConfig.catchAllCategoryId) {
+					categories.push(
+						poiCategoryModule.createPoiCategory(
+							mapConfig.catchAllCategoryId,
+							i18n.msg('wikia-interactive-maps-default-poi-category')
+						)
+					);
+					break;
+				}
+			}
+
+			poiCategoryModule.setupPoiCategories(categories);
 		}
 
 		/**
@@ -392,7 +454,7 @@ require(
 				utils.addClass(body, 'wikia-mobile');
 				setUpHideButton();
 			} else {
-				toggleFilterBox(doc.getElementsByClassName('.filter-menu')[0]);
+				toggleFilterBox(doc.getElementsByClassName('filter-menu')[0]);
 			}
 		}
 
