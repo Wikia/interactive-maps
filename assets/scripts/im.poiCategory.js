@@ -16,7 +16,7 @@ define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config
 	function setupPoiCategoryIcon(poiCategory) {
 		var poiCategoryIcon;
 
-		if (!poiCategory.marker && !poiCategory.no_marker) {
+		if (poiCategory.marker && !poiCategory.hasOwnProperty('no_marker')) {
 			poiCategoryIcon = createCustomPoiCategoryIcon(poiCategory);
 		} else {
 			poiCategoryIcon = createDefaultPoiCategoryIcon(poiCategory);
@@ -68,6 +68,29 @@ define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config
 	 */
 	function getPoiCategoryIcon(id) {
 		return poiCategoryIcons[id];
+	}
+
+	/**
+	 * @desc creates simple poi category object
+	 * @param {number} id - category id
+	 * @param {string} name - category name
+	 * @param {string=} marker - marker url
+	 * @returns {object}
+	 */
+	function createPoiCategory(id, name, marker) {
+		if (typeof id !== 'number' && !isFinite(id) && id % 1 !== 0) {
+			throw new Error('"id" argument must finite integer');
+		}
+
+		if (typeof name !== 'string' && name.trim().length === 0) {
+			throw new Error('"name" attribute mast be non empty string');
+		}
+
+		return {
+			id: id,
+			marker: marker || null,
+			name: name
+		};
 	}
 
 	/**
@@ -130,6 +153,7 @@ define('im.poiCategory', ['im.leafletWrapper', 'im.config'], function (L, config
 		getPoiCategoryIcon: getPoiCategoryIcon,
 		getAllPoiCategories: getAllPoiCategories,
 		setEditablePoiCategories: setEditablePoiCategories,
-		setupPoiCategories: setupPoiCategories
+		setupPoiCategories: setupPoiCategories,
+		createPoiCategory: createPoiCategory
 	};
 });
