@@ -1,6 +1,5 @@
 (function (window, L, Ponto, Tracker) {
 	'use strict';
-
 	var doc = window.document,
 		body = doc.body,
 		mapContainerId = 'map',
@@ -57,6 +56,11 @@
 		return config.i18n.hasOwnProperty(message) ? config.i18n[message] : message;
 	}
 
+	function isEmbed() {
+		return document.referrer.indexOf(config.mapConfig.city_url) === -1;
+	}
+
+	alert( !!isEmbed() )
 	/**
 	 * @desc Build popup HTML
 	 * @param {object} point - POI object
@@ -131,6 +135,8 @@
 			innerHtml +
 			'</a>';
 	}
+
+	console.log(config);
 
 	/**
 	 * @desc Add point to the map
