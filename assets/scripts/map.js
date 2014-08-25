@@ -280,7 +280,7 @@ require(
 
 			// extend data object
 			params.data.mapId = mapConfig.id;
-			params.data.categories = mapConfig.types;
+			params.data.categories = poiCategoryModule.getEditablePoiCategories();
 
 			pontoWikiaBridge.postMessage('processData', params, function (point) {
 				var markerObject,
