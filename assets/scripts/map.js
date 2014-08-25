@@ -643,19 +643,25 @@
 
 	/**
 	 * @desc setup map options available only when map displayed on Wikia page
-	 * @param {object} options - {enableEdit: bool, skin: string}
+	 * @param {object} options - {cityId: int, mobile: bool, skin: string}
 	 */
 	function setupWikiaOnlyOptions(options) {
+		var mapId = parseInt(config.id, 10);
 		// @todo Remove this, once Ponto errors on missing pair
 		isWikiaSet = true;
 
-		if (options.enableEdit) {
-			setUpEditOptions();
-		}
-		if (options.skin === 'wikiamobile') {
+		if (options.mobile) {
 			addClass(body, 'wikia-mobile');
 			setUpHideButton();
+		} else if (config.city_id === options.cityId) {
+			setUpEditOptions();
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
 		} else {
+			showAttributionStripe();
+			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
+		}
+
+		if (!options.mobile) {
 			toggleFilterBox(document.querySelector('.filter-menu'));
 		}
 	}
@@ -699,7 +705,6 @@
 		addClass(body, 'enable-edit');
 		map.addControl(drawControls);
 		map.addControl(embedMapCodeButton);
-		Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', parseInt(config.id, 10));
 	}
 
 	/**
