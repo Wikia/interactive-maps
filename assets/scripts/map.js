@@ -57,6 +57,12 @@
 		return config.i18n.hasOwnProperty(message) ? config.i18n[message] : message;
 	}
 
+	function isEmbeddedOutside() {
+		return window.top !== window &&
+			document.referrer.indexOf(config.city_url) === -1;
+	}
+
+
 	/**
 	 * @desc Build popup HTML
 	 * @param {object} point - POI object
@@ -608,26 +614,16 @@
 	}
 
 	/**
-	 * @desc This is temporary function to handle Ponto, not error-ing when there is no Ponto on the other side
-	 * @todo Remove this once Ponto errors on missing pair
-	 */
-	function setupPontoTimeout() {
-		setTimeout(function () {
-			if (!isWikiaSet) {
-				setUpHideButton();
-				showAttributionStripe();
-			}
-		}, pontoTimeout);
-	}
-
-	/**
 	 * @desc setup Ponto communication for Wikia Client
 	 */
 	function setupPontoWikiaClient() {
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions, showPontoError, false);
-			setupPontoTimeout();
+			if (isEmbeddedOutside()) {
+				setUpHideButton();
+				showAttributionStripe();
+			}
 		} else {
 			showAttributionStripe();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
