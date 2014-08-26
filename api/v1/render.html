@@ -3,9 +3,11 @@
 	<head>
 		<title>Map</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-		<link rel="stylesheet" href="/assets/{{cacheBuster}}/vendor/leaflet/styles/leaflet.css">
-		<link rel="stylesheet" href="/assets/{{cacheBuster}}/styles/leaflet-wikia.css">
-		<link rel="stylesheet" href="/assets/{{cacheBuster}}/vendor/leafletDraw/leaflet.draw.css">
+		<!-- build:css /assets/styles/style.css -->
+		<link rel="stylesheet" href="/assets/vendor/leaflet/styles/leaflet.css">
+		<link rel="stylesheet" href="/assets/styles/leaflet-wikia.css">
+		<link rel="stylesheet" href="/assets/vendor/leafletDraw/leaflet.draw.css">
+		<!-- endbuild -->
 		<script>
 			window.mapSetup = {{{mapSetup}}};
 		</script>
@@ -25,26 +27,28 @@
 		<div class="attr" id="attr">
 			{{{attribution}}}
 		</div>
-		<script src="/assets/{{cacheBuster}}/vendor/leaflet/scripts/leaflet.js"></script>
-		<script src="/assets/{{cacheBuster}}/vendor/leafletDraw/leaflet.draw.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/leaflet.embedMapCode.js"></script>
+		<!-- build:js /assets/scripts/script.js -->
+		<script src="/assets/vendor/leaflet/scripts/leaflet.js"></script>
+		<script src="/assets/vendor/leafletDraw/leaflet.draw.js"></script>
+		<script src="/assets/scripts/leaflet.embedMapCode.js"></script>
 		<script>
 			// need to load leaflet before modil.js cause leaflet define doesn't have id and throws error
 			// TODO: we need to figure out how to fix it
 		</script>
-		<script src="/assets/{{cacheBuster}}/vendor/modil.js"></script>
-		<script src="/assets/{{cacheBuster}}/vendor/ponto.js"></script>
-		<script src="/assets/{{cacheBuster}}/vendor/tracker.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/im.window.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/im.config.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/im.leafletWrapper.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/im.i18n.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/im.utils.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/im.renderUI.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/im.poi.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/im.poiCategory.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/im.poiCollection.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/im.pontoWikiaBridge.js"></script>
-		<script src="/assets/{{cacheBuster}}/scripts/map.js"></script>
+		<script src="/assets/vendor/modil.js"></script>
+		<script src="/assets/vendor/ponto.js"></script>
+		<script src="/assets/vendor/tracker.js"></script>
+		<script src="/assets/scripts/im.window.js"></script>
+		<script src="/assets/scripts/im.config.js"></script>
+		<script src="/assets/scripts/im.leafletWrapper.js"></script>
+		<script src="/assets/scripts/im.i18n.js"></script>
+		<script src="/assets/scripts/im.utils.js"></script>
+		<script src="/assets/scripts/im.renderUI.js"></script>
+		<script src="/assets/scripts/im.poi.js"></script>
+		<script src="/assets/scripts/im.poiCategory.js"></script>
+		<script src="/assets/scripts/im.poiCollection.js"></script>
+		<script src="/assets/scripts/im.pontoWikiaBridge.js"></script>
+		<script src="/assets/scripts/map.js"></script>
+		<!-- endbuild -->
 	</body>
 </html>

@@ -4,8 +4,12 @@ var gulp = require('gulp'),
 	nodemon = require('gulp-nodemon'),
 	jasmine = require('gulp-jasmine'),
 	istanbul = require('gulp-istanbul'),
+	useref = require('gulp-useref'),
+	gulpif = require('gulp-if'),
+	uglify = require('gulp-uglify'),
+	minifyCss = require('gulp-minify-css'),
 	exec = require('child_process').exec,
-	config = require('./lib/config.js'),
+	//config = require('./lib/config.js'),
 	localesDir = './locales/',
 	translationFile = localesDir + 'translations.json';
 
@@ -66,6 +70,20 @@ gulp.task('update_translation', function () {
 
 });
 
-gulp.task('default', ['dev'], function () {
+/*gulp.task('default', ['dev'], function () {
 
+});*/
+
+gulp.task('build', function () {
+	var assets = useref.assets({
+		searchPath: '/'
+	});
+
+	return gulp.src('api/v1/render.html')
+		.pipe(assets)
+		.pipe(gulpif('*.js', uglify()))
+		.pipe(gulpif('*.css', minifyCss()))
+		.pipe(assets.restore())
+		.pipe(useref())
+		.pipe(gulp.dest('build'));
 });

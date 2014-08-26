@@ -33,6 +33,7 @@ publish
 tmp
 node_modules
 coverage
+build
 
 newrelic_agent.log
 cachebuster.json
