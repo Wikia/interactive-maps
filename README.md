@@ -16,6 +16,12 @@ export WIKIA_SWIFT_YML="<Path/To/SwiftConfigFile>"
 export WIKIA_PROD_DATACENTER="<datacenter>"
 export NODE_ENV="<devbox|production>"
 ```
+
+Optionally you can define the number of background workers:
+```Shell
+export WIKIA_IM_WORKERS=4
+```
+
 then you can run it
 ```Shell
 gulp
