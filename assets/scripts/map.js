@@ -820,8 +820,8 @@
 			popupWidthWithoutPhoto = mobilePopupWidth;
 		}
 
-		setupPontoWikiaClient();
 		setupPoints();
+		setupPontoWikiaClient();
 		setupClickTracking();
 		markers.addTo(map);
 
