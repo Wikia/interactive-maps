@@ -62,7 +62,6 @@
 			document.referrer.indexOf(config.city_url) === -1;
 	}
 
-
 	/**
 	 * @desc Build popup HTML
 	 * @param {object} point - POI object
@@ -623,11 +622,11 @@
 			if (isEmbeddedOutside()) {
 				setUpHideButton();
 				showAttributionStripe();
+				Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
+					parseInt(config.id, 10));
 			}
 		} else {
 			showAttributionStripe();
-			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
-				parseInt(config.id, 10));
 		}
 	}
 
@@ -653,7 +652,6 @@
 			setUpEditOptions();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
 		} else {
-			showAttributionStripe();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
 		}
 
