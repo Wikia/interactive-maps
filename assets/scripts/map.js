@@ -626,7 +626,6 @@
 					parseInt(config.id, 10));
 			}
 		} else {
-			showAttributionStripe();
 		}
 	}
 
@@ -652,6 +651,7 @@
 			setUpEditOptions();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
 		} else {
+			setUpHideButton();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
 		}
 
