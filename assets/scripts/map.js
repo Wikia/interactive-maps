@@ -57,6 +57,11 @@
 		return config.i18n.hasOwnProperty(message) ? config.i18n[message] : message;
 	}
 
+	function isEmbeddedOutside() {
+		return window.top !== window &&
+			document.referrer.indexOf(config.city_url) === -1;
+	}
+
 	/**
 	 * @desc Build popup HTML
 	 * @param {object} point - POI object
@@ -212,8 +217,8 @@
 	function loadPointsToCache(pointType) {
 		pointCache[pointType] = doc.querySelectorAll(
 			(pointType === 0) ?
-			'.leaflet-marker-icon, .leaflet-marker-shadow' :
-			'.point-type-' + pointType
+				'.leaflet-marker-icon, .leaflet-marker-shadow' :
+				'.point-type-' + pointType
 		);
 
 		return pointCache[pointType];
@@ -510,9 +515,9 @@
 	 */
 	function editMarker(marker) {
 		var params = {
-				action: 'editPOI',
-				data: marker.point
-			};
+			action: 'editPOI',
+			data: marker.point
+		};
 
 		params.data.mapId = config.id;
 		params.data.categories = config.types;
@@ -582,13 +587,13 @@
 	 */
 	function editPointTypes() {
 		var params = {
-				action: 'poiCategories',
-				data: {
-					mapId: config.id,
-					poiCategories: getEditablePointTypes(config.types),
-					mode: 'edit'
-				}
-			};
+			action: 'poiCategories',
+			data: {
+				mapId: config.id,
+				poiCategories: getEditablePointTypes(config.types),
+				mode: 'edit'
+			}
+		};
 
 		Ponto.invoke(pontoBridgeModule, 'processData', params, function () {
 			// TODO this is hotfix to display updated poi categories after editing. not elegant at all
@@ -608,30 +613,19 @@
 	}
 
 	/**
-	 * @desc This is temporary function to handle Ponto, not error-ing when there is no Ponto on the other side
-	 * @todo Remove this once Ponto errors on missing pair
-	 */
-	function setupPontoTimeout() {
-		setTimeout(function () {
-			if (!isWikiaSet) {
-				setUpHideButton();
-				showAttributionStripe();
-			}
-		}, pontoTimeout);
-	}
-
-	/**
 	 * @desc setup Ponto communication for Wikia Client
 	 */
 	function setupPontoWikiaClient() {
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions, showPontoError, false);
-			setupPontoTimeout();
+			if (isEmbeddedOutside()) {
+				setUpHideButton();
+				showAttributionStripe();
+				Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
+					parseInt(config.id, 10));
+			}
 		} else {
-			showAttributionStripe();
-			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
-				parseInt(config.id, 10));
 		}
 	}
 
@@ -657,7 +651,7 @@
 			setUpEditOptions();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
 		} else {
-			showAttributionStripe();
+			setUpHideButton();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
 		}
 
@@ -826,8 +820,8 @@
 			popupWidthWithoutPhoto = mobilePopupWidth;
 		}
 
-		setupPontoWikiaClient();
 		setupPoints();
+		setupPontoWikiaClient();
 		setupClickTracking();
 		markers.addTo(map);
 
