@@ -89,6 +89,7 @@ define('im.poi', ['im.leafletWrapper', 'im.config', 'im.renderUI', 'im.i18n'], f
 	return {
 		addPoiToMap: addPoiToMap,
 		createTempPoiMarker: createTempPoiMarker,
-		getPoiMarker: getPoiMarker
+		getPoiMarker: getPoiMarker,
+		createPoiMarker: createPoiMarker
 	};
 });
