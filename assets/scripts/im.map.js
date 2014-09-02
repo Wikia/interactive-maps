@@ -56,7 +56,11 @@ define(
 
 			// This is called as async because leaflet freezes when map.fitBounds is called directly
 			setTimeout(function () {
-				map.fitBounds(group.getBounds().pad(config.autoZoomPadding));
+				map.fitBounds(
+					group
+						.getBounds()
+						.pad(config.autoZoomPadding)
+				);
 			}, 1);
 		}
 
@@ -80,7 +84,8 @@ define(
 		 * @returns {number}
 		 */
 		function setInitialZoom() {
-			return ((mapConfig.type === 'custom') ?
+			return (
+				mapConfig.type === 'custom' ?
 				Math.max(mapConfig.zoom, setDefaultMinZoom()) :
 				mapConfig.defaultZoomForRealMap
 			);
@@ -88,7 +93,6 @@ define(
 
 		/**
 		 * @desc helper function that sets zoom controls object for map
-		 * @returns {Object} - leaflet zoom controls object
 		 */
 		function setZoomControls() {
 			map.addControl(
