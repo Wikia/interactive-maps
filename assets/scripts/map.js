@@ -11,12 +11,13 @@ require(
 		'im.renderUI',
 		'im.i18n',
 		'im.utils',
+		'im.map',
 		'im.poi',
 		'im.poiCategory',
 		'im.poiCollection'
 	],
-	function (ponto, tracker, w, L, config, pontoWikiaBridge, renderUI, i18n, utils, poiModule, poiCategoryModule,
-			poiCollectionModule) {
+	function (ponto, tracker, w, L, config, pontoWikiaBridge, renderUI, i18n, utils, mapModule, poiModule,
+		poiCategoryModule, poiCollectionModule) {
 
 		var doc = w.document,
 			body = doc.body,
@@ -534,62 +535,11 @@ require(
 			});
 		}
 
-		/**
-		 * @desc Create new map
-		 */
-		function createMap() {
-			var zoomControl,
-				defaultMinZoom,
-				zoom,
-				mapBounds,
-				pointsList;
+		mapModule.setupMap(function (mapObject) {
+			var pointsList;
 
-			setupInterfaceTranslations();
-
-			defaultMinZoom = utils.getMinZoomLevel(
-				mapConfig.layer.maxZoom,
-				Math.max(mapConfig.width, mapConfig.height),
-				Math.max(
-					Math.max(doc.documentElement.clientWidth, w.innerWidth || 0),
-					Math.max(doc.documentElement.clientHeight, w.innerHeight || 0)
-				)
-			);
-
-			if (mapConfig.imagesPath) {
-				L.Icon.Default.imagePath = mapConfig.imagesPath;
-			}
-
-			map = L.map(config.mapContainerId, {
-				minZoom: mapConfig.layer.minZoom,
-				maxZoom: mapConfig.layer.maxZoom,
-				zoomControl: false
-			});
-
-			map.attributionControl.setPrefix(false);
-
-			if (mapConfig.hasOwnProperty('boundaries')) {
-				mapBounds = new L.LatLngBounds(
-					L.latLng(mapConfig.boundaries.south, mapConfig.boundaries.west),
-					L.latLng(mapConfig.boundaries.north, mapConfig.boundaries.east)
-				);
-
-				mapConfig.layer.bounds = mapBounds;
-			}
-
-			L.tileLayer(mapConfig.pathTemplate, mapConfig.layer).addTo(map);
-
-			zoom = Math.max(mapConfig.zoom, defaultMinZoom);
-			if (mapConfig.type !== 'custom') {
-				zoom = mapConfig.defaultZoomForRealMap;
-			}
-			map.setView(
-				L.latLng(mapConfig.latitude, mapConfig.longitude),
-				zoom
-			);
-
-			zoomControl = L.control.zoom({
-				position: config.uiControlsPosition
-			});
+			// set reference to map object
+			map = mapObject;
 
 			embedMapCodeButton = new L.Control.EmbedMapCode({
 				position: config.uiControlsPosition,
@@ -598,7 +548,9 @@ require(
 				onClick: embedMapCode
 			});
 
-			map.addControl(zoomControl);
+			if (mapConfig.imagesPath) {
+				L.Icon.Default.imagePath = mapConfig.imagesPath;
+			}
 
 			// Change popup size for small mobile screens
 			if (utils.isMobileScreenSize()) {
@@ -606,12 +558,16 @@ require(
 				config.popupWidthWithoutPhoto = config.mobilePopupWidth;
 			}
 
+			setupInterfaceTranslations();
 			setupPontoWikiaClient();
+
 			setupInitialPoiState(mapConfig.points);
 			poiCategoryModule.setupPoiCategories(mapConfig.types);
+
 			setupPoisAndFilters(poiCollectionModule.getPoiState(), poiCategoryModule.getAllPoiCategories());
 
 			setupClickTracking();
+
 			markers.addTo(map);
 
 			// Collect all the markers from the markers layer
@@ -626,8 +582,6 @@ require(
 					map.fitBounds(group.getBounds().pad(config.autoZoomPadding));
 				}, 1);
 			}
-		}
-
-		createMap();
+		});
 	}
 );
