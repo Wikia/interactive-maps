@@ -31,9 +31,33 @@ define(
 			return map;
 		}
 
+		/**
+		 * @desc creates contribution UI controls and adds it to map
+		 */
 		function createContributionControls() {
 			map.addControl(createDrawControls());
 			map.addControl(createEmbedMapCodeControls());
+		}
+
+		/**
+		 * @desc shows attribution stripe at the bottom of the map
+		 */
+		function showAttributionStripe() {
+			utils.addClass(doc.getElementById('wrapper'), 'embed');
+			utils.addClass(doc.getElementById('attr'), 'embed');
+		}
+
+		/**
+		 * @desc set map zoom level so all pois are visible
+		 * @param {Array} pois - array of poi markers
+		 */
+		function setAllPoisInView(pois) {
+			var group = new L.featureGroup(pois);
+
+			// This is called as async because leaflet freezes when map.fitBounds is called directly
+			setTimeout(function () {
+				map.fitBounds(group.getBounds().pad(config.autoZoomPadding));
+			}, 1);
 		}
 
 		/**
@@ -166,7 +190,9 @@ define(
 		return {
 			setupMap: setupMap,
 			getMapObject: getMapObject,
-			createContributionControls: createContributionControls
+			createContributionControls: createContributionControls,
+			showAttributionStripe: showAttributionStripe,
+			setAllPoisInView: setAllPoisInView
 		};
 	}
 );

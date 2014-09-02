@@ -405,7 +405,7 @@ require(
 			setTimeout(function () {
 				if (!isWikiaSet) {
 					setUpHideButton();
-					showAttributionStripe();
+					mapModule.showAttributionStripe();
 				}
 			}, config.pontoTimeout);
 		}
@@ -419,20 +419,12 @@ require(
 				pontoWikiaBridge.postMessage('getWikiaSettings', null, setupWikiaOnlyOptions, false);
 				setupPontoTimeout();
 			} else {
-				showAttributionStripe();
+				mapModule.showAttributionStripe();
 				tracker.track(
 					'map', tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 					parseInt(mapConfig.id, 10)
 				);
 			}
-		}
-
-		/**
-		 * @desc shows attribution stripe at the bottom of the map
-		 */
-		function showAttributionStripe() {
-			utils.addClass(doc.getElementById('wrapper'), 'embed');
-			utils.addClass(doc.getElementById('attr'), 'embed');
 		}
 
 		/**
@@ -451,7 +443,7 @@ require(
 				setupContributionOptions();
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
 			} else {
-				showAttributionStripe();
+				mapModule.showAttributionStripe();
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
 			}
 
@@ -505,7 +497,8 @@ require(
 		}
 
 		mapModule.setupMap(function (mapObject) {
-			var pointsList;
+			// placeholder for array of poi markers
+			var poiMarkersList;
 
 			// set reference to map object
 			map = mapObject;
@@ -521,26 +514,21 @@ require(
 			}
 
 			setupPontoWikiaClient();
+			setupClickTracking();
 
 			poiCollectionModule.setupInitialPoiState(mapConfig.points);
 			poiCategoryModule.setupPoiCategories(mapConfig.types);
 			setupPoisAndFilters(poiCollectionModule.getPoiState(), poiCategoryModule.getAllPoiCategories());
 
-			setupClickTracking();
-
 			markers.addTo(map);
 
 			// Collect all the markers from the markers layer
-			pointsList = Object.keys(markers._layers).map(function (k) {
+			poiMarkersList = Object.keys(markers._layers).map(function (k) {
 				return markers._layers[k];
 			});
 
-			if (pointsList.length > 0) {
-				// This is called as async because leaflet freezes when map.fitBounds is called directly
-				setTimeout(function () {
-					var group = new L.featureGroup(pointsList);
-					map.fitBounds(group.getBounds().pad(config.autoZoomPadding));
-				}, 1);
+			if (poiMarkersList.length) {
+				mapModule.setAllPoisInView(poiMarkersList);
 			}
 		});
 	}
