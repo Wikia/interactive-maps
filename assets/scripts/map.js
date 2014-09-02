@@ -27,19 +27,7 @@ require(
 			map,
 		// leaflet layer for storing markers
 			markers = new L.LayerGroup(),
-		// leaflet layer for drawing controls
-			drawControls = new L.Control.Draw({
-				position: config.uiControlsPosition,
-				draw: {
-					polyline: false,
-					polygon: false,
-					circle: false,
-					rectangle: false
-				}
-			}),
-
 			mapConfig = config.mapConfig,
-			embedMapCodeButton,
 			pointTypeFiltersContainer,
 			pointTypes = {},
 
@@ -269,6 +257,21 @@ require(
 		}
 
 		/**
+		 * @desc sends data to Wikia Client via ponto to show embed map code modal
+		 */
+		function embedMapCode() {
+			var params = {
+				action: 'embedMapCode',
+				data: {
+					mapId: mapConfig.id,
+					iframeSrc: mapConfig.iframeSrc
+				}
+			};
+
+			pontoWikiaBridge.postMessage('processData', params, null, true);
+		}
+
+		/**
 		 * @desc sends data to Wikia Client via ponto to add / edit POI
 		 * @param {object} marker - marker object
 		 * @todo: should be moved to im.poi.js
@@ -471,12 +474,13 @@ require(
 		 * @desc setup edit options
 		 */
 		function setUpEditOptions() {
-			// add POI handler
-			map.on('draw:created', function (event) {
+			// attach event handlers
+			map
+				.on('draw:created', function (event) {
 				editMarker(poiModule.createTempPoiMarker(event));
-			});
+				})
+				.on('embedMapCode:clicked', embedMapCode);
 
-			// edit POI handler
 			wrapper.addEventListener('click', function (event) {
 				var target = event.target;
 
@@ -490,34 +494,9 @@ require(
 				}
 			}, false);
 
-			// show edit UI elements
+			// show / create edit UI elements
 			utils.addClass(body, 'enable-edit');
-			map.addControl(drawControls);
-			map.addControl(embedMapCodeButton);
-		}
-
-		/**
-		 * @desc sends data to Wikia Client via ponto to show embed map code modal
-		 */
-		function embedMapCode() {
-			var params = {
-				action: 'embedMapCode',
-				data: {
-					mapId: mapConfig.id,
-					iframeSrc: mapConfig.iframeSrc
-				}
-			};
-
-			pontoWikiaBridge.postMessage('processData', params, null, true);
-		}
-
-		/**
-		 * @desc Sets up the interface translations
-		 */
-		function setupInterfaceTranslations() {
-			L.drawLocal.draw.handlers.marker.tooltip.start = i18n.msg('wikia-interactive-maps-create-marker-handler');
-			L.drawLocal.draw.toolbar.buttons.marker = i18n.msg('wikia-interactive-maps-create-marker-tooltip');
-			L.drawLocal.draw.toolbar.actions.text = i18n.msg('wikia-interactive-maps-create-marker-cancel');
+			mapModule.createContributionControls();
 		}
 
 		/**
@@ -541,13 +520,6 @@ require(
 			// set reference to map object
 			map = mapObject;
 
-			embedMapCodeButton = new L.Control.EmbedMapCode({
-				position: config.uiControlsPosition,
-				//TODO fix icon
-				title: '< >',
-				onClick: embedMapCode
-			});
-
 			if (mapConfig.imagesPath) {
 				L.Icon.Default.imagePath = mapConfig.imagesPath;
 			}
@@ -558,7 +530,6 @@ require(
 				config.popupWidthWithoutPhoto = config.mobilePopupWidth;
 			}
 
-			setupInterfaceTranslations();
 			setupPontoWikiaClient();
 
 			setupInitialPoiState(mapConfig.points);
