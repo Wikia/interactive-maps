@@ -398,16 +398,6 @@ require(
 		}
 
 		/**
-		 * @desc setup initial poi state object
-		 * @param {Array} pois
-		 */
-		function setupInitialPoiState(pois) {
-			pois.forEach(function(poi) {
-				poiCollectionModule.addToState(poi);
-			});
-		}
-
-		/**
 		 * @desc This is temporary function to handle Ponto, not error-ing when there is no Ponto on the other side
 		 * @todo Remove this once Ponto errors on missing pair
 		 */
@@ -458,7 +448,7 @@ require(
 				utils.addClass(body, 'wikia-mobile');
 				setUpHideButton();
 			} else if (mapConfig.city_id === options.cityId) {
-				setUpEditOptions();
+				setupContributionOptions();
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
 			} else {
 				showAttributionStripe();
@@ -473,7 +463,7 @@ require(
 		/**
 		 * @desc setup edit options
 		 */
-		function setUpEditOptions() {
+		function setupContributionOptions() {
 			// attach event handlers
 			map
 				.on('draw:created', function (event) {
@@ -532,9 +522,8 @@ require(
 
 			setupPontoWikiaClient();
 
-			setupInitialPoiState(mapConfig.points);
+			poiCollectionModule.setupInitialPoiState(mapConfig.points);
 			poiCategoryModule.setupPoiCategories(mapConfig.types);
-
 			setupPoisAndFilters(poiCollectionModule.getPoiState(), poiCategoryModule.getAllPoiCategories());
 
 			setupClickTracking();
