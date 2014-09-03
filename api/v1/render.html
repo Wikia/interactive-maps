@@ -3,11 +3,9 @@
 	<head>
 		<title>Map</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-		<!-- build:css /assets/styles/style.css -->
 		<link rel="stylesheet" href="/assets/vendor/leaflet/styles/leaflet.css">
 		<link rel="stylesheet" href="/assets/styles/leaflet-wikia.css">
 		<link rel="stylesheet" href="/assets/vendor/leafletDraw/leaflet.draw.css">
-		<!-- endbuild -->
 		<script>
 			window.mapSetup = {{{mapSetup}}};
 		</script>
@@ -27,10 +25,9 @@
 		<div class="attr" id="attr">
 			{{{attribution}}}
 		</div>
-		<!-- build:js /assets/scripts/script.js -->
+		<!-- build:js /assets/vendor.js -->
 		<script src="/assets/vendor/leaflet/scripts/leaflet.js"></script>
 		<script src="/assets/vendor/leafletDraw/leaflet.draw.js"></script>
-		<script src="/assets/scripts/leaflet.embedMapCode.js"></script>
 		<script>
 			// need to load leaflet before modil.js cause leaflet define doesn't have id and throws error
 			// TODO: we need to figure out how to fix it
@@ -38,6 +35,9 @@
 		<script src="/assets/vendor/modil.js"></script>
 		<script src="/assets/vendor/ponto.js"></script>
 		<script src="/assets/vendor/tracker.js"></script>
+		<!-- endbuild -->
+		<!-- build:js /assets/script.js -->
+		<script src="/assets/scripts/leaflet.embedMapCode.js"></script>
 		<script src="/assets/scripts/im.window.js"></script>
 		<script src="/assets/scripts/im.config.js"></script>
 		<script src="/assets/scripts/im.leafletWrapper.js"></script>
