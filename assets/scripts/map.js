@@ -621,7 +621,7 @@
 	 * @desc Shows attribution stripe if needed
 	 */
 	function setupAttributionStripe() {
-		if (config.showAttr) {
+		if (!config.hideAttr) {
 			var doc = window.document;
 			addClass(doc.getElementById('wrapper'), 'embed');
 			addClass(doc.getElementById('attr'), 'embed');
