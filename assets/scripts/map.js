@@ -43,10 +43,7 @@
 		pointCache = {},
 		pointTypes = {},
 		config = window.mapSetup,
-		editablePointTypes,
-		// @todo Remove these once Ponto is fixed
-		isWikiaSet = false,
-		pontoTimeout = 500;
+		editablePointTypes;
 
 	/**
 	 * @desc Translates message
@@ -608,37 +605,27 @@
 	}
 
 	/**
-	 * @desc This is temporary function to handle Ponto, not error-ing when there is no Ponto on the other side
-	 * @todo Remove this once Ponto errors on missing pair
-	 */
-	function setupPontoTimeout() {
-		setTimeout(function () {
-			if (!isWikiaSet) {
-				setUpHideButton();
-				showAttributionStripe();
-			}
-		}, pontoTimeout);
-	}
-
-	/**
 	 * @desc setup Ponto communication for Wikia Client
 	 */
 	function setupPontoWikiaClient() {
 		if (window.self !== window.top) {
 			Ponto.setTarget(Ponto.TARGET_IFRAME_PARENT, '*');
 			Ponto.invoke(pontoBridgeModule, 'getWikiaSettings', null, setupWikiaOnlyOptions, showPontoError, false);
-			setupPontoTimeout();
 		} else {
-			showAttributionStripe();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 				parseInt(config.id, 10));
 		}
 	}
 
-	function showAttributionStripe() {
-		var doc = window.document;
-		addClass(doc.getElementById('wrapper'), 'embed');
-		addClass(doc.getElementById('attr'), 'embed');
+	/**
+	 * @desc Shows attribution stripe if needed
+	 */
+	function setupAttributionStripe() {
+		if (config.showAttr) {
+			var doc = window.document;
+			addClass(doc.getElementById('wrapper'), 'embed');
+			addClass(doc.getElementById('attr'), 'embed');
+		}
 	}
 
 	/**
@@ -647,8 +634,6 @@
 	 */
 	function setupWikiaOnlyOptions(options) {
 		var mapId = parseInt(config.id, 10);
-		// @todo Remove this, once Ponto errors on missing pair
-		isWikiaSet = true;
 
 		if (options.mobile) {
 			addClass(body, 'wikia-mobile');
@@ -657,7 +642,6 @@
 			setUpEditOptions();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
 		} else {
-			showAttributionStripe();
 			Tracker.track('map', Tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
 		}
 
@@ -829,6 +813,7 @@
 		setupPontoWikiaClient();
 		setupPoints();
 		setupClickTracking();
+		setupAttributionStripe();
 		markers.addTo(map);
 
 		// Collect all the markers from the markers layer
