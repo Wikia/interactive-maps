@@ -130,10 +130,10 @@ define(
 		 * @returns {boolean}
 		 */
 		function isPlayerLocationInMapBounds(bounds, lat, lng) {
-			return lat < bounds.north &&
-				lat > bounds.south &&
-				lng > bounds.west &&
-				lng < bounds.east;
+			return lat <= bounds.north &&
+				lat >= bounds.south &&
+				lng >= bounds.west &&
+				lng <= bounds.east;
 		}
 
 		/**
