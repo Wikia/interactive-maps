@@ -337,7 +337,7 @@
 		}
 
 		// show/hide all points
-		for ( i = 0; i < pointsLength; i++ ) {
+		for (i = 0; i < pointsLength; i++) {
 			if (enabled) {
 				removeClass(points[i], 'hidden');
 			} else {
@@ -622,7 +622,6 @@
 	 */
 	function setupAttributionStripe() {
 		if (!config.hideAttr) {
-			var doc = window.document;
 			addClass(doc.getElementById('wrapper'), 'embed');
 			addClass(doc.getElementById('attr'), 'embed');
 		}
