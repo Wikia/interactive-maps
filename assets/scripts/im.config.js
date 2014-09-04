@@ -32,7 +32,7 @@ define('im.config', ['im.window'], function(w) {
 				invalidParams: 422
 			},
 			defaultMarkerSize: 70,
-			defaultPlayerIcon: '/assets/images/player_location_marker.png'
+			defaultPlayerIcon: '/assets/' + w.mapSetup.cacheBuster + '/images/player_location_marker.png'
 		}
 	};
 });
