@@ -65,6 +65,14 @@ define(
 		}
 
 		/**
+		 * @desc returns map boundaries
+		 * @returns {Object|Undefined}
+		 */
+		function getMapBoundaries() {
+			return config.mapConfig.boundaries;
+		}
+
+		/**
 		 * @desc helper function that sets minimal zoom level
 		 * @returns {number}
 		 */
@@ -196,7 +204,8 @@ define(
 			getMapObject: getMapObject,
 			createContributionControls: createContributionControls,
 			showAttributionStripe: showAttributionStripe,
-			setAllPoisInView: setAllPoisInView
+			setAllPoisInView: setAllPoisInView,
+			getMapBoundaries: getMapBoundaries
 		};
 	}
 );
