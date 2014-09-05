@@ -38,3 +38,4 @@ build
 # Wikia files to ignore
 newrelic_agent.log
 cachebuster.json
+setVariables.sh

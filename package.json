@@ -44,7 +44,8 @@
     "karma-jasmine": "^0.1.5",
     "karma-phantomjs-launcher": "^0.1.4",
     "multipipe": "^0.1.1",
-    "proxyquire": "0.6.x"
+    "proxyquire": "0.6.x",
+    "mkdirp": "0.5.0"
   },
   "private": true
 }
