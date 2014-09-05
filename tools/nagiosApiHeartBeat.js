@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 'use strict';
 
 var healthCheck = require(__dirname + '/../lib/healthCheck'),
@@ -12,8 +13,7 @@ var healthCheck = require(__dirname + '/../lib/healthCheck'),
 
 try {
 	healthCheck.getApiHeartbeat(hostnameToCheck, responseTimeThresholds, healthCheck.printResult);
-}
-catch (e) {
+} catch (e) {
 	healthCheck.printResult({
 		code: healthCheck.exitCodes.CRITICAL,
 		message: e.message

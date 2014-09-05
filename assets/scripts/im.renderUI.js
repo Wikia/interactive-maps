@@ -24,7 +24,7 @@ define('im.renderUI', ['im.config'], function (config) {
 	 * @returns {string} - HTML markup for photo
 	 */
 	function buildImageHTML(imageUrl, alt, imageWidth, imageHeight) {
-		return '<img src="' + imageUrl + '" alt="' + alt + '" width="' + imageWidth + '" height="'+ imageHeight + '">';
+		return '<img src="' + imageUrl + '" alt="' + alt + '" width="' + imageWidth + '" height="' + imageHeight + '">';
 	}
 
 	/**
