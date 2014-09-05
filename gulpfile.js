@@ -80,12 +80,14 @@ gulp.task('default', ['dev'], function () {
 gulp.task('bump-cachebuster', function () {
 	var mkdirp = require('mkdirp'),
 		getDirName = require('path').dirname,
-		path = './build/cachebuster.json';
+		path = './build/cachebuster.json',
+		cbValue = new Date().getTime();
 
 	mkdirp(getDirName(path), function () {
 		fs.writeFileSync(path, JSON.stringify({
-			cb: new Date().getTime()
+			cb: cbValue
 		}));
+		console.info('New cache buster value set to: ' + cbValue);
 	});
 });
 
