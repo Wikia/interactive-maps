@@ -1,6 +1,6 @@
-'use strict';
-
 define('im.config', ['im.window'], function(w) {
+	'use strict';
+
 	return {
 		mapConfig: w.mapSetup,
 		messages: w.mapSetup.i18n,

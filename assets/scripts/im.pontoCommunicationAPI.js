@@ -1,9 +1,9 @@
-'use strict';
-
 define(
 	'im.pontoCommunicationAPI',
 	['ponto', 'im.config', 'im.leafletWrapper', 'im.pontoCommunicationAPI.utils', 'im.map'],
 	function (ponto, config, L, apiUtils, mapModule) {
+		'use strict';
+
 		var apiConfig = config.pontoCommunicationAPI,
 			playerMarker,
 			map;

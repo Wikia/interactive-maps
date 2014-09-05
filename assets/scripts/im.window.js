@@ -2,8 +2,8 @@
  * AMD wrapper on window object
  */
 
-'use strict';
-
 define('im.window', function () {
+	'use strict';
+
 	return window;
 });

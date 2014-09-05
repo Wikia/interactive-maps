@@ -1,9 +1,9 @@
-'use strict';
-
 define(
 	'im.map',
 	['im.window', 'im.config', 'im.utils', 'im.leafletWrapper', 'im.i18n'],
 	function (w, config, utils, L, i18n) {
+		'use strict';
+
 		var doc = w.document,
 			mapConfig = config.mapConfig,
 			// reference to leaflet map object

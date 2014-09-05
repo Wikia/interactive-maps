@@ -1,6 +1,6 @@
-'use strict';
-
 define('im.poiCollection', ['im.window'], function (w) {
+	'use strict';
+
 	var doc = w.document,
 		// holds all poi objects currently displayed on map
 		poiObjectsState = {},

@@ -1,6 +1,6 @@
-'use strict';
-
 define('im.poi', ['im.leafletWrapper', 'im.config', 'im.renderUI', 'im.i18n'], function (L, config, renderUI, i18n) {
+	'use strict';
+
 	/**
 	 * @desc Creates POI marker
 	 * @param {object} poi - POI object

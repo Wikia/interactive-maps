@@ -1,6 +1,6 @@
-'use strict';
-
 define('im.pontoWikiaBridge', ['ponto', 'im.window', 'tracker', 'im.config'], function (ponto, w, tracker, config) {
+	'use strict';
+
 	/**
 	 * @desc shows error message for ponto communication
 	 * @param {string} message - error message
