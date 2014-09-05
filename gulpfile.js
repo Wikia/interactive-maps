@@ -132,6 +132,7 @@ gulp.task('scripts-concatenate', function () {
 	.pipe(gulpif('*.js', uglify()))
 	.pipe(assets.restore())
 	.pipe(useref())
+	.pipe(gulpif('*.html', replace('/assets/', '/assets/{{cacheBuster}}/')))
 	.pipe(gulp.dest('build'));
 });
 
