@@ -5,16 +5,7 @@ require('./gulp');
 var gulp = require('gulp'),
 	nodemon = require('gulp-nodemon'),
 	jasmine = require('gulp-jasmine'),
-	istanbul = require('gulp-istanbul'),
-	useref = require('gulp-useref'),
-	gulpif = require('gulp-if'),
-	uglify = require('gulp-uglify'),
-	replace = require('gulp-replace'),
-	exec = require('child_process').exec,
-	fs = require('fs'),
-	config = require('./lib/config.js'),
-	localesDir = './locales/',
-	translationFile = localesDir + 'translations.json';
+	istanbul = require('gulp-istanbul');
 
 gulp.task('dev', function () {
 	nodemon({
@@ -55,87 +46,4 @@ gulp.task('coverage', function (cb) {
 				.pipe(istanbul.writeReports()) // Creating the reports after tests were executed
 				.on('end', cb);
 		});
-});
-
-/**
-* Translation is currently downloaded from MediaWiki as we use the existing infrastructure for translations.
-* The translationUrl is defined in config. After the translation is downloaded the task makes a quick sanity check
-* in case something is wrong with the translation JSON file.
-*/
-gulp.task('update-translation', function () {
-	console.assert(typeof config.translationUrl === 'string', 'Translation URL not set');
-	var cmd = 'curl "' + config.translationUrl + '" -o ' + translationFile;
-	exec(cmd, function () {
-		// check if the downloaded translation is consistent
-		var translation = require(translationFile);
-		console.assert(typeof translation.messages === 'object', 'Translation is broken');
-	});
-
-});
-
-gulp.task('default', ['dev'], function () {
-
-});
-
-gulp.task('bump-cachebuster', function () {
-	var mkdirp = require('mkdirp'),
-		getDirName = require('path').dirname,
-		path = './build/cachebuster.json',
-		cbValue = new Date().getTime();
-
-	mkdirp(getDirName(path), function () {
-		fs.writeFileSync(path, JSON.stringify({
-			cb: cbValue
-		}));
-		console.info('New cache buster value set to: ' + cbValue);
-	});
-});
-
-gulp.task('copy-files', function () {
-	return gulp.src([
-		'./api/**/*.*',
-		'!./api/v1/render.html',
-		'./assets/**/*.*',
-		'!./assets/**/*.js',
-		'./lib/*.*',
-		'./locales/*.*',
-		'./specs/*.*',
-		'./tools/*.*',
-		'./apiServer.js',
-		'./app.js',
-		'./gulpfiles.js',
-		'./kueServer.js',
-		'./newrelic.js'
-	], {
-		base: './'
-	})
-	.pipe(gulp.dest('build'));
-});
-
-gulp.task('assets-cachebuster', function () {
-	return gulp.src('api/v1/render.html', {
-		base: './'
-	})
-	.pipe(replace('/assets/', '/assets/{{cacheBuster}}/'))
-	.pipe(gulp.dest('build'));
-});
-
-gulp.task('scripts-concatenate', function () {
-	var assets = useref.assets({
-		searchPath: '/'
-	});
-
-	return gulp.src('api/v1/render.html', {
-		base: './'
-	})
-	.pipe(assets)
-	.pipe(gulpif('*.js', uglify()))
-	.pipe(assets.restore())
-	.pipe(useref())
-	.pipe(gulpif('*.html', replace('/assets/', '/assets/{{cacheBuster}}/')))
-	.pipe(gulp.dest('build'));
-});
-
-gulp.task('build', ['scripts-concatenate', 'update-translation', 'copy-files', 'bump-cachebuster'], function () {
-
 });

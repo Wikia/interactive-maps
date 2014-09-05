@@ -23,10 +23,10 @@ gulp.task('front', function () {
 				assets,
 				gulpif('*.js', uglify()),
 				assets.restore(),
-				useref()
+				useref(),
+				gulpif('*.html', replace('/assets/', '/assets/{{cacheBuster}}/'))
 			)
 		),
-		replace('/assets/', '/assets/{{cacheBuster}}/'),
 		gulp.dest(paths.dest)
 	);
 });
