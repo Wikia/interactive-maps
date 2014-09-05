@@ -15,6 +15,15 @@ define(
 		 * @returns {Object}
 		 */
 		function createPontoResponse(success, responseCode, message, content) {
+			if (
+				typeof success !== 'boolean' ||
+				typeof responseCode !== 'number' ||
+				typeof message !== 'string' ||
+				typeof content !== 'object' && typeof content !== 'undefined' || content === null
+				) {
+				throw new Error('Invalid function params');
+			}
+
 			return {
 				success: success,
 				responseCode: responseCode,
@@ -26,7 +35,7 @@ define(
 		/**
 		 * @desc helper function that validates player location params
 		 * @param {Object} params - params sent via ponto
-		 * @param {Object} mapBoundaries -  map boundaries
+		 * @param {Object=} mapBoundaries -  map boundaries
 		 */
 		function validateParams(params, mapBoundaries) {
 			var result = {
