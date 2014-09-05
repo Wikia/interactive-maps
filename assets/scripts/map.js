@@ -11,12 +11,13 @@ require(
 		'im.renderUI',
 		'im.i18n',
 		'im.utils',
+		'im.map',
 		'im.poi',
 		'im.poiCategory',
 		'im.poiCollection'
 	],
-	function (ponto, tracker, w, L, config, pontoWikiaBridge, renderUI, i18n, utils, poiModule, poiCategoryModule,
-			poiCollectionModule) {
+	function (ponto, tracker, w, L, config, pontoWikiaBridge, renderUI, i18n, utils, mapModule, poiModule,
+		poiCategoryModule, poiCollectionModule) {
 
 		var doc = w.document,
 			body = doc.body,
@@ -26,19 +27,7 @@ require(
 			map,
 		// leaflet layer for storing markers
 			markers = new L.LayerGroup(),
-		// leaflet layer for drawing controls
-			drawControls = new L.Control.Draw({
-				position: config.uiControlsPosition,
-				draw: {
-					polyline: false,
-					polygon: false,
-					circle: false,
-					rectangle: false
-				}
-			}),
-
 			mapConfig = config.mapConfig,
-			embedMapCodeButton,
 			pointTypeFiltersContainer,
 			pointTypes = {},
 
@@ -268,6 +257,21 @@ require(
 		}
 
 		/**
+		 * @desc sends data to Wikia Client via ponto to show embed map code modal
+		 */
+		function embedMapCode() {
+			var params = {
+				action: 'embedMapCode',
+				data: {
+					mapId: mapConfig.id,
+					iframeSrc: mapConfig.iframeSrc
+				}
+			};
+
+			pontoWikiaBridge.postMessage('processData', params, null, true);
+		}
+
+		/**
 		 * @desc sends data to Wikia Client via ponto to add / edit POI
 		 * @param {object} marker - marker object
 		 * @todo: should be moved to im.poi.js
@@ -394,16 +398,6 @@ require(
 		}
 
 		/**
-		 * @desc setup initial poi state object
-		 * @param {Array} pois
-		 */
-		function setupInitialPoiState(pois) {
-			pois.forEach(function(poi) {
-				poiCollectionModule.addToState(poi);
-			});
-		}
-
-		/**
 		 * @desc This is temporary function to handle Ponto, not error-ing when there is no Ponto on the other side
 		 * @todo Remove this once Ponto errors on missing pair
 		 */
@@ -411,7 +405,7 @@ require(
 			setTimeout(function () {
 				if (!isWikiaSet) {
 					setUpHideButton();
-					showAttributionStripe();
+					mapModule.showAttributionStripe();
 				}
 			}, config.pontoTimeout);
 		}
@@ -425,20 +419,12 @@ require(
 				pontoWikiaBridge.postMessage('getWikiaSettings', null, setupWikiaOnlyOptions, false);
 				setupPontoTimeout();
 			} else {
-				showAttributionStripe();
+				mapModule.showAttributionStripe();
 				tracker.track(
 					'map', tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 					parseInt(mapConfig.id, 10)
 				);
 			}
-		}
-
-		/**
-		 * @desc shows attribution stripe at the bottom of the map
-		 */
-		function showAttributionStripe() {
-			utils.addClass(doc.getElementById('wrapper'), 'embed');
-			utils.addClass(doc.getElementById('attr'), 'embed');
 		}
 
 		/**
@@ -454,10 +440,10 @@ require(
 				utils.addClass(body, 'wikia-mobile');
 				setUpHideButton();
 			} else if (mapConfig.city_id === options.cityId) {
-				setUpEditOptions();
+				setupContributionOptions();
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
 			} else {
-				showAttributionStripe();
+				mapModule.showAttributionStripe();
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
 			}
 
@@ -469,13 +455,14 @@ require(
 		/**
 		 * @desc setup edit options
 		 */
-		function setUpEditOptions() {
-			// add POI handler
-			map.on('draw:created', function (event) {
+		function setupContributionOptions() {
+			// attach event handlers
+			map
+				.on('draw:created', function (event) {
 				editMarker(poiModule.createTempPoiMarker(event));
-			});
+				})
+				.on('embedMapCode:clicked', embedMapCode);
 
-			// edit POI handler
 			wrapper.addEventListener('click', function (event) {
 				var target = event.target;
 
@@ -489,34 +476,9 @@ require(
 				}
 			}, false);
 
-			// show edit UI elements
+			// show / create edit UI elements
 			utils.addClass(body, 'enable-edit');
-			map.addControl(drawControls);
-			map.addControl(embedMapCodeButton);
-		}
-
-		/**
-		 * @desc sends data to Wikia Client via ponto to show embed map code modal
-		 */
-		function embedMapCode() {
-			var params = {
-				action: 'embedMapCode',
-				data: {
-					mapId: mapConfig.id,
-					iframeSrc: mapConfig.iframeSrc
-				}
-			};
-
-			pontoWikiaBridge.postMessage('processData', params, null, true);
-		}
-
-		/**
-		 * @desc Sets up the interface translations
-		 */
-		function setupInterfaceTranslations() {
-			L.drawLocal.draw.handlers.marker.tooltip.start = i18n.msg('wikia-interactive-maps-create-marker-handler');
-			L.drawLocal.draw.toolbar.buttons.marker = i18n.msg('wikia-interactive-maps-create-marker-tooltip');
-			L.drawLocal.draw.toolbar.actions.text = i18n.msg('wikia-interactive-maps-create-marker-cancel');
+			mapModule.createContributionControls();
 		}
 
 		/**
@@ -534,71 +496,16 @@ require(
 			});
 		}
 
-		/**
-		 * @desc Create new map
-		 */
-		function createMap() {
-			var zoomControl,
-				defaultMinZoom,
-				zoom,
-				mapBounds,
-				pointsList;
+		mapModule.setupMap(function (mapObject) {
+			// placeholder for array of poi markers
+			var poiMarkersList;
 
-			setupInterfaceTranslations();
-
-			defaultMinZoom = utils.getMinZoomLevel(
-				mapConfig.layer.maxZoom,
-				Math.max(mapConfig.width, mapConfig.height),
-				Math.max(
-					Math.max(doc.documentElement.clientWidth, w.innerWidth || 0),
-					Math.max(doc.documentElement.clientHeight, w.innerHeight || 0)
-				)
-			);
+			// set reference to map object
+			map = mapObject;
 
 			if (mapConfig.imagesPath) {
 				L.Icon.Default.imagePath = mapConfig.imagesPath;
 			}
-
-			map = L.map(config.mapContainerId, {
-				minZoom: mapConfig.layer.minZoom,
-				maxZoom: mapConfig.layer.maxZoom,
-				zoomControl: false
-			});
-
-			map.attributionControl.setPrefix(false);
-
-			if (mapConfig.hasOwnProperty('boundaries')) {
-				mapBounds = new L.LatLngBounds(
-					L.latLng(mapConfig.boundaries.south, mapConfig.boundaries.west),
-					L.latLng(mapConfig.boundaries.north, mapConfig.boundaries.east)
-				);
-
-				mapConfig.layer.bounds = mapBounds;
-			}
-
-			L.tileLayer(mapConfig.pathTemplate, mapConfig.layer).addTo(map);
-
-			zoom = Math.max(mapConfig.zoom, defaultMinZoom);
-			if (mapConfig.type !== 'custom') {
-				zoom = mapConfig.defaultZoomForRealMap;
-			}
-			map.setView(
-				L.latLng(mapConfig.latitude, mapConfig.longitude),
-				zoom
-			);
-
-			zoomControl = L.control.zoom({
-				position: config.uiControlsPosition
-			});
-
-			embedMapCodeButton = new L.Control.EmbedMapCode({
-				position: config.uiControlsPosition,
-				//TODO fix icon
-				title: '< >',
-				onClick: embedMapCode
-			});
-
-			map.addControl(zoomControl);
 
 			// Change popup size for small mobile screens
 			if (utils.isMobileScreenSize()) {
@@ -607,27 +514,22 @@ require(
 			}
 
 			setupPontoWikiaClient();
-			setupInitialPoiState(mapConfig.points);
+			setupClickTracking();
+
+			poiCollectionModule.setupInitialPoiState(mapConfig.points);
 			poiCategoryModule.setupPoiCategories(mapConfig.types);
 			setupPoisAndFilters(poiCollectionModule.getPoiState(), poiCategoryModule.getAllPoiCategories());
 
-			setupClickTracking();
 			markers.addTo(map);
 
 			// Collect all the markers from the markers layer
-			pointsList = Object.keys(markers._layers).map(function (k) {
+			poiMarkersList = Object.keys(markers._layers).map(function (k) {
 				return markers._layers[k];
 			});
 
-			if (pointsList.length > 0) {
-				// This is called as async because leaflet freezes when map.fitBounds is called directly
-				setTimeout(function () {
-					var group = new L.featureGroup(pointsList);
-					map.fitBounds(group.getBounds().pad(config.autoZoomPadding));
-				}, 1);
+			if (poiMarkersList.length) {
+				mapModule.setAllPoisInView(poiMarkersList);
 			}
-		}
-
-		createMap();
+		});
 	}
 );
