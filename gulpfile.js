@@ -73,9 +73,9 @@ gulp.task('update-translation', function () {
 
 });
 
-/*gulp.task('default', ['dev'], function () {
+gulp.task('default', ['dev'], function () {
 
-});*/
+});
 
 gulp.task('bump-cachebuster', function () {
 	var mkdirp = require('mkdirp'),
