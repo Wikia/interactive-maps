@@ -13,8 +13,12 @@ var gulp = require('gulp'),
 	exec = require('child_process').exec,
 	fs = require('fs'),
 	config = require('./lib/config.js'),
-	localesDir = './locales/',
-	translationFile = localesDir + 'translations.json';
+	buildDir = './build',
+	localesDir = 'locales/',
+	translationFiles = [
+		'./' + localesDir + 'translations.json',
+		buildDir + '/' + localesDir + 'translations.json',
+	];
 
 gulp.task('dev', function () {
 	nodemon({
@@ -64,13 +68,16 @@ gulp.task('coverage', function (cb) {
 */
 gulp.task('update-translation', function () {
 	console.assert(typeof config.translationUrl === 'string', 'Translation URL not set');
-	var cmd = 'curl "' + config.translationUrl + '" -o ' + translationFile;
-	exec(cmd, function () {
-		// check if the downloaded translation is consistent
-		var translation = require(translationFile);
-		console.assert(typeof translation.messages === 'object', 'Translation is broken');
-	});
+	Object.keys(translationFiles).forEach(function (key) {
+		var translationFile = translationFiles[key],
+			cmd = 'curl "' + config.translationUrl + '" -o ' + translationFile;
 
+		exec(cmd, function () {
+			// check if the downloaded translation is consistent
+			var translation = require(translationFile);
+			console.assert(typeof translation.messages === 'object', 'Translation is broken');
+		});
+	});
 });
 
 gulp.task('default', ['dev'], function () {
