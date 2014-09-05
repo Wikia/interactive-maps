@@ -6,6 +6,6 @@
 
 'use strict';
 
-define('im.leafletWrapper',  ['im.window'], function(w) {
+define('im.leafletWrapper',  ['im.window'], function (w) {
 	return w.L;
 });

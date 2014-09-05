@@ -74,7 +74,7 @@ describe('im.poi', function () {
 			},
 			tempMarker;
 
-		markerSpy.getLatLng = function() {
+		markerSpy.getLatLng = function () {
 			return {
 				lat: 1,
 				lng: 1

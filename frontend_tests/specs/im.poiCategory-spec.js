@@ -29,7 +29,7 @@ describe('im.poiCategory', function () {
 
 	// Extend leaflet mock
 	L.Icon = {
-		Default: function() {
+		Default: function () {
 			return {
 				_getIconUrl: function () {
 					return 'test.png';
@@ -89,7 +89,7 @@ describe('im.poiCategory', function () {
 		expect(categories.allCategories.pop().id).toBe(0);
 	});
 
-	it('sets poi category custom icon', function() {
+	it('sets poi category custom icon', function () {
 		var iconParamMock = {
 			iconUrl: intialCategories[2].marker,
 			iconSize: [config.poiIconWidth, config.poiIconHeight]
@@ -101,14 +101,14 @@ describe('im.poiCategory', function () {
 		expect(L.icon).toHaveBeenCalledWith(iconParamMock);
 	});
 
-//	it('sets poi category default icon', function() {
+//	it('sets poi category default icon', function () {
 //		setupPoiCategoryIconHelper();
 //
 //		expect(L.Icon.Default).toHaveBeenCalled();
 //		expect(L.Icon.Default.callCount).toBe(2);
 //	});
 
-	it('extends poi category object with className data', function() {
+	it('extends poi category object with className data', function () {
 		var category = intialCategories[2],
 			paramsMock = {
 				className: 'point-type-' + category.id
@@ -120,7 +120,7 @@ describe('im.poiCategory', function () {
 		expect(L.setOptions).toHaveBeenCalledWith(undefined, paramsMock);
 	});
 
-//	it('stores poi category icon in icon cache object', function() {
+//	it('stores poi category icon in icon cache object', function () {
 //		var category = intialCategories[2];
 //
 //		poiCategory.setupPoiCategoryIcon(category);

@@ -8,6 +8,16 @@ define('im.poiCollection', ['im.window'], function (w) {
 		poiCategoriesCache = {};
 
 	/**
+	 * @desc setup initial poi state object
+	 * @param {Array} pois
+	 */
+	function setupInitialPoiState(pois) {
+		pois.forEach(function (poi) {
+			addToState(poi);
+		});
+	}
+
+	/**
 	 * @desc checks if poi is in state
 	 * @param {number} id - poi id
 	 * @returns {boolean}
@@ -100,6 +110,7 @@ define('im.poiCollection', ['im.window'], function (w) {
 	}
 
 	return {
+		setupInitialPoiState: setupInitialPoiState,
 		isPoiInState: isPoiInState,
 		addToState: addToState,
 		getPoiState: getPoiState,

@@ -20,7 +20,7 @@ define('im.pontoWikiaBridge', ['ponto', 'im.window', 'tracker', 'im.config'], fu
 	 * @param {boolean} asynch - optional flag indicating if ponto should post message asynchronously (default = true)
 	 */
 	function postMessage(method, params, callback, asynch) {
-		ponto.invoke(config.pontoBridgeModule, method, params, function(data) {
+		ponto.invoke(config.pontoBridgeModule, method, params, function (data) {
 			callback(data);
 		}, showPontoError, asynch);
 	}
