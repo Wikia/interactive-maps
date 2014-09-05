@@ -120,7 +120,7 @@ gulp.task('assets-cachebuster', function () {
 	.pipe(gulp.dest('build'));
 });
 
-gulp.task('scripts-contacenate', function () {
+gulp.task('scripts-concatenate', function () {
 	var assets = useref.assets({
 		searchPath: '/'
 	});
@@ -135,6 +135,6 @@ gulp.task('scripts-contacenate', function () {
 	.pipe(gulp.dest('build'));
 });
 
-gulp.task('build', ['scripts', 'update-translation', 'copy-files', 'bump-cachebuster'], function () {
+gulp.task('build', ['scripts-concatenate', 'update-translation', 'copy-files', 'bump-cachebuster'], function () {
 
 });
