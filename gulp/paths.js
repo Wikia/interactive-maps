@@ -34,13 +34,6 @@ module.exports = {
 		src: 'node_modules',
 		dest: dest + 'node_modules'
 	},
-	nodemon: {
-		script: dest + 'app.js',
-		ignore: [
-			dest + 'tmp/**',
-			dest + 'node_modules/**'
-		]
-	},
 	specs: 'specs/**',
 	lib: 'lib/*.js'
 };
