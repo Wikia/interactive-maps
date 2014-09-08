@@ -82,7 +82,7 @@ describe('im.pontoCommunicationAPI', function () {
 			true,
 			config.pontoCommunicationAPI.responseCodes.success,
 			config.pontoCommunicationAPI.responseMessages.setPlayerLocation,
-			{}
+			undefined
 		);
 	});
 
@@ -113,7 +113,7 @@ describe('im.pontoCommunicationAPI', function () {
 			true,
 			config.pontoCommunicationAPI.responseCodes.success,
 			config.pontoCommunicationAPI.responseMessages.setPlayerLocation,
-			{}
+			undefined
 		);
 	});
 

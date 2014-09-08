@@ -45,7 +45,10 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			expect(response.success).toBe(data.success);
 			expect(response.responseCode).toBe(data.responseCode);
 			expect(response.message).toBe(data.message);
-			expect(typeof response.content).toBe('object');
+			expect(
+				typeof response.content === 'object' ||
+				typeof response.content === 'undefined'
+			).toBe(true);
 		});
 	});
 

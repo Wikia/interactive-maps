@@ -15,6 +15,8 @@ define(
 		 * @returns {Object}
 		 */
 		function createPontoResponse(success, responseCode, message, content) {
+			var response = {};
+
 			if (
 				typeof success !== 'boolean' ||
 				typeof responseCode !== 'number' ||
@@ -24,12 +26,15 @@ define(
 				throw new Error('Invalid function params');
 			}
 
-			return {
-				success: success,
-				responseCode: responseCode,
-				message: message,
-				content: content || {}
-			};
+			response.success = success;
+			response.responseCode = responseCode;
+			response.message = message;
+
+			if (content) {
+				response.content = content;
+			}
+
+			return response;
 		}
 
 		/**
