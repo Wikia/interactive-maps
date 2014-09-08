@@ -19,6 +19,7 @@ define(
 			setupTiles();
 			setZoomControls();
 			setupMapPosition();
+			setupAttributionStripe();
 
 			cb(map);
 		}
@@ -40,11 +41,13 @@ define(
 		}
 
 		/**
-		 * @desc shows attribution stripe at the bottom of the map
+		 * @desc Shows attribution stripe if needed
 		 */
-		function showAttributionStripe() {
-			utils.addClass(doc.getElementById('wrapper'), 'embed');
-			utils.addClass(doc.getElementById('attr'), 'embed');
+		function setupAttributionStripe() {
+			if (!mapConfig.hideAttr) {
+				utils.addClass(doc.getElementById('wrapper'), 'embed');
+				utils.addClass(doc.getElementById('attr'), 'embed');
+			}
 		}
 
 		/**
@@ -203,7 +206,6 @@ define(
 			setupMap: setupMap,
 			getMapObject: getMapObject,
 			createContributionControls: createContributionControls,
-			showAttributionStripe: showAttributionStripe,
 			setAllPoisInView: setAllPoisInView,
 			getMapBoundaries: getMapBoundaries
 		};

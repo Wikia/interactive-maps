@@ -29,10 +29,7 @@ require(
 			markers = new L.LayerGroup(),
 			mapConfig = config.mapConfig,
 			pointTypeFiltersContainer,
-			pointTypes = {},
-
-		// @todo Remove these once Ponto is fixed
-			isWikiaSet = false;
+			pointTypes = {};
 
 		/**
 		 * @desc Toggles visibility of points corresponding with clicked filter
@@ -398,28 +395,13 @@ require(
 		}
 
 		/**
-		 * @desc This is temporary function to handle Ponto, not error-ing when there is no Ponto on the other side
-		 * @todo Remove this once Ponto errors on missing pair
-		 */
-		function setupPontoTimeout() {
-			setTimeout(function () {
-				if (!isWikiaSet) {
-					setUpHideButton();
-					mapModule.showAttributionStripe();
-				}
-			}, config.pontoTimeout);
-		}
-
-		/**
 		 * @desc setup Ponto communication for Wikia Client
 		 */
 		function setupPontoWikiaClient() {
 			if (w.self !== w.top) {
 				ponto.setTarget(ponto.TARGET_IFRAME_PARENT, '*');
 				pontoWikiaBridge.postMessage('getWikiaSettings', null, setupWikiaOnlyOptions, false);
-				setupPontoTimeout();
 			} else {
-				mapModule.showAttributionStripe();
 				tracker.track(
 					'map', tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 					parseInt(mapConfig.id, 10)
@@ -433,8 +415,6 @@ require(
 		 */
 		function setupWikiaOnlyOptions(options) {
 			var mapId = parseInt(mapConfig.id, 10);
-			// @todo Remove this, once Ponto errors on missing pair
-			isWikiaSet = true;
 
 			if (options.mobile) {
 				utils.addClass(body, 'wikia-mobile');
@@ -443,7 +423,6 @@ require(
 				setupContributionOptions();
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
 			} else {
-				mapModule.showAttributionStripe();
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
 			}
 
