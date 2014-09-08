@@ -9,7 +9,9 @@ var gulp = require('gulp'),
 	translationFile = localesDir + 'translations.json';
 
 gulp.task('locales', function () {
-	console.assert(typeof config.translationUrl === 'string', 'Translation URL not set');
+	if (typeof config.translationUrl !== 'string') {
+		throw new Error('Translation URL not set');
+	}
 
 	var deferred = Q.defer(),
 		translationsData = '';
