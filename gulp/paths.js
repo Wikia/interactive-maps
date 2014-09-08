@@ -24,7 +24,8 @@ module.exports = {
 		'./app.js',
 		'./gulpfiles.js',
 		'./kueServer.js',
-		'./newrelic.js'
+		'./newrelic.js',
+		'./node_modules/**/*.*'
 	],
 	dest: dest,
 	front: './api/v1/render.html',
