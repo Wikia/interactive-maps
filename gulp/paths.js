@@ -40,5 +40,7 @@ module.exports = {
 			dest + 'tmp/**',
 			dest + 'node_modules/**'
 		]
-	}
+	},
+	specs: 'specs/**',
+	lib: 'lib/*.js'
 };
