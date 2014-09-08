@@ -69,12 +69,14 @@ define(
 			 * @param {number} callbackId - ponto callback ID
 			 */
 			this.removePlayerLocation = function (params, callbackId) {
-				var responseMessage = apiConfig.responseMessages.removePlayerLocation;
-
 				map.removeLayer(playerMarker);
 
 				ponto.respond(
-					apiUtils.createPontoResponse(true, apiConfig.responseCodes.success, responseMessage),
+					apiUtils.createPontoResponse(
+						true,
+						apiConfig.responseCodes.success,
+						apiConfig.responseMessages.removePlayerLocation
+					),
 					callbackId
 				);
 			};
