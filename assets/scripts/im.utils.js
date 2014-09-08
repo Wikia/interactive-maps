@@ -1,6 +1,6 @@
-'use strict';
-
 define('im.utils', ['im.window', 'im.config'], function (w, config) {
+	'use strict';
+
 	/**
 	 * @desc Adds a class to an element
 	 * @param {HTMLElement} element
