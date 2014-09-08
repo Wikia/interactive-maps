@@ -24,7 +24,8 @@ gulp.task('front', function () {
 				gulpif('*.js', uglify()),
 				assets.restore(),
 				useref(),
-				gulpif('*.html', replace('/assets/', '/assets/{{cacheBuster}}/'))
+				gulpif('*.html', replace(
+					paths.assetsCBPath.src, paths.assetsCBPath.dest))
 			)
 		),
 		gulp.dest(paths.dest)

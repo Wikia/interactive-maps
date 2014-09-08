@@ -35,5 +35,9 @@ module.exports = {
 		dest: dest + 'node_modules'
 	},
 	specs: 'specs/**',
-	lib: 'lib/*.js'
+	lib: 'lib/*.js',
+	assetsCBPath: {
+		src: '/assets/',
+		dest: '/assets/{{cacheBuster}}/'
+	}
 };
