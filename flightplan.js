@@ -89,10 +89,10 @@ plan.local(function (local) {
 	local.log('Run build on branch: ' + branchName);
 	local.exec('gulp test');
 
-	createCacheBuster(cacheBusterFileName, local);
+	local.exec('gulp build --production');
 
 	local.log('Creating build archive');
-	local.exec('tar zcf /tmp/' + archive + ' . --exclude=.git');
+	local.exec('cd build; tar zcf /tmp/' + archive + ' .');
 	local.exec('mv /tmp/' + archive + ' ./');
 
 	local.log('Copy files to remote hosts');
