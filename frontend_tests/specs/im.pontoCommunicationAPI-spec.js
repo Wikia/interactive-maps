@@ -60,7 +60,7 @@ describe('im.pontoCommunicationAPI', function () {
 				lat: 1,
 				lng: 1
 			},
-			createMarkeParams = {
+			createMarkerParams = {
 				lat: requestParams.lat,
 				lon: requestParams.lng
 			},
@@ -76,7 +76,7 @@ describe('im.pontoCommunicationAPI', function () {
 
 		api.setPlayerCurrentLocation(requestParams, callbackId);
 
-		expect(apiUtils.createPlayerMarker).toHaveBeenCalledWith(createMarkeParams);
+		expect(apiUtils.createPlayerMarker).toHaveBeenCalledWith(createMarkerParams);
 		expect(playerMarkerMock.addTo).toHaveBeenCalledWith(mapMock);
 		expect(apiUtils.createPontoResponse).toHaveBeenCalledWith(
 			true,
