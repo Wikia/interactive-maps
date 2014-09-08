@@ -32,13 +32,24 @@
     "when": "~3.4.2"
   },
   "devDependencies": {
+    "flightplan": "~0.4.0",
     "gulp": "3.6.x",
     "gulp-changed": "0.3.x",
-    "gulp-nodemon": "1.0.x",
-    "proxyquire": "0.6.x",
-    "gulp-jasmine": "0.2.x",
+    "gulp-if": "^1.2.4",
+    "gulp-ignore": "^1.2.0",
     "gulp-istanbul": "~0.1.1",
-    "flightplan": "~0.4.0"
+    "gulp-jasmine": "0.2.x",
+    "gulp-nodemon": "1.0.x",
+    "gulp-replace": "^0.4.0",
+    "gulp-uglify": "^0.3.1",
+    "gulp-useref": "0.6.x",
+    "gulp-util": "^3.0.1",
+    "karma": "^0.12.21",
+    "karma-jasmine": "^0.1.5",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "multipipe": "^0.1.1",
+    "proxyquire": "0.6.x",
+    "mkdirp": "0.5.0"
   },
   "private": true
 }

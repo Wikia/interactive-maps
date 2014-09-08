@@ -33,6 +33,10 @@ publish
 tmp
 node_modules
 coverage
+build
+locales
 
+# Wikia files to ignore
 newrelic_agent.log
 cachebuster.json
+setVariables.sh
