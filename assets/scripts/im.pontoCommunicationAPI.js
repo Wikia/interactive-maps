@@ -32,7 +32,7 @@ define(
 					mapBoundaries = mapModule.getMapBoundaries(),
 					validationResult = apiUtils.validateParams(params, mapBoundaries),
 					responseCode = apiConfig.responseCodes.success,
-					responseContent = {},
+					responseContent,
 					latLng;
 
 				if (validationResult.success) {
@@ -54,6 +54,12 @@ define(
 				} else {
 					responseMessage = validationResult.message;
 					responseCode = apiConfig.responseCodes.invalidParams;
+
+					if (mapBoundaries) {
+						responseContent = {
+							boundaries: mapBoundaries
+						};
+					}
 				}
 				ponto.respond(
 					apiUtils.createPontoResponse(
