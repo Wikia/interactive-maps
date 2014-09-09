@@ -1,6 +1,6 @@
-'use strict';
-
 define('im.i18n', ['im.config'], function (config) {
+	'use strict';
+
 	var messages = config.messages;
 
 	/**
