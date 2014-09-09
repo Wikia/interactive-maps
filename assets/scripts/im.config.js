@@ -1,6 +1,6 @@
-'use strict';
+define('im.config', ['im.window'], function (w) {
+	'use strict';
 
-define('im.config', ['im.window'], function(w) {
 	return {
 		mapConfig: w.mapSetup,
 		messages: w.mapSetup.i18n,
@@ -19,6 +19,21 @@ define('im.config', ['im.window'], function(w) {
 		editPointTypesButtonId: 'editPointTypes',
 		allPointTypesFilterId: 'allPointTypes',
 		pontoBridgeModule: 'wikia.intMap.pontoBridge',
-		uiControlsPosition: 'bottomright'
+		uiControlsPosition: 'bottomright',
+		pontoCommunicationAPI: {
+			responseMessages: {
+				setPlayerLocation: 'Player location set successfully',
+				removePlayerLocation: 'Player location removed from map successfully',
+				invalidParamTypes: 'Wrong parameters types',
+				invalidZoomLevel: 'Invalid zoom level value',
+				outOfMapBounds: 'Player location must be inside map boundaries'
+			},
+			responseCodes: {
+				success: 200,
+				invalidParams: 422
+			},
+			defaultMarkerSize: 70,
+			defaultPlayerIcon: '/assets/' + w.mapSetup.cacheBuster + '/images/player_location_marker.png'
+		}
 	};
 });

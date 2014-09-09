@@ -1,6 +1,6 @@
-'use strict';
-
 define('im.renderUI', ['im.config'], function (config) {
+	'use strict';
+
 	/**
 	 * @desc Build link HTML
 	 * @param {object} point - POI object

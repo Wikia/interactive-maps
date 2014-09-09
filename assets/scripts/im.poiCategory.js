@@ -1,6 +1,6 @@
-'use strict';
-
 define('im.poiCategory', ['im.leafletWrapper', 'im.config', 'im.utils'], function (L, config, utils) {
+	'use strict';
+
 	// id of uneditable poi category (Other)
 	var catchAllCategoryId = config.mapConfig.catchAllCategoryId,
 		// placeholder for array with editable poi categories
