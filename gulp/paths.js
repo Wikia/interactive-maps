@@ -31,8 +31,8 @@ module.exports = {
 		basePath + '/newrelic.js'
 	],
 	dest: dest,
-	front: './api/v1/render.html',
-	ignoreScriptFiles: '!./assets/**/*.js',
+	front: basePath + '/api/v1/render.html',
+	ignoreScriptFiles: '!' + basePath + '/assets/**/*.js',
 	lib: 'lib/*.js',
 	locales: basePath + '/locales/translations.json',
 	nodeModules: {
