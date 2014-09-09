@@ -2,4 +2,4 @@
 
 var gulp = require('gulp');
 
-gulp.task('default', ['autoRestart']);
+gulp.task('default', ['build', 'server', 'watch']);
