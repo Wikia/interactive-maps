@@ -54,11 +54,13 @@ define(
 				} else {
 					responseMessage = validationResult.message;
 					responseCode = apiConfig.responseCodes.invalidParams;
+					responseContent = {
+						maxZoom: config.mapConfig.max_zoom,
+						minZoom: config.mapConfig.min_zoom
+					};
 
 					if (mapBoundaries) {
-						responseContent = {
-							boundaries: mapBoundaries
-						};
+						responseContent.boundaries = mapBoundaries;
 					}
 				}
 				ponto.respond(

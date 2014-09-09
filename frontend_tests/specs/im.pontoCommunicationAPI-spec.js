@@ -6,6 +6,10 @@ describe('im.pontoCommunicationAPI', function () {
 			respond: function () {}
 		},
 		config = {
+			mapConfig: {
+				max_zoom: 1,
+				min_zoom: 0
+			},
 			pontoCommunicationAPI: {
 				responseMessages: {
 					setPlayerLocation: 'Player location set successfully',
@@ -130,7 +134,9 @@ describe('im.pontoCommunicationAPI', function () {
 			},
 			boundaries = {},
 			responseContent = {
-				boundaries: boundaries
+				boundaries: boundaries,
+				maxZoom: config.mapConfig.max_zoom,
+				minZoom: config.mapConfig.min_zoom
 			};
 
 		spyOn(apiUtils, 'validateParams').andReturn(validationResult);
