@@ -51,6 +51,8 @@ define(
 				result.message = apiConfig.responseMessages.invalidParamTypes;
 			} else if (mapBoundaries && !isPlayerLocationInMapBounds(mapBoundaries, params.lat, params.lng)) {
 				result.message = apiConfig.responseMessages.outOfMapBounds;
+			} else if (params.zoom && !validateZoomLevel(params.zoom)) {
+				result.message = apiConfig.responseMessages.invalidZoomLevel;
 			} else {
 				result.success = true;
 			}
@@ -64,7 +66,10 @@ define(
 		 * @returns {boolean}
 		 */
 		function validateTypes(params) {
-			return typeof params.lat === 'number' && typeof params.lng === 'number';
+			return typeof params.lat === 'number' &&
+				typeof params.lng === 'number' &&
+				(typeof params.zoom === 'number' || typeof params.zoom === 'undefined') &&
+				(typeof params.centerMap === 'boolean' || typeof params.centerMap === 'undefined');
 		}
 
 		/**
@@ -79,6 +84,15 @@ define(
 				lat >= bounds.south &&
 				lng >= bounds.west &&
 				lng <= bounds.east;
+		}
+
+		/**
+		 * @desc checks is zoom value fits supported zoom levels for given map
+		 * @param {Number} zoom
+		 * @returns {Boolean}
+		 */
+		function validateZoomLevel(zoom) {
+			return zoom <= config.mapConfig.max_zoom && zoom >= config.mapConfig.min_zoom;
 		}
 
 		/**

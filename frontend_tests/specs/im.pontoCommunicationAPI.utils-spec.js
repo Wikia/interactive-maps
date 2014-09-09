@@ -8,9 +8,14 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			}
 		},
 		config = {
+			mapConfig: {
+				max_zoom: 3,
+				min_zoom: 0
+			},
 			pontoCommunicationAPI: {
 				responseMessages : {
-					invalidParamTypes: '"lat" and "lng" params must be numbers',
+					invalidParamTypes: 'Wrong parameters types',
+					invalidZoomLevel: 'Invalid zoom level value',
 					outOfMapBounds: 'Player location must be inside map boundaries'
 				},
 				defaultMarkerSize: 1,
@@ -108,11 +113,23 @@ describe('im.pontoCommunicationAPI.utils', function () {
 		var params = [
 			{
 				lat: '',
-				lng: 1
+				lng: 1,
+				zoom: 1
 			},
 			{
 				lat: 1,
-				lng: ''
+				lng: '',
+				centerMap: true
+			},
+			{
+				lat: 1,
+				lng: 1,
+				zoom: ''
+			},
+			{
+				lat: 1,
+				lng: 1,
+				centerMap: ''
 			}
 		];
 
@@ -155,6 +172,70 @@ describe('im.pontoCommunicationAPI.utils', function () {
 
 			expect(result.success).toBe(false);
 			expect(result.message).toBe(config.pontoCommunicationAPI.responseMessages.outOfMapBounds);
+		});
+	});
+
+	it('Fails params validation - invalid zoom level', function () {
+		var params = [
+			{
+				lat: 1,
+				lng: 1,
+				zoom: -1
+			},
+			{
+				lat: 1,
+				lng: 1,
+				zoom: 4
+			}
+		];
+
+		params.forEach(function (data) {
+			var result = apiUtils.validateParams(data);
+
+			expect(result.success).toBe(false);
+			expect(result.message).toBe(config.pontoCommunicationAPI.responseMessages.invalidZoomLevel);
+		});
+	});
+
+	it('Passes params validation', function () {
+		var bounds = {
+				north: 1,
+				south: -1,
+				west: -1,
+				east: 1
+			},
+			params = [
+			{
+				lat: 1,
+				lng: 1
+			},
+			{
+				lat: 1,
+				lng: 1,
+				zoom: 0,
+				centerMap: true
+			},
+			{
+				lat: 1,
+				lng: 1,
+				zoom: 3
+			},
+			{
+				lat: 1,
+				lng: 1,
+				zoom: 2
+			},
+			{
+				lat: 1,
+				lng: 1,
+				centerMap: true
+			}
+		];
+
+		params.forEach(function (data) {
+			var result = apiUtils.validateParams(data, bounds);
+
+			expect(result.success).toBe(true);
 		});
 	});
 
