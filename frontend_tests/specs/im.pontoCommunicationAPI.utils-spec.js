@@ -22,7 +22,12 @@ describe('im.pontoCommunicationAPI.utils', function () {
 				defaultPlayerIcon: 'test.png'
 			}
 		},
-		apiUtils = modules['im.pontoCommunicationAPI.utils'](L, config, poiModule);
+		utils = {
+			isInteger: function (variable) {
+				return typeof variable === 'number' && isFinite(variable) && variable % 1 === 0;
+			}
+		},
+		apiUtils = modules['im.pontoCommunicationAPI.utils'](L, config, utils, poiModule);
 
 	it('Creates valid API response object', function () {
 		var params = [
@@ -125,6 +130,11 @@ describe('im.pontoCommunicationAPI.utils', function () {
 				lat: 1,
 				lng: 1,
 				zoom: ''
+			},
+			{
+				lat: 1,
+				lng: 1,
+				zoom: 1.2
 			},
 			{
 				lat: 1,

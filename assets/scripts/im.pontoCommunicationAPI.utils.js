@@ -1,7 +1,7 @@
 define(
 	'im.pontoCommunicationAPI.utils',
-	['im.leafletWrapper', 'im.config', 'im.poi'],
-	function (L, config, poiModule) {
+	['im.leafletWrapper', 'im.config', 'im.utils', 'im.poi'],
+	function (L, config, utils, poiModule) {
 		'use strict';
 
 		var apiConfig = config.pontoCommunicationAPI;
@@ -68,7 +68,7 @@ define(
 		function validateTypes(params) {
 			return typeof params.lat === 'number' &&
 				typeof params.lng === 'number' &&
-				(typeof params.zoom === 'number' || typeof params.zoom === 'undefined') &&
+				(utils.isInteger(params.zoom) || typeof params.zoom === 'undefined') &&
 				(typeof params.centerMap === 'boolean' || typeof params.centerMap === 'undefined');
 		}
 
