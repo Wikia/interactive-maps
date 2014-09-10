@@ -24,8 +24,7 @@ gulp.task('front', function () {
 				gulpif('*.js', uglify()),
 				assets.restore(),
 				useref(),
-				gulpif('*.html', replace(
-					paths.assetsCBPath.src, paths.assetsCBPath.dest))
+				gulpif('*.html', replace(paths.assetsCBPath.src, paths.assetsCBPath.dest))
 			)
 		),
 		gulp.dest(paths.dest)

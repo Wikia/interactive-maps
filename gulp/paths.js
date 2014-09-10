@@ -34,7 +34,7 @@ module.exports = {
 	front: basePath + '/api/v1/render.html',
 	ignoreScriptFiles: '!' + basePath + '/assets/**/*.js',
 	lib: 'lib/*.js',
-	locales: basePath + '/locales/translations.json',
+	locales: dest + 'locales/translations.json',
 	nodeModules: {
 		src: 'node_modules',
 		dest: dest + 'node_modules'

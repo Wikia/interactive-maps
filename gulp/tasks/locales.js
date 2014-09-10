@@ -3,10 +3,11 @@
 var gulp = require('gulp'),
 	http = require('http'),
 	Q = require('q'),
+	mkdirp = require('mkdirp'),
 	fs = require('fs'),
+	getDirName = require('path').dirname,
 	config = require('../../lib/config.js'),
-	localesDir = './locales/',
-	translationFile = localesDir + 'translations.json';
+	path = require('../paths').locales;
 
 gulp.task('locales', function () {
 	if (typeof config.translationUrl !== 'string') {
@@ -26,8 +27,10 @@ gulp.task('locales', function () {
 		});
 
 		res.on('end', function () {
-			fs.writeFileSync(translationFile, translationsData);
-			deferred.resolve();
+			mkdirp(getDirName(path), function () {
+				fs.writeFileSync(paths.locales, translationsData);
+				deferred.resolve();
+			});
 		});
 	});
 
