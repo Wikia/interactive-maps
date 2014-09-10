@@ -147,7 +147,7 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			var result = apiUtils.validateParams(data);
 
 			expect(result.success).toBe(false);
-			expect(result.message).toBe(config.pontoCommunicationAPI.responseMessages.invalidParamTypes);
+			expect(result.errorMessage).toBe(config.pontoCommunicationAPI.responseMessages.invalidParamTypes);
 		});
 	});
 
@@ -181,7 +181,7 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			var result = apiUtils.validateParams(data, bounds);
 
 			expect(result.success).toBe(false);
-			expect(result.message).toBe(config.pontoCommunicationAPI.responseMessages.outOfMapBounds);
+			expect(result.errorMessage).toBe(config.pontoCommunicationAPI.responseMessages.outOfMapBounds);
 		});
 	});
 
@@ -203,7 +203,7 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			var result = apiUtils.validateParams(data);
 
 			expect(result.success).toBe(false);
-			expect(result.message).toBe(config.pontoCommunicationAPI.responseMessages.invalidZoomLevel);
+			expect(result.errorMessage).toBe(config.pontoCommunicationAPI.responseMessages.invalidZoomLevel);
 		});
 	});
 
@@ -284,7 +284,7 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			latLng = {},
 			zoom = 0;
 
-		apiUtils.centerMapToPlayerLocation(map, latLng, zoom);
+		apiUtils.updateMapPosition(map, latLng, zoom);
 
 		expect(map.setView).toHaveBeenCalledWith(latLng, zoom);
 	});

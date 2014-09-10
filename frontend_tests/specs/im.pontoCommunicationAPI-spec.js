@@ -14,16 +14,13 @@ describe('im.pontoCommunicationAPI', function () {
 				responseMessages: {
 					setPlayerLocation: 'Player location set successfully',
 					removePlayerLocation: 'Player location removed from map successfully',
-					invalidParamTypes: '"lat" and "lng" params must be numbers'
+					invalidParamTypes: 'Wrong parameters types'
 				},
 				responseCodes: {
 					success: 200,
 					invalidParams: 422
 				}
 			}
-		},
-		L = {
-			latLng: function() {}
 		},
 		playerMarkerMock = jasmine.createSpyObj('playerMarkerMock', ['addTo']),
 		mapMock = {
@@ -36,6 +33,7 @@ describe('im.pontoCommunicationAPI', function () {
 			createPlayerMarker: function () {
 				return playerMarkerMock;
 			},
+			createLatLng: function () {},
 			updatePlayerMarkerLocation: function () {}
 		},
 		mapModule = {
@@ -44,7 +42,7 @@ describe('im.pontoCommunicationAPI', function () {
 			},
 			getMapBoundaries: function() {}
 		},
-		PontoAPI = modules['im.pontoCommunicationAPI'](ponto, config, L, apiUtils, mapModule);
+		PontoAPI = modules['im.pontoCommunicationAPI'](ponto, config, apiUtils, mapModule);
 
 
 	it('Creates Ponto Communication API', function () {
@@ -56,11 +54,11 @@ describe('im.pontoCommunicationAPI', function () {
 		expect(api instanceof PontoAPI).toBe(true);
 		expect(typeof api.setPlayerCurrentLocation).toBe('function');
 		expect(typeof api.removePlayerLocation).toBe('function');
+		expect(typeof api.updateMapPosition).toBe('function');
 	});
 
 	it('Sets player location on map', function() {
-		var api = PontoAPI.getInstance(),
-			requestParams = {
+		var requestParams = {
 				lat: 1,
 				lng: 1
 			},
@@ -78,7 +76,7 @@ describe('im.pontoCommunicationAPI', function () {
 		spyOn(apiUtils, 'createPlayerMarker').andCallThrough();
 		spyOn(apiUtils, 'createPontoResponse');
 
-		api.setPlayerCurrentLocation(requestParams, callbackId);
+		PontoAPI.getInstance().setPlayerCurrentLocation(requestParams, callbackId);
 
 		expect(apiUtils.createPlayerMarker).toHaveBeenCalledWith(createMarkerParams);
 		expect(playerMarkerMock.addTo).toHaveBeenCalledWith(mapMock);
@@ -91,8 +89,7 @@ describe('im.pontoCommunicationAPI', function () {
 	});
 
 	it('Updates player location on map', function () {
-		var api = PontoAPI.getInstance(),
-			requestParams = {
+		var requestParams = {
 				lat: 1,
 				lng: 1
 			},
@@ -105,12 +102,12 @@ describe('im.pontoCommunicationAPI', function () {
 		spyOn(apiUtils, 'validateParams').andReturn(validationResult);
 		spyOn(mapMock, 'hasLayer').andReturn(true);
 		spyOn(apiUtils, 'updatePlayerMarkerLocation');
-		spyOn(L, 'latLng').andReturn(latLng);
+		spyOn(apiUtils, 'createLatLng').andReturn(latLng);
 		spyOn(apiUtils, 'createPontoResponse');
 
-		api.setPlayerCurrentLocation(requestParams, callbackId);
+		PontoAPI.getInstance().setPlayerCurrentLocation(requestParams, callbackId);
 
-		expect(L.latLng).toHaveBeenCalledWith(requestParams.lat, requestParams.lng);
+		expect(apiUtils.createLatLng).toHaveBeenCalledWith(requestParams.lat, requestParams.lng);
 		expect(apiUtils.updatePlayerMarkerLocation).toHaveBeenCalled();
 		expect(apiUtils.updatePlayerMarkerLocation.mostRecentCall.args[1]).toBe(latLng);
 		expect(apiUtils.createPontoResponse).toHaveBeenCalledWith(
@@ -122,15 +119,14 @@ describe('im.pontoCommunicationAPI', function () {
 	});
 
 	it('Sends success false response for setPlayerCurrentLocation', function () {
-		var api = PontoAPI.getInstance(),
-			requestParams = {
+		var requestParams = {
 				lat: 1,
 				lng: 1
 			},
 			callbackId = 1,
 			validationResult = {
 				success: false,
-				message: config.pontoCommunicationAPI.responseMessages.invalidParamTypes
+				errorMessage: config.pontoCommunicationAPI.responseMessages.invalidParamTypes
 			},
 			boundaries = {},
 			responseContent = {
@@ -143,7 +139,7 @@ describe('im.pontoCommunicationAPI', function () {
 		spyOn(apiUtils, 'createPontoResponse');
 		spyOn(mapModule, 'getMapBoundaries').andReturn(boundaries);
 
-		api.setPlayerCurrentLocation(requestParams, callbackId);
+		PontoAPI.getInstance().setPlayerCurrentLocation(requestParams, callbackId);
 
 		expect(apiUtils.createPontoResponse).toHaveBeenCalledWith(
 			false,
@@ -154,15 +150,14 @@ describe('im.pontoCommunicationAPI', function () {
 	});
 
 	it('Removes player location from map', function () {
-		var api = PontoAPI.getInstance(),
-			callbackId = 1,
+		var callbackId = 1,
 			pontoResponse = 'test';
 
 		spyOn(mapMock, 'removeLayer');
 		spyOn(ponto, 'respond');
 		spyOn(apiUtils, 'createPontoResponse').andReturn(pontoResponse);
 
-		api.removePlayerLocation(null, callbackId);
+		PontoAPI.getInstance().removePlayerLocation(null, callbackId);
 
 		expect(mapMock.removeLayer).toHaveBeenCalled();
 		expect(apiUtils.createPontoResponse).toHaveBeenCalledWith(
