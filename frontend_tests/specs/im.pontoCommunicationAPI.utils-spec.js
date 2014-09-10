@@ -29,6 +29,16 @@ describe('im.pontoCommunicationAPI.utils', function () {
 		},
 		apiUtils = modules['im.pontoCommunicationAPI.utils'](L, config, utils, poiModule);
 
+	it('is module with public API', function () {
+		expect(typeof apiUtils === 'object').toBe(true);
+		expect(typeof apiUtils.createPontoResponse === 'function').toBe(true);
+		expect(typeof apiUtils.validateParams === 'function').toBe(true);
+		expect(typeof apiUtils.createPlayerMarker === 'function').toBe(true);
+		expect(typeof apiUtils.updatePlayerMarkerLocation === 'function').toBe(true);
+		expect(typeof apiUtils.updateMapPosition === 'function').toBe(true);
+		expect(typeof apiUtils.createLatLng === 'function').toBe(true);
+	});
+
 	it('Creates valid API response object', function () {
 		var params = [
 			{
