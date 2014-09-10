@@ -38,7 +38,7 @@ define(
 		}
 
 		/**
-		 * @desc helper function that validates player location params
+		 * @desc validates player location params
 		 * @param {Object} params - params sent via ponto
 		 * @param {Object=} mapBoundaries -  map boundaries
 		 */
@@ -48,11 +48,11 @@ define(
 				};
 
 			if (!validateTypes(params)) {
-				result.message = apiConfig.responseMessages.invalidParamTypes;
+				result.errorMessage = apiConfig.responseMessages.invalidParamTypes;
 			} else if (mapBoundaries && !isPlayerLocationInMapBounds(mapBoundaries, params.lat, params.lng)) {
-				result.message = apiConfig.responseMessages.outOfMapBounds;
+				result.errorMessage = apiConfig.responseMessages.outOfMapBounds;
 			} else if (params.zoom && !validateZoomLevel(params.zoom)) {
-				result.message = apiConfig.responseMessages.invalidZoomLevel;
+				result.errorMessage = apiConfig.responseMessages.invalidZoomLevel;
 			} else {
 				result.success = true;
 			}
@@ -96,7 +96,7 @@ define(
 		}
 
 		/**
-		 * @desc helper function that creates marker for player location and adds it to map
+		 * @desc creates marker for player location and adds it to map
 		 * @param {Object} params
 		 */
 		function createPlayerMarker(params) {
@@ -112,7 +112,7 @@ define(
 		}
 
 		/**
-		 * @desc helper function that updates player marker location
+		 * @desc updates player marker location
 		 * @param {Object} playerMarker - leaflet marker object
 		 * @param {Object} latLng - latLng Leaflet object
 		 */
@@ -121,13 +121,23 @@ define(
 		}
 
 		/**
-		 * @desc helper function that centers map and sets its zoom level to player current location
+		 * @desc centers map to given coordinates and sets its zoom level
 		 * @param {Object} map - leaflet map object
 		 * @param {Object} latLng - latLng Leaflet object
 		 * @param {Number} zoom - map zoom level
 		 */
-		function centerMapToPlayerLocation(map, latLng, zoom) {
+		function updateMapPosition(map, latLng, zoom) {
 			map.setView(latLng, zoom);
+		}
+
+		/**
+		 * @desc return lealfet latLng object
+		 * @param {Number} lat - latitude
+		 * @param {Number} lng - longitude
+		 * @returns {Object}
+		 */
+		function createLatLng(lat, lng) {
+			return L.latLng(lat, lng);
 		}
 
 		return {
@@ -135,7 +145,8 @@ define(
 			validateParams: validateParams,
 			createPlayerMarker: createPlayerMarker,
 			updatePlayerMarkerLocation: updatePlayerMarkerLocation,
-			centerMapToPlayerLocation: centerMapToPlayerLocation
+			updateMapPosition: updateMapPosition,
+			createLatLng: createLatLng
 		};
 	}
 );
