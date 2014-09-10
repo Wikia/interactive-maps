@@ -28,7 +28,7 @@ gulp.task('locales', function () {
 
 		res.on('end', function () {
 			mkdirp(getDirName(path), function () {
-				fs.writeFileSync(paths.locales, translationsData);
+				fs.writeFileSync(path, translationsData);
 				deferred.resolve();
 			});
 		});
