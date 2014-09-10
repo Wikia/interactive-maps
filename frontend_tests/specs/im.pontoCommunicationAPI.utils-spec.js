@@ -1,7 +1,7 @@
 'use strict';
 
 describe('im.pontoCommunicationAPI.utils', function () {
-	var L = jasmine.createSpyObj('L', ['icon']),
+	var L = jasmine.createSpyObj('L', ['icon', 'latLng']),
 		poiModule = {
 			createPoiMarker: function () {
 				return true;
@@ -287,5 +287,19 @@ describe('im.pontoCommunicationAPI.utils', function () {
 		apiUtils.updateMapPosition(map, latLng, zoom);
 
 		expect(map.setView).toHaveBeenCalledWith(latLng, zoom);
+	});
+
+	it('creates latLng leaflet object', function () {
+		var lat = 1,
+			lng = 1,
+			latLngMock = {},
+			latLng;
+
+		L.latLng.andReturn(latLngMock);
+
+		latLng = apiUtils.createLatLng(lat, lng);
+
+		expect(L.latLng).toHaveBeenCalledWith(lat, lng);
+		expect(latLng).toBe(latLngMock);
 	});
 });
