@@ -87,7 +87,7 @@ define(
 			};
 
 			/**
-			 * @desc removes player location marker from map
+			 * @desc updates Map position and its zoom level
 			 * @param {Object} params - params sent via ponto
 			 * @param {Number} callbackId - ponto callback ID
 			 */
