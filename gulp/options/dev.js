@@ -3,17 +3,17 @@
  */
 'use strict';
 
-var paths = require('../paths');
+var paths = require('../paths'),
+	extend = require('util')._extend;
 
 module.exports = {
-	nodemon: {
-		script: paths.nodemon.script,
-		env: {
+	server: {
+		delay: 0,
+		env: extend(process.env, {
 			'NODE_ENV': 'devbox'
-		},
-		// this is workaround, see https://github.com/JacksonGariety/gulp-nodemon/issues/20
-		ext: '__non_existing_extension__',
-		watch: '__non_existing_path__'
+		}),
+		path: paths.server.script,
+		successMessage: /Server started/
 	},
 	srcBase: {
 		base: './'

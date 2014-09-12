@@ -103,6 +103,8 @@ if (typeof workersCount === 'undefined') {
 }
 
 if (cluster.isMaster) {
+	process.send('Server started'); // it's used by gulp-develop-server
+
 	logger.debug('Started master process, pid: ' + process.pid);
 	// Fork workers
 	for (var i = 0; i < workersCount; i++) {

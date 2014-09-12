@@ -35,7 +35,7 @@ module.exports = {
 		src: basePath + '/node_modules',
 		dest: dest + '/node_modules'
 	},
-	nodemon: {
+	server: {
 		script: dest + '/server/app.js'
 	},
 	specs: 'specs/**',
