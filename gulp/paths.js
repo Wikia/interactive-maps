@@ -6,7 +6,7 @@
 
 var path = require('path'),
 	basePath = '.',
-	dest = basePath + '/build/';
+	dest = basePath + '/build';
 
 module.exports = {
 	assetsCBPath: {
@@ -15,36 +15,41 @@ module.exports = {
 	},
 	base: basePath,
 	baseFull: path.resolve(basePath),
-	cacheBuster: dest + 'cachebuster.json',
+	cacheBuster: dest + '/cachebuster.json',
 	copyFiles: [
 		basePath + '/api/**/*.*',
-		'!' + basePath + '/api/v1/render.html',
+		'!' + basePath + '/api/v1/render.html', // it's handled by 'front' task
 		basePath + '/assets/**/*.*',
 		basePath + '/lib/*.*',
-		basePath + '/locales/*.*',
 		basePath + '/specs/*.*',
 		basePath + '/tools/*.*',
-		basePath + '/apiServer.js',
-		basePath + '/app.js',
-		basePath + '/gulpfiles.js',
-		basePath + '/kueServer.js',
-		basePath + '/newrelic.js'
+		basePath + '/server/*.*'
 	],
 	dest: dest,
+	destFull: path.resolve(dest),
 	front: basePath + '/api/v1/render.html',
-	ignoreScriptFiles: '!' + basePath + '/assets/**/*.js',
+	ignoreScriptFiles: '!' + basePath + '/assets/**/*.js', // scripts from assets are handled by 'front' task
 	lib: 'lib/*.js',
-	locales: dest + 'locales/translations.json',
+	locales: dest + '/locales/translations.json',
 	nodeModules: {
-		src: 'node_modules',
-		dest: dest + 'node_modules'
+		src: basePath + '/node_modules',
+		dest: dest + '/node_modules'
 	},
 	nodemon: {
-		script: dest + 'app.js'
+		script: dest + '/server/app.js'
 	},
 	specs: 'specs/**',
-	watch: [
-		basePath + '/api/**/*.js',
-		basePath + '/lib/*.js'
-	]
+	watch: {
+		assets: [
+			basePath + '/assets/**/*.*'
+		],
+		copyFiles: [
+			basePath + '/api/**/*.*',
+			basePath + '/lib/*.js',
+			basePath + '/server/*.js'
+		],
+		nodeModules: [
+			basePath + '/package.json'
+		]
+	}
 };

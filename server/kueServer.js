@@ -1,6 +1,6 @@
 'use strict';
 
-var config = require('./lib/config'),
+var config = require('../lib/config'),
 	kue = require('kue');
 
 // create kue server

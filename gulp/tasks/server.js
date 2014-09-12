@@ -8,9 +8,9 @@ var gulp = require('gulp'),
 	log = require('../utils/logger'),
 	instance;
 
-gulp.task('server', ['build'], function () {
+gulp.task('server', function () {
 	if (!environment.isDev) {
-		throw new Error('This task shouldn\'t be run outside of dev environment');
+		throw new Error('This task shouldn\'t be ran outside of dev environment');
 	}
 
 	if (!instance) {
@@ -19,7 +19,7 @@ gulp.task('server', ['build'], function () {
 				log('Restarting server');
 			});
 
-		require(paths.baseFull + '/kueServer');
+		require(paths.destFull + '/server/kueServer');
 	} else {
 		instance.emit('restart');
 	}

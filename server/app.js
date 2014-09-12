@@ -1,10 +1,10 @@
 'use strict';
 
 if (process.env.NEW_RELIC_ENABLED === 'true') {
-	require('newrelic');
+	require('./newrelic');
 }
 
-var logger = require('./lib/logger'),
+var logger = require('../lib/logger'),
 	cluster = require('cluster'),
 	coresCount = require('os').cpus().length,
 	workersCount = process.env.WIKIA_IM_WORKERS,
@@ -16,7 +16,7 @@ var logger = require('./lib/logger'),
 	gracefulShutdown = false,
 	http = require('http');
 
-config = require('./lib/config');
+config = require('../lib/config');
 config.setRoot(__dirname);
 
 jobs = kue.createQueue(config);
@@ -133,7 +133,7 @@ if (cluster.isMaster) {
 
 	require('./apiServer');
 } else {
-	require('./lib/jobProcessors');
+	require('../lib/jobProcessors');
 }
 
 process.on('uncaughtException', function (err) {

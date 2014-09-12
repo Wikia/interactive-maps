@@ -4,7 +4,7 @@
  * See lib/config.defaults.js in the agent distribution for a more complete
  * description of configuration variables and their potential values.
  */
-var config = require('./lib/config').newrelic;
+var config = require('../lib/config').newrelic;
 
 exports.config = {
     /**
