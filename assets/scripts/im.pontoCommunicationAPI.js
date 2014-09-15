@@ -4,16 +4,18 @@ define(
 	function (ponto, config, apiUtils, mapModule) {
 		'use strict';
 
+		var apiConfig = config.pontoCommunicationAPI,
+			map,
+			mapBoundaries,
+			playerMarker;
+
 		/**
 		 * @desc Ponto scope object with communication API with map in web view / iframe
 		 * @constructor
 		 */
 		function PontoCommunicationAPI() {
-			var apiConfig = config.pontoCommunicationAPI,
-				map = mapModule.getMapObject(),
-				mapBoundaries = mapModule.getMapBoundaries(),
-				playerMarker;
-
+			map = mapModule.getMapObject();
+			mapBoundaries = mapModule.getMapBoundaries();
 
 			/**
 			 * @desc sets position of player location
