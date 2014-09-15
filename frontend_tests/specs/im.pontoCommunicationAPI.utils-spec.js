@@ -1,7 +1,7 @@
 'use strict';
 
 describe('im.pontoCommunicationAPI.utils', function () {
-	var L = jasmine.createSpyObj('L', ['icon']),
+	var L = jasmine.createSpyObj('L', ['icon', 'latLng']),
 		poiModule = {
 			createPoiMarker: function () {
 				return true;
@@ -28,6 +28,16 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			}
 		},
 		apiUtils = modules['im.pontoCommunicationAPI.utils'](L, config, utils, poiModule);
+
+	it('is module with public API', function () {
+		expect(typeof apiUtils === 'object').toBe(true);
+		expect(typeof apiUtils.createPontoResponse === 'function').toBe(true);
+		expect(typeof apiUtils.validateParams === 'function').toBe(true);
+		expect(typeof apiUtils.createPlayerMarker === 'function').toBe(true);
+		expect(typeof apiUtils.updatePlayerMarkerLocation === 'function').toBe(true);
+		expect(typeof apiUtils.updateMapPosition === 'function').toBe(true);
+		expect(typeof apiUtils.createLatLng === 'function').toBe(true);
+	});
 
 	it('Creates valid API response object', function () {
 		var params = [
@@ -147,7 +157,7 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			var result = apiUtils.validateParams(data);
 
 			expect(result.success).toBe(false);
-			expect(result.message).toBe(config.pontoCommunicationAPI.responseMessages.invalidParamTypes);
+			expect(result.errorMessage).toBe(config.pontoCommunicationAPI.responseMessages.invalidParamTypes);
 		});
 	});
 
@@ -181,7 +191,7 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			var result = apiUtils.validateParams(data, bounds);
 
 			expect(result.success).toBe(false);
-			expect(result.message).toBe(config.pontoCommunicationAPI.responseMessages.outOfMapBounds);
+			expect(result.errorMessage).toBe(config.pontoCommunicationAPI.responseMessages.outOfMapBounds);
 		});
 	});
 
@@ -203,7 +213,7 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			var result = apiUtils.validateParams(data);
 
 			expect(result.success).toBe(false);
-			expect(result.message).toBe(config.pontoCommunicationAPI.responseMessages.invalidZoomLevel);
+			expect(result.errorMessage).toBe(config.pontoCommunicationAPI.responseMessages.invalidZoomLevel);
 		});
 	});
 
@@ -284,8 +294,22 @@ describe('im.pontoCommunicationAPI.utils', function () {
 			latLng = {},
 			zoom = 0;
 
-		apiUtils.centerMapToPlayerLocation(map, latLng, zoom);
+		apiUtils.updateMapPosition(map, latLng, zoom);
 
 		expect(map.setView).toHaveBeenCalledWith(latLng, zoom);
+	});
+
+	it('creates latLng leaflet object', function () {
+		var lat = 1,
+			lng = 1,
+			latLngMock = {},
+			latLng;
+
+		L.latLng.andReturn(latLngMock);
+
+		latLng = apiUtils.createLatLng(lat, lng);
+
+		expect(L.latLng).toHaveBeenCalledWith(lat, lng);
+		expect(latLng).toBe(latLngMock);
 	});
 });

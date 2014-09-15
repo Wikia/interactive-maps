@@ -2,9 +2,10 @@
 
 describe('im.pontoCommunicationAPI', function () {
 	var ponto = {
-			PontoBaseHandler: jasmine.createSpyObj('PontoBaseHandler', ['derive']),
-			respond: function () {}
+			respond: jasmine.createSpy('respond'),
+			PontoBaseHandler: jasmine.createSpyObj('PontoBaseHandler', ['derive'])
 		},
+		pontoCallbackId = 1,
 		config = {
 			mapConfig: {
 				max_zoom: 1,
@@ -14,7 +15,8 @@ describe('im.pontoCommunicationAPI', function () {
 				responseMessages: {
 					setPlayerLocation: 'Player location set successfully',
 					removePlayerLocation: 'Player location removed from map successfully',
-					invalidParamTypes: '"lat" and "lng" params must be numbers'
+					invalidParamTypes: 'Wrong parameters types',
+					updatedMapPosition: 'Map position updated successfully'
 				},
 				responseCodes: {
 					success: 200,
@@ -22,21 +24,22 @@ describe('im.pontoCommunicationAPI', function () {
 				}
 			}
 		},
-		L = {
-			latLng: function() {}
-		},
 		playerMarkerMock = jasmine.createSpyObj('playerMarkerMock', ['addTo']),
 		mapMock = {
-			removeLayer: function() {},
-			hasLayer: function() {}
+			removeLayer: jasmine.createSpy('removeLayer'),
+			hasLayer: jasmine.createSpy('hasLayer')
 		},
+		pontoResponseMock = {},
+		latLngMock = {},
 		apiUtils = {
-			createPontoResponse: function () {},
+			createPontoResponse: jasmine.createSpy('createPontoResponse').andReturn(pontoResponseMock),
 			validateParams: function () {},
 			createPlayerMarker: function () {
 				return playerMarkerMock;
 			},
-			updatePlayerMarkerLocation: function () {}
+			createLatLng: jasmine.createSpy('createLatLng').andReturn(latLngMock),
+			updatePlayerMarkerLocation: jasmine.createSpy('updatePlayerMarkerLocation'),
+			updateMapPosition: jasmine.createSpy('updateMapPosition')
 		},
 		mapModule = {
 			getMapObject: function() {
@@ -44,8 +47,25 @@ describe('im.pontoCommunicationAPI', function () {
 			},
 			getMapBoundaries: function() {}
 		},
-		PontoAPI = modules['im.pontoCommunicationAPI'](ponto, config, L, apiUtils, mapModule);
+		PontoAPI = modules['im.pontoCommunicationAPI'](ponto, config, apiUtils, mapModule);
 
+	/**
+	 * @desc helper function for spying on validateParams with return value
+	 * @param {Boolean} success
+	 */
+	function paramsValidationSpyHelper(success) {
+		var result = {
+			success: success
+		};
+
+		if (!success) {
+			result.errorMessage = config.pontoCommunicationAPI.responseMessages.invalidParamTypes;
+		}
+
+		spyOn(apiUtils, 'validateParams').andReturn(result);
+
+		return result;
+	}
 
 	it('Creates Ponto Communication API', function () {
 		var api = PontoAPI.getInstance();
@@ -56,11 +76,11 @@ describe('im.pontoCommunicationAPI', function () {
 		expect(api instanceof PontoAPI).toBe(true);
 		expect(typeof api.setPlayerCurrentLocation).toBe('function');
 		expect(typeof api.removePlayerLocation).toBe('function');
+		expect(typeof api.updateMapPosition).toBe('function');
 	});
 
 	it('Sets player location on map', function() {
-		var api = PontoAPI.getInstance(),
-			requestParams = {
+		var requestParams = {
 				lat: 1,
 				lng: 1
 			},
@@ -68,22 +88,18 @@ describe('im.pontoCommunicationAPI', function () {
 				lat: requestParams.lat,
 				lon: requestParams.lng
 			},
-			callbackId = 1,
-			validationResult = {
-				success: true
-			};
+			validationResult = paramsValidationSpyHelper(true);
 
-		spyOn(apiUtils, 'validateParams').andReturn(validationResult);
-		spyOn(mapMock, 'hasLayer').andReturn(false);
+
+		mapMock.hasLayer.andReturn(false);
 		spyOn(apiUtils, 'createPlayerMarker').andCallThrough();
-		spyOn(apiUtils, 'createPontoResponse');
 
-		api.setPlayerCurrentLocation(requestParams, callbackId);
+		PontoAPI.getInstance().setPlayerCurrentLocation(requestParams, pontoCallbackId);
 
 		expect(apiUtils.createPlayerMarker).toHaveBeenCalledWith(createMarkerParams);
 		expect(playerMarkerMock.addTo).toHaveBeenCalledWith(mapMock);
 		expect(apiUtils.createPontoResponse).toHaveBeenCalledWith(
-			true,
+			validationResult.success,
 			config.pontoCommunicationAPI.responseCodes.success,
 			config.pontoCommunicationAPI.responseMessages.setPlayerLocation,
 			undefined
@@ -91,47 +107,35 @@ describe('im.pontoCommunicationAPI', function () {
 	});
 
 	it('Updates player location on map', function () {
-		var api = PontoAPI.getInstance(),
-			requestParams = {
+		var requestParams = {
 				lat: 1,
 				lng: 1
 			},
-			callbackId = 1,
-			validationResult = {
-				success: true
-			},
-			latLng = {};
+			validationResult = paramsValidationSpyHelper(true);
 
-		spyOn(apiUtils, 'validateParams').andReturn(validationResult);
-		spyOn(mapMock, 'hasLayer').andReturn(true);
-		spyOn(apiUtils, 'updatePlayerMarkerLocation');
-		spyOn(L, 'latLng').andReturn(latLng);
-		spyOn(apiUtils, 'createPontoResponse');
+		mapMock.hasLayer.andReturn(true);
 
-		api.setPlayerCurrentLocation(requestParams, callbackId);
+		PontoAPI.getInstance().setPlayerCurrentLocation(requestParams, pontoCallbackId);
 
-		expect(L.latLng).toHaveBeenCalledWith(requestParams.lat, requestParams.lng);
+		expect(apiUtils.createLatLng).toHaveBeenCalledWith(requestParams.lat, requestParams.lng);
 		expect(apiUtils.updatePlayerMarkerLocation).toHaveBeenCalled();
-		expect(apiUtils.updatePlayerMarkerLocation.mostRecentCall.args[1]).toBe(latLng);
+		expect(apiUtils.updatePlayerMarkerLocation.mostRecentCall.args[1]).toBe(latLngMock);
 		expect(apiUtils.createPontoResponse).toHaveBeenCalledWith(
-			true,
+			validationResult.success,
 			config.pontoCommunicationAPI.responseCodes.success,
 			config.pontoCommunicationAPI.responseMessages.setPlayerLocation,
 			undefined
 		);
+		expect(ponto.respond).toHaveBeenCalledWith(pontoResponseMock, pontoCallbackId);
+
 	});
 
 	it('Sends success false response for setPlayerCurrentLocation', function () {
-		var api = PontoAPI.getInstance(),
-			requestParams = {
+		var requestParams = {
 				lat: 1,
 				lng: 1
 			},
-			callbackId = 1,
-			validationResult = {
-				success: false,
-				message: config.pontoCommunicationAPI.responseMessages.invalidParamTypes
-			},
+			validationResult = paramsValidationSpyHelper(false),
 			boundaries = {},
 			responseContent = {
 				boundaries: boundaries,
@@ -139,30 +143,21 @@ describe('im.pontoCommunicationAPI', function () {
 				minZoom: config.mapConfig.min_zoom
 			};
 
-		spyOn(apiUtils, 'validateParams').andReturn(validationResult);
-		spyOn(apiUtils, 'createPontoResponse');
 		spyOn(mapModule, 'getMapBoundaries').andReturn(boundaries);
 
-		api.setPlayerCurrentLocation(requestParams, callbackId);
+		PontoAPI.getInstance().setPlayerCurrentLocation(requestParams, pontoCallbackId);
 
 		expect(apiUtils.createPontoResponse).toHaveBeenCalledWith(
-			false,
+			validationResult.success,
 			config.pontoCommunicationAPI.responseCodes.invalidParams,
-			config.pontoCommunicationAPI.responseMessages.invalidParamTypes,
+			validationResult.errorMessage,
 			responseContent
 		);
+		expect(ponto.respond).toHaveBeenCalledWith(pontoResponseMock, pontoCallbackId);
 	});
 
 	it('Removes player location from map', function () {
-		var api = PontoAPI.getInstance(),
-			callbackId = 1,
-			pontoResponse = 'test';
-
-		spyOn(mapMock, 'removeLayer');
-		spyOn(ponto, 'respond');
-		spyOn(apiUtils, 'createPontoResponse').andReturn(pontoResponse);
-
-		api.removePlayerLocation(null, callbackId);
+		PontoAPI.getInstance().removePlayerLocation(null, pontoCallbackId);
 
 		expect(mapMock.removeLayer).toHaveBeenCalled();
 		expect(apiUtils.createPontoResponse).toHaveBeenCalledWith(
@@ -170,6 +165,54 @@ describe('im.pontoCommunicationAPI', function () {
 			config.pontoCommunicationAPI.responseCodes.success,
 			config.pontoCommunicationAPI.responseMessages.removePlayerLocation
 		);
-		expect(ponto.respond).toHaveBeenCalledWith(apiUtils.createPontoResponse(), callbackId);
+		expect(ponto.respond).toHaveBeenCalledWith(pontoResponseMock, pontoCallbackId);
+	});
+
+	it('Updates Map position', function () {
+		var api = PontoAPI.getInstance(),
+			requestParams = [
+				{
+					lat: 1,
+					lng: 1
+				},
+				{
+					lat: 1,
+					lng: 1,
+					zoom: 1
+				}
+			],
+			validationResult = paramsValidationSpyHelper(true);
+
+		requestParams.forEach( function (data) {
+			api.updateMapPosition(data, pontoCallbackId);
+
+			expect(apiUtils.createLatLng).toHaveBeenCalledWith(data.lat, data.lng);
+			expect(apiUtils.updateMapPosition).toHaveBeenCalledWith(mapMock, latLngMock, data.zoom);
+			expect(apiUtils.createPontoResponse).toHaveBeenCalledWith(
+				validationResult.success,
+				config.pontoCommunicationAPI.responseCodes.success,
+				config.pontoCommunicationAPI.responseMessages.updatedMapPosition,
+				undefined
+			);
+			expect(ponto.respond).toHaveBeenCalledWith(pontoResponseMock, pontoCallbackId);
+		});
+	});
+
+	it('fails to update Map position - params validation failed', function () {
+		var params = {},
+			validationResult = paramsValidationSpyHelper(false),
+			responseContent = {
+				maxZoom: config.mapConfig.max_zoom,
+				minZoom: config.mapConfig.min_zoom
+			};
+
+		PontoAPI.getInstance().updateMapPosition(params, pontoCallbackId);
+
+		expect(apiUtils.createPontoResponse).toHaveBeenCalledWith(
+			validationResult.success,
+			config.pontoCommunicationAPI.responseCodes.invalidParams,
+			validationResult.errorMessage,
+			responseContent
+		);
 	});
 });
