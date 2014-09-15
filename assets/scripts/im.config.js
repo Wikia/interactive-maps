@@ -26,7 +26,8 @@ define('im.config', ['im.window'], function (w) {
 				removePlayerLocation: 'Player location removed from map successfully',
 				invalidParamTypes: 'Wrong parameters types',
 				invalidZoomLevel: 'Invalid zoom level value',
-				outOfMapBounds: 'Player location must be inside map boundaries'
+				outOfMapBounds: 'Player location must be inside map boundaries',
+				updatedMapPosition: 'Map position updated successfully'
 			},
 			responseCodes: {
 				success: 200,
