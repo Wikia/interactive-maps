@@ -18,9 +18,10 @@ var dbCon = require('../lib/db_connector'),
 
 	table = 'poi',
 	args = process.argv.slice(2),
-	mapId = args[0],
+	mapId = +args[0],
 	find = args[1],
 	replace = args[2];
+
 
 /**
  * @desc validates process arguments
@@ -108,18 +109,15 @@ validateArgs(mapId, find, replace);
 
 dbCon.getConnection(dbCon.connType.master, function (conn) {
 	getAllPoisOnMap(conn, mapId).then(function (pois) {
-		var newLink,
-			length = pois.length,
-			i;
+		var newLink;
 
-		for (i = 0; i < length; i++) {
-			newLink = pois[i].link.replace(find, replace);
-
-			if (pois[i].link !== newLink) {
-				updatePoiLink(conn, pois[i].id, newLink).then(function () {
-					poiIndexer.addPoiDataToQueue(conn, poiIndexer.poiOperations.update, pois[i].id);
+		pois.forEach(function (poi) {
+			newLink = poi.link.replace(find, replace);
+			if (poi.link !== newLink) {
+				updatePoiLink(conn, poi.id, newLink).then(function () {
+					poiIndexer.addPoiDataToQueue(conn, poiIndexer.poiOperations.update, pois.id);
 				});
 			}
-		}
+		});
 	});
 });
