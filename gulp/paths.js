@@ -30,7 +30,11 @@ module.exports = {
 	front: basePath + '/api/v1/render.html',
 	ignoreScriptFiles: '!' + basePath + '/assets/**/*.js', // scripts from assets are handled by 'front' task
 	lib: 'lib/*.js',
-	locales: dest + '/locales/translations.json',
+	locales: {
+		dest: dest + '/locales/translations.json',
+		// temporary solution, to be changed when new Messages Service is introduced
+		src: 'http://maps.wikia.com/wikia.php?controller=WikiaInteractiveMaps&method=translation'
+	},
 	nodeModules: {
 		src: basePath + '/node_modules',
 		dest: dest + '/node_modules'
