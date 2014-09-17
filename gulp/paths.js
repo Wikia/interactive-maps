@@ -9,17 +9,20 @@ var path = require('path'),
 	dest = basePath + '/build';
 
 module.exports = {
-	assetsCBPath: {
-		src: '/assets/',
-		dest: '/assets/{{cacheBuster}}/'
-	},
 	base: basePath,
 	baseFull: path.resolve(basePath),
-	cacheBuster: dest + '/cachebuster.json',
+	cacheBuster: {
+		file: dest + '/cachebuster.json',
+		assetsPath: {
+			src: '/assets/',
+			dest: '/assets/{{cacheBuster}}/'
+		}
+	},
 	copyFiles: [
 		basePath + '/api/**/*.*',
 		'!' + basePath + '/api/v1/render.html', // it's handled by 'front' task
 		basePath + '/assets/**/*.*',
+		basePath + '/frontend_tests/**/*.*',
 		basePath + '/lib/*.*',
 		basePath + '/specs/*.*',
 		basePath + '/tools/*.*',

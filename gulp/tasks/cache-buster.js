@@ -5,7 +5,7 @@ var gulp = require('gulp'),
 	fs = require('fs'),
 	gutil = require('gulp-util'),
 	getDirName = require('path').dirname,
-	path = require('../paths').cacheBuster,
+	path = require('../paths').cacheBuster.file,
 	log = require('../utils/logger'),
 	cbValue = new Date().getTime();
 

@@ -28,7 +28,7 @@ gulp.task('front', function () {
 		),
 		gulpif(
 			'*.html',
-			replace(paths.assetsCBPath.src, paths.assetsCBPath.dest)
+			replace(paths.cacheBuster.assetsPath.src, paths.cacheBuster.assetsPath.dest)
 		),
 		gulp.dest(paths.dest)
 	);
