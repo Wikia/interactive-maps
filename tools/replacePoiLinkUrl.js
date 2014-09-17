@@ -115,7 +115,7 @@ dbCon.getConnection(dbCon.connType.master, function (conn) {
 			newLink = poi.link.replace(find, replace);
 			if (poi.link !== newLink) {
 				updatePoiLink(conn, poi.id, newLink).then(function () {
-					poiIndexer.addPoiDataToQueue(conn, poiIndexer.poiOperations.update, pois.id);
+					poiIndexer.addPoiDataToQueue(conn, poiIndexer.poiOperations.update, poi.id);
 				});
 			}
 		});
