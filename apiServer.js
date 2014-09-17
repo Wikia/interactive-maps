@@ -3,6 +3,7 @@
 // third party modules
 var express = require('express'),
 	detour = require('detour'),
+	responseTime = require('response-time'),
 
 	// express middleware
 	guard = require('./lib/guard'),
@@ -35,11 +36,14 @@ routeBuilder(router, crudModules, apiPath);
 
 // enable CORS for all requests (possiblty apiAbsolutePath could be used insteaf of *)
 app.all('*', function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Headers', 'X-Requested-With');
 	next();
 });
-
+app.use(responseTime({
+	digits: 0,
+	header: 'X-Backend-Response-Time'
+}));
 app.use(guard);
 app.use(logger.middleware);
 app.use(rawBody);
@@ -48,7 +52,6 @@ app.use(cachingUtils.middleware);
 app.use(router.middleware);
 renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
-
 // assets' cachebusting
 app.use('/assets', cachingUtils.filterCachebuster);
 app.use('/assets', express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
