@@ -21,11 +21,13 @@ function getTileSetsCollection(req, res, next) {
 		},
 		limit = parseInt(req.query.limit, 10) || false,
 		offset = parseInt(req.query.offset, 10) || 0,
-		search = req.query.search.trim() || false,
+		search = req.query.search || false,
 		query = dbCon.knex(tileSetConfig.dbTable).column(tileSetConfig.getCollectionDbColumns).where(filter);
 
 	// add search term to DB query
 	if (search) {
+		search = search.trim();
+
 		if (!tileSetUtils.validateSearchTerm(search)) {
 			next(
 				errorHandler.badRequestError([tileSetConfig.searchErrorMsg])
