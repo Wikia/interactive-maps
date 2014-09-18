@@ -38,8 +38,13 @@ function createTileSetAPIUrl(tileSetId, req) {
  */
 function extendTileSetObject(tileSet, req) {
 	tileSet.image = createTileSetImageUrl(tileSet.id, tileSet.image);
-	tileSet.max_zoom = utils.binToMaxZoomLevel(tileSet.max_zoom);
 	tileSet.url = createTileSetAPIUrl(tileSet.id, req);
+
+	if (tileSet.max_zoom) {
+		tileSet.max_zoom = utils.binToMaxZoomLevel(tileSet.max_zoom);
+	}
+
+	return tileSet;
 }
 
 /**
@@ -54,7 +59,7 @@ function processTileSetCollection(collection, req, process) {
 		i;
 
 	for (i = 0; i < length; i++) {
-		process(collection[i], req);
+		collection[i] = process(collection[i], req);
 	}
 
 	return collection;
