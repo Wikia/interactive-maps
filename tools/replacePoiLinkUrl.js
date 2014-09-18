@@ -25,23 +25,18 @@ var dbCon = require('../lib/db_connector'),
 
 /**
  * @desc validates process arguments
- * @param {*} mapId
- * @param {*} find
- * @param {*} replace
+ * @param {Number} mapId
+ * @param {String} find
+ * @param {String} replace
  * @throws {Error} - if validation fail
  * @returns {boolean} - true if validation pass
  */
 function validateArgs(mapId, find, replace) {
-	var findReplace = [
-		find,
-		replace
-	];
-
 	if (typeof mapId !== 'number' || mapId % 1 !== 0) {
 		throw new Error('mapId argument must be integer');
 	}
 
-	findReplace.forEach(function (arg) {
+	[find, replace].forEach(function (arg) {
 		if (typeof arg !== 'string' || arg.trim().length === 0) {
 			throw new Error('find and replace arguments must be non empty strings');
 		}
@@ -70,29 +65,9 @@ function getAllPoisOnMap(conn, mapId) {
 /**
  * @desc replaces the 'find' string with 'replace' string in link column and updates the POI in db
  * @param {Object} conn
- * @param {Object} poi - poi object from db
- * @param {String} find
- * @param {String} replace
+ * @param {Number} poiId - id of Point Of Interest
+ * @param {String} newLink -
  */
-function replacePoiLinkUrl(conn, poi, find, replace) {
-	var newLink = poi.link.replace(find, replace);
-
-	if (poi.link !== newLink) {
-		dbCon.update(
-			conn,
-			table,
-			{
-				link: newLink
-			},
-			{
-				id: poi.id
-			}
-		).then(function (data) {
-			console.log('POI id: ' + poi.id + ' link: ' + poi.link + ' updated to: ' + newLink);
-			console.log(data);
-		});
-	}
-}
 
 function updatePoiLink(conn, poiId, newLink) {
 	return dbCon.update(conn, table,
