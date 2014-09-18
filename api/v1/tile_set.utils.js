@@ -2,7 +2,7 @@
 
 var utils = require('./../../lib/utils'),
 	config = require('./../../lib/config'),
-	tileSetConfig = require('./tileSet.config');
+	tileSetConfig = require('./tile_set.config');
 
 /**
  * @desc creates tileSet image URL and returns it

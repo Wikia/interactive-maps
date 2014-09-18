@@ -5,8 +5,8 @@ var dbCon = require('./../../lib/db_connector'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	utils = require('./../../lib/utils'),
 	errorHandler = require('./../../lib/errorHandler'),
-	tileSetConfig = require('./tileSet.config'),
-	tileSetUtils = require('./tileSet.utils'),
+	tileSetConfig = require('./tile_set.config'),
+	tileSetUtils = require('./tile_set.utils'),
 	addTileSet = require('./../../lib/addTileSet'); // custom action for POST method
 
 /**
