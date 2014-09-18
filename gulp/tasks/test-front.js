@@ -1,10 +1,12 @@
 'use strict';
 
 var gulp = require('gulp'),
+	gutil = require('gulp-util'),
 	karma = require('gulp-karma'),
-	paths = require('../paths');
+	paths = require('../paths'),
+	dependencies = gutil.env.nobuild ? [] : ['build'];
 
-gulp.task('test-front', ['build'], function () {
+gulp.task('test-front', dependencies, function () {
 	return gulp
 		.src(paths.tests.front.files)
 		.pipe(karma({

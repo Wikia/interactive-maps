@@ -32,7 +32,9 @@ describe('jobProcessors', function () {
 			'./logger': {},
 			'./cleanupTiles': {},
 			'./uploadTiles': {},
-			'./optimizeTiles': {}
+			'./optimizeTiles': {},
+			'./imageBackground': {},
+			'./squidUpdate': {}
 		});
 	});
 });
