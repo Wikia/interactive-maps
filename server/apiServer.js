@@ -6,27 +6,27 @@ var express = require('express'),
 	responseTime = require('response-time'),
 
 	// express middleware
-	guard = require('./lib/guard'),
-	logger = require('./lib/logger'),
-	rawBody = require('./lib/rawBody'),
-	errorHandler = require('./lib/errorHandler'),
-	heartBeatHandler = require('./lib/healthCheck').heartBeatHandler,
-	cachingUtils = require('./lib/cachingUtils'),
+	guard = require('../lib/guard'),
+	logger = require('../lib/logger'),
+	rawBody = require('../lib/rawBody'),
+	errorHandler = require('../lib/errorHandler'),
+	heartBeatHandler = require('../lib/healthCheck').heartBeatHandler,
+	cachingUtils = require('../lib/cachingUtils'),
 
 	// API entry points modules
-	getCRUDs = require('./lib/getCRUDs'),
-	routeBuilder = require('./lib/routeBuilder'),
-	renderMap = require('./lib/renderMap'),
+	getCRUDs = require('../lib/getCRUDs'),
+	routeBuilder = require('../lib/routeBuilder'),
+	renderMap = require('../lib/renderMap'),
 
 	// other local variables
-	config = require('./lib/config'),
+	config = require('../lib/config'),
 	port = config.api.port,
 	app = express(),
 	router = detour(),
 
 	// Interactive Maps API Version 1
 	apiPath = '/api/v1/',
-	apiAbsolutePath = __dirname + apiPath,
+	apiAbsolutePath = config.root + apiPath,
 	crudModules = getCRUDs.requireCruds(getCRUDs.getCruds(apiAbsolutePath)),
 	// express divides passed maxAge by 1000
 	staticMaxAge = cachingUtils.cacheShort * 1000;
@@ -54,9 +54,9 @@ renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
 // assets' cachebusting
 app.use('/assets', cachingUtils.filterCachebuster);
-app.use('/assets', express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
+app.use('/assets', express.static(config.root + '/assets', {maxAge: staticMaxAge}));
 // for assets required in leaflet-wikia.css
-app.use(express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
+app.use(express.static(config.root + '/assets', {maxAge: staticMaxAge}));
 
 app.use(errorHandler.middleware);
 
