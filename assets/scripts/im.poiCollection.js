@@ -1,11 +1,21 @@
-'use strict';
-
 define('im.poiCollection', ['im.window'], function (w) {
+	'use strict';
+
 	var doc = w.document,
 		// holds all poi objects currently displayed on map
 		poiObjectsState = {},
 		// holds all pois DOM elements grouped by poi categories
 		poiCategoriesCache = {};
+
+	/**
+	 * @desc setup initial poi state object
+	 * @param {Array} pois
+	 */
+	function setupInitialPoiState(pois) {
+		pois.forEach(function (poi) {
+			addToState(poi);
+		});
+	}
 
 	/**
 	 * @desc checks if poi is in state
@@ -100,6 +110,7 @@ define('im.poiCollection', ['im.window'], function (w) {
 	}
 
 	return {
+		setupInitialPoiState: setupInitialPoiState,
 		isPoiInState: isPoiInState,
 		addToState: addToState,
 		getPoiState: getPoiState,

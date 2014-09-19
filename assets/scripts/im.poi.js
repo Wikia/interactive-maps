@@ -1,10 +1,10 @@
-'use strict';
-
 define('im.poi', ['im.leafletWrapper', 'im.config', 'im.renderUI', 'im.i18n'], function (L, config, renderUI, i18n) {
+	'use strict';
+
 	/**
 	 * @desc Creates POI marker
 	 * @param {object} poi - POI object
-	 * @param {string} icon - icon URL
+	 * @param {object} icon - leaflet icon object
 	 * @returns {object} - leaflet marker object
 	 */
 	function createPoiMarker(poi, icon) {
@@ -53,7 +53,7 @@ define('im.poi', ['im.leafletWrapper', 'im.config', 'im.renderUI', 'im.i18n'], f
 	/**
 	 * @desc Add point to the map
 	 * @param {object} poi - POI object
-	 * @param {string} icon - icon URL
+	 * @param {object} icon - leaflet icon object
 	 * @param {object} markers - leaflet markers layer group
 	 * @returns {object} - marker object
 	 */
@@ -89,6 +89,7 @@ define('im.poi', ['im.leafletWrapper', 'im.config', 'im.renderUI', 'im.i18n'], f
 	return {
 		addPoiToMap: addPoiToMap,
 		createTempPoiMarker: createTempPoiMarker,
-		getPoiMarker: getPoiMarker
+		getPoiMarker: getPoiMarker,
+		createPoiMarker: createPoiMarker
 	};
 });
