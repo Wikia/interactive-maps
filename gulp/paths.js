@@ -57,11 +57,13 @@ module.exports = {
 		}
 	},
 	watch: {
-		assets: [
-			basePath + '/assets/**/*.*'
+		front: [
+			basePath + '/assets/**/*.*',
+			basePath + '/api/v1/render.html'
 		],
 		copyFiles: [
 			basePath + '/api/**/*.*',
+			'!' + basePath + '/api/v1/render.html',
 			basePath + '/lib/*.js',
 			basePath + '/server/*.js'
 		],
