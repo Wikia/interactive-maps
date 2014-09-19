@@ -32,7 +32,7 @@ module.exports = {
 	destFull: path.resolve(dest),
 	front: basePath + '/api/v1/render.html',
 	ignoreScriptFiles: '!' + basePath + '/assets/**/*.js', // scripts from assets are handled by 'front' task
-	lib: 'lib/*.js',
+	lib: dest + '/lib/*.js',
 	locales: {
 		dest: dest + '/locales/translations.json',
 		// temporary solution, to be changed when new Messages Service is introduced
