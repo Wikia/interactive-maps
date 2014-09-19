@@ -82,17 +82,26 @@ function updatePoiLink(conn, poiId, newLink) {
 
 validateArgs(mapId, find, replace);
 
-dbCon.getConnection(dbCon.connType.master, function (conn) {
-	getAllPoisOnMap(conn, mapId).then(function (pois) {
-		var newLink;
+function start() {
+	dbCon.getConnection(dbCon.connType.master, onConnection);
+}
 
-		pois.forEach(function (poi) {
-			newLink = poi.link.replace(find, replace);
-			if (poi.link !== newLink) {
-				updatePoiLink(conn, poi.id, newLink).then(function () {
-					poiIndexer.addPoiDataToQueue(conn, poiIndexer.poiOperations.update, poi.id);
-				});
-			}
-		});
+function onConnection(conn) {
+	getAllPoisOnMap(conn, mapId).then(function (pois) {
+		processPois(conn, pois);
 	});
-});
+}
+
+function processPois(conn, pois) {
+	var newLink;
+	pois.forEach(function (poi) {
+		newLink = poi.link.replace(find, replace);
+		if (poi.link !== newLink) {
+			updatePoiLink(conn, poi.id, newLink).then(function () {
+				poiIndexer.addPoiDataToQueue(conn, poiIndexer.poiOperations.update, poi.id);
+			});
+		}
+	});
+}
+
+start();
