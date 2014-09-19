@@ -535,8 +535,8 @@ describe('utils', function () {
 				date: new Date(1),
 				expected: 1
 			}, {
-				date: new Date('2014-12-12 01:01:01'),
-				expected: 1418342461
+				date: new Date(Date.UTC(2014, 11, 12, 1, 1, 1)),
+				expected: 1418346061
 			}
 		];
 		testCases.forEach(function (testCase) {

@@ -32,7 +32,7 @@ module.exports = {
 	destFull: path.resolve(dest),
 	front: basePath + '/api/v1/render.html',
 	ignoreScriptFiles: '!' + basePath + '/assets/**/*.js', // scripts from assets are handled by 'front' task
-	lib: 'lib/*.js',
+	lib: dest + '/lib/*.js',
 	locales: {
 		dest: dest + '/locales/translations.json',
 		// temporary solution, to be changed when new Messages Service is introduced
@@ -45,7 +45,17 @@ module.exports = {
 	server: {
 		script: dest + '/server/app.js'
 	},
-	specs: 'specs/**',
+	tests: {
+		back: dest + '/specs/**',
+		front: {
+			config: dest + '/frontend_tests/karma.conf.js',
+			files: [
+				dest + '/frontend_tests/define.mock.js',
+				dest + '/assets/scripts/im.*.js',
+				dest + '/frontend_tests/specs/*-spec.js'
+			]
+		}
+	},
 	watch: {
 		assets: [
 			basePath + '/assets/**/*.*'

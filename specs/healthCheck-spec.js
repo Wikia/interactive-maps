@@ -12,6 +12,7 @@ describe('Health Check', function () {
 					port: 1
 				}
 			},
+			'./db_connector': {},
 			'kue': {
 				createQueue: function () {
 					return {
