@@ -5,20 +5,20 @@ var gulp = require('gulp'),
 	server = require('gulp-develop-server'),
 	runSequence = require('run-sequence'),
 	log = require('../utils/logger'),
-	paths = require('../paths').watch;
+	paths = require('../paths');
 
 gulp.task('watch', ['server'], function () {
-	gulp.watch(paths.front).on('change', function (event) {
+	gulp.watch(paths.buildDynamic).on('change', function (event) {
 		log('File changed:', gutil.colors.green(event.path));
-		runSequence(['front', 'cache-buster'], server.changed);
+		runSequence(['build-dynamic', 'cache-buster'], server.changed);
 	});
 
-	gulp.watch(paths.copyFiles).on('change', function (event) {
+	gulp.watch(paths.buildStatic).on('change', function (event) {
 		log('File changed:', gutil.colors.green(event.path));
-		runSequence('copy-files', server.changed);
+		runSequence(['build-static', 'cache-buster'], server.changed);
 	});
 
-	gulp.watch(paths.nodeModules).on('change', function (event) {
+	gulp.watch(paths.nodeModules.list).on('change', function (event) {
 		log('File changed:', gutil.colors.green(event.path));
 		runSequence('node-modules', server.changed);
 	});

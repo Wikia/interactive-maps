@@ -2,4 +2,4 @@
 
 var gulp = require('gulp');
 
-gulp.task('build', ['node-modules', 'front', 'locales', 'copy-files', 'cache-buster']);
+gulp.task('build', ['node-modules', 'build-dynamic', 'build-static', 'locales', 'cache-buster']);
