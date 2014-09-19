@@ -36,7 +36,6 @@
     "gulp": "3.6.x",
     "gulp-develop-server": "^0.2.0",
     "gulp-if": "^1.2.4",
-    "gulp-ignore": "^1.2.0",
     "gulp-istanbul": "~0.1.1",
     "gulp-jasmine": "0.2.x",
     "gulp-karma": "0.0.4",
