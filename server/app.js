@@ -17,7 +17,7 @@ var logger = require('../lib/logger'),
 	http = require('http');
 
 config = require('../lib/config');
-config.setRoot(__dirname);
+config.setRoot(__dirname + '/..');
 
 jobs = kue.createQueue(config);
 

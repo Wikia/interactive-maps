@@ -26,7 +26,7 @@ var express = require('express'),
 
 	// Interactive Maps API Version 1
 	apiPath = '/api/v1/',
-	apiAbsolutePath = __dirname + '/../' + apiPath,
+	apiAbsolutePath = config.root + apiPath,
 	crudModules = getCRUDs.requireCruds(getCRUDs.getCruds(apiAbsolutePath)),
 	// express divides passed maxAge by 1000
 	staticMaxAge = cachingUtils.cacheShort * 1000;
@@ -54,9 +54,9 @@ renderMap(app, apiPath, apiAbsolutePath);
 heartBeatHandler(app);
 // assets' cachebusting
 app.use('/assets', cachingUtils.filterCachebuster);
-app.use('/assets', express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
+app.use('/assets', express.static(config.root + '/assets', {maxAge: staticMaxAge}));
 // for assets required in leaflet-wikia.css
-app.use(express.static(__dirname + '/assets', {maxAge: staticMaxAge}));
+app.use(express.static(config.root + '/assets', {maxAge: staticMaxAge}));
 
 app.use(errorHandler.middleware);
 

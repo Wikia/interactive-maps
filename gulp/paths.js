@@ -12,7 +12,7 @@ module.exports = {
 	base: basePath,
 	baseFull: path.resolve(basePath),
 	cacheBuster: {
-		file: dest + '/server/cachebuster.json',
+		file: dest + '/cachebuster.json',
 		assetsPath: {
 			src: '/assets/',
 			dest: '/assets/{{cacheBuster}}/'
