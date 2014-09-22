@@ -11,7 +11,7 @@ var proxyquire = require('proxyquire').noCallThru(),
 	configuration = {
 		tmp: '/tmp/',
 		wgFSSwiftDC: {
-			dev: ''
+			test: ''
 		},
 		wgTaskBroker: {
 			dev: ''
