@@ -1,4 +1,7 @@
-var jsonValidator = require('./../../lib/jsonValidator');
+'use strict';
+
+var jsonValidator = require('./../../lib/jsonValidator'),
+	minSearchCharacters = 2;
 
 module.exports = {
 	dbTable: 'tile_set',
@@ -54,6 +57,6 @@ module.exports = {
 		additionalProperties: false
 	},
 	searchLimit: 50,
-	minSearchCharacters: 2,
-	searchErrorMsg: 'Search string should be at least ' + this.minSearchCharacters + ' long.'
+	minSearchCharacters: minSearchCharacters,
+	searchErrorMsg: 'Search string should be at least ' + minSearchCharacters + ' long.'
 };
