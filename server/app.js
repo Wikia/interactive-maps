@@ -1,10 +1,10 @@
 'use strict';
 
 if (process.env.NEW_RELIC_ENABLED === 'true') {
-	require('newrelic');
+	require('./newrelic');
 }
 
-var logger = require('./lib/logger'),
+var logger = require('../lib/logger'),
 	cluster = require('cluster'),
 	coresCount = require('os').cpus().length,
 	workersCount = process.env.WIKIA_IM_WORKERS,
@@ -16,8 +16,8 @@ var logger = require('./lib/logger'),
 	gracefulShutdown = false,
 	http = require('http');
 
-config = require('./lib/config');
-config.setRoot(__dirname);
+config = require('../lib/config');
+config.setRoot(__dirname + '/..');
 
 jobs = kue.createQueue(config);
 
@@ -103,6 +103,10 @@ if (typeof workersCount === 'undefined') {
 }
 
 if (cluster.isMaster) {
+	if (process.send) {
+		process.send('Server started'); // it's used by gulp-develop-server
+	}
+
 	logger.debug('Started master process, pid: ' + process.pid);
 	// Fork workers
 	for (var i = 0; i < workersCount; i++) {
@@ -133,7 +137,7 @@ if (cluster.isMaster) {
 
 	require('./apiServer');
 } else {
-	require('./lib/jobProcessors');
+	require('../lib/jobProcessors');
 }
 
 process.on('uncaughtException', function (err) {
