@@ -15,12 +15,15 @@
 
 var dbCon = require('../lib/db_connector'),
 	poiIndexer = require('../lib/poiIndexer'),
+	utils = require('../lib/utils'),
+	squidUpdate = require('../lib/squidUpdate'),
 
 	table = 'poi',
-	args = process.argv.slice(2),
+	args = process.argv.slice(3),
 	mapId = +args[0],
 	find = args[1],
-	replace = args[2];
+	replace = args[2],
+	shouldUpdate = args[3] === 'update';
 
 
 /**
@@ -92,13 +95,25 @@ function onConnection(conn) {
 	});
 }
 
+function exit() {
+	process.exit();
+}
+
 function processPois(conn, pois) {
-	var newLink;
+	var newLink,
+		callback;
 	pois.forEach(function (poi) {
 		newLink = poi.link.replace(find, replace);
 		if (poi.link !== newLink) {
 			updatePoiLink(conn, poi.id, newLink).then(function () {
-				poiIndexer.addPoiDataToQueue(conn, poiIndexer.poiOperations.update, poi.id);
+				squidUpdate.purgeKey(
+					utils.surrogateKeyPrefix + mapId,
+					'mapPoiUpdated'
+				);
+				callback = (poi === pois[pois.length-1]) ? exit : null;
+				if (shouldUpdate) {
+					poiIndexer.addPoiDataToQueue(conn, poiIndexer.poiOperations.update, poi.id, callback);
+				}
 			});
 		}
 	});
