@@ -3,7 +3,7 @@
 process.env = {
 	WIKIA_CONFIG_ROOT: 'test',
 	WIKIA_SWIFT_YML: 'test',
-	WIKIA_PROD_DATACENTER: 'test',
+	WIKIA_DATACENTER: 'test',
 	NODE_ENV: 'test'
 };
 
