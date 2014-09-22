@@ -19,7 +19,7 @@ var dbCon = require('../lib/db_connector'),
 	squidUpdate = require('../lib/squidUpdate'),
 
 	table = 'poi',
-	args = process.argv.slice(3),
+	args = process.argv.slice(2),
 	mapId = +args[0],
 	find = args[1],
 	replace = args[2],

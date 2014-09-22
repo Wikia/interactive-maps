@@ -6,5 +6,5 @@
 export WIKIA_CONFIG_ROOT="/usr/wikia/source/config"
 export WIKIA_SWIFT_YML="/usr/wikia/source/config/Swift.yml"
 export WIKIA_PROD_DATACENTER="sjc"
-export NODE_ENV="devbox"
+export NODE_ENV="production"
 eval "node replacePoiLinkUrl.js $1 $2 $3"
