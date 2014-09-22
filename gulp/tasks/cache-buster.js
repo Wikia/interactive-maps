@@ -3,8 +3,10 @@
 var gulp = require('gulp'),
 	mkdirp = require('mkdirp'),
 	fs = require('fs'),
+	gutil = require('gulp-util'),
 	getDirName = require('path').dirname,
-	path = './build/cachebuster.json',
+	path = require('../paths').cacheBuster.file,
+	log = require('../utils/logger'),
 	cbValue = new Date().getTime();
 
 gulp.task('cache-buster', function () {
@@ -12,6 +14,7 @@ gulp.task('cache-buster', function () {
 		fs.writeFileSync(path, JSON.stringify({
 			cb: cbValue
 		}));
-		console.info('New cache buster value set to: ' + cbValue);
+
+		log('New cache buster value set to:', gutil.colors.green(cbValue));
 	});
 });
