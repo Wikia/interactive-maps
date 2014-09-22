@@ -43,18 +43,20 @@ function getTileSetsCollection(req, res, next) {
 		tileSetUtils.addPaginationToQuery(query, limit, offset);
 	}
 
-	// make a DB query
-	dbCon.getConnection(dbCon.connType.all, function (conn) {
-		query
-			.connection(conn)
-			.select()
-			.then(function (collection) {
-				res
-					.status(200)
-					.send(tileSetUtils.processTileSetCollection(collection, req, tileSetUtils.extendTileSetObject))
-					.end();
-			}, next);
-	}, next);
+	dbCon
+		.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			return query
+				.connection(conn)
+				.select();
+		}, tileSetUtils.passError)
+		.then(function (collection) {
+			utils.sendHttoResponse(
+				res,
+				200,
+				tileSetUtils.processTileSetCollection(collection, req, tileSetUtils.extendTileSetObject)
+			);
+		}, next);
 }
 
 /**
@@ -71,20 +73,18 @@ function getTileSet(req, res, next) {
 		};
 
 	if (isFinite(id)) {
-		dbCon.getConnection(dbCon.connType.all, function (conn) {
-			dbCon
-				.select(conn, tileSetConfig.dbTable, tileSetConfig.getTileSetDbColumns, filter)
-				.then(function (collection) {
-					if (collection.length) {
-						res
-							.status(200)
-							.send(tileSetUtils.extendTileSetObject(collection[0], req))
-							.end();
-					} else {
-						next(errorHandler.elementNotFoundError(tileSetConfig.dbTable, id));
-					}
-				}, next);
-		}, next);
+		dbCon
+			.getConnection(dbCon.connType.all)
+			.then(function (conn) {
+				return dbCon.select(conn, tileSetConfig.dbTable, tileSetConfig.getTileSetDbColumns, filter);
+			}, tileSetUtils.passError)
+			.then(function (collection) {
+				if (collection.length) {
+					utils.sendHttoResponse(res, 200, tileSetUtils.extendTileSetObject(collection[0], req));
+				} else {
+					next(errorHandler.elementNotFoundError(tileSetConfig.dbTable, id));
+				}
+			}, next);
 	} else {
 		next(errorHandler.badNumberError(req.pathVar.id));
 	}
@@ -101,14 +101,18 @@ function createTileSet(req, res, next) {
 		errors = jsonValidator.validateJSON(reqBody, tileSetConfig.createSchema);
 
 	if (errors.length === 0) {
-		dbCon.getConnection(dbCon.connType.master, function (conn) {
-			addTileSet(conn, tileSetConfig.dbTable, reqBody).then(function (data) {
-				res
-					.status(data.exists ? 200 : 201)
-					.send(tileSetUtils.setupCreateTileSetResponse(data, req))
-					.end();
+		dbCon
+			.getConnection(dbCon.connType.master)
+			.then(function (conn) {
+				return addTileSet(conn, tileSetConfig.dbTable, reqBody);
+			}, tileSetUtils.passError)
+			.then(function (data) {
+				utils.sendHttoResponse(
+					res,
+					data.exists ? 200 : 201,
+					tileSetUtils.setupCreateTileSetResponse(data, req)
+				);
 			}, next);
-		}, next);
 	} else {
 		next(errorHandler.badRequestError(errors));
 	}
