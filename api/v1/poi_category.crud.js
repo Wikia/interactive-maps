@@ -129,11 +129,11 @@ function deletePoiCategory(req, res, next) {
 		.then(function (conn) {
 			dbConnection = conn;
 			return poiCategoryUtils.getMapId(dbConnection, poiCategoryId);
-		}, crudUtils.passError)
+		})
 		.then(function (id) {
 			mapId = id;
 			return dbCon.destroy(dbConnection, poiCategoryConfig.dbTable, filter);
-		}, crudUtils.passError)
+		})
 		.then(function (affectedRows) {
 			if (affectedRows > 0) {
 				utils.changeMapUpdatedOn(dbConnection, dbCon, mapId).then(function () {
@@ -144,7 +144,8 @@ function deletePoiCategory(req, res, next) {
 			} else {
 				next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId));
 			}
-		}, function (err) {
+		})
+		.fail(function (err) {
 			if (poiCategoryUtils.isDeletedCategoryUsed(err)) {
 				poiCategoryUtils.handleUsedCategories(dbConnection, poiCategoryId, res, next);
 			} else {

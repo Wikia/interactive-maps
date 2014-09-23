@@ -135,6 +135,7 @@ function setupCreatePoiCategoryResponse(id, req) {
 
 function isDeletedCategoryUsed(err) {
 	return (
+		err &&
 		err.clientError &&
 		err.clientError.name &&
 		errorHandler.isHandledSQLError(err.clientError.name) &&
