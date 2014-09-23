@@ -5,12 +5,13 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	Q = require('q'),
 	config = require('./../../lib/config'),
-	poiCategoryConfig = require('./poi_category.config');
+	poiCategoryConfig = require('./poi_category.config'),
+	poiConfig = require('./poi.config');
 
 function updatePoisFromUsedCategory(conn, id) {
 	return dbCon.update(
 		conn,
-		'poi',
+		poiConfig.dbTable,
 		{
 			poi_category_id: config.catchAllCategoryId
 		},
@@ -33,6 +34,7 @@ function deleteCategory(conn, id) {
 /**
  * @desc Handle deleting used categories by moving all points to CatchAll category
  *
+ * @param {object} conn
  * @param {number} id
  * @param {object} res
  * @param {function} next
