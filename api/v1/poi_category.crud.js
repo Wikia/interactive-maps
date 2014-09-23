@@ -5,7 +5,6 @@ var dbCon = require('./../../lib/db_connector'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
-	config = require('./../../lib/config'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	poiCategoryConfig = require('./poi_category.config'),
@@ -13,9 +12,9 @@ var dbCon = require('./../../lib/db_connector'),
 
 /**
  * @desc CRUD function for getting collection of poi categories
- * @param {Object} req - HTTP request object
- * @param {Object} res - HTTP response object
- * @param {Function} next
+ * @param {object} req - HTTP request object
+ * @param {object} res - HTTP response object
+ * @param {function} next
  */
 function getPoiCategoriesCollection(req, res, next) {
 	dbCon.getConnection(dbCon.connType.all, function (conn) {
@@ -41,9 +40,9 @@ function getPoiCategoriesCollection(req, res, next) {
 
 /**
  * @desc CRUD function for getting collection of poi categories
- * @param {Object} req - HTTP request object
- * @param {Object} res - HTTP response object
- * @param {Function} next
+ * @param {object} req - HTTP request object
+ * @param {object} res - HTTP response object
+ * @param {function} next
  */
 function getPoiCategory(req, res, next) {
 	var id = parseInt(req.pathVar.id, 10),
@@ -59,13 +58,7 @@ function getPoiCategory(req, res, next) {
 				poiCategoryConfig.getCategoryDBColumns,
 				filter
 			).then(function (collection) {
-				utils.handleDefaultMarker(collection);
-				utils.convertMarkersNamesToUrls(
-					collection,
-					config.dfsHost,
-					config.bucketPrefix,
-					config.markersPrefix
-				);
+				collection = poiCategoryUtils.processPoiCategoriesCollection(collection);
 
 				if (collection[0]) {
 					utils.sendHttpResponse(res, 200, collection[0]);
@@ -81,9 +74,9 @@ function getPoiCategory(req, res, next) {
 
 /**
  * @desc CRUD function for creating poi category
- * @param {Object} req - HTTP request object
- * @param {Object} res - HTTP response object
- * @param {Function} next
+ * @param {object} req - HTTP request object
+ * @param {object} res - HTTP response object
+ * @param {function} next
  */
 function createPoiCategory(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
@@ -117,11 +110,10 @@ function createPoiCategory(req, res, next) {
 
 /**
  * @desc CRUD function for deleting poi category
- * @param {Object} req - HTTP request object
- * @param {Object} res - HTTP response object
- * @param {Function} next
+ * @param {object} req - HTTP request object
+ * @param {object} res - HTTP response object
+ * @param {function} next
  */
-
 function deletePoiCategory(req, res, next) {
 	var id = parseInt(req.pathVar.id, 10),
 		filter = {
@@ -160,11 +152,10 @@ function deletePoiCategory(req, res, next) {
 
 /**
  * @desc CRUD function for updating poi category
- * @param {Object} req - HTTP request object
- * @param {Object} res - HTTP response object
- * @param {Function} next
+ * @param {object} req - HTTP request object
+ * @param {object} res - HTTP response object
+ * @param {function} next
  */
-
 function updatePoicategory (req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
 		id = parseInt(req.pathVar.id, 10),
@@ -219,7 +210,6 @@ function updatePoicategory (req, res, next) {
  * @desc Creates CRUD collection
  * @returns {object} - CRUD collection
  */
-
 module.exports = function createCRUD() {
 	return {
 		handler: {
