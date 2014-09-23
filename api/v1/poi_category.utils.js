@@ -58,7 +58,7 @@ function handleUsedCategories(conn, id, res, next) {
 		if (rowsAffected > 0) {
 			deleteCategory(conn, id).then(function (affectedRows) {
 				if (affectedRows > 0) {
-					utils.sendHttoResponse(res, 204, {});
+					utils.sendHttpResponse(res, 204, {});
 				} else {
 					next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id));
 				}

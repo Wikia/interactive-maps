@@ -11,7 +11,6 @@ var dbCon = require('./../../lib/db_connector'),
 	poiCategoryConfig = require('./poi_category.config'),
 	poiCategoryUtils = require('./poi_category.utils');
 
-
 /**
  * @desc CRUD function for getting collection of poi categories
  * @param {Object} req - HTTP request object
@@ -33,7 +32,7 @@ function getPoiCategoriesCollection(req, res, next) {
 			.connection(conn)
 			.select()
 			.then(function (collection) {
-				utils.sendHttoResponse(res, 200, poiCategoryUtils.processPoiCategoriesCollection(collection));
+				utils.sendHttpResponse(res, 200, poiCategoryUtils.processPoiCategoriesCollection(collection));
 			},
 			next
 		);
@@ -69,7 +68,7 @@ function getPoiCategory(req, res, next) {
 				);
 
 				if (collection[0]) {
-					utils.sendHttoResponse(res, 200, collection[0]);
+					utils.sendHttpResponse(res, 200, collection[0]);
 				} else {
 					next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id));
 				}
@@ -107,7 +106,7 @@ function createPoiCategory(req, res, next) {
 						// purge cache for map
 						squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
 
-						utils.sendHttoResponse(res, 201, poiCategoryUtils.setupCreatePoiCategoryResponse(id, req));
+						utils.sendHttpResponse(res, 201, poiCategoryUtils.setupCreatePoiCategoryResponse(id, req));
 					}, next);
 				}, next);
 		}, next);
@@ -140,7 +139,7 @@ function deletePoiCategory(req, res, next) {
 								// purge cache for map
 								squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
 
-								utils.sendHttoResponse(res, 204, {});
+								utils.sendHttpResponse(res, 204, {});
 							}, next);
 						} else {
 							next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id));
@@ -200,7 +199,7 @@ function updatePoicategory (req, res, next) {
 								utils.changeMapUpdatedOn(conn, dbCon, mapId).then(function () {
 									squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
 
-									utils.sendHttoResponse(res, 303, response);
+									utils.sendHttpResponse(res, 303, response);
 								}, next);
 							} else {
 								next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id));

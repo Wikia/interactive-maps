@@ -51,7 +51,7 @@ function getTileSetsCollection(req, res, next) {
 				.select();
 		}, tileSetUtils.passError)
 		.then(function (collection) {
-			utils.sendHttoResponse(
+			utils.sendHttpResponse(
 				res,
 				200,
 				tileSetUtils.processTileSetCollection(collection, req, tileSetUtils.extendTileSetObject)
@@ -80,7 +80,7 @@ function getTileSet(req, res, next) {
 			}, tileSetUtils.passError)
 			.then(function (collection) {
 				if (collection.length) {
-					utils.sendHttoResponse(res, 200, tileSetUtils.extendTileSetObject(collection[0], req));
+					utils.sendHttpResponse(res, 200, tileSetUtils.extendTileSetObject(collection[0], req));
 				} else {
 					next(errorHandler.elementNotFoundError(tileSetConfig.dbTable, id));
 				}
@@ -107,7 +107,7 @@ function createTileSet(req, res, next) {
 				return addTileSet(conn, tileSetConfig.dbTable, reqBody);
 			}, tileSetUtils.passError)
 			.then(function (data) {
-				utils.sendHttoResponse(
+				utils.sendHttpResponse(
 					res,
 					data.exists ? 200 : 201,
 					tileSetUtils.setupCreateTileSetResponse(data, req)
