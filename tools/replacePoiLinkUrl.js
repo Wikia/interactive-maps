@@ -96,7 +96,7 @@ function onConnection(conn) {
 }
 
 function exit() {
-	process.exit();
+	console.log('All done');
 }
 
 function processPois(conn, pois) {
