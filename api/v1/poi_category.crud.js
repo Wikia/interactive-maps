@@ -114,21 +114,21 @@ function createPoiCategory(req, res, next) {
  * @param {function} next
  */
 function deletePoiCategory(req, res, next) {
-	var poiId = parseInt(req.pathVar.id, 10),
+	var poiCategoryId = parseInt(req.pathVar.id, 10),
 		filter = {
-			id: poiId
+			id: poiCategoryId
 		},
 		mapId,
 		dbConnection;
 
-	if (!isFinite(poiId)) {
-		next(errorHandler.badNumberError(req.pathVar.id));
+	if (!isFinite(poiCategoryId)) {
+		next(errorHandler.badNumberError(poiCategoryId));
 	}
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
 			dbConnection = conn;
-			return poiCategoryUtils.getMapId(dbConnection, poiId);
+			return poiCategoryUtils.getMapId(dbConnection, poiCategoryId);
 		}, crudUtils.passError)
 		.then(function (id) {
 			mapId = id;
@@ -142,11 +142,11 @@ function deletePoiCategory(req, res, next) {
 					utils.sendHttpResponse(res, 204, {});
 				}, next);
 			} else {
-				next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiId));
+				next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId));
 			}
 		}, function (err) {
 			if (poiCategoryUtils.isDeletedCategoryUsed(err)) {
-				poiCategoryUtils.handleUsedCategories(dbConnection, poiId, res, next);
+				poiCategoryUtils.handleUsedCategories(dbConnection, poiCategoryId, res, next);
 			} else {
 				next(err);
 			}
@@ -161,52 +161,58 @@ function deletePoiCategory(req, res, next) {
  */
 function updatePoiCategory (req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
-		id = parseInt(req.pathVar.id, 10),
+		poiCategoryId = parseInt(req.pathVar.id, 10),
 		filter = {
-			id: id
+			id: poiCategoryId
 		},
-		errors = jsonValidator.validateJSON(reqBody, poiCategoryConfig.updateSchema);
+		errors = jsonValidator.validateJSON(reqBody, poiCategoryConfig.updateSchema),
+		dbConnection,
+		mapId;
 
-	if (errors.length === 0) {
-		// If new marker is uploaded, reset the marker status to 0
-		if (reqBody.marker) {
-			reqBody.status = 0;
-		}
-
-		if (isFinite(id)) {
-			dbCon.getConnection(dbCon.connType.master, function (conn) {
-				poiCategoryUtils.getMapId(conn, id).then(function (mapId) {
-					dbCon
-						.update(conn, poiCategoryConfig.dbTable, reqBody, filter)
-						.then(function (affectedRows) {
-							if (affectedRows > 0) {
-								var response = {
-									message: 'POI category successfully updated',
-									id: id,
-									url: utils.responseUrl(req, '/api/v1/poi_category/', id)
-								};
-
-								if (reqBody.marker) {
-									poiCategoryMarker(id, mapId, reqBody.marker, poiCategoryConfig.dbTable);
-								}
-
-								utils.changeMapUpdatedOn(conn, dbCon, mapId).then(function () {
-									squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
-
-									utils.sendHttpResponse(res, 303, response);
-								}, next);
-							} else {
-								next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id));
-							}
-					}, next);
-				}, next);
-			}, next);
-		} else {
-			next(errorHandler.badNumberError(req.pathVar.id));
-		}
-	} else {
+	if (errors.length > 0) {
 		next(errorHandler.badRequestError(errors));
 	}
+
+	if (!isFinite(poiCategoryId)) {
+		next(errorHandler.badNumberError(poiCategoryId));
+	}
+
+	// If new marker is uploaded, reset the marker status to 0
+	if (reqBody.marker) {
+		reqBody.status = 0;
+	}
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			dbConnection = conn;
+			return poiCategoryUtils.getMapId(dbConnection, poiCategoryId);
+		})
+		.then(function (id) {
+			mapId = id;
+			return dbCon.update(dbConnection, poiCategoryConfig.dbTable, reqBody, filter);
+		})
+		.then(function (affectedRows) {
+			if (affectedRows > 0) {
+				var response = {
+					message: 'POI category successfully updated',
+					id: poiCategoryId,
+					url: utils.responseUrl(req, '/api/v1/poi_category/', poiCategoryId)
+				};
+
+				if (reqBody.marker) {
+					poiCategoryMarker(poiCategoryId, mapId, reqBody.marker, poiCategoryConfig.dbTable);
+				}
+
+				utils.changeMapUpdatedOn(dbConnection, dbCon, mapId).then(function () {
+					squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
+
+					utils.sendHttpResponse(res, 303, response);
+				}, next);
+			} else {
+				next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId));
+			}
+		})
+		.fail(next);
 }
 
 /**
