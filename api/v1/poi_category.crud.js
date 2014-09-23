@@ -49,25 +49,17 @@ function getPoiCategory(req, res, next) {
 	var id = parseInt(req.pathVar.id, 10),
 		filter = {
 			id: id
-		};
+		},
+		query = dbCon.knex(poiCategoryConfig.dbTable).column(poiCategoryConfig.getCollectionDbColumns).where(filter);
 
 	if (isFinite(id)) {
-		dbCon.getConnection(dbCon.connType.all, function (conn) {
-			dbCon.select(
-				conn,
-				poiCategoryConfig.dbTable,
-				poiCategoryConfig.getCategoryDBColumns,
-				filter
-			).then(function (collection) {
-				collection = poiCategoryUtils.processPoiCategoriesCollection(collection);
-
-				if (collection[0]) {
-					utils.sendHttpResponse(res, 200, collection[0]);
-				} else {
-					next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id));
-				}
+		dbCon.getConnection(dbCon.connType.all)
+			.then(function (conn) {
+				return query.connection(conn).select();
+			}, crudUtils.passError)
+			.then(function (collection) {
+				poiCategoryUtils.processPoiCategory(id, collection, res, next);
 			}, next);
-		}, next);
 	} else {
 		next(errorHandler.badNumberError(req.pathVar.id));
 	}
