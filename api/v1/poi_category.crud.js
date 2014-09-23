@@ -8,7 +8,8 @@ var dbCon = require('./../../lib/db_connector'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	poiCategoryConfig = require('./poi_category.config'),
-	poiCategoryUtils = require('./poi_category.utils');
+	poiCategoryUtils = require('./poi_category.utils'),
+	crudUtils = require('./crud.utils.js');
 
 /**
  * @desc CRUD function for getting collection of poi categories
@@ -17,25 +18,25 @@ var dbCon = require('./../../lib/db_connector'),
  * @param {function} next
  */
 function getPoiCategoriesCollection(req, res, next) {
-	dbCon.getConnection(dbCon.connType.all, function (conn) {
-		var query = dbCon.knex(poiCategoryConfig.dbTable).column(poiCategoryConfig.getCollectionDbColumns);
+	var query = dbCon.knex(poiCategoryConfig.dbTable).column(poiCategoryConfig.getCollectionDbColumns);
 
-		// limit query to parent categories only
-		if (req.query.hasOwnProperty('parentsOnly')) {
-			query.where({
-				parent_poi_category_id: null
-			});
-		}
+	// limit query to parent categories only
+	if (req.query.hasOwnProperty('parentsOnly')) {
+		query.where({
+			parent_poi_category_id: null
+		});
+	}
 
-		query
-			.connection(conn)
-			.select()
-			.then(function (collection) {
-				utils.sendHttpResponse(res, 200, poiCategoryUtils.processPoiCategoriesCollection(collection));
-			},
-			next
-		);
-	}, next);
+	dbCon
+		.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			return query
+				.connection(conn)
+				.select();
+		}, crudUtils.passError)
+		.then(function (collection) {
+			utils.sendHttpResponse(res, 200, poiCategoryUtils.processPoiCategoriesCollection(collection));
+		}, next);
 }
 
 /**
