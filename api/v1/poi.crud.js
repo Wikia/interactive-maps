@@ -2,138 +2,13 @@
 
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
-	jsonValidator = require('./../../lib/jsonValidator'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	taskQueue = require('./../../lib/taskQueue'),
 	logger = require('./../../lib/logger'),
-
-	urlPattern = jsonValidator.getOptionalUrlPattern(),
-
-	poiOperations = {
-		insert: 'insert',
-		update: 'update',
-		delete: 'delete'
-	},
-
-	dbTable = 'poi',
-	createSchema = {
-		description: 'Schema for creating POI',
-		type: 'Object',
-		properties: {
-			name: {
-				description: 'POI name',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			},
-			poi_category_id: {
-				description: 'Unique identifier for category',
-				type: 'integer',
-				required: true
-			},
-			map_id: {
-				description: 'Unique identifier for map',
-				type: 'integer',
-				required: true
-			},
-			description: {
-				description: 'POI description',
-				type: 'string',
-				minLength: 1,
-				maxLength: 500
-			},
-			link: {
-				description: 'Link to article connected with this POI',
-				type: 'string',
-				pattern: urlPattern
-			},
-			link_title: {
-				description: 'Title of the article connected with this POI',
-				type: 'string'
-			},
-			photo: {
-				description: 'Link photo connected with this POI',
-				type: 'string',
-				pattern: urlPattern,
-				maxLength: 255
-			},
-			lat: {
-				description: 'POI latitude',
-				type: 'number',
-				required: true
-			},
-			lon: {
-				description: 'POI longitude',
-				type: 'number',
-				required: true
-			},
-			created_by: {
-				description: 'creator user name',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			}
-		},
-		additionalProperties: false
-	},
-	updateSchema = {
-		description: 'Schema for updating POI',
-		type: 'Object',
-		properties: {
-			name: {
-				description: 'POI name',
-				type: 'string',
-				minLength: 1,
-				maxLength: 255
-			},
-			poi_category_id: {
-				description: 'Unique identifier for category',
-				type: 'integer'
-			},
-			description: {
-				description: 'POI description',
-				type: 'string',
-				minLength: 1
-			},
-			link: {
-				description: 'Link to article connected with this POI',
-				type: 'string',
-				pattern: urlPattern,
-				format: 'uri'
-			},
-			link_title: {
-				description: 'Title of the article connected with this POI',
-				type: 'string'
-			},
-			photo: {
-				description: 'Link photo connected with this POI',
-				type: 'string',
-				pattern: urlPattern,
-				format: 'uri',
-				maxLength: 255
-			},
-			lat: {
-				description: 'POI latitude',
-				type: 'number'
-			},
-			lon: {
-				description: 'POI longitude',
-				type: 'number'
-			},
-			updated_by: {
-				description: 'Editor user name',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			}
-		},
-		additionalProperties: false
-	};
+	poiConfig = require('./poi.config'),
+	jsonValidator = require('./../../lib/jsonValidator');
 
 /**
  * @desc Helper function to get map_id from poi_id
@@ -145,7 +20,7 @@ var dbCon = require('./../../lib/db_connector'),
 function getMapIdByPoiId(conn, poiId) {
 	return dbCon.select(
 		conn,
-		'poi',
+		poiConfig.dbTable,
 		['map_id'],
 		{
 			id: poiId
@@ -161,7 +36,7 @@ function getMapIdByPoiId(conn, poiId) {
  * @returns {object}
  */
 function collectPoiData(conn, poiId) {
-	return dbCon.knex('poi')
+	return dbCon.knex(poiConfig.dbTable)
 		.select(
 			'poi.id',
 			'poi.name',
@@ -200,7 +75,7 @@ function collectPoiData(conn, poiId) {
 function addPoiDataToQueue(conn, operation, poiId) {
 	var workId = operation + poiId,
 		context;
-	if (operation === poiOperations.delete) {
+	if (operation === poiConfig.poiOperations.delete) {
 		context = {
 			operation: operation,
 			data: [
@@ -226,7 +101,7 @@ function addPoiDataToQueue(conn, operation, poiId) {
 				};
 				taskQueue.publish(taskQueue.payload(
 					taskQueue.tasks.poiUpdate,
-					poiOperations.insert === operation ? row.created_by : row.updated_by,
+					poiConfig.poiOperations.insert === operation ? row.created_by : row.updated_by,
 					workId,
 					context
 				));
@@ -249,7 +124,7 @@ module.exports = function createCRUD() {
 				var dbColumns = ['id', 'name'];
 				dbCon.getConnection(dbCon.connType.all, function (conn) {
 					dbCon
-						.select(conn, dbTable, dbColumns)
+						.select(conn, poiConfig.dbTable, dbColumns)
 						.then(
 						function (collection) {
 							res.send(200, collection);
@@ -261,7 +136,7 @@ module.exports = function createCRUD() {
 			},
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, createSchema);
+					errors = jsonValidator.validateJSON(reqBody, poiConfig.createSchema);
 
 				if (errors.length === 0) {
 					// extend data object
@@ -269,7 +144,7 @@ module.exports = function createCRUD() {
 					reqBody.created_on = dbCon.knex.raw('CURRENT_TIMESTAMP');
 					dbCon.getConnection(dbCon.connType.master, function (conn) {
 						dbCon
-							.insert(conn, dbTable, reqBody)
+							.insert(conn, poiConfig.dbTable, reqBody)
 							.then(
 								function (data) {
 									var id = data[0],
@@ -282,7 +157,7 @@ module.exports = function createCRUD() {
 									utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
 										function () {
 											squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
-											addPoiDataToQueue(conn, poiOperations.insert, id);
+											addPoiDataToQueue(conn, poiConfig.poiOperations.insert, id);
 											res.send(201, response);
 											res.end();
 										},
@@ -311,7 +186,7 @@ module.exports = function createCRUD() {
 									var mapId = rows[0].map_id;
 
 									dbCon
-										.destroy(conn, dbTable, filter)
+										.destroy(conn, poiConfig.dbTable, filter)
 										.then(
 											function () {
 												utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
@@ -320,7 +195,7 @@ module.exports = function createCRUD() {
 															utils.surrogateKeyPrefix + mapId,
 															'mapPoiDeleted'
 														);
-														addPoiDataToQueue(conn, poiOperations.delete, id);
+														addPoiDataToQueue(conn, poiConfig.poiOperations.delete, id);
 														res.send(204, {});
 														res.end();
 													},
@@ -330,7 +205,7 @@ module.exports = function createCRUD() {
 											next
 									);
 								} else {
-									next(errorHandler.elementNotFoundError(dbTable, id));
+									next(errorHandler.elementNotFoundError(poiConfig.dbTable, id));
 								}
 							},
 							next
@@ -352,14 +227,14 @@ module.exports = function createCRUD() {
 				if (isFinite(id)) {
 					dbCon.getConnection(dbCon.connType.all, function (conn) {
 						dbCon
-							.select(conn, dbTable, dbColumns, filter)
+							.select(conn, poiConfig.dbTable, dbColumns, filter)
 							.then(
 							function (collection) {
 								if (collection[0]) {
 									res.send(200, collection[0]);
 									res.end();
 								} else {
-									next(errorHandler.elementNotFoundError(dbTable, id));
+									next(errorHandler.elementNotFoundError(poiConfig.dbTable, id));
 								}
 							},
 							next
@@ -371,7 +246,7 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, updateSchema),
+					errors = jsonValidator.validateJSON(reqBody, poiConfig.updateSchema),
 					id,
 					filter,
 					mapId;
@@ -389,7 +264,7 @@ module.exports = function createCRUD() {
 									if (rows.length > 0) {
 										mapId = rows[0].map_id;
 										dbCon
-											.update(conn, dbTable, reqBody, filter)
+											.update(conn, poiConfig.dbTable, reqBody, filter)
 											.then(
 												function () {
 													var response = {
@@ -403,7 +278,7 @@ module.exports = function createCRUD() {
 																utils.surrogateKeyPrefix + mapId,
 																'mapPoiUpdated'
 															);
-															addPoiDataToQueue(conn, poiOperations.update, id);
+															addPoiDataToQueue(conn, poiConfig.poiOperations.update, id);
 															res.send(303, response);
 															res.end();
 														},
@@ -413,7 +288,7 @@ module.exports = function createCRUD() {
 												next
 										);
 									} else {
-										next(errorHandler.elementNotFoundError(dbTable, id));
+										next(errorHandler.elementNotFoundError(poiConfig.dbTable, id));
 									}
 								},
 								next
