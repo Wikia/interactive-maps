@@ -52,17 +52,17 @@ function getPoiCategory(req, res, next) {
 		},
 		query = dbCon.knex(poiCategoryConfig.dbTable).column(poiCategoryConfig.getCollectionDbColumns).where(filter);
 
-	if (isFinite(id)) {
-		dbCon.getConnection(dbCon.connType.all)
-			.then(function (conn) {
-				return query.connection(conn).select();
-			}, crudUtils.passError)
-			.then(function (collection) {
-				poiCategoryUtils.processPoiCategory(id, collection, res, next);
-			}, next);
-	} else {
+	if (!isFinite(id)) {
 		next(errorHandler.badNumberError(req.pathVar.id));
 	}
+
+	dbCon.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			return query.connection(conn).select();
+		}, crudUtils.passError)
+		.then(function (collection) {
+			poiCategoryUtils.processPoiCategory(id, collection, res, next);
+		}, next);
 }
 
 /**
