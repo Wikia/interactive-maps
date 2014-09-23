@@ -1,15 +1,8 @@
 'use strict';
 
-var Q = require('q'),
-	utils = require('./../../lib/utils'),
+var utils = require('./../../lib/utils'),
 	config = require('./../../lib/config'),
 	tileSetConfig = require('./tile_set.config');
-
-function passError(error) {
-	var deferred = Q.defer().reject(error);
-
-	return deferred.promise;
-}
 
 /**
  * @desc creates tileSet image URL and returns it
@@ -134,7 +127,6 @@ function setupCreateTileSetResponse(dbRes, req) {
 }
 
 module.exports = {
-	passError: passError,
 	addSearchToQuery: addSearchToQuery,
 	validateSearchTerm: validateSearchTerm,
 	setupSearchLimit: setupSearchLimit,

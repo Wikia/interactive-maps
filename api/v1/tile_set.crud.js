@@ -7,6 +7,7 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	tileSetConfig = require('./tile_set.config'),
 	tileSetUtils = require('./tile_set.utils'),
+	crudUtils = require('./crud.utils.js'),
 	addTileSet = require('./../../lib/addTileSet'); // custom action for POST method
 
 /**
@@ -49,7 +50,7 @@ function getTileSetsCollection(req, res, next) {
 			return query
 				.connection(conn)
 				.select();
-		}, tileSetUtils.passError)
+		}, crudUtils.passError)
 		.then(function (collection) {
 			utils.sendHttpResponse(
 				res,
@@ -77,7 +78,7 @@ function getTileSet(req, res, next) {
 			.getConnection(dbCon.connType.all)
 			.then(function (conn) {
 				return dbCon.select(conn, tileSetConfig.dbTable, tileSetConfig.getTileSetDbColumns, filter);
-			}, tileSetUtils.passError)
+			}, crudUtils.passError)
 			.then(function (collection) {
 				if (collection.length) {
 					utils.sendHttpResponse(res, 200, tileSetUtils.extendTileSetObject(collection[0], req));
@@ -105,7 +106,7 @@ function createTileSet(req, res, next) {
 			.getConnection(dbCon.connType.master)
 			.then(function (conn) {
 				return addTileSet(conn, tileSetConfig.dbTable, reqBody);
-			}, tileSetUtils.passError)
+			}, crudUtils.passError)
 			.then(function (data) {
 				utils.sendHttpResponse(
 					res,
