@@ -73,32 +73,38 @@ function getPoiCategory(req, res, next) {
  */
 function createPoiCategory(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
-		errors = jsonValidator.validateJSON(reqBody, poiCategoryConfig.createSchema);
+		errors = jsonValidator.validateJSON(reqBody, poiCategoryConfig.createSchema),
+		mapId = reqBody.map_id,
+		poiCategoryId,
+		dbConnection;
 
-	if (errors.length === 0) {
-		dbCon.getConnection(dbCon.connType.master, function (conn) {
-			dbCon
-				.insert(conn, poiCategoryConfig.dbTable, reqBody)
-				.then(function (data) {
-					var id = data[0],
-						mapId = reqBody.map_id;
-
-					// handle custom markers
-					if (reqBody.marker) {
-						poiCategoryMarker(id, mapId, reqBody.marker, poiCategoryConfig.dbTable);
-					}
-
-					utils.changeMapUpdatedOn(conn, dbCon, mapId).then(function () {
-						// purge cache for map
-						squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
-
-						utils.sendHttpResponse(res, 201, poiCategoryUtils.setupCreatePoiCategoryResponse(id, req));
-					}, next);
-				}, next);
-		}, next);
-	} else {
+	if (errors.length > 0) {
 		next(errorHandler.badRequestError(errors));
 	}
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+		// add new row to DB table and save reference to promise result
+			dbConnection = conn;
+			return dbCon.insert(dbConnection, poiCategoryConfig.dbTable, reqBody);
+		}, crudUtils.passError)
+		.then(function (data) {
+			poiCategoryId = data[0];
+
+			// handle custom markers
+			if (reqBody.marker) {
+				poiCategoryMarker(poiCategoryId, mapId, reqBody.marker, poiCategoryConfig.dbTable);
+			}
+
+			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
+		}, crudUtils.passError)
+		.then(function () {
+			// purge cache for map
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
+
+			// send proper response
+			utils.sendHttpResponse(res, 201, poiCategoryUtils.setupCreatePoiCategoryResponse(poiCategoryId, req));
+		}, next);
 }
 
 /**
