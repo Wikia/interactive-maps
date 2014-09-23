@@ -159,7 +159,7 @@ function deletePoiCategory(req, res, next) {
  * @param {object} res - HTTP response object
  * @param {function} next
  */
-function updatePoicategory (req, res, next) {
+function updatePoiCategory (req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
 		id = parseInt(req.pathVar.id, 10),
 		filter = {
@@ -222,7 +222,7 @@ module.exports = function createCRUD() {
 		wildcard: {
 			DELETE: deletePoiCategory,
 			GET: getPoiCategory,
-			PUT: updatePoicategory
+			PUT: updatePoiCategory
 		}
 	};
 };
