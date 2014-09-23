@@ -134,8 +134,12 @@ function setupCreatePoiCategoryResponse(id, req) {
 // error
 
 function isDeletedCategoryUsed(err) {
-	return errorHandler.isHandledSQLError(err.clientError.name) &&
-	err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_';
+	return (
+		err.clientError &&
+		err.clientError.name &&
+		errorHandler.isHandledSQLError(err.clientError.name) &&
+		err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_'
+	);
 }
 
 module.exports = {

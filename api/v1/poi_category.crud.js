@@ -114,39 +114,43 @@ function createPoiCategory(req, res, next) {
  * @param {function} next
  */
 function deletePoiCategory(req, res, next) {
-	var id = parseInt(req.pathVar.id, 10),
+	var poiId = parseInt(req.pathVar.id, 10),
 		filter = {
-			id: id
-		};
+			id: poiId
+		},
+		mapId,
+		dbConnection;
 
-	if (isFinite(id)) {
-		dbCon.getConnection(dbCon.connType.master, function (conn) {
-			poiCategoryUtils.getMapId(conn, id).then(function (mapId) {
-				dbCon
-					.destroy(conn, poiCategoryConfig.dbTable, filter)
-					.then(function (affectedRows) {
-						if (affectedRows > 0) {
-							utils.changeMapUpdatedOn(conn, dbCon, mapId).then(function () {
-								// purge cache for map
-								squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
-
-								utils.sendHttpResponse(res, 204, {});
-							}, next);
-						} else {
-							next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id));
-						}
-					}, function (err) {
-						if (poiCategoryUtils.isDeletedCategoryUsed(err)) {
-							poiCategoryUtils.handleUsedCategories(conn, id, res, next);
-						} else {
-							next(err);
-						}
-					});
-			}, next);
-		}, next);
-	} else {
+	if (!isFinite(poiId)) {
 		next(errorHandler.badNumberError(req.pathVar.id));
 	}
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			dbConnection = conn;
+			return poiCategoryUtils.getMapId(dbConnection, poiId);
+		}, crudUtils.passError)
+		.then(function (id) {
+			mapId = id;
+			return dbCon.destroy(dbConnection, poiCategoryConfig.dbTable, filter);
+		}, crudUtils.passError)
+		.then(function (affectedRows) {
+			if (affectedRows > 0) {
+				utils.changeMapUpdatedOn(dbConnection, dbCon, mapId).then(function () {
+					// purge cache for map
+					squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
+					utils.sendHttpResponse(res, 204, {});
+				}, next);
+			} else {
+				next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiId));
+			}
+		}, function (err) {
+			if (poiCategoryUtils.isDeletedCategoryUsed(err)) {
+				poiCategoryUtils.handleUsedCategories(dbConnection, poiId, res, next);
+			} else {
+				next(err);
+			}
+		});
 }
 
 /**
