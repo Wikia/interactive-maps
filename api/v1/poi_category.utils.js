@@ -8,6 +8,13 @@ var dbCon = require('./../../lib/db_connector'),
 	poiCategoryConfig = require('./poi_category.config'),
 	poiConfig = require('./poi.config');
 
+/**
+ * @desc Moves all POIs linked with poi_category of given id to default category
+ *
+ * @param {object} conn
+ * @param {integer} id POI category id to which POIs belong
+ * @returns {object}
+ */
 function updatePoisFromUsedCategory(conn, id) {
 	return dbCon.update(
 		conn,
@@ -21,6 +28,13 @@ function updatePoisFromUsedCategory(conn, id) {
 	);
 }
 
+/**
+ * @desc Removes a poi_category of given id row from DB
+ *
+ * @param {object} conn
+ * @param {integer} id category which should be removed id
+ * @returns {object}
+ */
 function deleteCategory(conn, id) {
 	return dbCon.destroy(
 		conn,
