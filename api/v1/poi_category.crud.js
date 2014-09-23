@@ -8,8 +8,7 @@ var dbCon = require('./../../lib/db_connector'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	poiCategoryConfig = require('./poi_category.config'),
-	poiCategoryUtils = require('./poi_category.utils'),
-	crudUtils = require('./crud.utils.js');
+	poiCategoryUtils = require('./poi_category.utils');
 
 /**
  * @desc CRUD function for getting collection of poi categories
@@ -33,10 +32,11 @@ function getPoiCategoriesCollection(req, res, next) {
 			return query
 				.connection(conn)
 				.select();
-		}, crudUtils.passError)
+		})
 		.then(function (collection) {
 			utils.sendHttpResponse(res, 200, poiCategoryUtils.processPoiCategoriesCollection(collection));
-		}, next);
+		})
+		.fail(next);
 }
 
 /**
@@ -59,10 +59,11 @@ function getPoiCategory(req, res, next) {
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
 			return query.connection(conn).select();
-		}, crudUtils.passError)
+		})
 		.then(function (collection) {
 			poiCategoryUtils.processPoiCategory(id, collection, res, next);
-		}, next);
+		})
+		.fail(next);
 }
 
 /**
@@ -87,7 +88,7 @@ function createPoiCategory(req, res, next) {
 		// add new row to DB table and save reference to promise result
 			dbConnection = conn;
 			return dbCon.insert(dbConnection, poiCategoryConfig.dbTable, reqBody);
-		}, crudUtils.passError)
+		})
 		.then(function (data) {
 			poiCategoryId = data[0];
 
@@ -97,14 +98,15 @@ function createPoiCategory(req, res, next) {
 			}
 
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
-		}, crudUtils.passError)
+		})
 		.then(function () {
 			// purge cache for map
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
 
 			// send proper response
 			utils.sendHttpResponse(res, 201, poiCategoryUtils.setupCreatePoiCategoryResponse(poiCategoryId, req));
-		}, next);
+		})
+		.fail(next);
 }
 
 /**
