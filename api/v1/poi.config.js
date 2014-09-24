@@ -125,5 +125,20 @@ module.exports = {
 			}
 		},
 		additionalProperties: false
-	}
+	},
+	poiSelectColumns: [
+		'name',
+		'poi_category_id',
+		'description',
+		'link',
+		'link_title',
+		'photo',
+		'lat',
+		'lon',
+		'created_on',
+		'created_by',
+		'updated_on',
+		'updated_by',
+		'map_id'
+	]
 };

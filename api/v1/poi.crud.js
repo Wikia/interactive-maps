@@ -80,10 +80,7 @@ function createPoi(req, res, next) {
  * @param {Function} next callback for express.js
  */
 function getPoi(req, res, next) {
-	var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'link_title', 'photo', 'lat', 'lon',
-			'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
-		],
-		poiIdParam = req.pathVar.id,
+	var poiIdParam = req.pathVar.id,
 		poiId = parseInt(poiIdParam),
 		filter = {
 			id: poiId
@@ -93,7 +90,7 @@ function getPoi(req, res, next) {
 
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
-			return dbCon.select(conn, poiConfig.dbTable, dbColumns, filter);
+			return dbCon.select(conn, poiConfig.dbTable, poiConfig.poiSelectColumns, filter);
 		})
 		.then(function (data) {
 			if (!data[0]) {
