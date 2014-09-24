@@ -139,6 +139,40 @@ function deleteMap(req, res, next) {
 }
 
 /**
+ * @desc Retrieves and returns a map's data
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP request object
+ * @param {function} next callback for express.js
+ */
+function getMap(req, res, next) {
+	var mapIdParam = req.pathVar.id,
+		mapId = parseInt(mapIdParam, 10),
+		filter = {
+			id: mapId
+		},
+		mapData;
+
+	mapUtils.validateMapId(mapId, mapIdParam);
+
+	dbCon.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			return dbCon.select(conn, mapConfig.dbTable, mapConfig.mapColumns, filter);
+		})
+		.then(function (data) {
+			if (!data[0]) {
+				throw errorHandler.elementNotFoundError(mapConfig.dbTable, mapId);
+			}
+
+			mapData = data[0];
+			utils.extendObject(mapData, {
+				tile_set_url: utils.responseUrl(req, '/api/v1/tile_set/', mapData.tile_set_id)
+			});
+			utils.sendHttpResponse(res, 200, mapData);
+		})
+		.fail(next);
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -150,46 +184,7 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			DELETE: deleteMap,
-			GET: function (req, res, next) {
-				var dbColumns = [
-						'id',
-						'title',
-						'tile_set_id',
-						'city_id',
-						'created_by',
-						'created_on',
-						'updated_on',
-						'deleted'
-
-					],
-					id = parseInt(req.pathVar.id, 10),
-					filter = {
-						id: id
-					};
-
-				if (isFinite(id)) {
-					dbCon.getConnection(dbCon.connType.all, function (conn) {
-						dbCon
-							.select(conn, mapConfig.dbTable, dbColumns, filter)
-							.then(
-								function (collection) {
-									var obj = collection[0];
-
-									if (obj) {
-										obj.tile_set_url = utils.responseUrl(req, '/api/v1/tile_set/', obj.tile_set_id);
-										res.send(200, obj);
-										res.end();
-									} else {
-										next(errorHandler.elementNotFoundError(mapConfig.dbTable, id));
-									}
-								},
-								next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badNumberError(req.pathVar.id));
-				}
-			},
+			GET: getMap,
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, mapConfig.updateSchema),

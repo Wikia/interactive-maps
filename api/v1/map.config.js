@@ -96,5 +96,15 @@ module.exports = {
 		'map.updated_on',
 		'tile_set.status',
 		'tile_set.id as tile_set_id'
+	],
+	mapColumns: [
+		'id',
+		'title',
+		'tile_set_id',
+		'city_id',
+		'created_by',
+		'created_on',
+		'updated_on',
+		'deleted'
 	]
 };
