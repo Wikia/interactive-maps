@@ -6,8 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	poiConfig = require('./poi.config'),
-	poiUtils = require('./poi.utils'),
-	jsonValidator = require('./../../lib/jsonValidator');
+	poiUtils = require('./poi.utils');
 
 /**
  * @desc CRUD function for listing collection of all POIs
@@ -16,11 +15,9 @@ var dbCon = require('./../../lib/db_connector'),
  * @param {Function} next callback for express.js
  */
 function getPoisCollection(req, res, next) {
-	var dbColumns = ['id', 'name'];
-
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
-			return dbCon.select(conn, poiConfig.dbTable, dbColumns);
+			return dbCon.select(conn, poiConfig.dbTable, poiConfig.poiCollectionColumns);
 		})
 		.then(function (collection) {
 			utils.sendHttpResponse(res, 200, collection);
@@ -90,7 +87,7 @@ function getPoi(req, res, next) {
 
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
-			return dbCon.select(conn, poiConfig.dbTable, poiConfig.poiSelectColumns, filter);
+			return dbCon.select(conn, poiConfig.dbTable, poiConfig.poiColumns, filter);
 		})
 		.then(function (data) {
 			if (!data[0]) {
@@ -154,7 +151,6 @@ function deletePoi(req, res, next) {
  */
 function updatePoi(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
-		errors = jsonValidator.validateJSON(reqBody, poiConfig.updateSchema),
 		poiIdParam = req.pathVar.id,
 		poiId = parseInt(poiIdParam, 10),
 		filter = {

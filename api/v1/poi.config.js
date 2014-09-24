@@ -126,7 +126,11 @@ module.exports = {
 		},
 		additionalProperties: false
 	},
-	poiSelectColumns: [
+	poiCollectionColumns: [
+		'id',
+		'name'
+	],
+	poiColumns: [
 		'name',
 		'poi_category_id',
 		'description',
