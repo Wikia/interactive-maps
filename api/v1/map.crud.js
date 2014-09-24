@@ -173,6 +173,56 @@ function getMap(req, res, next) {
 }
 
 /**
+ * @desc Updates data of a map which id was passed
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP request object
+ * @param {function} next callback for express.js
+ */
+function updateMap(req, res, next) {
+	var reqBody = reqBodyParser(req.rawBody),
+		errors = jsonValidator.validateJSON(reqBody, mapConfig.updateSchema),
+		response = {
+			message: 'Map successfully updated'
+		},
+		mapIdParam = req.pathVar.id,
+		mapId,
+		filter;
+
+	if (errors.length > 0) {
+		throw errorHandler.badRequestError(errors);
+	}
+
+	mapId = parseInt(mapIdParam, 10);
+	filter = {
+		id: mapId
+	};
+
+	mapUtils.validateMapId(mapId, mapIdParam);
+
+	utils.extendObject(reqBody, {
+		updated_on: dbCon.raw('CURRENT_TIMESTAMP')
+	});
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			dbCon.update(conn, mapConfig.dbTable, reqBody, filter);
+		})
+		.then(function (affectedRows) {
+			if (affectedRows <= 0) {
+				throw errorHandler.elementNotFoundError(mapConfig.dbTable, mapId);
+			}
+
+			utils.extendObject(response, {
+				id: mapId,
+				url: utils.responseUrl(req, '/api/v1/map/', mapId)
+			});
+
+			utils.sendHttpResponse(res, 303, response);
+		})
+		.fail(next);
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -185,49 +235,7 @@ module.exports = function createCRUD() {
 		wildcard: {
 			DELETE: deleteMap,
 			GET: getMap,
-			PUT: function (req, res, next) {
-				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, mapConfig.updateSchema),
-					id,
-					filter;
-
-				if (errors.length === 0) {
-					id = parseInt(req.pathVar.id, 10);
-					filter = {
-						id: id
-					};
-
-					if (isFinite(id)) {
-						reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
-						dbCon.getConnection(dbCon.connType.master, function (conn) {
-							dbCon
-								.update(conn, mapConfig.dbTable, reqBody, filter)
-								.then(
-									function (affectedRows) {
-										if (affectedRows > 0) {
-											var response = {
-												message: 'Map successfully updated',
-												id: id,
-												url: utils.responseUrl(req, '/api/v1/map/', id)
-											};
-
-											res.send(303, response);
-											res.end();
-										} else {
-											next(errorHandler.elementNotFoundError(mapConfig.dbTable, id));
-										}
-									},
-									next
-							);
-						}, next);
-					} else {
-						next(errorHandler.badNumberError(req.pathVar.id));
-					}
-
-				} else {
-					next(errorHandler.badRequestError(errors));
-				}
-			}
+			PUT: updateMap
 		}
 	};
 };
