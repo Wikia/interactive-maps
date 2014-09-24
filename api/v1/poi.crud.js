@@ -155,6 +155,67 @@ function deletePoi(req, res, next) {
 }
 
 /**
+ * @desc CRUD function for updating a POI
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ * @param {Function} next callback for express.js
+ */
+function updatePoi(req, res, next) {
+	var reqBody = reqBodyParser(req.rawBody),
+		errors = jsonValidator.validateJSON(reqBody, poiConfig.updateSchema),
+		poiId = parseInt(req.pathVar.id, 10),
+		filter = {
+			id: poiId
+		},
+		mapId,
+		dbConnection,
+		response = {
+			message: 'POI successfully updated',
+			id: poiId
+		};
+
+	if (errors.length > 0) {
+		throw errorHandler.badRequestError(errors);
+	}
+
+	if (!isFinite(poiId)) {
+		throw errorHandler.badNumberError(req.pathVar.id);
+	}
+
+	if (poiId <= 0) {
+		throw errorHandler.badRequestError('Invalid POI id');
+	}
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			dbConnection = conn;
+			return poiUtils.getMapIdByPoiId(dbConnection, poiId);
+		})
+		.then(function (rows) {
+			if (rows.length <= 0) {
+				throw errorHandler.elementNotFoundError(poiConfig.dbTable, poiId);
+			}
+
+			mapId = rows[0].map_id;
+			return dbCon.update(dbConnection, poiConfig.dbTable, reqBody, filter);
+		})
+		.then(function () {
+			response.url = utils.responseUrl(req, '/api/v1/poi/', poiId);
+			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
+		})
+		.then(function () {
+			squidUpdate.purgeKey(
+				utils.surrogateKeyPrefix + mapId,
+				'mapPoiUpdated'
+			);
+			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.update, poiId);
+			res.send(303, response);
+			res.end();
+		})
+		.fail(next);
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -167,64 +228,7 @@ module.exports = function createCRUD() {
 		wildcard: {
 			DELETE: deletePoi,
 			GET: getPoi,
-			PUT: function (req, res, next) {
-				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, poiConfig.updateSchema),
-					id,
-					filter,
-					mapId;
-
-				if (errors.length === 0) {
-					id = parseInt(req.pathVar.id);
-					filter = {
-						id: id
-					};
-
-					if (isFinite(id)) {
-						dbCon.getConnection(dbCon.connType.master, function (conn) {
-							poiUtils.getMapIdByPoiId(conn, id).then(
-								function (rows) {
-									if (rows.length > 0) {
-										mapId = rows[0].map_id;
-										dbCon
-											.update(conn, poiConfig.dbTable, reqBody, filter)
-											.then(
-												function () {
-													var response = {
-														message: 'POI successfully updated',
-														id: id,
-														url: utils.responseUrl(req, '/api/v1/poi/', id)
-													};
-													utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
-														function () {
-															squidUpdate.purgeKey(
-																utils.surrogateKeyPrefix + mapId,
-																'mapPoiUpdated'
-															);
-															poiUtils.addPoiDataToQueue(conn, poiConfig.poiOperations.update, id);
-															res.send(303, response);
-															res.end();
-														},
-														next
-													);
-												},
-												next
-										);
-									} else {
-										next(errorHandler.elementNotFoundError(poiConfig.dbTable, id));
-									}
-								},
-								next
-							);
-						}, next);
-					} else {
-						next(errorHandler.badNumberError(req.pathVar.id));
-					}
-
-				} else {
-					next(errorHandler.badRequestError(errors));
-				}
-			}
+			PUT: updatePoi
 		}
 	};
 };
