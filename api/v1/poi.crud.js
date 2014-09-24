@@ -9,6 +9,12 @@ var dbCon = require('./../../lib/db_connector'),
 	poiUtils = require('./poi.utils'),
 	jsonValidator = require('./../../lib/jsonValidator');
 
+/**
+ * @desc CRUD function for listing collection of all POIs
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ * @param {Function} next
+ */
 function getPoisCollection(req, res, next) {
 	var dbColumns = ['id', 'name'];
 
@@ -23,6 +29,53 @@ function getPoisCollection(req, res, next) {
 }
 
 /**
+ * @desc CRUD function for creating new POI
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ * @param {Function} next
+ */
+function createPoi(req, res, next) {
+	var reqBody = reqBodyParser(req.rawBody),
+		errors = jsonValidator.validateJSON(reqBody, poiConfig.createSchema),
+		mapId = reqBody.map_id,
+		response = {
+			message: 'POI successfully created'
+		},
+		dbConnection,
+		poiId;
+
+	if (errors.length > 0) {
+		next(errorHandler.badRequestError(errors));
+	}
+
+	// extend data object
+	reqBody.updated_by = reqBody.created_by;
+	reqBody.created_on = dbCon.knex.raw('CURRENT_TIMESTAMP');
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			dbConnection = conn;
+			return dbCon.insert(conn, poiConfig.dbTable, reqBody);
+		})
+		.then(function (data) {
+			poiId = data[0];
+
+			// extend response object
+			response.id = poiId;
+			response.url = utils.responseUrl(req, utils.addTrailingSlash(req.route.path), poiId);
+
+			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
+		})
+		.then(function () {
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
+			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.insert, poiId);
+			res.send(201, response);
+			res.end();
+		})
+		.fail(next);
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -30,43 +83,7 @@ module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: getPoisCollection,
-			POST: function (req, res, next) {
-				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, poiConfig.createSchema);
-
-				if (errors.length === 0) {
-					// extend data object
-					reqBody.updated_by = reqBody.created_by;
-					reqBody.created_on = dbCon.knex.raw('CURRENT_TIMESTAMP');
-					dbCon.getConnection(dbCon.connType.master, function (conn) {
-						dbCon
-							.insert(conn, poiConfig.dbTable, reqBody)
-							.then(
-								function (data) {
-									var id = data[0],
-										response = {
-											message: 'POI successfully created',
-											id: id,
-											url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
-										},
-										mapId = reqBody.map_id;
-									utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
-										function () {
-											squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
-											poiUtils.addPoiDataToQueue(conn, poiConfig.poiOperations.insert, id);
-											res.send(201, response);
-											res.end();
-										},
-										next
-									);
-								},
-								next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badRequestError(errors));
-				}
-			}
+			POST: createPoi
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
