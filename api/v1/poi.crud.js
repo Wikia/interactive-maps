@@ -83,15 +83,13 @@ function getPoi(req, res, next) {
 	var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'link_title', 'photo', 'lat', 'lon',
 			'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
 		],
-		poiId = parseInt(req.pathVar.id),
+		poiIdParam = req.pathVar.id,
+		poiId = parseInt(poiIdParam),
 		filter = {
 			id: poiId
 		};
 
-	if (!isFinite(poiId)) {
-		next(errorHandler.badNumberError(req.pathVar.id));
-		return;
-	}
+	poiUtils.validatePoiId(poiId, poiIdParam);
 
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
@@ -114,16 +112,15 @@ function getPoi(req, res, next) {
  * @param {Function} next callback for express.js
  */
 function deletePoi(req, res, next) {
-	var poiId = parseInt(req.pathVar.id),
+	var poiIdParam = req.pathVar.id,
+		poiId = parseInt(poiIdParam),
 		filter = {
 			id: poiId
 		},
 		dbConnection,
 		mapId;
 
-	if (!isFinite(poiId)) {
-		next(errorHandler.badNumberError(poiId));
-	}
+	poiUtils.validatePoiId(poiId, poiIdParam);
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
@@ -161,7 +158,8 @@ function deletePoi(req, res, next) {
 function updatePoi(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
 		errors = jsonValidator.validateJSON(reqBody, poiConfig.updateSchema),
-		poiId = parseInt(req.pathVar.id, 10),
+		poiIdParam = req.pathVar.id,
+		poiId = parseInt(poiIdParam, 10),
 		filter = {
 			id: poiId
 		},
@@ -176,13 +174,7 @@ function updatePoi(req, res, next) {
 		throw errorHandler.badRequestError(errors);
 	}
 
-	if (!isFinite(poiId)) {
-		throw errorHandler.badNumberError(req.pathVar.id);
-	}
-
-	if (poiId <= 0) {
-		throw errorHandler.badRequestError('Invalid POI id');
-	}
+	poiUtils.validatePoiId(poiId, poiIdParam);
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {

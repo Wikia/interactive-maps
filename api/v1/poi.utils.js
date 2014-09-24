@@ -121,8 +121,24 @@ function validatePoiCreation(reqBody) {
 	}
 }
 
+/**
+ * @desc Checks if poiId is valid
+ * @param {number} poiId an unique number of given POI
+ * @param {string} paramName a request parameter name (taken from req.pathVar)
+ */
+function validatePoiId(poiId, paramName) {
+	if (!isFinite(poiId)) {
+		throw errorHandler.badNumberError(paramName);
+	}
+
+	if (poiId <= 0) {
+		throw errorHandler.badRequestError('Invalid POI id');
+	}
+}
+
 module.exports = {
 	getMapIdByPoiId: getMapIdByPoiId,
 	addPoiDataToQueue: addPoiDataToQueue,
-	validatePoiCreation: validatePoiCreation
+	validatePoiCreation: validatePoiCreation,
+	validatePoiId: validatePoiId
 };
