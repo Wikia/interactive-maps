@@ -13,7 +13,7 @@ var dbCon = require('./../../lib/db_connector'),
  * @desc CRUD function for listing collection of all POIs
  * @param {Object} req - HTTP request object
  * @param {Object} res - HTTP response object
- * @param {Function} next
+ * @param {Function} next callback for express.js
  */
 function getPoisCollection(req, res, next) {
 	var dbColumns = ['id', 'name'];
@@ -32,7 +32,7 @@ function getPoisCollection(req, res, next) {
  * @desc CRUD function for creating new POI
  * @param {Object} req - HTTP request object
  * @param {Object} res - HTTP response object
- * @param {Function} next
+ * @param {Function} next callback for express.js
  */
 function createPoi(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
@@ -76,6 +76,51 @@ function createPoi(req, res, next) {
 }
 
 /**
+ * @desc CRUD function for deleting a POI
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ * @param {Function} next callback for express.js
+ */
+function deletePoi(req, res, next) {
+	var poiId = parseInt(req.pathVar.id),
+		filter = {
+			id: poiId
+		},
+		dbConnection,
+		mapId;
+
+	if (!isFinite(poiId)) {
+		next(errorHandler.badNumberError(poiId));
+	}
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			dbConnection = conn;
+			return poiUtils.getMapIdByPoiId(conn, poiId);
+		})
+		.then(function (rows) {
+			if (rows.length <= 0) {
+				throw errorHandler.elementNotFoundError(poiConfig.dbTable, poiId);
+			}
+
+			mapId = rows[0].map_id;
+			return dbCon.destroy(dbConnection, poiConfig.dbTable, filter);
+		})
+		.then(function () {
+			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
+		})
+		.then(function () {
+			squidUpdate.purgeKey(
+				utils.surrogateKeyPrefix + mapId,
+				'mapPoiDeleted'
+			);
+			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.delete, poiId);
+			utils.sendHttpResponse(res, 204, {});
+		})
+		.fail(next);
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -86,48 +131,7 @@ module.exports = function createCRUD() {
 			POST: createPoi
 		},
 		wildcard: {
-			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id),
-					filter = {
-						id: id
-					};
-				if (isFinite(id)) {
-					dbCon.getConnection(dbCon.connType.master, function (conn) {
-						poiUtils.getMapIdByPoiId(conn, id).then(
-							function (rows) {
-								if (rows.length > 0) {
-									var mapId = rows[0].map_id;
-
-									dbCon
-										.destroy(conn, poiConfig.dbTable, filter)
-										.then(
-											function () {
-												utils.changeMapUpdatedOn(conn, dbCon, mapId).then(
-													function () {
-														squidUpdate.purgeKey(
-															utils.surrogateKeyPrefix + mapId,
-															'mapPoiDeleted'
-														);
-														poiUtils.addPoiDataToQueue(conn, poiConfig.poiOperations.delete, id);
-														res.send(204, {});
-														res.end();
-													},
-													next
-												);
-											},
-											next
-									);
-								} else {
-									next(errorHandler.elementNotFoundError(poiConfig.dbTable, id));
-								}
-							},
-							next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badNumberError(req.pathVar.id));
-				}
-			},
+			DELETE: deletePoi,
 			GET: function (req, res, next) {
 				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'link_title', 'photo', 'lat', 'lon',
 						'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
