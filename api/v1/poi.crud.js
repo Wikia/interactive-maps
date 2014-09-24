@@ -9,6 +9,19 @@ var dbCon = require('./../../lib/db_connector'),
 	poiUtils = require('./poi.utils'),
 	jsonValidator = require('./../../lib/jsonValidator');
 
+function getPoiCollection(req, res, next) {
+	var dbColumns = ['id', 'name'];
+
+	dbCon.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			return dbCon.select(conn, poiConfig.dbTable, dbColumns);
+		})
+		.then(function (collection) {
+			utils.sendHttpResponse(res, 200, collection);
+		})
+		.fail(next);
+}
+
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
@@ -16,20 +29,7 @@ var dbCon = require('./../../lib/db_connector'),
 module.exports = function createCRUD() {
 	return {
 		handler: {
-			GET: function (req, res, next) {
-				var dbColumns = ['id', 'name'];
-				dbCon.getConnection(dbCon.connType.all, function (conn) {
-					dbCon
-						.select(conn, poiConfig.dbTable, dbColumns)
-						.then(
-						function (collection) {
-							res.send(200, collection);
-							res.end();
-						},
-						next
-					);
-				}, next);
-			},
+			GET: getPoiCollection,
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, poiConfig.createSchema);
