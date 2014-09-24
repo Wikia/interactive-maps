@@ -7,62 +7,21 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	config = require('./../../lib/config'),
 	squidUpdate = require('./../../lib/squidUpdate'),
-	mapConfig = require('./map.config');
+	mapConfig = require('./map.config'),
+	mapUtils = require('./map.utils');
 
 /**
- * @desc Builds object which is later used in knex.orderBy()
- *       Default value is { column: 'created_on', direction: 'desc' }
- * @param {String} sort description of sorting passed as GET parameter i.e. title_asc
- * @returns {*}
+ * @desc Returns a collection of maps' data
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP request object
+ * @param {function} next callback for express.js
  */
-function buildSort(sort) {
-	if (mapConfig.sortingOptions.hasOwnProperty(sort)) {
-		return mapConfig.sortingOptions[sort];
-	}
-
-	// default sorting type
-	return mapConfig.sortingOptions.created_on;
-}
-
-/**
- * @desc Builds maps collection list
- * @param {array} collection List of maps
- * @param {object} req Express request object
- * @returns {array}
- */
-function buildMapCollectionResult(collection, req) {
-	collection.forEach(function (value) {
-		value.image = utils.imageUrl(
-			config.dfsHost,
-			utils.getBucketName(
-				config.bucketPrefix + config.tileSetPrefix,
-				value.tile_set_id
-			),
-			value.image
-		);
-		value.url = utils.responseUrl(
-			req,
-			utils.addTrailingSlash(req.route.path),
-			value.id
-		);
-
-		delete value.tile_set_id;
-	});
-	return collection;
-}
-
-/**
- * @desc Get Maps express handler
- * @param {object} req Express request object
- * @param {object} res Express response object
- * @param {function} next Next function
- */
-function getMapsHandler(req, res, next) {
+function getMapsCollection(req, res, next) {
 	var cityId = parseInt(req.query.city_id, 10) || 0,
 		filter = {
 			deleted: 0
 		},
-		sort = buildSort(req.query.sort),
+		sort = mapUtils.buildSort(req.query.sort),
 		limit = parseInt(req.query.limit, 10) || false,
 		offset = parseInt(req.query.offset, 10) || 0,
 		tileSetStatuses = [utils.tileSetStatus.ok],
@@ -113,7 +72,7 @@ function getMapsHandler(req, res, next) {
 					function (count) {
 						res.send(200, {
 							total: count[0].cntr,
-							items: buildMapCollectionResult(collection, req)
+							items: mapUtils.buildMapCollectionResult(collection, req)
 						});
 						res.end();
 					},
@@ -133,7 +92,7 @@ function getMapsHandler(req, res, next) {
 module.exports = function createCRUD() {
 	return {
 		handler: {
-			GET: getMapsHandler,
+			GET: getMapsCollection,
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, mapConfig.createSchema);
