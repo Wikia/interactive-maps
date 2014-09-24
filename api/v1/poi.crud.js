@@ -30,7 +30,7 @@ function getPoisCollection(req, res, next) {
 
 /**
  * @desc CRUD function for creating new POI
- * @param {Object} req - HTTP request object
+ * @param {Object} req - HTTP request objectdeletePoi,
  * @param {Object} res - HTTP response object
  * @param {Function} next callback for express.js
  */
@@ -71,6 +71,40 @@ function createPoi(req, res, next) {
 			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.insert, poiId);
 			res.send(201, response);
 			res.end();
+		})
+		.fail(next);
+}
+
+/**
+ * @desc CRUD function for listing a POI data
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ * @param {Function} next callback for express.js
+ */
+function getPoi(req, res, next) {
+	var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'link_title', 'photo', 'lat', 'lon',
+			'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
+		],
+		poiId = parseInt(req.pathVar.id),
+		filter = {
+			id: poiId
+		};
+
+	if (!isFinite(poiId)) {
+		next(errorHandler.badNumberError(req.pathVar.id));
+		return;
+	}
+
+	dbCon.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			return dbCon.select(conn, poiConfig.dbTable, dbColumns, filter);
+		})
+		.then(function (data) {
+			if (!data[0]) {
+				return errorHandler.elementNotFoundError(poiConfig.dbTable, poiId);
+			}
+
+			utils.sendHttpResponse(res, 200, data[0]);
 		})
 		.fail(next);
 }
@@ -132,35 +166,7 @@ module.exports = function createCRUD() {
 		},
 		wildcard: {
 			DELETE: deletePoi,
-			GET: function (req, res, next) {
-				var dbColumns = ['name', 'poi_category_id', 'description', 'link', 'link_title', 'photo', 'lat', 'lon',
-						'created_on', 'created_by', 'updated_on', 'updated_by', 'map_id'
-					],
-					id = parseInt(req.pathVar.id),
-					filter = {
-						id: id
-					};
-
-				if (isFinite(id)) {
-					dbCon.getConnection(dbCon.connType.all, function (conn) {
-						dbCon
-							.select(conn, poiConfig.dbTable, dbColumns, filter)
-							.then(
-							function (collection) {
-								if (collection[0]) {
-									res.send(200, collection[0]);
-									res.end();
-								} else {
-									next(errorHandler.elementNotFoundError(poiConfig.dbTable, id));
-								}
-							},
-							next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badNumberError(req.pathVar.id));
-				}
-			},
+			GET: getPoi,
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, poiConfig.updateSchema),
