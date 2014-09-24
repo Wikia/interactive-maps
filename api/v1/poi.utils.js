@@ -110,11 +110,23 @@ function addPoiDataToQueue(conn, operation, poiId) {
 }
 
 /**
- * @desc Validates data passed for POI creation and throws an error if it's invalid
+ * @desc Validates data passed for POI update and throws an error if it's invalid
  * @param {object} reqBody data for POI creation send within the request
+ * @param {string} operation an operation for which it should be validated (taken from poiConfig.poiOperations)
  */
-function validatePoiCreation(reqBody) {
-	var errors = jsonValidator.validateJSON(reqBody, poiConfig.createSchema);
+function validateData(reqBody, operation) {
+	var errors;
+
+	switch (operation) {
+		case poiConfig.poiOperations.insert:
+			errors = jsonValidator.validateJSON(reqBody, poiConfig.createSchema);
+			break;
+		case poiConfig.poiOperations.update:
+			errors = jsonValidator.validateJSON(reqBody, poiConfig.updateSchema);
+			break;
+		default:
+			errors = [];
+	}
 
 	if (errors.length > 0) {
 		throw errorHandler.badRequestError(errors);
@@ -139,6 +151,6 @@ function validatePoiId(poiId, paramName) {
 module.exports = {
 	getMapIdByPoiId: getMapIdByPoiId,
 	addPoiDataToQueue: addPoiDataToQueue,
-	validatePoiCreation: validatePoiCreation,
+	validateData: validateData,
 	validatePoiId: validatePoiId
 };

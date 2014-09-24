@@ -43,7 +43,7 @@ function createPoi(req, res, next) {
 		dbConnection,
 		poiId;
 
-	poiUtils.validatePoiCreation(reqBody);
+	poiUtils.validateData(reqBody, poiConfig.poiOperations.insert);
 
 	utils.extendObject(reqBody, {
 		updated_by: reqBody.created_by,
@@ -167,10 +167,7 @@ function updatePoi(req, res, next) {
 			id: poiId
 		};
 
-	if (errors.length > 0) {
-		throw errorHandler.badRequestError(errors);
-	}
-
+	poiUtils.validateData(reqBody, poiConfig.poiOperations.update);
 	poiUtils.validatePoiId(poiId, poiIdParam);
 
 	dbCon.getConnection(dbCon.connType.master)
@@ -196,8 +193,7 @@ function updatePoi(req, res, next) {
 				'mapPoiUpdated'
 			);
 			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.update, poiId);
-			res.send(303, response);
-			res.end();
+			utils.sendHttpResponse(res, 303, response);
 		})
 		.fail(next);
 }
