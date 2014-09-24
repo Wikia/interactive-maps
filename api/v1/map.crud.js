@@ -70,42 +70,50 @@ function getMapsCollection(req, res, next) {
 }
 
 /**
+ * @desc Created a map
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP request object
+ * @param {function} next callback for express.js
+ */
+function createMap(req, res, next) {
+	var reqBody = reqBodyParser(req.rawBody),
+		errors = jsonValidator.validateJSON(reqBody, mapConfig.createSchema),
+		response = {
+			message: 'Map successfully created'
+		};
+
+	if (errors.length > 0) {
+		throw errorHandler.badRequestError(errors);
+	}
+
+	reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			return dbCon.insert(conn, mapConfig.dbTable, reqBody);
+		})
+		.then(function (data) {
+			var mapId = data[0];
+
+			utils.extendObject(response, {
+				id: mapId,
+				url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), mapId)
+			});
+
+			utils.sendHttpResponse(res, 200, response);
+		})
+		.fail(next);
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
-
 module.exports = function createCRUD() {
 	return {
 		handler: {
 			GET: getMapsCollection,
-			POST: function (req, res, next) {
-				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, mapConfig.createSchema);
-
-				if (errors.length === 0) {
-					reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
-					dbCon.getConnection(dbCon.connType.master, function (conn) {
-						dbCon
-							.insert(conn, mapConfig.dbTable, reqBody)
-							.then(
-								function (data) {
-									var id = data[0],
-										response = {
-											message: 'Map successfully created',
-											id: id,
-											url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
-										};
-
-									res.send(201, response);
-									res.end();
-								},
-								next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badRequestError(errors));
-				}
-			}
+			POST: createMap
 		},
 		wildcard: {
 			DELETE: function (req, res, next) {
