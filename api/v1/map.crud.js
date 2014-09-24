@@ -7,95 +7,7 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	config = require('./../../lib/config'),
 	squidUpdate = require('./../../lib/squidUpdate'),
-
-	dbTable = 'map',
-	createSchema = {
-		description: 'Schema for creating maps',
-		type: 'object',
-		properties: {
-			title: {
-				description: 'Map title',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			},
-			tile_set_id: {
-				description: 'Unique identifier for a tile set',
-				type: 'integer',
-				required: true
-			},
-			city_id: {
-				description: 'ID of the Wikia this map instance belongs to',
-				type: 'integer',
-				required: true
-			},
-			city_title: {
-				description: 'Name of the Wikia this map instance belongs to',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			},
-			city_url: {
-				description: 'URL of the Wikia this map instance belongs to',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			},
-			created_by: {
-				description: 'creator user name',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			}
-		},
-		additionalProperties: false
-	},
-	updateSchema = {
-		description: 'Schema for updating map instance',
-		type: 'object',
-		properties: {
-			title: {
-				description: 'Map instance name',
-				type: 'string',
-				minLength: 1
-			},
-			deleted: {
-				description: 'Map deleted flag',
-				type: 'bool'
-			},
-			city_title: {
-				description: 'Name of the Wikia this map instance belongs to',
-				type: 'string',
-				minLength: 1,
-				maxLength: 255
-			},
-			city_url: {
-				description: 'URL of the Wikia this map instance belongs to',
-				type: 'string',
-				minLength: 1,
-				maxLength: 255
-			}
-		},
-		additionalProperties: false
-	},
-	sortingOptions = {
-		title_asc: {
-			column: 'map.title',
-			direction: 'asc'
-		},
-		updated_on_desc: {
-			column: 'map.updated_on',
-			direction: 'desc'
-		},
-		created_on: {
-			column: 'map.created_on',
-			direction: 'desc'
-		}
-	};
+	mapConfig = require('./map.config');
 
 /**
  * @desc Builds object which is later used in knex.orderBy()
@@ -104,12 +16,12 @@ var dbCon = require('./../../lib/db_connector'),
  * @returns {*}
  */
 function buildSort(sort) {
-	if (sortingOptions.hasOwnProperty(sort)) {
-		return sortingOptions[sort];
+	if (mapConfig.sortingOptions.hasOwnProperty(sort)) {
+		return mapConfig.sortingOptions[sort];
 	}
 
 	// default sorting type
-	return sortingOptions.created_on;
+	return mapConfig.sortingOptions.created_on;
 }
 
 /**
@@ -168,7 +80,7 @@ function getMapsHandler(req, res, next) {
 	}
 
 	dbCon.getConnection(dbCon.connType.all, function (conn) {
-		query = dbCon.knex(dbTable)
+		query = dbCon.knex(mapConfig.dbTable)
 			.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
 			.column([
 				'map.id',
@@ -191,7 +103,7 @@ function getMapsHandler(req, res, next) {
 
 		query.then(
 			function (collection) {
-				dbCon.knex(dbTable)
+				dbCon.knex(mapConfig.dbTable)
 					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
 					.count('* as cntr')
 					.where(filter)
@@ -224,13 +136,13 @@ module.exports = function createCRUD() {
 			GET: getMapsHandler,
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, createSchema);
+					errors = jsonValidator.validateJSON(reqBody, mapConfig.createSchema);
 
 				if (errors.length === 0) {
 					reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
 					dbCon.getConnection(dbCon.connType.master, function (conn) {
 						dbCon
-							.insert(conn, dbTable, reqBody)
+							.insert(conn, mapConfig.dbTable, reqBody)
 							.then(
 								function (data) {
 									var id = data[0],
@@ -260,7 +172,7 @@ module.exports = function createCRUD() {
 				if (isFinite(id)) {
 					dbCon.getConnection(dbCon.connType.master, function (conn) {
 						dbCon
-							.destroy(conn, dbTable, filter)
+							.destroy(conn, mapConfig.dbTable, filter)
 							.then(
 								function (affectedRows) {
 									if (affectedRows > 0) {
@@ -271,7 +183,7 @@ module.exports = function createCRUD() {
 										});
 										res.end();
 									} else {
-										next(errorHandler.elementNotFoundError(dbTable, id));
+										next(errorHandler.elementNotFoundError(mapConfig.dbTable, id));
 									}
 								},
 								next
@@ -301,7 +213,7 @@ module.exports = function createCRUD() {
 				if (isFinite(id)) {
 					dbCon.getConnection(dbCon.connType.all, function (conn) {
 						dbCon
-							.select(conn, dbTable, dbColumns, filter)
+							.select(conn, mapConfig.dbTable, dbColumns, filter)
 							.then(
 								function (collection) {
 									var obj = collection[0];
@@ -311,7 +223,7 @@ module.exports = function createCRUD() {
 										res.send(200, obj);
 										res.end();
 									} else {
-										next(errorHandler.elementNotFoundError(dbTable, id));
+										next(errorHandler.elementNotFoundError(mapConfig.dbTable, id));
 									}
 								},
 								next
@@ -323,7 +235,7 @@ module.exports = function createCRUD() {
 			},
 			PUT: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, updateSchema),
+					errors = jsonValidator.validateJSON(reqBody, mapConfig.updateSchema),
 					id,
 					filter;
 
@@ -337,7 +249,7 @@ module.exports = function createCRUD() {
 						reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
 						dbCon.getConnection(dbCon.connType.master, function (conn) {
 							dbCon
-								.update(conn, dbTable, reqBody, filter)
+								.update(conn, mapConfig.dbTable, reqBody, filter)
 								.then(
 									function (affectedRows) {
 										if (affectedRows > 0) {
@@ -350,7 +262,7 @@ module.exports = function createCRUD() {
 											res.send(303, response);
 											res.end();
 										} else {
-											next(errorHandler.elementNotFoundError(dbTable, id));
+											next(errorHandler.elementNotFoundError(mapConfig.dbTable, id));
 										}
 									},
 									next
