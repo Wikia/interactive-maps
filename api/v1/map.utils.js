@@ -1,6 +1,7 @@
 'use strict';
 
-var config = require('./../../lib/config'),
+var dbCon = require('./../../lib/db_connector'),
+	config = require('./../../lib/config'),
 	utils = require('./../../lib/utils'),
 	mapConfig = require('./map.config');
 
@@ -46,7 +47,27 @@ function buildMapCollectionResult(collection, req) {
 	return collection;
 }
 
+/**
+ * @desc Returns an instance of knex query
+ * @param {object} conn database connection object
+ * @param {object} filter filtering options (passed to WHERE clause in SQL query)
+ * @param {object} tileSetStatuses another parameter passed to WHERE clause in SQL query
+ * @param {object} sort sorting options object; it's required for it to have column and direction fields
+ * @returns {object} knex query instance
+ */
+function getMapsCollectionQuery(conn, filter, tileSetStatuses, sort) {
+	return dbCon.knex(mapConfig.dbTable)
+		.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+		.column(mapConfig.mapsCollectionColumns)
+		.where(filter)
+		.whereIn('tile_set.status', tileSetStatuses)
+		.orderBy(sort.column, sort.direction)
+		.connection(conn)
+		.select();
+}
+
 module.exports = {
+	getMapsCollectionQuery: getMapsCollectionQuery,
 	buildSort: buildSort,
 	buildMapCollectionResult: buildMapCollectionResult
 };

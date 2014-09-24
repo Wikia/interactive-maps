@@ -88,5 +88,13 @@ module.exports = {
 			column: 'map.created_on',
 			direction: 'desc'
 		}
-	}
+	},
+	mapsCollectionColumns: [
+		'map.id',
+		'map.title',
+		'tile_set.image',
+		'map.updated_on',
+		'tile_set.status',
+		'tile_set.id as tile_set_id'
+	]
 };

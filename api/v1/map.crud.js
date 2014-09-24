@@ -5,7 +5,6 @@ var dbCon = require('./../../lib/db_connector'),
 	jsonValidator = require('./../../lib/jsonValidator'),
 	utils = require('./../../lib/utils'),
 	errorHandler = require('./../../lib/errorHandler'),
-	config = require('./../../lib/config'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	mapConfig = require('./map.config'),
 	mapUtils = require('./map.utils');
@@ -25,7 +24,8 @@ function getMapsCollection(req, res, next) {
 		limit = parseInt(req.query.limit, 10) || false,
 		offset = parseInt(req.query.offset, 10) || 0,
 		tileSetStatuses = [utils.tileSetStatus.ok],
-		query;
+		dbConnection,
+		mapsList;
 
 	if (cityId !== 0) {
 		filter.city_id = cityId;
@@ -38,50 +38,35 @@ function getMapsCollection(req, res, next) {
 		filter.deleted = 1;
 	}
 
-	dbCon.getConnection(dbCon.connType.all, function (conn) {
-		query = dbCon.knex(mapConfig.dbTable)
-			.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-			.column([
-				'map.id',
-				'map.title',
-				'tile_set.image',
-				'map.updated_on',
-				'tile_set.status',
-				'tile_set.id as tile_set_id'
-			])
-			.where(filter)
-			.whereIn('tile_set.status', tileSetStatuses)
-			.orderBy(sort.column, sort.direction)
-			.connection(conn)
-			.select();
+	dbCon.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			var query = mapUtils.getMapsCollectionQuery(conn, filter, tileSetStatuses, sort);
 
-		if (limit) {
-			query.limit(limit);
-			query.offset(offset);
-		}
+			dbConnection = conn;
 
-		query.then(
-			function (collection) {
-				dbCon.knex(mapConfig.dbTable)
-					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-					.count('* as cntr')
-					.where(filter)
-					.whereIn('tile_set.status', tileSetStatuses)
-					.connection(conn)
-					.then(
-					function (count) {
-						res.send(200, {
-							total: count[0].cntr,
-							items: mapUtils.buildMapCollectionResult(collection, req)
-						});
-						res.end();
-					},
-					next
-				);
-			},
-			next
-		);
-	}, next);
+			if (limit) {
+				query.limit(limit);
+				query.offset(offset);
+			}
+
+			return query;
+		})
+		.then(function (collection) {
+			mapsList = collection;
+			return dbCon.knex(mapConfig.dbTable)
+				.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+				.count('* as cntr')
+				.where(filter)
+				.whereIn('tile_set.status', tileSetStatuses)
+				.connection(dbConnection);
+		})
+		.then(function (count) {
+			utils.sendHttpResponse(res, 200, {
+				total: count[0].cntr,
+				items: mapUtils.buildMapCollectionResult(mapsList, req)
+			});
+		})
+		.fail(next);
 }
 
 /**
