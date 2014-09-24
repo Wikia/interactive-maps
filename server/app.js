@@ -14,7 +14,8 @@ var logger = require('../lib/logger'),
 	jobs,
 	worker,
 	gracefulShutdown = false,
-	http = require('http');
+	http = require('http'),
+	queue = require('../lib/queue');
 
 config = require('../lib/config');
 config.setRoot(__dirname + '/..');
@@ -134,6 +135,9 @@ if (cluster.isMaster) {
 	// we need to check if something should get promoted
 	//by default it happens every 5000ms
 	jobs.promote();
+
+	// connect to RabbitMQ
+	queue.connect();
 
 	require('./apiServer');
 } else {
