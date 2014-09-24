@@ -3,7 +3,9 @@
 var dbCon = require('./../../lib/db_connector'),
 	taskQueue = require('./../../lib/taskQueue'),
 	logger = require('./../../lib/logger'),
-	poiConfig = require('./poi.config');
+	poiConfig = require('./poi.config'),
+	errorHandler = require('./../../lib/errorHandler'),
+	jsonValidator = require('./../../lib/jsonValidator');
 
 /**
  * @desc Helper function to get map_id from poi_id
@@ -107,7 +109,20 @@ function addPoiDataToQueue(conn, operation, poiId) {
 	}
 }
 
+/**
+ * @desc Validates data passed for POI creation and throws an error if it's invalid
+ * @param {object} reqBody data for POI creation send within the request
+ */
+function validatePoiCreation(reqBody) {
+	var errors = jsonValidator.validateJSON(reqBody, poiConfig.createSchema);
+
+	if (errors.length > 0) {
+		throw errorHandler.badRequestError(errors);
+	}
+}
+
 module.exports = {
 	getMapIdByPoiId: getMapIdByPoiId,
-	addPoiDataToQueue: addPoiDataToQueue
+	addPoiDataToQueue: addPoiDataToQueue,
+	validatePoiCreation: validatePoiCreation
 };
