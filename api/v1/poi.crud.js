@@ -9,7 +9,7 @@ var dbCon = require('./../../lib/db_connector'),
 	poiUtils = require('./poi.utils'),
 	jsonValidator = require('./../../lib/jsonValidator');
 
-function getPoiCollection(req, res, next) {
+function getPoisCollection(req, res, next) {
 	var dbColumns = ['id', 'name'];
 
 	dbCon.getConnection(dbCon.connType.all)
@@ -29,7 +29,7 @@ function getPoiCollection(req, res, next) {
 module.exports = function createCRUD() {
 	return {
 		handler: {
-			GET: getPoiCollection,
+			GET: getPoisCollection,
 			POST: function (req, res, next) {
 				var reqBody = reqBodyParser(req.rawBody),
 					errors = jsonValidator.validateJSON(reqBody, poiConfig.createSchema);
