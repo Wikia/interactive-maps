@@ -106,6 +106,39 @@ function createMap(req, res, next) {
 }
 
 /**
+ * @desc Deletes a map
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP request object
+ * @param {function} next callback for express.js
+ */
+function deleteMap(req, res, next) {
+	var mapIdParam = req.pathVar.id,
+		mapId = parseInt(mapIdParam, 10),
+		filter = {
+			id: mapId
+		};
+
+	mapUtils.validateMapId(mapId, mapIdParam);
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			return dbCon.destroy(conn, mapConfig.dbTable, filter);
+		})
+		.then(function (affectedRows) {
+			if (affectedRows <= 0) {
+				throw errorHandler.elementNotFoundError(mapConfig.dbTable, mapId);
+			}
+
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapDeleted');
+			utils.sendHttpResponse(res, 204, {
+				message: 'Map successfully deleted',
+				id: mapId
+			});
+		})
+		.fail(next);
+}
+
+/**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
@@ -116,35 +149,7 @@ module.exports = function createCRUD() {
 			POST: createMap
 		},
 		wildcard: {
-			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id, 10),
-					filter = {
-						id: id
-					};
-				if (isFinite(id)) {
-					dbCon.getConnection(dbCon.connType.master, function (conn) {
-						dbCon
-							.destroy(conn, mapConfig.dbTable, filter)
-							.then(
-								function (affectedRows) {
-									if (affectedRows > 0) {
-										squidUpdate.purgeKey(utils.surrogateKeyPrefix + id, 'mapDeleted');
-										res.send(204, {
-											message: 'Map successfully deleted',
-											id: id
-										});
-										res.end();
-									} else {
-										next(errorHandler.elementNotFoundError(mapConfig.dbTable, id));
-									}
-								},
-								next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badNumberError(req.pathVar.id));
-				}
-			},
+			DELETE: deleteMap,
 			GET: function (req, res, next) {
 				var dbColumns = [
 						'id',

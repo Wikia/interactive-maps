@@ -3,6 +3,7 @@
 var dbCon = require('./../../lib/db_connector'),
 	config = require('./../../lib/config'),
 	utils = require('./../../lib/utils'),
+	errorHandler = require('./../../lib/errorHandler'),
 	mapConfig = require('./map.config');
 
 /**
@@ -66,8 +67,24 @@ function getMapsCollectionQuery(conn, filter, tileSetStatuses, sort) {
 		.select();
 }
 
+/**
+ * @desc Checks if mapId is valid
+ * @param {number} mapId an unique number of given map
+ * @param {string} paramName a request parameter name (taken from req.pathVar)
+ */
+function validateMapId(mapId, paramName) {
+	if (!isFinite(mapId)) {
+		throw errorHandler.badNumberError(paramName);
+	}
+
+	if (mapId <= 0) {
+		throw errorHandler.badRequestError('Invalid mapId');
+	}
+}
+
 module.exports = {
 	getMapsCollectionQuery: getMapsCollectionQuery,
 	buildSort: buildSort,
-	buildMapCollectionResult: buildMapCollectionResult
+	buildMapCollectionResult: buildMapCollectionResult,
+	validateMapId: validateMapId
 };
