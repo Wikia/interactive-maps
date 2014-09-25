@@ -6,7 +6,8 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	poiConfig = require('./poi.config'),
-	poiUtils = require('./poi.utils');
+	poiUtils = require('./poi.utils'),
+	crudUtils = require('./crud.utils');
 
 /**
  * @desc CRUD function for listing collection of all POIs
@@ -27,7 +28,7 @@ function getPoisCollection(req, res, next) {
 
 /**
  * @desc CRUD function for creating new POI
- * @param {Object} req - HTTP request objectdeletePoi,
+ * @param {Object} req - HTTP request object
  * @param {Object} res - HTTP response object
  * @param {Function} next callback for express.js
  */
@@ -40,7 +41,7 @@ function createPoi(req, res, next) {
 		dbConnection,
 		poiId;
 
-	poiUtils.validateData(reqBody, poiConfig.poiOperations.insert);
+	crudUtils.validateData(reqBody, poiConfig.createSchema);
 
 	utils.extendObject(reqBody, {
 		updated_by: reqBody.created_by,
@@ -77,13 +78,14 @@ function createPoi(req, res, next) {
  * @param {Function} next callback for express.js
  */
 function getPoi(req, res, next) {
-	var poiIdParam = req.pathVar.id,
-		poiId = parseInt(poiIdParam),
-		filter = {
-			id: poiId
-		};
+	var poiId = req.pathVar.id,
+		filter;
 
-	poiUtils.validatePoiId(poiId, poiIdParam);
+	crudUtils.validateIdParam(poiId);
+	poiId = parseInt(poiId, 10);
+	filter = {
+		id: poiId
+	};
 
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
@@ -91,7 +93,7 @@ function getPoi(req, res, next) {
 		})
 		.then(function (data) {
 			if (!data[0]) {
-				return errorHandler.elementNotFoundError(poiConfig.dbTable, poiId);
+				throw errorHandler.elementNotFoundError(poiConfig.dbTable, poiId);
 			}
 
 			utils.sendHttpResponse(res, 200, data[0]);
@@ -106,15 +108,16 @@ function getPoi(req, res, next) {
  * @param {Function} next callback for express.js
  */
 function deletePoi(req, res, next) {
-	var poiIdParam = req.pathVar.id,
-		poiId = parseInt(poiIdParam),
-		filter = {
-			id: poiId
-		},
+	var poiId = req.pathVar.id,
+		filter,
 		dbConnection,
 		mapId;
 
-	poiUtils.validatePoiId(poiId, poiIdParam);
+	crudUtils.validateIdParam(poiId);
+	poiId = parseInt(poiId, 10);
+	filter = {
+		id: poiId
+	};
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
@@ -151,11 +154,8 @@ function deletePoi(req, res, next) {
  */
 function updatePoi(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
-		poiIdParam = req.pathVar.id,
-		poiId = parseInt(poiIdParam, 10),
-		filter = {
-			id: poiId
-		},
+		poiId = req.pathVar.id,
+		filter,
 		mapId,
 		dbConnection,
 		response = {
@@ -163,8 +163,12 @@ function updatePoi(req, res, next) {
 			id: poiId
 		};
 
-	poiUtils.validateData(reqBody, poiConfig.poiOperations.update);
-	poiUtils.validatePoiId(poiId, poiIdParam);
+	crudUtils.validateData(reqBody, poiConfig.updateSchema);
+	crudUtils.validateIdParam(poiId);
+	poiId = parseInt(poiId, 10);
+	filter = {
+		id: poiId
+	};
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {

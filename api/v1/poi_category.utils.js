@@ -119,7 +119,7 @@ function setupCreatePoiCategoryResponse(id, req) {
  * (caused by non able to delete foreign key) and handle this case by calling
  * the handleUsedCategories function, otherwise handle the error as regular
  * error. See: poi_category.crud.js:156
- * 
+ *
  * @param {Object} err an error instance
  * @returns {*|clientError|testCases.clientError|Error.clientError|testCases.clientError.name|boolean}
  */

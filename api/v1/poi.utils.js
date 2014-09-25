@@ -3,9 +3,7 @@
 var dbCon = require('./../../lib/db_connector'),
 	taskQueue = require('./../../lib/taskQueue'),
 	logger = require('./../../lib/logger'),
-	poiConfig = require('./poi.config'),
-	errorHandler = require('./../../lib/errorHandler'),
-	jsonValidator = require('./../../lib/jsonValidator');
+	poiConfig = require('./poi.config');
 
 /**
  * @desc Helper function to get map_id from poi_id
@@ -109,48 +107,7 @@ function addPoiDataToQueue(conn, operation, poiId) {
 	}
 }
 
-/**
- * @desc Validates data passed for POI update and throws an error if it's invalid
- * @param {object} reqBody data for POI creation send within the request
- * @param {string} operation an operation for which it should be validated (taken from poiConfig.poiOperations)
- */
-function validateData(reqBody, operation) {
-	var errors;
-
-	switch (operation) {
-		case poiConfig.poiOperations.insert:
-			errors = jsonValidator.validateJSON(reqBody, poiConfig.createSchema);
-			break;
-		case poiConfig.poiOperations.update:
-			errors = jsonValidator.validateJSON(reqBody, poiConfig.updateSchema);
-			break;
-		default:
-			errors = [];
-	}
-
-	if (errors.length > 0) {
-		throw errorHandler.badRequestError(errors);
-	}
-}
-
-/**
- * @desc Checks if poiId is valid
- * @param {number} poiId an unique number of given POI
- * @param {string} paramName a request parameter name (taken from req.pathVar)
- */
-function validatePoiId(poiId, paramName) {
-	if (!isFinite(poiId)) {
-		throw errorHandler.badNumberError(paramName);
-	}
-
-	if (poiId <= 0) {
-		throw errorHandler.badRequestError('Invalid POI id');
-	}
-}
-
 module.exports = {
 	getMapIdByPoiId: getMapIdByPoiId,
-	addPoiDataToQueue: addPoiDataToQueue,
-	validateData: validateData,
-	validatePoiId: validatePoiId
+	addPoiDataToQueue: addPoiDataToQueue
 };
