@@ -71,7 +71,7 @@ function getMapsCollection(req, res, next) {
 function createMap(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
 		response = {
-			message: 'Map successfully created'
+			message: mapConfig.responseMessages.created
 		};
 
 	crudUtils.validateData(reqBody, mapConfig.createSchema);
@@ -121,7 +121,7 @@ function deleteMap(req, res, next) {
 
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapDeleted');
 			utils.sendHttpResponse(res, 204, {
-				message: 'Map successfully deleted',
+				message: mapConfig.responseMessages.deleted,
 				id: mapId
 			});
 		})
@@ -172,7 +172,7 @@ function getMap(req, res, next) {
 function updateMap(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
 		response = {
-			message: 'Map successfully updated'
+			message: mapConfig.responseMessages.updated
 		},
 		mapId = req.pathVar.id,
 		filter;

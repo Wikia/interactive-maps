@@ -111,5 +111,10 @@ module.exports = {
 		'created_on',
 		'updated_on',
 		'deleted'
-	]
+	],
+	responseMessages: {
+		created: 'Map successfully created',
+		updated: 'Map successfully updated',
+		deleted: 'Map successfully deleted'
+	}
 };
