@@ -39,9 +39,8 @@ function getTileSetsCollection(req, res, next) {
 		tileSetUtils.addSearchToQuery(query, search);
 	}
 
-	// add pagination to DB query
 	if (limit) {
-		tileSetUtils.addPaginationToQuery(query, limit, offset);
+		crudUtils.addPaginationToQuery(query, limit, offset);
 	}
 
 	dbCon

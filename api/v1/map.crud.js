@@ -41,15 +41,13 @@ function getMapsCollection(req, res, next) {
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
 			var query = mapUtils.getMapsCollectionQuery(conn, filter, tileSetStatuses, sort);
-
 			dbConnection = conn;
 
 			if (limit) {
-				query.limit(limit);
-				query.offset(offset);
+				crudUtils.addPaginationToQuery(query, limit, offset);
 			}
 
-			return query;
+			return query.select();
 		})
 		.then(function (collection) {
 			mapsList = collection;

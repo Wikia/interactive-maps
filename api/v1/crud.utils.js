@@ -16,6 +16,18 @@ function passError(error) {
 }
 
 /**
+ * @desc adds pagination to DB query
+ * @param {Object} query - Knex DB query object
+ * @param {Number} limit - number of results
+ * @param {Number} offset - offset from top
+ */
+function addPaginationToQuery(query, limit, offset) {
+	query
+		.limit(limit)
+		.offset(offset);
+}
+
+/**
  * @desc Checks if a value passed as a unique id is valid
  * @param {String|Number} value a number passed as id value
  */
@@ -49,5 +61,6 @@ function validateData(reqBody, schema) {
 module.exports = {
 	passError: passError,
 	validateIdParam: validateIdParam,
-	validateData: validateData
+	validateData: validateData,
+	addPaginationToQuery: addPaginationToQuery
 };

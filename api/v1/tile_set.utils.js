@@ -66,18 +66,6 @@ function processTileSetCollection(collection, req, process) {
 }
 
 /**
- * @desc adds pagination to DB query
- * @param {Object} query - Knex DB query object
- * @param {Number} limit - number of results
- * @param {Number} offset - offset from top
- */
-function addPaginationToQuery(query, limit, offset) {
-	query
-		.limit(limit)
-		.offset(offset);
-}
-
-/**
  * @desc adds search term to query
  * @param {Object} query - Knex DB query object
  * @param {String} search - search term
@@ -130,7 +118,6 @@ module.exports = {
 	addSearchToQuery: addSearchToQuery,
 	validateSearchTerm: validateSearchTerm,
 	setupSearchLimit: setupSearchLimit,
-	addPaginationToQuery: addPaginationToQuery,
 	processTileSetCollection: processTileSetCollection,
 	extendTileSetObject: extendTileSetObject,
 	setupCreateTileSetResponse: setupCreateTileSetResponse

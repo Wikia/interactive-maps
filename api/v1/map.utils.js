@@ -3,7 +3,6 @@
 var dbCon = require('./../../lib/db_connector'),
 	config = require('./../../lib/config'),
 	utils = require('./../../lib/utils'),
-	errorHandler = require('./../../lib/errorHandler'),
 	mapConfig = require('./map.config');
 
 /**
@@ -63,8 +62,7 @@ function getMapsCollectionQuery(conn, filter, tileSetStatuses, sort) {
 		.where(filter)
 		.whereIn('tile_set.status', tileSetStatuses)
 		.orderBy(sort.column, sort.direction)
-		.connection(conn)
-		.select();
+		.connection(conn);
 }
 
 module.exports = {
