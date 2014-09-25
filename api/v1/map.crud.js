@@ -2,7 +2,6 @@
 
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
-	jsonValidator = require('./../../lib/jsonValidator'),
 	utils = require('./../../lib/utils'),
 	errorHandler = require('./../../lib/errorHandler'),
 	squidUpdate = require('./../../lib/squidUpdate'),
@@ -78,15 +77,11 @@ function getMapsCollection(req, res, next) {
  */
 function createMap(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
-		errors = jsonValidator.validateJSON(reqBody, mapConfig.createSchema),
 		response = {
 			message: 'Map successfully created'
 		};
 
-	if (errors.length > 0) {
-		throw errorHandler.badRequestError(errors);
-	}
-
+	crudUtils.validateData(reqBody, mapConfig.operations.insert);
 	reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
 
 	dbCon.getConnection(dbCon.connType.master)
@@ -181,17 +176,13 @@ function getMap(req, res, next) {
  */
 function updateMap(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
-		errors = jsonValidator.validateJSON(reqBody, mapConfig.updateSchema),
 		response = {
 			message: 'Map successfully updated'
 		},
 		mapId = req.pathVar.id,
 		filter;
 
-	if (errors.length > 0) {
-		throw errorHandler.badRequestError(errors);
-	}
-
+	crudUtils.validateData(reqBody, mapConfig.operations.update);
 	crudUtils.validateIdParam(mapId);
 	mapId = parseInt(mapId, 10);
 
