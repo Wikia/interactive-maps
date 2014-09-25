@@ -67,24 +67,8 @@ function getMapsCollectionQuery(conn, filter, tileSetStatuses, sort) {
 		.select();
 }
 
-/**
- * @desc Checks if mapId is valid
- * @param {number} mapId an unique number of given map
- * @param {string} paramName a request parameter name (taken from req.pathVar)
- */
-function validateMapId(mapId, paramName) {
-	if (!isFinite(mapId)) {
-		throw errorHandler.badNumberError(paramName);
-	}
-
-	if (mapId <= 0) {
-		throw errorHandler.badRequestError('Invalid mapId');
-	}
-}
-
 module.exports = {
 	getMapsCollectionQuery: getMapsCollectionQuery,
 	buildSort: buildSort,
-	buildMapCollectionResult: buildMapCollectionResult,
-	validateMapId: validateMapId
+	buildMapCollectionResult: buildMapCollectionResult
 };

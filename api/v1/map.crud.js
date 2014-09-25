@@ -7,7 +7,8 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	mapConfig = require('./map.config'),
-	mapUtils = require('./map.utils');
+	mapUtils = require('./map.utils'),
+	crudUtils = require('./crud.utils');
 
 /**
  * @desc Returns a collection of maps' data
@@ -118,7 +119,7 @@ function deleteMap(req, res, next) {
 			id: mapId
 		};
 
-	mapUtils.validateMapId(mapId, mapIdParam);
+	crudUtils.validateIdParam(mapId, mapIdParam);
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
@@ -145,14 +146,14 @@ function deleteMap(req, res, next) {
  * @param {function} next callback for express.js
  */
 function getMap(req, res, next) {
-	var mapIdParam = req.pathVar.id,
-		mapId = parseInt(mapIdParam, 10),
+	var mapId = req.pathVar.id,
 		filter = {
 			id: mapId
 		},
 		mapData;
 
-	mapUtils.validateMapId(mapId, mapIdParam);
+	crudUtils.validateIdParam(mapId);
+	mapId = parseInt(mapId, 10);
 
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
@@ -184,20 +185,19 @@ function updateMap(req, res, next) {
 		response = {
 			message: 'Map successfully updated'
 		},
-		mapIdParam = req.pathVar.id,
-		mapId,
+		mapId = req.pathVar.id,
 		filter;
 
 	if (errors.length > 0) {
 		throw errorHandler.badRequestError(errors);
 	}
 
-	mapId = parseInt(mapIdParam, 10);
+	crudUtils.validateIdParam(mapId);
+	mapId = parseInt(mapId, 10);
+
 	filter = {
 		id: mapId
 	};
-
-	mapUtils.validateMapId(mapId, mapIdParam);
 
 	utils.extendObject(reqBody, {
 		updated_on: dbCon.raw('CURRENT_TIMESTAMP')
@@ -205,7 +205,7 @@ function updateMap(req, res, next) {
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
-			dbCon.update(conn, mapConfig.dbTable, reqBody, filter);
+			return dbCon.update(conn, mapConfig.dbTable, reqBody, filter);
 		})
 		.then(function (affectedRows) {
 			if (affectedRows <= 0) {
