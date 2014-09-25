@@ -22,8 +22,7 @@ var dbCon = require('../lib/db_connector'),
 	args = process.argv.slice(2),
 	mapId = +args[0],
 	find = args[1],
-	replace = args[2],
-	shouldUpdate = args[3] === 'update';
+	replace = args[2];
 
 
 /**
@@ -110,12 +109,13 @@ function processPois(conn, pois) {
 					utils.surrogateKeyPrefix + mapId,
 					'mapPoiUpdated'
 				);
-				callback = (poi === pois[pois.length-1]) ? exit : null;
-				if (shouldUpdate) {
-					poiIndexer.addPoiDataToQueue(conn, poiIndexer.poiOperations.update, poi.id, callback);
+				if (poi === pois[pois.length-1]) {
+					//by default knex doesnt close the connection to db
+					process.exit();
 				}
 			});
 		}
+		console.log('All requests to DB sent');
 	});
 }
 
