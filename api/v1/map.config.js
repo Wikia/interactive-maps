@@ -2,10 +2,6 @@
 
 module.exports = {
 	dbTable: 'map',
-	operations: {
-		'insert': 'insert',
-		'update': 'update'
-	},
 	createSchema: {
 		description: 'Schema for creating maps',
 		type: 'object',

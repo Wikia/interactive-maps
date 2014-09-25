@@ -81,7 +81,7 @@ function createMap(req, res, next) {
 			message: 'Map successfully created'
 		};
 
-	crudUtils.validateData(reqBody, mapConfig.operations.insert);
+	crudUtils.validateData(reqBody, mapConfig.createSchema);
 	reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
 
 	dbCon.getConnection(dbCon.connType.master)
@@ -108,13 +108,14 @@ function createMap(req, res, next) {
  * @param {function} next callback for express.js
  */
 function deleteMap(req, res, next) {
-	var mapIdParam = req.pathVar.id,
-		mapId = parseInt(mapIdParam, 10),
-		filter = {
-			id: mapId
-		};
+	var mapId = req.pathVar.id,
+		filter;
 
-	crudUtils.validateIdParam(mapId, mapIdParam);
+	crudUtils.validateIdParam(mapId);
+	mapId = parseInt(mapId, 10);
+	filter = {
+		id: mapId
+	};
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
@@ -142,13 +143,14 @@ function deleteMap(req, res, next) {
  */
 function getMap(req, res, next) {
 	var mapId = req.pathVar.id,
-		filter = {
-			id: mapId
-		},
+		filter,
 		mapData;
 
 	crudUtils.validateIdParam(mapId);
 	mapId = parseInt(mapId, 10);
+	filter = {
+		id: mapId
+	};
 
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
@@ -182,10 +184,9 @@ function updateMap(req, res, next) {
 		mapId = req.pathVar.id,
 		filter;
 
-	crudUtils.validateData(reqBody, mapConfig.operations.update);
+	crudUtils.validateData(reqBody, mapConfig.updateSchema);
 	crudUtils.validateIdParam(mapId);
 	mapId = parseInt(mapId, 10);
-
 	filter = {
 		id: mapId
 	};
