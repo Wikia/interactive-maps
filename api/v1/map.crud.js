@@ -136,8 +136,7 @@ function deleteMap(req, res, next) {
  */
 function getMap(req, res, next) {
 	var mapId = req.pathVar.id,
-		filter,
-		mapData;
+		filter;
 
 	crudUtils.validateIdParam(mapId);
 	mapId = parseInt(mapId, 10);
@@ -150,11 +149,12 @@ function getMap(req, res, next) {
 			return dbCon.select(conn, mapConfig.dbTable, mapConfig.mapColumns, filter);
 		})
 		.then(function (data) {
-			if (!data[0]) {
+			var mapData = data[0];
+
+			if (!mapData) {
 				throw errorHandler.elementNotFoundError(mapConfig.dbTable, mapId);
 			}
 
-			mapData = data[0];
 			utils.extendObject(mapData, {
 				tile_set_url: utils.responseUrl(req, '/api/v1/tile_set/', mapData.tile_set_id)
 			});
