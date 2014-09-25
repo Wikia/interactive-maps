@@ -2,13 +2,13 @@
 
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
-	jsonValidator = require('./../../lib/jsonValidator'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	poiCategoryConfig = require('./poi_category.config'),
-	poiCategoryUtils = require('./poi_category.utils');
+	poiCategoryUtils = require('./poi_category.utils'),
+	crudUtils = require('./crud.utils');
 
 /**
  * @desc CRUD function for getting collection of poi categories
@@ -46,15 +46,16 @@ function getPoiCategoriesCollection(req, res, next) {
  * @param {function} next
  */
 function getPoiCategory(req, res, next) {
-	var id = parseInt(req.pathVar.id, 10),
-		filter = {
-			id: id
-		},
-		query = dbCon.knex(poiCategoryConfig.dbTable).column(poiCategoryConfig.getCollectionDbColumns).where(filter);
+	var id = req.pathVar.id,
+		filter,
+		query;
 
-	if (!isFinite(id)) {
-		next(errorHandler.badNumberError(req.pathVar.id));
-	}
+	crudUtils.validateIdParam(id);
+	id = parseInt(req.pathVar.id, 10);
+	filter = {
+		id: id
+	};
+	query = dbCon.knex(poiCategoryConfig.dbTable).column(poiCategoryConfig.getCollectionDbColumns).where(filter);
 
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
@@ -74,14 +75,11 @@ function getPoiCategory(req, res, next) {
  */
 function createPoiCategory(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
-		errors = jsonValidator.validateJSON(reqBody, poiCategoryConfig.createSchema),
 		mapId = reqBody.map_id,
 		poiCategoryId,
 		dbConnection;
 
-	if (errors.length > 0) {
-		next(errorHandler.badRequestError(errors));
-	}
+	crudUtils.validateData(reqBody, poiCategoryConfig.createSchema);
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
@@ -116,16 +114,16 @@ function createPoiCategory(req, res, next) {
  * @param {function} next
  */
 function deletePoiCategory(req, res, next) {
-	var poiCategoryId = parseInt(req.pathVar.id, 10),
-		filter = {
-			id: poiCategoryId
-		},
+	var poiCategoryId = req.pathVar.id,
+		filter,
 		mapId,
 		dbConnection;
 
-	if (!isFinite(poiCategoryId)) {
-		next(errorHandler.badNumberError(poiCategoryId));
-	}
+	crudUtils.validateIdParam(poiCategoryId);
+	poiCategoryId = parseInt(poiCategoryId, 10);
+	filter = {
+		id: poiCategoryId
+	};
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
@@ -165,20 +163,17 @@ function deletePoiCategory(req, res, next) {
 function updatePoiCategory (req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
 		poiCategoryId = parseInt(req.pathVar.id, 10),
+		response = {
+			message: 'POI category successfully updated'
+		},
 		filter = {
 			id: poiCategoryId
 		},
-		errors = jsonValidator.validateJSON(reqBody, poiCategoryConfig.updateSchema),
 		dbConnection,
 		mapId;
 
-	if (errors.length > 0) {
-		next(errorHandler.badRequestError(errors));
-	}
-
-	if (!isFinite(poiCategoryId)) {
-		next(errorHandler.badNumberError(poiCategoryId));
-	}
+	crudUtils.validateData(reqBody, poiCategoryConfig.updateSchema);
+	crudUtils.validateIdParam(poiCategoryId);
 
 	// If new marker is uploaded, reset the marker status to 0
 	if (reqBody.marker) {
@@ -195,25 +190,24 @@ function updatePoiCategory (req, res, next) {
 			return dbCon.update(dbConnection, poiCategoryConfig.dbTable, reqBody, filter);
 		})
 		.then(function (affectedRows) {
-			if (affectedRows > 0) {
-				var response = {
-					message: 'POI category successfully updated',
-					id: poiCategoryId,
-					url: utils.responseUrl(req, '/api/v1/poi_category/', poiCategoryId)
-				};
-
-				if (reqBody.marker) {
-					poiCategoryMarker(poiCategoryId, mapId, reqBody.marker, poiCategoryConfig.dbTable);
-				}
-
-				utils.changeMapUpdatedOn(dbConnection, dbCon, mapId).then(function () {
-					squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
-
-					utils.sendHttpResponse(res, 303, response);
-				}, next);
-			} else {
-				next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId));
+			if (affectedRows <= 0) {
+				throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId);
 			}
+
+			utils.extendObject(response, {
+				id: poiCategoryId,
+				url: utils.responseUrl(req, '/api/v1/poi_category/', poiCategoryId)
+			});
+
+			if (reqBody.marker) {
+				poiCategoryMarker(poiCategoryId, mapId, reqBody.marker, poiCategoryConfig.dbTable);
+			}
+
+			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
+		})
+		.then(function () {
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
+			utils.sendHttpResponse(res, 303, response);
 		})
 		.fail(next);
 }
