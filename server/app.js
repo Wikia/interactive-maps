@@ -15,7 +15,7 @@ var logger = require('../lib/logger'),
 	worker,
 	gracefulShutdown = false,
 	http = require('http'),
-	queue = require('../lib/queue');
+	taskQueue = require('../lib/taskQueue');
 
 config = require('../lib/config');
 config.setRoot(__dirname + '/..');
@@ -137,7 +137,7 @@ if (cluster.isMaster) {
 	jobs.promote();
 
 	// connect to RabbitMQ
-	queue.connect();
+	taskQueue.connect();
 
 	require('./apiServer');
 } else {

@@ -6,7 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 	squidUpdate = require('./../../lib/squidUpdate'),
-	queue = require('./../../lib/queue'),
+	taskQueue = require('./../../lib/taskQueue'),
 	logger = require('./../../lib/logger'),
 
 	urlPattern = jsonValidator.getOptionalUrlPattern(),
@@ -209,8 +209,8 @@ function addPoiDataToQueue(conn, operation, poiId) {
 				}
 			]
 		};
-		queue.publish(queue.payload(
-			queue.tasks.poiUpdate,
+		taskQueue.publish(taskQueue.payload(
+			taskQueue.tasks.poiUpdate,
 			'',
 			workId,
 			context
@@ -224,8 +224,8 @@ function addPoiDataToQueue(conn, operation, poiId) {
 					operation: operation,
 					data: poiData
 				};
-				queue.publish(queue.payload(
-					queue.tasks.poiUpdate,
+				taskQueue.publish(taskQueue.payload(
+					taskQueue.tasks.poiUpdate,
 					poiOperations.insert === operation ? row.created_by : row.updated_by,
 					workId,
 					context
