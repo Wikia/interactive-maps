@@ -98,28 +98,6 @@ function getMapId(conn, poiCategoryId) {
 	return deferred.promise;
 }
 
-function processPoiCategoriesCollection(collection) {
-	utils.handleDefaultMarker(collection);
-	utils.convertMarkersNamesToUrls(
-		collection,
-		config.dfsHost,
-		config.bucketPrefix,
-		config.markersPrefix
-	);
-
-	return collection;
-}
-
-function processPoiCategory(id, collection, res, next) {
-	collection = processPoiCategoriesCollection(collection);
-
-	if (collection[0]) {
-		utils.sendHttpResponse(res, 200, collection[0]);
-	} else {
-		next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id));
-	}
-}
-
 function setupCreatePoiCategoryResponse(id, req) {
 	return {
 		message: 'POI category successfully created',
@@ -146,8 +124,6 @@ function isDeletedCategoryUsed(err) {
 module.exports = {
 	handleUsedCategories: handleUsedCategories,
 	getMapId: getMapId,
-	processPoiCategoriesCollection: processPoiCategoriesCollection,
-	processPoiCategory: processPoiCategory,
 	setupCreatePoiCategoryResponse: setupCreatePoiCategoryResponse,
 	isDeletedCategoryUsed: isDeletedCategoryUsed
 };

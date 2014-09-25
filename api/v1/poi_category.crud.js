@@ -3,6 +3,7 @@
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	errorHandler = require('./../../lib/errorHandler'),
+	config = require('./../../lib/config'),
 	utils = require('./../../lib/utils'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 	squidUpdate = require('./../../lib/squidUpdate'),
@@ -34,7 +35,7 @@ function getPoiCategoriesCollection(req, res, next) {
 				.select();
 		})
 		.then(function (collection) {
-			utils.sendHttpResponse(res, 200, poiCategoryUtils.processPoiCategoriesCollection(collection));
+			utils.sendHttpResponse(res, 200, utils.processPoiCategoriesCollection(collection, config));
 		})
 		.fail(next);
 }
@@ -62,7 +63,13 @@ function getPoiCategory(req, res, next) {
 			return query.connection(conn).select();
 		})
 		.then(function (collection) {
-			poiCategoryUtils.processPoiCategory(id, collection, res, next);
+			collection = utils.processPoiCategoriesCollection(collection, config);
+
+			if (!collection[0]) {
+				throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id);
+			}
+
+			utils.sendHttpResponse(res, 200, collection[0]);
 		})
 		.fail(next);
 }
