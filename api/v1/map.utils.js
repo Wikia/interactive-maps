@@ -12,12 +12,9 @@ var dbCon = require('./../../lib/db_connector'),
  * @returns {object}
  */
 function buildSort(sort) {
-	if (mapConfig.sortingOptions.hasOwnProperty(sort)) {
-		return mapConfig.sortingOptions[sort];
-	}
+	var sortType = mapConfig.sortingOptions[sort];
 
-	// default sorting type
-	return mapConfig.sortingOptions.created_on;
+	return sortType ? sortType : mapConfig.sortingOptions.created_on;
 }
 
 /**
