@@ -1,5 +1,5 @@
-/*
- 	Load appropriate options object based on environment
+/**
+ * Load appropriate options object based on environment
  */
 'use strict';
 

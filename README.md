@@ -9,12 +9,12 @@ Service that allows creating, storing and serving interactive maps
 ```Shell
 npm install
 ```
-then export some env variables
+then export some env variables from `/etc/environment` file on our Wikia machines or do it by your own:
 ```Shell
 export WIKIA_CONFIG_ROOT="<Path/To/ConfigFile>"
 export WIKIA_SWIFT_YML="<Path/To/SwiftConfigFile>"
-export WIKIA_PROD_DATACENTER="<datacenter>"
-export NODE_ENV="<devbox|production>"
+export WIKIA_DATACENTER="<datacenter>"
+export NODE_ENV="<dev|prod>"
 ```
 
 Optionally you can define the number of background workers:
@@ -30,8 +30,6 @@ or
 ```Shell
 node app.js
 ```
-
-
 
 # What is it ?
 
