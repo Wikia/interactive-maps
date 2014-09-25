@@ -98,6 +98,12 @@ function getMapId(conn, poiCategoryId) {
 	return deferred.promise;
 }
 
+/**
+ * @desc Returns a response object for creation of POI category
+ * @param {Number} id POI category id
+ * @param {Object} req request object from express.js
+ * @returns {{message: string, id: *, url: (Number|String)}}
+ */
 function setupCreatePoiCategoryResponse(id, req) {
 	return {
 		message: 'POI category successfully created',
@@ -106,11 +112,17 @@ function setupCreatePoiCategoryResponse(id, req) {
 	};
 }
 
-// If the delete request results an error, check if the error is reference error
-// (caused by non able to delete foreign key) and handle this case by calling
-// the handleUsedCategories function, otherwise handle the error as regular
-// error
-
+/**
+ * @desc Checks if the error is DB error connected to foreign key constraint
+ *
+ * If the delete request results an error, check if the error is reference error
+ * (caused by non able to delete foreign key) and handle this case by calling
+ * the handleUsedCategories function, otherwise handle the error as regular
+ * error. See: poi_category.crud.js:156
+ * 
+ * @param {Object} err an error instance
+ * @returns {*|clientError|testCases.clientError|Error.clientError|testCases.clientError.name|boolean}
+ */
 function isDeletedCategoryUsed(err) {
 	return (
 		err &&
