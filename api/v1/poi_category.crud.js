@@ -137,15 +137,15 @@ function deletePoiCategory(req, res, next) {
 			return dbCon.destroy(dbConnection, poiCategoryConfig.dbTable, filter);
 		})
 		.then(function (affectedRows) {
-			if (affectedRows > 0) {
-				utils.changeMapUpdatedOn(dbConnection, dbCon, mapId).then(function () {
-					// purge cache for map
-					squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
-					utils.sendHttpResponse(res, 204, {});
-				}, next);
-			} else {
-				next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId));
+			if (affectedRows <= 0) {
+				throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId);
 			}
+
+			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
+		})
+		.then(function () {
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
+			utils.sendHttpResponse(res, 204, {});
 		})
 		.fail(function (err) {
 			if (poiCategoryUtils.isDeletedCategoryUsed(err)) {
