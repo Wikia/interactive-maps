@@ -65,8 +65,24 @@ function getMapsCollectionQuery(conn, filter, tileSetStatuses, sort) {
 		.connection(conn);
 }
 
+/**
+ * @desc Returns an instance of knex query with results of count() on map table
+ * @param {Object} conn database connection object
+ * @param {Object} filter filtering options (passed to WHERE clause in SQL query)
+ * @param {Object} tileSetStatuses another parameter passed to WHERE clause in SQL query
+ * @returns {Object} knex query instance
+ */
+function getMapsCountQuery(conn, filter, tileSetStatuses) {
+	return dbCon.knex(mapConfig.dbTable)
+		.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
+		.where(filter)
+		.whereIn('tile_set.status', tileSetStatuses)
+		.connection(conn);
+}
+
 module.exports = {
 	getMapsCollectionQuery: getMapsCollectionQuery,
+	getMapsCountQuery: getMapsCountQuery,
 	buildSort: buildSort,
 	buildMapCollectionResult: buildMapCollectionResult
 };

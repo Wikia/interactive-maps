@@ -51,12 +51,7 @@ function getMapsCollection(req, res, next) {
 		})
 		.then(function (collection) {
 			mapsList = collection;
-			return dbCon.knex(mapConfig.dbTable)
-				.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-				.count('* as cntr')
-				.where(filter)
-				.whereIn('tile_set.status', tileSetStatuses)
-				.connection(dbConnection);
+			return mapUtils.getMapsCountQuery(dbConnection, filter, tileSetStatuses).count('* as cntr');
 		})
 		.then(function (count) {
 			utils.sendHttpResponse(res, 200, {
