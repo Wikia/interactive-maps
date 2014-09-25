@@ -1,5 +1,8 @@
 'use strict';
 
+var jsonValidator = require('./../../lib/jsonValidator'),
+	urlPattern = jsonValidator.getUrlPattern();
+
 module.exports = {
 	dbTable: 'map',
 	createSchema: {
@@ -35,7 +38,8 @@ module.exports = {
 				type: 'string',
 				required: true,
 				minLength: 1,
-				maxLength: 255
+				maxLength: 255,
+				pattern: urlPattern
 			},
 			created_by: {
 				description: 'creator user name',
@@ -70,7 +74,8 @@ module.exports = {
 				description: 'URL of the Wikia this map instance belongs to',
 				type: 'string',
 				minLength: 1,
-				maxLength: 255
+				maxLength: 255,
+				pattern: urlPattern
 			}
 		},
 		additionalProperties: false
