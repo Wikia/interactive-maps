@@ -1,19 +1,7 @@
 'use strict';
 
-var Q = require('q'),
-	errorHandler = require('./../../lib/errorHandler'),
+var errorHandler = require('./../../lib/errorHandler'),
 	jsonValidator = require('./../../lib/jsonValidator');
-
-/**
- * @desc Decorates error with a promise
- * @param {*} error
- * @returns {Object} rejected promise
- */
-function passError(error) {
-	var deferred = Q.defer().reject(error);
-
-	return deferred.promise;
-}
 
 /**
  * @desc adds pagination to DB query
@@ -59,7 +47,6 @@ function validateData(reqBody, schema) {
 }
 
 module.exports = {
-	passError: passError,
 	validateIdParam: validateIdParam,
 	validateData: validateData,
 	addPaginationToQuery: addPaginationToQuery
