@@ -92,11 +92,12 @@ function getPoi(req, res, next) {
 			return dbCon.select(conn, poiConfig.dbTable, poiConfig.poiColumns, filter);
 		})
 		.then(function (data) {
-			if (!data[0]) {
+			var poiData = data[0];
+			if (!poiData) {
 				throw errorHandler.elementNotFoundError(poiConfig.dbTable, poiId);
 			}
 
-			utils.sendHttpResponse(res, 200, data[0]);
+			utils.sendHttpResponse(res, 200, poiData);
 		})
 		.fail(next);
 }
