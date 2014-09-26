@@ -20,7 +20,7 @@ var dbCon = require('../lib/db_connector'),
 
 	table = 'poi',
 	args = process.argv.slice(2),
-	mapId = +args[0],
+	mapId = parseInt(args[0], 10),
 	find = args[1],
 	replace = args[2];
 
