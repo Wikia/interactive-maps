@@ -144,5 +144,10 @@ module.exports = {
 		'updated_on',
 		'updated_by',
 		'map_id'
-	]
+	],
+	responseMessages: {
+		created: 'POI successfully created',
+		updated: 'POI successfully updated',
+		deleted: 'POI successfully deleted'
+	}
 };

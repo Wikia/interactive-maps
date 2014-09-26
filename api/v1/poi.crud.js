@@ -36,7 +36,7 @@ function createPoi(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
 		mapId = reqBody.map_id,
 		response = {
-			message: 'POI successfully created'
+			message: poiConfig.responseMessages.created
 		},
 		dbConnection,
 		poiId;
@@ -141,7 +141,7 @@ function deletePoi(req, res, next) {
 				'mapPoiDeleted'
 			);
 			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.delete, poiId);
-			utils.sendHttpResponse(res, 204, {});
+			utils.sendHttpResponse(res, 200, {message: poiConfig.responseMessages.deleted});
 		})
 		.fail(next);
 }
@@ -159,7 +159,7 @@ function updatePoi(req, res, next) {
 		mapId,
 		dbConnection,
 		response = {
-			message: 'POI successfully updated',
+			message: poiConfig.responseMessages.updated,
 			id: poiId
 		};
 
