@@ -21,6 +21,11 @@ module.exports = {
 		'created_on',
 		'created_by'
 	],
+	responseMessages: {
+		created: 'POI category successfully created',
+		updated: 'POI category successfully updated',
+		deleted: 'POI category successfully deleted'
+	},
 	createSchema: {
 		description: 'Schema for creating a category',
 		type: 'object',

@@ -150,7 +150,7 @@ function deletePoiCategory(req, res, next) {
 		})
 		.then(function () {
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
-			utils.sendHttpResponse(res, 204, {});
+			utils.sendHttpResponse(res, 200, {message: poiCategoryConfig.responseMessages.deleted});
 		})
 		.fail(function (err) {
 			if (poiCategoryUtils.isDeletedCategoryUsed(err)) {
@@ -171,7 +171,7 @@ function updatePoiCategory (req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
 		poiCategoryId = parseInt(req.pathVar.id, 10),
 		response = {
-			message: 'POI category successfully updated'
+			message: poiCategoryConfig.responseMessages.updated
 		},
 		filter = {
 			id: poiCategoryId

@@ -106,7 +106,7 @@ function getMapId(conn, poiCategoryId) {
  */
 function setupCreatePoiCategoryResponse(id, req) {
 	return {
-		message: 'POI category successfully created',
+		message: poiCategoryConfig.responseMessages.created,
 		id: id,
 		url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
 	};
