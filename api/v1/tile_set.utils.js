@@ -7,23 +7,6 @@ var Q = require('q'),
 	tileSetConfig = require('./tile_set.config');
 
 /**
- * @desc creates tileSet image URL and returns it
- * @param {Number} tileSetId
- * @param {String} imageName
- * @returns {String} - tileSet image URL
- */
-function createTileSetImageUrl(tileSetId, imageName) {
-	return utils.imageUrl(
-		config.dfsHost,
-		utils.getBucketName(
-			config.bucketPrefix + config.tileSetPrefix,
-			tileSetId
-		),
-		imageName
-	);
-}
-
-/**
  * @desc creates API URL for tileSetObject and returns it
  * @param {Number} tileSetId
  * @param {Object} req - HTTP request object
@@ -39,8 +22,18 @@ function createTileSetApiUrl(tileSetId, req) {
  * @param {Object} req - HTTP request object
  */
 function extendTileSetObject(tileSet, req) {
-	tileSet.image = createTileSetImageUrl(tileSet.id, tileSet.image);
-	tileSet.url = createTileSetApiUrl(tileSet.id, req);
+	var tileSetId = tileSet.id;
+
+	tileSet.image = utils.imageUrl(
+		config.dfsHost,
+		utils.getBucketName(
+			config.bucketPrefix + config.tileSetPrefix,
+			tileSetId
+		),
+		tileSet.image
+	);
+
+	tileSet.url = createTileSetApiUrl(tileSetId, req);
 
 	if (tileSet.max_zoom) {
 		tileSet.max_zoom = utils.binToMaxZoomLevel(tileSet.max_zoom);
