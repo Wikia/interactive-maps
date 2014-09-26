@@ -1,7 +1,9 @@
 'use strict';
 
-var utils = require('./../../lib/utils'),
+var Q = require('q'),
+	utils = require('./../../lib/utils'),
 	config = require('./../../lib/config'),
+	errorHandler = require('./../../lib/errorHandler'),
 	tileSetConfig = require('./tile_set.config');
 
 /**
@@ -112,11 +114,42 @@ function setupCreateTileSetResponse(dbRes, req) {
 	};
 }
 
+/**
+ * @desc Changes query and its options if valid search parameter was passed
+ * @param {Object} query knex query object's instance
+ * @param {String} search value of search parameter
+ * @param {Number} limit results limit
+ * @returns {Object} a simple object with new query and new limit
+ */
+function changeOptionsIfSearchIsValid(query, search, limit) {
+	var deferred = Q.defer();
+
+	// add search term to DB query
+	if (search) {
+		search = search.trim();
+
+		if (!validateSearchTerm(search)) {
+			throw errorHandler.badRequestError([tileSetConfig.searchErrorMsg]);
+		}
+
+		limit = setupSearchLimit(limit);
+		addSearchToQuery(query, search);
+	}
+
+	deferred.resolve({
+		query: query,
+		limit: limit
+	});
+
+	return deferred.promise;
+}
+
 module.exports = {
 	addSearchToQuery: addSearchToQuery,
 	validateSearchTerm: validateSearchTerm,
 	setupSearchLimit: setupSearchLimit,
 	processTileSetCollection: processTileSetCollection,
 	extendTileSetObject: extendTileSetObject,
-	setupCreateTileSetResponse: setupCreateTileSetResponse
+	setupCreateTileSetResponse: setupCreateTileSetResponse,
+	changeOptionsIfSearchIsValid: changeOptionsIfSearchIsValid
 };

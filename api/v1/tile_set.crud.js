@@ -22,21 +22,8 @@ function getTileSetsCollection(req, res, next) {
 		limit = parseInt(req.query.limit, 10) || false,
 		offset = parseInt(req.query.offset, 10) || 0,
 		search = req.query.search || false,
-		query = dbCon.knex(tileSetConfig.dbTable).column(tileSetConfig.getCollectionDbColumns).where(filter);
-
-	// add search term to DB query
-	if (search) {
-		search = search.trim();
-
-		if (!tileSetUtils.validateSearchTerm(search)) {
-			next(
-				errorHandler.badRequestError([tileSetConfig.searchErrorMsg])
-			);
-		}
-
-		limit = tileSetUtils.setupSearchLimit(limit);
-		tileSetUtils.addSearchToQuery(query, search);
-	}
+		query = dbCon.knex(tileSetConfig.dbTable).column(tileSetConfig.getCollectionDbColumns).where(filter),
+		dbConnection;
 
 	if (limit) {
 		crudUtils.addPaginationToQuery(query, limit, offset);
@@ -45,8 +32,19 @@ function getTileSetsCollection(req, res, next) {
 	dbCon
 		.getConnection(dbCon.connType.all)
 		.then(function (conn) {
+			dbConnection = conn;
+			return tileSetUtils.changeOptionsIfSearchIsValid(query, search, limit);
+		})
+		.then(function (data) {
+			query = data.query;
+			limit = data.limit;
+
+			if (limit) {
+				crudUtils.addPaginationToQuery(query, limit, offset);
+			}
+
 			return query
-				.connection(conn)
+				.connection(dbConnection)
 				.select();
 		})
 		.then(function (collection) {
@@ -108,6 +106,8 @@ function createTileSet(req, res, next) {
 			return addTileSet(conn, tileSetConfig.dbTable, reqBody);
 		})
 		.then(function (data) {
+			console.log();
+
 			utils.sendHttpResponse(
 				res,
 				data.exists ? 200 : 201,
