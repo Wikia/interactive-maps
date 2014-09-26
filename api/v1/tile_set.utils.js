@@ -27,7 +27,7 @@ function createTileSetImageUrl(tileSetId, imageName) {
  * @param {Object} req - HTTP request object
  * @returns {String} - tileSet Object API URL
  */
-function createTileSetAPIUrl(tileSetId, req) {
+function createTileSetApiUrl(tileSetId, req) {
 	return utils.responseUrl(req, utils.addTrailingSlash(req.route.path), tileSetId);
 }
 
@@ -38,7 +38,7 @@ function createTileSetAPIUrl(tileSetId, req) {
  */
 function extendTileSetObject(tileSet, req) {
 	tileSet.image = createTileSetImageUrl(tileSet.id, tileSet.image);
-	tileSet.url = createTileSetAPIUrl(tileSet.id, req);
+	tileSet.url = createTileSetApiUrl(tileSet.id, req);
 
 	if (tileSet.max_zoom) {
 		tileSet.max_zoom = utils.binToMaxZoomLevel(tileSet.max_zoom);
@@ -110,7 +110,7 @@ function setupCreateTileSetResponse(dbRes, req) {
 	return {
 		message: message,
 		id: id,
-		url: createTileSetAPIUrl(id, req)
+		url: createTileSetApiUrl(id, req)
 	};
 }
 
