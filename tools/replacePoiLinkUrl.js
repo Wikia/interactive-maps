@@ -82,12 +82,11 @@ function updatePoiLink(conn, poiId, newLink) {
 	);
 }
 
-validateArgs(mapId, find, replace);
-
 /**
  * @desc Entrypoint to the script
  */
 function start() {
+	validateArgs(mapId, find, replace);
 	dbCon.getConnection(dbCon.connType.master, onConnection);
 }
 
