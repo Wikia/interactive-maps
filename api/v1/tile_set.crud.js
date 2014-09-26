@@ -110,7 +110,7 @@ function createTileSet(req, res, next) {
 
 			utils.sendHttpResponse(
 				res,
-				data.exists ? 200 : 201,
+				data.exists ? 200 : 202,
 				tileSetUtils.setupCreateTileSetResponse(data, req)
 			);
 		})
