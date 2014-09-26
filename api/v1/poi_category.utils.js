@@ -46,27 +46,45 @@ function deleteCategory(conn, id) {
 }
 
 /**
+ * @desc Throws an error if there were no POIs within category of given id
+ * @param {Number} affectedRows number of POIs within a category
+ * @param {Number} id POI category's id
+ */
+function throwErrorIfNoRowsAffected(affectedRows, id) {
+	if (affectedRows <= 0) {
+		throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id);
+	}
+}
+
+/**
  * @desc Handle deleting used categories by moving all points to CatchAll category
  *
- * @param {object} conn
- * @param {number} id
- * @param {object} res
- * @param {function} next
+ * @param {object} conn database connection
+ * @param {number} id POI category's id
+ * @param {object} res express.js response object
+ * @param {function} next express.js callback function
  */
 function handleUsedCategories(conn, id, res, next) {
-	updatePoisFromUsedCategory(conn, id).then(function (rowsAffected) {
-		if (rowsAffected > 0) {
-			deleteCategory(conn, id).then(function (affectedRows) {
-				if (affectedRows > 0) {
-					utils.sendHttpResponse(res, 204, {});
-				} else {
-					next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id));
-				}
-			}, next);
-		} else {
-			next(errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id));
-		}
-	}, next);
+	updatePoisFromUsedCategory(conn, id)
+		.then(function (affectedRows) {
+			throwErrorIfNoRowsAffected(affectedRows, id);
+			return deleteCategory(conn, id);
+		})
+		.then(function (affectedRows) {
+			throwErrorIfNoRowsAffected(affectedRows, id);
+			utils.sendHttpResponse(res, 200, getDeletedResponse());
+		})
+		.fail(next);
+}
+
+/**
+ * @desc Returns simple response object
+ * @returns {Object} response object for deleted POI category
+ */
+function getDeletedResponse() {
+	return {
+		message: poiCategoryConfig.responseMessages.deleted
+	};
 }
 
 /**
@@ -137,5 +155,6 @@ module.exports = {
 	handleUsedCategories: handleUsedCategories,
 	getMapId: getMapId,
 	setupCreatePoiCategoryResponse: setupCreatePoiCategoryResponse,
-	isDeletedCategoryUsed: isDeletedCategoryUsed
+	isDeletedCategoryUsed: isDeletedCategoryUsed,
+	getDeletedResponse: getDeletedResponse
 };

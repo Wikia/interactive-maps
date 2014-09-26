@@ -150,7 +150,7 @@ function deletePoiCategory(req, res, next) {
 		})
 		.then(function () {
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
-			utils.sendHttpResponse(res, 200, {message: poiCategoryConfig.responseMessages.deleted});
+			utils.sendHttpResponse(res, 200, poiCategoryUtils.getDeletedResponse());
 		})
 		.fail(function (err) {
 			if (poiCategoryUtils.isDeletedCategoryUsed(err)) {
