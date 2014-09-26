@@ -103,9 +103,7 @@ function setupSearchLimit(limit) {
  */
 function setupCreateTileSetResponse(dbRes, req) {
 	var id = dbRes.id,
-		message = dbRes.exist ?
-			'This tile set already exists' :
-			'Tile set added to processing queue';
+		message = dbRes.exists ? tileSetConfig.responseMessages.canceled : tileSetConfig.responseMessages.created;
 
 	return {
 		message: message,

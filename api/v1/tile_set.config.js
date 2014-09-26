@@ -28,6 +28,10 @@ module.exports = {
 		'attribution',
 		'subdomains'
 	],
+	responseMessages: {
+		created: 'Tile set added to processing queue',
+		canceled: 'This tile set already exists'
+	},
 	createSchema: {
 		description: 'Schema for creating tile set',
 		type: 'Object',
