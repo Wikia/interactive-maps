@@ -50,7 +50,7 @@ function validateArgs(mapId, find, replace) {
 /**
  * @desc Get all POIs for given map
  * @param {Object} conn - db connection
- * @param {Number} mapId
+ * @param {Number} mapId - id of the map that POIs are linked to
  * @returns {Object}
  */
 function getAllPoisOnMap(conn, mapId) {
@@ -66,9 +66,9 @@ function getAllPoisOnMap(conn, mapId) {
 
 /**
  * @desc replaces the 'find' string with 'replace' string in link column and updates the POI in db
- * @param {Object} conn
+ * @param {Object} conn - DB connection object
  * @param {Number} poiId - id of Point Of Interest
- * @param {String} newLink -
+ * @param {String} newLink - updated POI link to switch to in DB
  */
 
 function updatePoiLink(conn, poiId, newLink) {
@@ -84,20 +84,28 @@ function updatePoiLink(conn, poiId, newLink) {
 
 validateArgs(mapId, find, replace);
 
+/**
+ * @desc Entrypoint to the script
+ */
 function start() {
 	dbCon.getConnection(dbCon.connType.master, onConnection);
 }
 
+/**
+ * @desc Callback after establishing connection with DB
+ * @param conn - DB connection object
+ */
 function onConnection(conn) {
 	getAllPoisOnMap(conn, mapId).then(function (pois) {
 		processPois(conn, pois);
 	});
 }
 
-function exit() {
-	console.log('All done');
-}
-
+/**
+ * @desc Sets up new links for POIS, updates DB and purges the map
+ * @param conn - DB connection object
+ * @param pois - collection of POI objects from DB
+ */
 function processPois(conn, pois) {
 	var newLink,
 		callback;
