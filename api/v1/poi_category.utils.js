@@ -57,6 +57,16 @@ function throwErrorIfNoRowsAffected(affectedRows, id) {
 }
 
 /**
+ * @desc Returns simple response object
+ * @returns {Object} response object for deleted POI category
+ */
+function getDeletedResponse() {
+	return {
+		message: poiCategoryConfig.responseMessages.deleted
+	};
+}
+
+/**
  * @desc Handle deleting used categories by moving all points to CatchAll category
  *
  * @param {object} conn database connection
@@ -78,16 +88,6 @@ function handleUsedCategories(conn, id, res, next) {
 }
 
 /**
- * @desc Returns simple response object
- * @returns {Object} response object for deleted POI category
- */
-function getDeletedResponse() {
-	return {
-		message: poiCategoryConfig.responseMessages.deleted
-	};
-}
-
-/**
  * @desc Gets map id for a POI category
  *
  * @param {Object} conn - Database connection
@@ -96,22 +96,18 @@ function getDeletedResponse() {
  */
 function getMapId(conn, poiCategoryId) {
 	var deferred = Q.defer(),
-		query = dbCon.knex(poiCategoryConfig.dbTable)
-			.column(['map_id'])
-			.connection(conn)
-			.where({
-				id: poiCategoryId
-			});
+		columns = ['map_id'],
+		where = {id: poiCategoryId};
 
-	query.select().then(
-		function (collection) {
-			if (collection[0]) {
+	dbCon
+		.select(conn, poiCategoryConfig.dbTable, columns, where)
+		.then(function (collection) {
+			if (collection[0] && collection[0].map_id) {
 				deferred.resolve(parseInt(collection[0].map_id, 10));
 			} else {
 				deferred.reject();
 			}
-		}
-	);
+		});
 
 	return deferred.promise;
 }
