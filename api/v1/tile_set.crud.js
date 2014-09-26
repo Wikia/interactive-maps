@@ -2,7 +2,6 @@
 
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
-	jsonValidator = require('./../../lib/jsonValidator'),
 	utils = require('./../../lib/utils'),
 	errorHandler = require('./../../lib/errorHandler'),
 	tileSetConfig = require('./tile_set.config'),
@@ -49,14 +48,15 @@ function getTileSetsCollection(req, res, next) {
 			return query
 				.connection(conn)
 				.select();
-		}, crudUtils.passError)
+		})
 		.then(function (collection) {
 			utils.sendHttpResponse(
 				res,
 				200,
 				tileSetUtils.processTileSetCollection(collection, req, tileSetUtils.extendTileSetObject)
 			);
-		}, next);
+		})
+		.fail(next);
 }
 
 /**
@@ -66,28 +66,29 @@ function getTileSetsCollection(req, res, next) {
  * @param {Function} next
  */
 function getTileSet(req, res, next) {
-	var id = parseInt(req.pathVar.id),
-		filter = {
-			id: id,
-			status: utils.tileSetStatus.ok
-		};
+	var id = req.pathVar.id,
+		filter;
 
-	if (isFinite(id)) {
-		dbCon
-			.getConnection(dbCon.connType.all)
-			.then(function (conn) {
-				return dbCon.select(conn, tileSetConfig.dbTable, tileSetConfig.getTileSetDbColumns, filter);
-			}, crudUtils.passError)
-			.then(function (collection) {
-				if (collection.length) {
-					utils.sendHttpResponse(res, 200, tileSetUtils.extendTileSetObject(collection[0], req));
-				} else {
-					next(errorHandler.elementNotFoundError(tileSetConfig.dbTable, id));
-				}
-			}, next);
-	} else {
-		next(errorHandler.badNumberError(req.pathVar.id));
-	}
+	crudUtils.validateIdParam(id);
+	id = parseInt(req.pathVar.id);
+	filter = {
+		id: id,
+		status: utils.tileSetStatus.ok
+	};
+
+	dbCon
+		.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			return dbCon.select(conn, tileSetConfig.dbTable, tileSetConfig.getTileSetDbColumns, filter);
+		})
+		.then(function (collection) {
+			if (collection.length <= 0) {
+				throw errorHandler.elementNotFoundError(tileSetConfig.dbTable, id);
+			}
+
+			utils.sendHttpResponse(res, 200, tileSetUtils.extendTileSetObject(collection[0], req));
+		})
+		.fail(next);
 }
 
 /**
@@ -97,25 +98,23 @@ function getTileSet(req, res, next) {
  * @param {Function} next
  */
 function createTileSet(req, res, next) {
-	var reqBody = reqBodyParser(req.rawBody),
-		errors = jsonValidator.validateJSON(reqBody, tileSetConfig.createSchema);
+	var reqBody = reqBodyParser(req.rawBody);
 
-	if (errors.length === 0) {
-		dbCon
-			.getConnection(dbCon.connType.master)
-			.then(function (conn) {
-				return addTileSet(conn, tileSetConfig.dbTable, reqBody);
-			}, crudUtils.passError)
-			.then(function (data) {
-				utils.sendHttpResponse(
-					res,
-					data.exists ? 200 : 201,
-					tileSetUtils.setupCreateTileSetResponse(data, req)
-				);
-			}, next);
-	} else {
-		next(errorHandler.badRequestError(errors));
-	}
+	crudUtils.validateData(reqBody, tileSetConfig.createSchema);
+
+	dbCon
+		.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			return addTileSet(conn, tileSetConfig.dbTable, reqBody);
+		})
+		.then(function (data) {
+			utils.sendHttpResponse(
+				res,
+				data.exists ? 200 : 201,
+				tileSetUtils.setupCreateTileSetResponse(data, req)
+			);
+		})
+		.fail(next);
 }
 
 /**
