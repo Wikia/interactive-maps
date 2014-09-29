@@ -3,20 +3,20 @@
 var gulp = require('gulp'),
 	http = require('http'),
 	Q = require('q'),
+	mkdirp = require('mkdirp'),
 	fs = require('fs'),
-	config = require('../../lib/config.js'),
-	localesDir = './locales/',
-	translationFile = localesDir + 'translations.json';
+	getDirName = require('path').dirname,
+	paths = require('../paths').locales;
 
 gulp.task('locales', function () {
-	if (typeof config.translationUrl !== 'string') {
+	if (typeof paths.src !== 'string') {
 		throw new Error('Translation URL not set');
 	}
 
 	var deferred = Q.defer(),
 		translationsData = '';
 
-	http.get(config.translationUrl, function (res) {
+	http.get(paths.src, function (res) {
 		if (res.statusCode !== 200) {
 			deferred.reject('Unable to download translations');
 		}
@@ -26,8 +26,10 @@ gulp.task('locales', function () {
 		});
 
 		res.on('end', function () {
-			fs.writeFileSync(translationFile, translationsData);
-			deferred.resolve();
+			mkdirp(getDirName(paths.dest), function () {
+				fs.writeFileSync(paths.dest, translationsData);
+				deferred.resolve();
+			});
 		});
 	});
 

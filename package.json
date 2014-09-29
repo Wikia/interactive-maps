@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "JSV": "4.0.x",
+    "amqplib": "~0.2.0",
     "cluster": "0.7.x",
     "colors": "0.6.x",
     "detour": "1.0.x",
@@ -25,21 +26,21 @@
     "mysql": "~2.3.2",
     "newrelic": "1.5.x",
     "node-syslog": "1.1.x",
-    "q": "1.0.x",
-    "scribe": "0.0.9",
     "node-uuid": "~1.4.1",
-    "amqplib": "~0.2.0",
+    "q": "1.0.x",
+    "response-time": "^2.1.0",
+    "scribe": "0.0.9",
     "when": "~3.4.2"
   },
   "devDependencies": {
     "flightplan": "~0.4.0",
     "gulp": "3.6.x",
-    "gulp-changed": "0.3.x",
+    "gulp-develop-server": "^0.2.0",
     "gulp-if": "^1.2.4",
     "gulp-ignore": "^1.2.0",
     "gulp-istanbul": "~0.1.1",
     "gulp-jasmine": "0.2.x",
-    "gulp-nodemon": "1.0.x",
+    "gulp-karma": "0.0.4",
     "gulp-replace": "^0.4.0",
     "gulp-uglify": "^0.3.1",
     "gulp-useref": "0.6.x",
@@ -47,9 +48,11 @@
     "karma": "^0.12.21",
     "karma-jasmine": "^0.1.5",
     "karma-phantomjs-launcher": "^0.1.4",
+    "mkdirp": "0.5.0",
     "multipipe": "^0.1.1",
+    "phantomjs": "^1.9.7-15",
     "proxyquire": "0.6.x",
-    "mkdirp": "0.5.0"
+    "run-sequence": "^0.3.6"
   },
   "private": true
 }

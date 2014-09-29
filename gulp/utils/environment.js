@@ -7,5 +7,6 @@ process.env.WIKIA_ENVIRONMENT = environment;
 
 module.exports = {
 	name: environment,
-	isProduction: environment === 'production'
+	isProduction: environment === 'prod',
+	isDev: environment === 'dev'
 };
