@@ -96,7 +96,7 @@ function createMap(req, res, next) {
 				url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), mapId)
 			});
 
-			utils.sendHttpResponse(res, 200, response);
+			utils.sendHttpResponse(res, 201, response);
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);
