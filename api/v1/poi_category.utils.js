@@ -135,7 +135,7 @@ function setupCreatePoiCategoryResponse(id, req) {
  * error. See: poi_category.crud.js:156
  *
  * @param {Object} err an error instance
- * @returns {*|clientError|testCases.clientError|Error.clientError|testCases.clientError.name|boolean}
+ * @returns {Boolean}
  */
 function isDeletedCategoryUsed(err) {
 	return (
