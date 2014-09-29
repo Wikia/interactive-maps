@@ -127,11 +127,7 @@ function deleteMap(req, res, next) {
 		})
 		.then(function (affectedRows) {
 			dbConnection.release();
-
-			if (affectedRows <= 0) {
-				throw errorHandler.elementNotFoundError(mapConfig.dbTable, mapId);
-			}
-
+			crudUtils.throwErrorIfNoRowsAffected(affectedRows, mapConfig, mapId);
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapDeleted');
 			utils.sendHttpResponse(res, 204, {
 				message: mapConfig.responseMessages.deleted,
@@ -217,11 +213,7 @@ function updateMap(req, res, next) {
 		})
 		.then(function (affectedRows) {
 			dbConnection.release();
-
-			if (affectedRows <= 0) {
-				throw errorHandler.elementNotFoundError(mapConfig.dbTable, mapId);
-			}
-
+			crudUtils.throwErrorIfNoRowsAffected(affectedRows, mapConfig, mapId);
 			utils.extendObject(response, {
 				id: mapId,
 				url: utils.responseUrl(req, '/api/v1/map/', mapId)

@@ -47,17 +47,6 @@ function deleteCategory(conn, id) {
 }
 
 /**
- * @desc Throws an error if there were no POIs within category of given id
- * @param {Number} affectedRows number of POIs within a category
- * @param {Number} id POI category's id
- */
-function throwErrorIfNoRowsAffected(affectedRows, id) {
-	if (affectedRows <= 0) {
-		throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id);
-	}
-}
-
-/**
  * @desc Returns simple response object
  * @returns {Object} response object for deleted POI category
  */
@@ -79,12 +68,12 @@ function handleUsedCategories(conn, id, res, next) {
 	updatePoisFromUsedCategory(conn, id)
 		.then(function (affectedRows) {
 			conn.release();
-			throwErrorIfNoRowsAffected(affectedRows, id);
+			crudUtils.throwErrorIfNoRowsAffected(affectedRows, poiCategoryConfig, id);
 			return deleteCategory(conn, id);
 		})
 		.then(function (affectedRows) {
 			conn.release();
-			throwErrorIfNoRowsAffected(affectedRows, id);
+			crudUtils.throwErrorIfNoRowsAffected(affectedRows, poiCategoryConfig, id);
 			utils.sendHttpResponse(res, 200, getDeletedResponse());
 		})
 		.fail(function () {

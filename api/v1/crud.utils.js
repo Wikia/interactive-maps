@@ -47,6 +47,18 @@ function validateData(reqBody, schema) {
 }
 
 /**
+ * @desc Throws an error if there were no POIs within category of given id
+ * @param {Number} affectedRows number of POIs within a category
+ * @param {Object} crudConfig configuration with database table
+ * @param {Number} id POI category's id
+ */
+function throwErrorIfNoRowsAffected(affectedRows, crudConfig, id) {
+	if (affectedRows <= 0) {
+		throw errorHandler.elementNotFoundError(crudConfig.dbTable, id);
+	}
+}
+
+/**
  * Helper function which releases database connection one a promise chain fails
  *
  * @param {Object} conn database connection handler
@@ -61,5 +73,6 @@ module.exports = {
 	validateIdParam: validateIdParam,
 	validateData: validateData,
 	addPaginationToQuery: addPaginationToQuery,
+	throwErrorIfNoRowsAffected: throwErrorIfNoRowsAffected,
 	releaseConnectionOnFail: releaseConnectionOnFail
 };
