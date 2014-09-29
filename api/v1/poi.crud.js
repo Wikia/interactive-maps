@@ -180,8 +180,7 @@ function updatePoi(req, res, next) {
 		mapId,
 		dbConnection,
 		response = {
-			message: poiConfig.responseMessages.updated,
-			id: poiId
+			message: poiConfig.responseMessages.updated
 		};
 
 	crudUtils.validateData(reqBody, poiConfig.updateSchema);
@@ -206,6 +205,7 @@ function updatePoi(req, res, next) {
 			return dbCon.update(dbConnection, poiConfig.dbTable, reqBody, filter);
 		})
 		.then(function () {
+			response.id = poiId;
 			response.url = utils.responseUrl(req, '/api/v1/poi/', poiId);
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
