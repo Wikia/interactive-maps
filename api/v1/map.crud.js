@@ -54,12 +54,15 @@ function getMapsCollection(req, res, next) {
 			return mapUtils.getMapsCountQuery(dbConnection, filter, tileSetStatuses).count('* as cntr');
 		})
 		.then(function (count) {
+			dbConnection.release();
 			utils.sendHttpResponse(res, 200, {
 				total: count[0].cntr,
 				items: mapUtils.buildMapCollectionResult(mapsList, req)
 			});
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -72,17 +75,21 @@ function createMap(req, res, next) {
 	var reqBody = reqBodyParser(req.rawBody),
 		response = {
 			message: mapConfig.responseMessages.created
-		};
+		},
+		dbConnection;
 
 	crudUtils.validateData(reqBody, mapConfig.createSchema);
 	reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
+			dbConnection = conn;
 			return dbCon.insert(conn, mapConfig.dbTable, reqBody);
 		})
 		.then(function (data) {
 			var mapId = data[0];
+
+			dbConnection.release();
 
 			utils.extendObject(response, {
 				id: mapId,
@@ -91,7 +98,9 @@ function createMap(req, res, next) {
 
 			utils.sendHttpResponse(res, 200, response);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -102,7 +111,8 @@ function createMap(req, res, next) {
  */
 function deleteMap(req, res, next) {
 	var mapId = req.pathVar.id,
-		filter;
+		filter,
+		dbConnection;
 
 	crudUtils.validateIdParam(mapId);
 	mapId = parseInt(mapId, 10);
@@ -112,9 +122,12 @@ function deleteMap(req, res, next) {
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
+			dbConnection = conn;
 			return dbCon.destroy(conn, mapConfig.dbTable, filter);
 		})
 		.then(function (affectedRows) {
+			dbConnection.release();
+
 			if (affectedRows <= 0) {
 				throw errorHandler.elementNotFoundError(mapConfig.dbTable, mapId);
 			}
@@ -125,7 +138,9 @@ function deleteMap(req, res, next) {
 				id: mapId
 			});
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -136,7 +151,8 @@ function deleteMap(req, res, next) {
  */
 function getMap(req, res, next) {
 	var mapId = req.pathVar.id,
-		filter;
+		filter,
+		dbConnection;
 
 	crudUtils.validateIdParam(mapId);
 	mapId = parseInt(mapId, 10);
@@ -146,10 +162,13 @@ function getMap(req, res, next) {
 
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
+			dbConnection = conn;
 			return dbCon.select(conn, mapConfig.dbTable, mapConfig.mapColumns, filter);
 		})
 		.then(function (data) {
 			var mapData = data[0];
+
+			dbConnection.release();
 
 			if (!mapData) {
 				throw errorHandler.elementNotFoundError(mapConfig.dbTable, mapId);
@@ -160,7 +179,9 @@ function getMap(req, res, next) {
 			});
 			utils.sendHttpResponse(res, 200, mapData);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -175,7 +196,8 @@ function updateMap(req, res, next) {
 			message: mapConfig.responseMessages.updated
 		},
 		mapId = req.pathVar.id,
-		filter;
+		filter,
+		dbConnection;
 
 	crudUtils.validateData(reqBody, mapConfig.updateSchema);
 	crudUtils.validateIdParam(mapId);
@@ -190,9 +212,12 @@ function updateMap(req, res, next) {
 
 	dbCon.getConnection(dbCon.connType.master)
 		.then(function (conn) {
+			dbConnection = conn;
 			return dbCon.update(conn, mapConfig.dbTable, reqBody, filter);
 		})
 		.then(function (affectedRows) {
+			dbConnection.release();
+
 			if (affectedRows <= 0) {
 				throw errorHandler.elementNotFoundError(mapConfig.dbTable, mapId);
 			}
@@ -204,7 +229,9 @@ function updateMap(req, res, next) {
 
 			utils.sendHttpResponse(res, 303, response);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**

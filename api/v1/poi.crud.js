@@ -16,14 +16,20 @@ var dbCon = require('./../../lib/db_connector'),
  * @param {Function} next callback for express.js
  */
 function getPoisCollection(req, res, next) {
+	var dbConnection;
+
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
+			dbConnection = conn;
 			return dbCon.select(conn, poiConfig.dbTable, poiConfig.poiCollectionColumns);
 		})
 		.then(function (collection) {
+			dbConnection.release();
 			utils.sendHttpResponse(res, 200, collection);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -64,11 +70,14 @@ function createPoi(req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			dbConnection.release();
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
 			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.insert, poiId);
 			utils.sendHttpResponse(res, 201, response);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -79,7 +88,8 @@ function createPoi(req, res, next) {
  */
 function getPoi(req, res, next) {
 	var poiId = req.pathVar.id,
-		filter;
+		filter,
+		dbConnection;
 
 	crudUtils.validateIdParam(poiId);
 	poiId = parseInt(poiId, 10);
@@ -89,17 +99,23 @@ function getPoi(req, res, next) {
 
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
+			dbConnection = conn;
 			return dbCon.select(conn, poiConfig.dbTable, poiConfig.poiColumns, filter);
 		})
 		.then(function (data) {
 			var poiData = data[0];
+
+			dbConnection.release();
+
 			if (!poiData) {
 				throw errorHandler.elementNotFoundError(poiConfig.dbTable, poiId);
 			}
 
 			utils.sendHttpResponse(res, 200, poiData);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -127,6 +143,7 @@ function deletePoi(req, res, next) {
 		})
 		.then(function (rows) {
 			if (rows.length <= 0) {
+				dbConnection.release();
 				throw errorHandler.elementNotFoundError(poiConfig.dbTable, poiId);
 			}
 
@@ -137,6 +154,7 @@ function deletePoi(req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			dbConnection.release();
 			squidUpdate.purgeKey(
 				utils.surrogateKeyPrefix + mapId,
 				'mapPoiDeleted'
@@ -144,7 +162,9 @@ function deletePoi(req, res, next) {
 			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.delete, poiId);
 			utils.sendHttpResponse(res, 200, {message: poiConfig.responseMessages.deleted});
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -178,6 +198,7 @@ function updatePoi(req, res, next) {
 		})
 		.then(function (rows) {
 			if (rows.length <= 0) {
+				dbConnection.release();
 				throw errorHandler.elementNotFoundError(poiConfig.dbTable, poiId);
 			}
 
@@ -189,6 +210,7 @@ function updatePoi(req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			dbConnection.release();
 			squidUpdate.purgeKey(
 				utils.surrogateKeyPrefix + mapId,
 				'mapPoiUpdated'
@@ -196,7 +218,9 @@ function updatePoi(req, res, next) {
 			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.update, poiId);
 			utils.sendHttpResponse(res, 303, response);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**

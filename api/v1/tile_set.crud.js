@@ -48,13 +48,17 @@ function getTileSetsCollection(req, res, next) {
 				.select();
 		})
 		.then(function (collection) {
+			dbConnection.release();
+
 			utils.sendHttpResponse(
 				res,
 				200,
 				tileSetUtils.processTileSetCollection(collection, req, tileSetUtils.extendTileSetObject)
 			);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -65,7 +69,8 @@ function getTileSetsCollection(req, res, next) {
  */
 function getTileSet(req, res, next) {
 	var id = req.pathVar.id,
-		filter;
+		filter,
+		dbConnection;
 
 	crudUtils.validateIdParam(id);
 	id = parseInt(req.pathVar.id);
@@ -77,16 +82,21 @@ function getTileSet(req, res, next) {
 	dbCon
 		.getConnection(dbCon.connType.all)
 		.then(function (conn) {
+			dbConnection = conn;
 			return dbCon.select(conn, tileSetConfig.dbTable, tileSetConfig.getTileSetDbColumns, filter);
 		})
 		.then(function (collection) {
+			dbConnection.release();
+
 			if (collection.length <= 0) {
 				throw errorHandler.elementNotFoundError(tileSetConfig.dbTable, id);
 			}
 
 			utils.sendHttpResponse(res, 200, tileSetUtils.extendTileSetObject(collection[0], req));
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -96,17 +106,19 @@ function getTileSet(req, res, next) {
  * @param {Function} next
  */
 function createTileSet(req, res, next) {
-	var reqBody = reqBodyParser(req.rawBody);
+	var reqBody = reqBodyParser(req.rawBody),
+		dbConnection;
 
 	crudUtils.validateData(reqBody, tileSetConfig.createSchema);
 
 	dbCon
 		.getConnection(dbCon.connType.master)
 		.then(function (conn) {
+			dbConnection = conn;
 			return addTileSet(conn, tileSetConfig.dbTable, reqBody);
 		})
 		.then(function (data) {
-			console.log();
+			dbConnection.release();
 
 			utils.sendHttpResponse(
 				res,
@@ -114,7 +126,9 @@ function createTileSet(req, res, next) {
 				tileSetUtils.setupCreateTileSetResponse(data, req)
 			);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**

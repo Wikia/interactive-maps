@@ -18,7 +18,8 @@ var dbCon = require('./../../lib/db_connector'),
  * @param {function} next
  */
 function getPoiCategoriesCollection(req, res, next) {
-	var query = dbCon.knex(poiCategoryConfig.dbTable).column(poiCategoryConfig.getCollectionDbColumns);
+	var query = dbCon.knex(poiCategoryConfig.dbTable).column(poiCategoryConfig.getCollectionDbColumns),
+		dbConnection;
 
 	// limit query to parent categories only
 	if (req.query.hasOwnProperty('parentsOnly')) {
@@ -30,14 +31,18 @@ function getPoiCategoriesCollection(req, res, next) {
 	dbCon
 		.getConnection(dbCon.connType.all)
 		.then(function (conn) {
+			dbConnection = conn;
 			return query
 				.connection(conn)
 				.select();
 		})
 		.then(function (collection) {
+			dbConnection.release();
 			utils.sendHttpResponse(res, 200, utils.processPoiCategoriesCollection(collection, config));
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -49,7 +54,8 @@ function getPoiCategoriesCollection(req, res, next) {
 function getPoiCategory(req, res, next) {
 	var id = req.pathVar.id,
 		filter,
-		query;
+		query,
+		dbConnection;
 
 	crudUtils.validateIdParam(id);
 	id = parseInt(req.pathVar.id, 10);
@@ -60,9 +66,11 @@ function getPoiCategory(req, res, next) {
 
 	dbCon.getConnection(dbCon.connType.all)
 		.then(function (conn) {
+			dbConnection = conn;
 			return query.connection(conn).select();
 		})
 		.then(function (collection) {
+			dbConnection.release();
 			collection = utils.processPoiCategoriesCollection(collection, config);
 
 			if (!collection[0]) {
@@ -71,7 +79,9 @@ function getPoiCategory(req, res, next) {
 
 			utils.sendHttpResponse(res, 200, collection[0]);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -105,13 +115,17 @@ function createPoiCategory(req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			dbConnection.release();
+
 			// purge cache for map
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
 
 			// send proper response
 			utils.sendHttpResponse(res, 201, poiCategoryUtils.setupCreatePoiCategoryResponse(poiCategoryId, req));
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
@@ -143,12 +157,14 @@ function deletePoiCategory(req, res, next) {
 		})
 		.then(function (affectedRows) {
 			if (affectedRows <= 0) {
+				dbConnection.release();
 				throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId);
 			}
 
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			dbConnection.release();
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
 			utils.sendHttpResponse(res, 200, poiCategoryUtils.getDeletedResponse());
 		})
@@ -156,7 +172,7 @@ function deletePoiCategory(req, res, next) {
 			if (poiCategoryUtils.isDeletedCategoryUsed(err)) {
 				poiCategoryUtils.handleUsedCategories(dbConnection, poiCategoryId, res, next);
 			} else {
-				next(err);
+				crudUtils.releaseConnectionOnFail(dbConnection, next);
 			}
 		});
 }
@@ -198,6 +214,7 @@ function updatePoiCategory (req, res, next) {
 		})
 		.then(function (affectedRows) {
 			if (affectedRows <= 0) {
+				dbConnection.release();
 				throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId);
 			}
 
@@ -213,10 +230,13 @@ function updatePoiCategory (req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			dbConnection.release();
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
 			utils.sendHttpResponse(res, 303, response);
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**

@@ -46,8 +46,20 @@ function validateData(reqBody, schema) {
 	}
 }
 
+/**
+ * Helper function which releases database connection one a promise chain fails
+ *
+ * @param {Object} conn database connection handler
+ * @param {Function} next express.js callback
+ */
+function releaseConnectionOnFail(conn, next) {
+	conn.release();
+	next();
+}
+
 module.exports = {
 	validateIdParam: validateIdParam,
 	validateData: validateData,
-	addPaginationToQuery: addPaginationToQuery
+	addPaginationToQuery: addPaginationToQuery,
+	releaseConnectionOnFail: releaseConnectionOnFail
 };

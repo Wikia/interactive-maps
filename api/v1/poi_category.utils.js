@@ -6,7 +6,8 @@ var dbCon = require('./../../lib/db_connector'),
 	Q = require('q'),
 	config = require('./../../lib/config'),
 	poiCategoryConfig = require('./poi_category.config'),
-	poiConfig = require('./poi.config');
+	poiConfig = require('./poi.config'),
+	crudUtils = require('./crud.utils');
 
 /**
  * @desc Moves all POIs linked with poi_category of given id to default category
@@ -77,14 +78,18 @@ function getDeletedResponse() {
 function handleUsedCategories(conn, id, res, next) {
 	updatePoisFromUsedCategory(conn, id)
 		.then(function (affectedRows) {
+			conn.release();
 			throwErrorIfNoRowsAffected(affectedRows, id);
 			return deleteCategory(conn, id);
 		})
 		.then(function (affectedRows) {
+			conn.release();
 			throwErrorIfNoRowsAffected(affectedRows, id);
 			utils.sendHttpResponse(res, 200, getDeletedResponse());
 		})
-		.fail(next);
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(conn, next);
+		});
 }
 
 /**
