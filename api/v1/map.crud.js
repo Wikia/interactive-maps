@@ -129,7 +129,7 @@ function deleteMap(req, res, next) {
 			dbConnection.release();
 			crudUtils.throwErrorIfNoRowsAffected(affectedRows, mapConfig, mapId);
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapDeleted');
-			utils.sendHttpResponse(res, 204, {
+			utils.sendHttpResponse(res, 200, {
 				message: mapConfig.responseMessages.deleted,
 				id: mapId
 			});
