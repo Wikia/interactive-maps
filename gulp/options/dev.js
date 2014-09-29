@@ -10,7 +10,7 @@ module.exports = {
 	server: {
 		delay: 0,
 		env: extend(process.env, {
-			'NODE_ENV': 'devbox',
+			'NODE_ENV': 'dev',
 			// karma-phantomjs-launcher tries to run phantomjs.exe if this is not set
 			'PHANTOMJS_BIN': paths.baseFull + '/node_modules/phantomjs/lib/phantom/bin/phantomjs'
 		}),
