@@ -32,7 +32,7 @@ function validateIdParam(value) {
 /**
  * @desc Validates data passed for insert/update operation
  * @param {Object} reqBody data send with the request
- * @param {String} schema a schema against which it should be validated (taken from cruds' configs)
+ * @param {Object} schema a schema against which it should be validated (taken from cruds' configs)
  */
 function validateData(reqBody, schema) {
 	var errors = [];
