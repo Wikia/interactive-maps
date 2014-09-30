@@ -96,6 +96,7 @@ function processPois(conn, pois) {
 					utils.surrogateKeyPrefix + mapId,
 					'mapPoiUpdated'
 				);
+
 				if (poi === pois[pois.length - 1]) {
 					//by default knex doesnt close the connection to db
 					process.exit();
