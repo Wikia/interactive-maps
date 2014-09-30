@@ -137,7 +137,7 @@ if (cluster.isMaster) {
 	jobs.promote();
 
 	// connect to RabbitMQ
-	taskQueue.connect();
+	taskQueue.setupQueueConnection();
 
 	require('./apiServer');
 } else {
@@ -145,7 +145,7 @@ if (cluster.isMaster) {
 }
 
 process.on('uncaughtException', function (err) {
-	logger.critical('uncaughtException:', err.message, {
+	logger.critical('uncaughtException: ' + err.message, {
 		stack: err.stack
 	});
 	process.exit(1);
