@@ -1,7 +1,8 @@
 'use strict';
 
 var errorHandler = require('./../../lib/errorHandler'),
-	jsonValidator = require('./../../lib/jsonValidator');
+	jsonValidator = require('./../../lib/jsonValidator'),
+	logger = require('./../../lib/logger');
 
 /**
  * @desc adds pagination to DB query
@@ -65,7 +66,12 @@ function throwErrorIfNoRowsAffected(affectedRows, crudConfig, id) {
  * @param {Function} next express.js callback
  */
 function releaseConnectionOnFail(conn, next) {
-	conn.release();
+	try {
+		conn.release();
+	} catch (e) {
+		logger.info('Error while releasing DB connection. Probably the connection has been already released.', e);
+	}
+
 	next();
 }
 
