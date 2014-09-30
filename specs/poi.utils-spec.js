@@ -1,13 +1,18 @@
 'use strict';
 
 var proxyquire = require('proxyquire').noCallThru(),
-	dbConStub = {},
-	taskQueueStub = {
-		publish: function () {},
-		payload: function () {}
+	dbConStub = {
+		select: function (conn, table, fields, where) {
+			expect(where).toEqual({
+				id: 123
+			});
+		}
 	},
+	taskQueueStub = {},
 	loggerStub = {},
-	poiConfig = {},
+	poiConfig = {
+		dbTable: {}
+	},
 	poiCrudUtils = proxyquire('../api/v1/poi.utils', {
 		'./../../lib/db_connector': dbConStub,
 		'./../../lib/taskQueue': taskQueueStub,
@@ -15,5 +20,8 @@ var proxyquire = require('proxyquire').noCallThru(),
 		'./poi.config': poiConfig
 	});
 
-xdescribe('poi.utils.js', function () {
+describe('poi.utils.js', function () {
+	it('getMapIdByPoiId() passes proper where options', function () {
+		poiCrudUtils.getMapIdByPoiId({}, 123);
+	});
 });
