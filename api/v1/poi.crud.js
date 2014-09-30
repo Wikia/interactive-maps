@@ -5,6 +5,7 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
 	squidUpdate = require('./../../lib/squidUpdate'),
+	poiIndexer = require('./../../lib/poiIndexer'),
 	poiConfig = require('./poi.config'),
 	poiUtils = require('./poi.utils'),
 	crudUtils = require('./crud.utils');
@@ -72,7 +73,7 @@ function createPoi(req, res, next) {
 		.then(function () {
 			dbConnection.release();
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
-			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.insert, poiId);
+			poiIndexer.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.insert, poiId);
 			utils.sendHttpResponse(res, 201, response);
 		})
 		.fail(function () {
@@ -159,7 +160,7 @@ function deletePoi(req, res, next) {
 				utils.surrogateKeyPrefix + mapId,
 				'mapPoiDeleted'
 			);
-			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.delete, poiId);
+			poiIndexer.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.delete, poiId);
 			utils.sendHttpResponse(res, 200, {message: poiConfig.responseMessages.deleted});
 		})
 		.fail(function () {
@@ -215,7 +216,7 @@ function updatePoi(req, res, next) {
 				utils.surrogateKeyPrefix + mapId,
 				'mapPoiUpdated'
 			);
-			poiUtils.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.update, poiId);
+			poiIndexer.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.update, poiId);
 			utils.sendHttpResponse(res, 303, response);
 		})
 		.fail(function () {
