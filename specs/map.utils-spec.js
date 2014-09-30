@@ -1,7 +1,46 @@
 'use strict';
 
 var proxyquire = require('proxyquire').noCallThru(),
-	dbConStub = {},
+	whereStub = {
+		city_id: 123
+	},
+	whereInStub = [
+		'tile-set-processed',
+		'tile-set-approved'
+	],
+	orderByStub = {
+		column: 'title',
+		direction: 'desc'
+	},
+	dbConStub = {
+		knex: function () {
+			return {
+				column: function () {
+					return this;
+				},
+				join: function () {
+					return this;
+				},
+				connection: function () {
+					return this;
+				},
+				where: function (whereOpts) {
+					expect(whereOpts).toEqual(whereStub);
+					return this;
+				},
+				whereIn: function (field, whereInOpts) {
+					expect(field).toEqual('tile_set.status');
+					expect(whereInOpts).toEqual(whereInStub);
+					return this;
+				},
+				orderBy: function (field, value) {
+					expect(field).toEqual(orderByStub.column);
+					expect(value).toEqual(orderByStub.direction);
+					return this;
+				}
+			};
+		}
+	},
 	configStub = {},
 	utilsStub = {
 		getBucketName: function () {},
@@ -116,5 +155,13 @@ describe('map.utils.js', function () {
 				mapCrudUtils.buildMapCollectionResult(collectionStub, requestStub);
 			}).toThrow();
 		});
+	});
+
+	it('getMapsCountQuery()', function () {
+		mapCrudUtils.getMapsCountQuery({}, whereStub, whereInStub);
+	});
+
+	it('getMapsCollectionQuery', function () {
+		mapCrudUtils.getMapsCollectionQuery({}, whereStub, whereInStub, orderByStub);
 	});
 });
