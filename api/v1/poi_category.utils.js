@@ -132,13 +132,19 @@ function setupCreatePoiCategoryResponse(id, req) {
  * @returns {Boolean}
  */
 function isDeletedCategoryUsed(err) {
-	return (
+	var check = (
 		err &&
 		err.clientError &&
 		err.clientError.name &&
 		errorHandler.isHandledSQLError(err.clientError.name) &&
 		err.clientError.cause.code === 'ER_ROW_IS_REFERENCED_'
 	);
+
+	if (typeof check === 'undefined') {
+		return false;
+	}
+
+	return check;
 }
 
 module.exports = {
