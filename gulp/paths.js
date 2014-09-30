@@ -36,6 +36,7 @@ module.exports = {
 	dest: dest,
 	destFull: path.resolve(dest),
 	lib: dest + '/lib/*.js',
+	api: dest + '/api/**/*.js',
 	locales: {
 		dest: dest + '/locales/translations.json',
 		// temporary solution, to be changed when new Messages Service is introduced

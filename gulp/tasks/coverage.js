@@ -7,7 +7,7 @@ var gulp = require('gulp'),
 
 gulp.task('coverage', ['build'], function (cb) {
 	gulp
-		.src(paths.lib)
+		.src([paths.api, paths.lib])
 		.pipe(istanbul()) // Covering files
 		.on('end', function () {
 			gulp
