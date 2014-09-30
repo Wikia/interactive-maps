@@ -130,4 +130,60 @@ describe('poi_category.utils.js', function () {
 			expect(poiCategoryUtils.isDeletedCategoryUsed(testCase.errorStub)).toBe(testCase.expected);
 		});
 	});
+
+	it('returns correct object when executing getDeletedResponse()', function () {
+		var poiCategoryUtils = getPoiCategoryUtilsMock(
+			dbConStub,
+			errorHandlerStub,
+			utilsStub, qStub,
+			configStub,
+			poiConfigStub,
+			crudUtilsStub
+		);
+
+		expect(poiCategoryUtils.getDeletedResponse()).toEqual({
+			message: poiCategoryConfig.responseMessages.deleted
+		});
+	});
+
+	it('uses select with proper where clause when executing getMapId()', function () {
+		var qStub = {
+				defer: function () {
+					return {
+						promise: {
+							then: function (cb) {
+								cb([]);
+
+								return {
+									catch: function () {}
+								};
+							}
+						},
+						resolve: function () {}
+					};
+				}
+			},
+			dbConStub = {
+				select: function (conn, table, columns, where) {
+					expect(where).toEqual({
+						id: 123
+					});
+					return this;
+				},
+				then: function () {
+					return this;
+				}
+			},
+			poiCategoryUtils = getPoiCategoryUtilsMock(
+				dbConStub,
+				errorHandlerStub,
+				utilsStub,
+				qStub,
+				configStub,
+				poiConfigStub,
+				crudUtilsStub
+			);
+
+		poiCategoryUtils.getMapId({}, 123);
+	});
 });
