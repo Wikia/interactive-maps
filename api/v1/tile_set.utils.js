@@ -6,15 +6,6 @@ var Q = require('q'),
 	errorHandler = require('./../../lib/errorHandler'),
 	tileSetConfig = require('./tile_set.config');
 
-/**
- * @desc creates API URL for tileSetObject and returns it
- * @param {Number} tileSetId
- * @param {Object} req - HTTP request object
- * @returns {String} - tileSet Object API URL
- */
-function createTileSetApiUrl(tileSetId, req) {
-	return utils.responseUrl(req, utils.addTrailingSlash(req.route.path), tileSetId);
-}
 
 /**
  * @desc extends params of tileSet object
@@ -33,7 +24,7 @@ function extendTileSetObject(tileSet, req) {
 		tileSet.image
 	);
 
-	tileSet.url = createTileSetApiUrl(tileSetId, req);
+	tileSet.url = utils.responseUrl(req, utils.addTrailingSlash(req.route.path), tileSetId);
 
 	if (tileSet.max_zoom) {
 		tileSet.max_zoom = utils.binToMaxZoomLevel(tileSet.max_zoom);
@@ -83,7 +74,7 @@ function validateSearchTerm(search) {
 
 /**
  * @desc sets pagination limit for search query
- * @param {Number} limit
+ * @param {Number=} limit
  * @returns {number}
  */
 function setupSearchLimit(limit) {
@@ -103,14 +94,14 @@ function setupCreateTileSetResponse(dbRes, req) {
 	return {
 		message: message,
 		id: id,
-		url: createTileSetApiUrl(id, req)
+		url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
 	};
 }
 
 /**
  * @desc Changes query and its options if valid search parameter was passed
  * @param {Object} query knex query object's instance
- * @param {String} search value of search parameter
+ * @param {String|Boolean} search value of search parameter
  * @param {Number} limit results limit
  * @returns {Object} a simple object with new query and new limit
  */
