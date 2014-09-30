@@ -3,7 +3,16 @@
 var proxyquire = require('proxyquire').noCallThru(),
 	dbConStub = {},
 	configStub = {},
-	utilsStub = {},
+	utilsStub = {
+		getBucketName: function () {},
+		addTrailingSlash: function () {},
+		imageUrl: function () {
+			return 'mocked image URL';
+		},
+		responseUrl: function () {
+			return 'mocked response URL';
+		}
+	},
 	mapConfigStub = {
 		sortingOptions: {
 			title_asc: {
@@ -52,5 +61,60 @@ describe('map.utils.js', function () {
 		expect(function () {
 			mapCrudUtils.buildSort('no_existing_option');
 		}).toThrow('Cannot read property \'no_existing_option\' of undefined');
+	});
+
+	it('buildMapCollectionResult() works as expected', function () {
+		var requestStub = {
+				route: {
+					path: ''
+				}
+			},
+			collectionStub = [{
+				'title': 'Map 1'
+				// don't pass tile_set_id for purpose
+			}, {
+				'title': 'Map 2',
+				'tile_set_id': 1
+			}, {
+				'title': 'Map 3',
+				'tile_set_id': 1
+			}],
+			expectedCollection = [{
+				'title': 'Map 1',
+				'image': 'mocked image URL',
+				'url': 'mocked response URL'
+			}, {
+				'title': 'Map 2',
+				'image': 'mocked image URL',
+				'url': 'mocked response URL'
+			}, {
+				'title': 'Map 3',
+				'image': 'mocked image URL',
+				'url': 'mocked response URL'
+			}];
+
+		expect(mapCrudUtils.buildMapCollectionResult(collectionStub, requestStub)).toEqual(expectedCollection);
+	});
+
+	it('buildMapCollectionResult() throws an error when invalid value as collection passed', function () {
+		var requestStub = {
+				route: {
+					path: ''
+				}
+			},
+			testCases = [
+				'collection',
+				1,
+				{
+					field: 'a field'
+				},
+				true
+			];
+
+		testCases.forEach(function (collectionStub) {
+			expect(function () {
+				mapCrudUtils.buildMapCollectionResult(collectionStub, requestStub);
+			}).toThrow();
+		});
 	});
 });
