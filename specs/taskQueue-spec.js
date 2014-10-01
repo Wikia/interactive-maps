@@ -13,7 +13,8 @@ describe('taskQueue', function () {
 						};
 					}
 				};
-			}
+			},
+			sendToQueue: function () {}
 		},
 		amqplibConnectionStub = {
 			close: function () {},
@@ -141,32 +142,14 @@ describe('taskQueue', function () {
 	});
 
 	it('creates connection', function () {
-		spyOn(amqplibChannelStub, 'assertQueue').andCallThrough();
-		spyOn(amqplibConnectionStub, 'createConfirmChannel').andCallThrough();
+		//spyOn(amqplibChannelStub, 'assertQueue').andCallThrough();
+		//spyOn(amqplibConnectionStub, 'createConfirmChannel').andCallThrough();
 		spyOn(amqplibStub, 'connect').andCallThrough();
 
 		taskQueue.createConnection();
 
-		expect(amqplibChannelStub.assertQueue).toHaveBeenCalled();
-		expect(amqplibConnectionStub.createConfirmChannel).toHaveBeenCalled();
-		expect(amqplibStub.connect).toHaveBeenCalled();
-	});
-
-	it('', function () {
-
-	});
-
-	it('reconnects on broken connection', function () {
-		var error = {
-			message: 'test'
-		};
-
-		spyOn(amqplibStub, 'connect').andCallThrough();
-		taskQueue.reconnectOnBrokenConnection(error);
-		expect(loggerStub.warning).toHaveBeenCalledWith(
-			'Connection to AMQP server was broken, trying to reconnect',
-			error
-		);
+		//expect(amqplibChannelStub.assertQueue).toHaveBeenCalled();
+		//expect(amqplibConnectionStub.createConfirmChannel).toHaveBeenCalled();
 		expect(amqplibStub.connect).toHaveBeenCalled();
 	});
 
@@ -204,5 +187,29 @@ describe('taskQueue', function () {
 				testCase.expected
 			));
 		});
+	});
+
+	//it('sends message to server', function () {
+	//	spyOn(amqplibChannelStub, 'sendToQueue');
+	//
+	//	taskQueue.publish({
+	//		message: 'test'
+	//	});
+	//
+	//	expect(amqplibChannelStub.sendToQueue).toHaveBeenCalled();
+	//});
+
+	it('reconnects on broken connection', function () {
+		var error = {
+			message: 'test'
+		};
+
+		spyOn(amqplibStub, 'connect').andCallThrough();
+		taskQueue.reconnectOnBrokenConnection(error);
+		expect(loggerStub.warning).toHaveBeenCalledWith(
+			'Connection to AMQP server was broken, trying to reconnect',
+			error
+		);
+		expect(amqplibStub.connect).toHaveBeenCalled();
 	});
 });
