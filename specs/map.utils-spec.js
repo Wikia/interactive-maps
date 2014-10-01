@@ -12,7 +12,46 @@ var proxyquire = require('proxyquire').noCallThru(),
 		column: 'title',
 		direction: 'desc'
 	},
-	dbConStub = {
+	dbConStub = {},
+	configStub = {},
+	utilsStub = {
+		getBucketName: function () {},
+		addTrailingSlash: function () {},
+		imageUrl: function () {
+			return 'mocked image URL';
+		},
+		responseUrl: function () {
+			return 'mocked response URL';
+		}
+	},
+	mapConfigStub = {
+		sortingOptions: {
+			title_asc: {
+				column: 'map.title',
+				direction: 'asc'
+			},
+			updated_on_desc: {
+				column: 'map.updated_on',
+				direction: 'desc'
+			},
+			created_on: {
+				column: 'map.created_on',
+				direction: 'desc'
+			}
+		}
+	};
+
+function getMapCrudUtilsMock(mapConfigStub, dbConStub) {
+	return proxyquire('../api/v1/map.utils', {
+		'./../../lib/db_connector': dbConStub,
+		'./../../lib/config': configStub,
+		'./../../lib/utils': utilsStub,
+		'./map.config': mapConfigStub
+	});
+}
+
+function getDbConMock() {
+	return {
 		knex: function () {
 			return {
 				column: function () {
@@ -40,43 +79,12 @@ var proxyquire = require('proxyquire').noCallThru(),
 				}
 			};
 		}
-	},
-	configStub = {},
-	utilsStub = {
-		getBucketName: function () {},
-		addTrailingSlash: function () {},
-		imageUrl: function () {
-			return 'mocked image URL';
-		},
-		responseUrl: function () {
-			return 'mocked response URL';
-		}
-	},
-	mapConfigStub = {
-		sortingOptions: {
-			title_asc: {
-				column: 'map.title',
-				direction: 'asc'
-			},
-			updated_on_desc: {
-				column: 'map.updated_on',
-				direction: 'desc'
-			},
-			created_on: {
-				column: 'map.created_on',
-				direction: 'desc'
-			}
-		}
-	},
-	mapCrudUtils = proxyquire('../api/v1/map.utils', {
-		'./../../lib/db_connector': dbConStub,
-		'./../../lib/config': configStub,
-		'./../../lib/utils': utilsStub,
-		'./map.config': mapConfigStub
-	});
+	};
+}
 
 describe('map.utils.js', function () {
 	it('buildSort() returns existing sorting option object', function () {
+		var mapCrudUtils = getMapCrudUtilsMock(mapConfigStub, dbConStub);
 		expect(mapCrudUtils.buildSort('title_asc')).toEqual({
 			column: 'map.title',
 			direction: 'asc'
@@ -84,6 +92,7 @@ describe('map.utils.js', function () {
 	});
 
 	it('buildSort() fall-backs to default sorting option', function () {
+		var mapCrudUtils = getMapCrudUtilsMock(mapConfigStub, dbConStub);
 		expect(mapCrudUtils.buildSort('no_existing_option')).toEqual({
 			column: 'map.created_on',
 			direction: 'desc'
@@ -91,19 +100,15 @@ describe('map.utils.js', function () {
 	});
 
 	it('buildSort() no default sorting option', function () {
-		mapCrudUtils = proxyquire('../api/v1/map.utils', {
-			'./../../lib/db_connector': dbConStub,
-			'./../../lib/config': configStub,
-			'./../../lib/utils': utilsStub,
-			'./map.config': {}
-		});
+		var mapCrudUtils = getMapCrudUtilsMock({}, dbConStub);
 		expect(function () {
 			mapCrudUtils.buildSort('no_existing_option');
 		}).toThrow('Cannot read property \'no_existing_option\' of undefined');
 	});
 
 	it('buildMapCollectionResult() works as expected', function () {
-		var requestStub = {
+		var mapCrudUtils = getMapCrudUtilsMock(mapConfigStub, dbConStub),
+			requestStub = {
 				route: {
 					path: ''
 				}
@@ -136,7 +141,8 @@ describe('map.utils.js', function () {
 	});
 
 	it('buildMapCollectionResult() throws an error when invalid value as collection passed', function () {
-		var requestStub = {
+		var mapCrudUtils = getMapCrudUtilsMock(mapConfigStub, dbConStub),
+			requestStub = {
 				route: {
 					path: ''
 				}
@@ -158,10 +164,16 @@ describe('map.utils.js', function () {
 	});
 
 	it('getMapsCountQuery()', function () {
+		var dbConStub = getDbConMock(),
+			mapCrudUtils = getMapCrudUtilsMock(mapConfigStub, dbConStub);
+
 		mapCrudUtils.getMapsCountQuery({}, whereStub, whereInStub);
 	});
 
 	it('getMapsCollectionQuery', function () {
+		var dbConStub = getDbConMock(),
+			mapCrudUtils = getMapCrudUtilsMock(mapConfigStub, dbConStub);
+
 		mapCrudUtils.getMapsCollectionQuery({}, whereStub, whereInStub, orderByStub);
 	});
 });
