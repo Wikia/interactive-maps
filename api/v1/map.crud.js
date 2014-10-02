@@ -2,159 +2,30 @@
 
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
-	jsonValidator = require('./../../lib/jsonValidator'),
 	utils = require('./../../lib/utils'),
 	errorHandler = require('./../../lib/errorHandler'),
-	config = require('./../../lib/config'),
 	squidUpdate = require('./../../lib/squidUpdate'),
-
-	dbTable = 'map',
-	createSchema = {
-		description: 'Schema for creating maps',
-		type: 'object',
-		properties: {
-			title: {
-				description: 'Map title',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			},
-			tile_set_id: {
-				description: 'Unique identifier for a tile set',
-				type: 'integer',
-				required: true
-			},
-			city_id: {
-				description: 'ID of the Wikia this map instance belongs to',
-				type: 'integer',
-				required: true
-			},
-			city_title: {
-				description: 'Name of the Wikia this map instance belongs to',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			},
-			city_url: {
-				description: 'URL of the Wikia this map instance belongs to',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			},
-			created_by: {
-				description: 'creator user name',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			}
-		},
-		additionalProperties: false
-	},
-	updateSchema = {
-		description: 'Schema for updating map instance',
-		type: 'object',
-		properties: {
-			title: {
-				description: 'Map instance name',
-				type: 'string',
-				minLength: 1
-			},
-			deleted: {
-				description: 'Map deleted flag',
-				type: 'bool'
-			},
-			city_title: {
-				description: 'Name of the Wikia this map instance belongs to',
-				type: 'string',
-				minLength: 1,
-				maxLength: 255
-			},
-			city_url: {
-				description: 'URL of the Wikia this map instance belongs to',
-				type: 'string',
-				minLength: 1,
-				maxLength: 255
-			}
-		},
-		additionalProperties: false
-	},
-	sortingOptions = {
-		title_asc: {
-			column: 'map.title',
-			direction: 'asc'
-		},
-		updated_on_desc: {
-			column: 'map.updated_on',
-			direction: 'desc'
-		},
-		created_on: {
-			column: 'map.created_on',
-			direction: 'desc'
-		}
-	};
+	mapConfig = require('./map.config'),
+	mapUtils = require('./map.utils'),
+	crudUtils = require('./crud.utils');
 
 /**
- * @desc Builds object which is later used in knex.orderBy()
- *       Default value is { column: 'created_on', direction: 'desc' }
- * @param {String} sort description of sorting passed as GET parameter i.e. title_asc
- * @returns {*}
+ * @desc Returns a collection of maps' data
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP request object
+ * @param {function} next callback for express.js
  */
-function buildSort(sort) {
-	if (sortingOptions.hasOwnProperty(sort)) {
-		return sortingOptions[sort];
-	}
-
-	// default sorting type
-	return sortingOptions.created_on;
-}
-
-/**
- * @desc Builds maps collection list
- * @param {array} collection List of maps
- * @param {object} req Express request object
- * @returns {array}
- */
-function buildMapCollectionResult(collection, req) {
-	collection.forEach(function (value) {
-		value.image = utils.imageUrl(
-			config.dfsHost,
-			utils.getBucketName(
-				config.bucketPrefix + config.tileSetPrefix,
-				value.tile_set_id
-			),
-			value.image
-		);
-		value.url = utils.responseUrl(
-			req,
-			utils.addTrailingSlash(req.route.path),
-			value.id
-		);
-
-		delete value.tile_set_id;
-	});
-	return collection;
-}
-
-/**
- * @desc Get Maps express handler
- * @param {object} req Express request object
- * @param {object} res Express response object
- * @param {function} next Next function
- */
-function getMapsHandler(req, res, next) {
+function getMapsCollection(req, res, next) {
 	var cityId = parseInt(req.query.city_id, 10) || 0,
 		filter = {
 			deleted: 0
 		},
-		sort = buildSort(req.query.sort),
+		sort = mapUtils.buildSort(req.query.sort),
 		limit = parseInt(req.query.limit, 10) || false,
 		offset = parseInt(req.query.offset, 10) || 0,
 		tileSetStatuses = [utils.tileSetStatus.ok],
-		query;
+		dbConnection,
+		mapsList;
 
 	if (cityId !== 0) {
 		filter.city_id = cityId;
@@ -167,203 +38,208 @@ function getMapsHandler(req, res, next) {
 		filter.deleted = 1;
 	}
 
-	dbCon.getConnection(dbCon.connType.all, function (conn) {
-		query = dbCon.knex(dbTable)
-			.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-			.column([
-				'map.id',
-				'map.title',
-				'tile_set.image',
-				'map.updated_on',
-				'tile_set.status',
-				'tile_set.id as tile_set_id'
-			])
-			.where(filter)
-			.whereIn('tile_set.status', tileSetStatuses)
-			.orderBy(sort.column, sort.direction)
-			.connection(conn)
-			.select();
+	dbCon.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			var query = mapUtils.getMapsCollectionQuery(conn, filter, tileSetStatuses, sort);
+			dbConnection = conn;
 
-		if (limit) {
-			query.limit(limit);
-			query.offset(offset);
-		}
+			if (limit) {
+				crudUtils.addPaginationToQuery(query, limit, offset);
+			}
 
-		query.then(
-			function (collection) {
-				dbCon.knex(dbTable)
-					.join('tile_set', 'tile_set.id', '=', 'map.tile_set_id')
-					.count('* as cntr')
-					.where(filter)
-					.whereIn('tile_set.status', tileSetStatuses)
-					.connection(conn)
-					.then(
-					function (count) {
-						res.send(200, {
-							total: count[0].cntr,
-							items: buildMapCollectionResult(collection, req)
-						});
-						res.end();
-					},
-					next
-				);
-			},
-			next
-		);
-	}, next);
+			return query.select();
+		})
+		.then(function (collection) {
+			mapsList = collection;
+			return mapUtils.getMapsCountQuery(dbConnection, filter, tileSetStatuses).count('* as cntr');
+		})
+		.then(function (count) {
+			dbConnection.release();
+			utils.sendHttpResponse(res, 200, {
+				total: count[0].cntr,
+				items: mapUtils.buildMapCollectionResult(mapsList, req)
+			});
+		})
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
+}
+
+/**
+ * @desc Created a map
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP request object
+ * @param {function} next callback for express.js
+ */
+function createMap(req, res, next) {
+	var reqBody = reqBodyParser(req.rawBody),
+		response = {
+			message: mapConfig.responseMessages.created
+		},
+		dbConnection;
+
+	crudUtils.validateData(reqBody, mapConfig.createSchema);
+	reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			dbConnection = conn;
+			return dbCon.insert(conn, mapConfig.dbTable, reqBody);
+		})
+		.then(function (data) {
+			var mapId = data[0];
+
+			dbConnection.release();
+
+			utils.extendObject(response, {
+				id: mapId,
+				url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), mapId)
+			});
+
+			utils.sendHttpResponse(res, 201, response);
+		})
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
+}
+
+/**
+ * @desc Deletes a map
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP request object
+ * @param {function} next callback for express.js
+ */
+function deleteMap(req, res, next) {
+	var mapId = req.pathVar.id,
+		filter,
+		dbConnection;
+
+	crudUtils.validateIdParam(mapId);
+	mapId = parseInt(mapId, 10);
+	filter = {
+		id: mapId
+	};
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			dbConnection = conn;
+			return dbCon.destroy(conn, mapConfig.dbTable, filter);
+		})
+		.then(function (affectedRows) {
+			dbConnection.release();
+			crudUtils.throwErrorIfNoRowsAffected(affectedRows, mapConfig, mapId);
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapDeleted');
+			utils.sendHttpResponse(res, 200, {
+				message: mapConfig.responseMessages.deleted,
+				id: mapId
+			});
+		})
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
+}
+
+/**
+ * @desc Retrieves and returns a map's data
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP request object
+ * @param {function} next callback for express.js
+ */
+function getMap(req, res, next) {
+	var mapId = req.pathVar.id,
+		filter,
+		dbConnection;
+
+	crudUtils.validateIdParam(mapId);
+	mapId = parseInt(mapId, 10);
+	filter = {
+		id: mapId
+	};
+
+	dbCon.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			dbConnection = conn;
+			return dbCon.select(conn, mapConfig.dbTable, mapConfig.mapColumns, filter);
+		})
+		.then(function (data) {
+			var mapData = data[0];
+
+			dbConnection.release();
+
+			if (!mapData) {
+				throw errorHandler.elementNotFoundError(mapConfig.dbTable, mapId);
+			}
+
+			utils.extendObject(mapData, {
+				tile_set_url: utils.responseUrl(req, '/api/v1/tile_set/', mapData.tile_set_id)
+			});
+			utils.sendHttpResponse(res, 200, mapData);
+		})
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
+}
+
+/**
+ * @desc Updates data of a map which id was passed
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP request object
+ * @param {function} next callback for express.js
+ */
+function updateMap(req, res, next) {
+	var reqBody = reqBodyParser(req.rawBody),
+		response = {
+			message: mapConfig.responseMessages.updated
+		},
+		mapId = req.pathVar.id,
+		filter,
+		dbConnection;
+
+	crudUtils.validateData(reqBody, mapConfig.updateSchema);
+	crudUtils.validateIdParam(mapId);
+	mapId = parseInt(mapId, 10);
+	filter = {
+		id: mapId
+	};
+
+	utils.extendObject(reqBody, {
+		updated_on: dbCon.raw('CURRENT_TIMESTAMP')
+	});
+
+	dbCon.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			dbConnection = conn;
+			return dbCon.update(conn, mapConfig.dbTable, reqBody, filter);
+		})
+		.then(function (affectedRows) {
+			dbConnection.release();
+			crudUtils.throwErrorIfNoRowsAffected(affectedRows, mapConfig, mapId);
+			utils.extendObject(response, {
+				id: mapId,
+				url: utils.responseUrl(req, '/api/v1/map/', mapId)
+			});
+
+			utils.sendHttpResponse(res, 303, response);
+		})
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
 }
 
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
  * @returns {object} - CRUD collection
  */
-
 module.exports = function createCRUD() {
 	return {
 		handler: {
-			GET: getMapsHandler,
-			POST: function (req, res, next) {
-				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, createSchema);
-
-				if (errors.length === 0) {
-					reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
-					dbCon.getConnection(dbCon.connType.master, function (conn) {
-						dbCon
-							.insert(conn, dbTable, reqBody)
-							.then(
-								function (data) {
-									var id = data[0],
-										response = {
-											message: 'Map successfully created',
-											id: id,
-											url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
-										};
-
-									res.send(201, response);
-									res.end();
-								},
-								next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badRequestError(errors));
-				}
-			}
+			GET: getMapsCollection,
+			POST: createMap
 		},
 		wildcard: {
-			DELETE: function (req, res, next) {
-				var id = parseInt(req.pathVar.id, 10),
-					filter = {
-						id: id
-					};
-				if (isFinite(id)) {
-					dbCon.getConnection(dbCon.connType.master, function (conn) {
-						dbCon
-							.destroy(conn, dbTable, filter)
-							.then(
-								function (affectedRows) {
-									if (affectedRows > 0) {
-										squidUpdate.purgeKey(utils.surrogateKeyPrefix + id, 'mapDeleted');
-										res.send(204, {
-											message: 'Map successfully deleted',
-											id: id
-										});
-										res.end();
-									} else {
-										next(errorHandler.elementNotFoundError(dbTable, id));
-									}
-								},
-								next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badNumberError(req.pathVar.id));
-				}
-			},
-			GET: function (req, res, next) {
-				var dbColumns = [
-						'id',
-						'title',
-						'tile_set_id',
-						'city_id',
-						'created_by',
-						'created_on',
-						'updated_on',
-						'deleted'
-
-					],
-					id = parseInt(req.pathVar.id, 10),
-					filter = {
-						id: id
-					};
-
-				if (isFinite(id)) {
-					dbCon.getConnection(dbCon.connType.all, function (conn) {
-						dbCon
-							.select(conn, dbTable, dbColumns, filter)
-							.then(
-								function (collection) {
-									var obj = collection[0];
-
-									if (obj) {
-										obj.tile_set_url = utils.responseUrl(req, '/api/v1/tile_set/', obj.tile_set_id);
-										res.send(200, obj);
-										res.end();
-									} else {
-										next(errorHandler.elementNotFoundError(dbTable, id));
-									}
-								},
-								next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badNumberError(req.pathVar.id));
-				}
-			},
-			PUT: function (req, res, next) {
-				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, updateSchema),
-					id,
-					filter;
-
-				if (errors.length === 0) {
-					id = parseInt(req.pathVar.id, 10);
-					filter = {
-						id: id
-					};
-
-					if (isFinite(id)) {
-						reqBody.updated_on = dbCon.raw('CURRENT_TIMESTAMP');
-						dbCon.getConnection(dbCon.connType.master, function (conn) {
-							dbCon
-								.update(conn, dbTable, reqBody, filter)
-								.then(
-									function (affectedRows) {
-										if (affectedRows > 0) {
-											var response = {
-												message: 'Map successfully updated',
-												id: id,
-												url: utils.responseUrl(req, '/api/v1/map/', id)
-											};
-
-											res.send(303, response);
-											res.end();
-										} else {
-											next(errorHandler.elementNotFoundError(dbTable, id));
-										}
-									},
-									next
-							);
-						}, next);
-					} else {
-						next(errorHandler.badNumberError(req.pathVar.id));
-					}
-
-				} else {
-					next(errorHandler.badRequestError(errors));
-				}
-			}
+			DELETE: deleteMap,
+			GET: getMap,
+			PUT: updateMap
 		}
 	};
 };

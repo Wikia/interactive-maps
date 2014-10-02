@@ -2,199 +2,147 @@
 
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
-	jsonValidator = require('./../../lib/jsonValidator'),
 	utils = require('./../../lib/utils'),
 	errorHandler = require('./../../lib/errorHandler'),
-	config = require('./../../lib/config'),
-
-	// custom action for POST method
-	addTileSet = require('./../../lib/addTileSet'),
-
-	urlPattern = jsonValidator.getUrlPattern(),
-
-	dbTable = 'tile_set',
-	createSchema = {
-		description: 'Schema for creating tile set',
-		type: 'Object',
-		properties: {
-			name: {
-				description: 'Tile set name',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			},
-			url: {
-				description: 'URL to image from which tiles wil be created',
-				type: 'string',
-				pattern: urlPattern,
-				required: true,
-				maxLength: 255
-			},
-			created_by: {
-				description: 'Creator user name',
-				type: 'string',
-				required: true,
-				minLength: 1,
-				maxLength: 255
-			}
-		},
-		additionalProperties: false
-	},
-	searchLimit = 50,
-	minSearchCharacters = 2;
+	tileSetConfig = require('./tile_set.config'),
+	tileSetUtils = require('./tile_set.utils'),
+	crudUtils = require('./crud.utils.js'),
+	addTileSet = require('./../../lib/addTileSet'); // custom action for POST method
 
 /**
- * @desc Creates CRUD collection based on configuration object passed as parameter
+ * @desc CRUD function for getting collection of tileSets
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ * @param {Function} next
+ */
+function getTileSetsCollection(req, res, next) {
+	var filter = {
+			status: utils.tileSetStatus.ok
+		},
+		limit = parseInt(req.query.limit, 10) || false,
+		offset = parseInt(req.query.offset, 10) || 0,
+		search = req.query.search || false,
+		query = dbCon.knex(tileSetConfig.dbTable).column(tileSetConfig.getCollectionDbColumns).where(filter),
+		dbConnection;
+
+	if (limit) {
+		crudUtils.addPaginationToQuery(query, limit, offset);
+	}
+
+	dbCon
+		.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			dbConnection = conn;
+			return tileSetUtils.changeOptionsIfSearchIsValid(query, search, limit);
+		})
+		.then(function (data) {
+			query = data.query;
+			limit = data.limit;
+
+			if (limit) {
+				crudUtils.addPaginationToQuery(query, limit, offset);
+			}
+
+			return query
+				.connection(dbConnection)
+				.select();
+		})
+		.then(function (collection) {
+			dbConnection.release();
+
+			utils.sendHttpResponse(
+				res,
+				200,
+				tileSetUtils.processTileSetCollection(collection, req, tileSetUtils.extendTileSetObject)
+			);
+		})
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
+}
+
+/**
+ * @desc CRUD function for getting tileSet
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ * @param {Function} next
+ */
+function getTileSet(req, res, next) {
+	var id = req.pathVar.id,
+		filter,
+		dbConnection;
+
+	crudUtils.validateIdParam(id);
+	id = parseInt(req.pathVar.id);
+	filter = {
+		id: id,
+		status: utils.tileSetStatus.ok
+	};
+
+	dbCon
+		.getConnection(dbCon.connType.all)
+		.then(function (conn) {
+			dbConnection = conn;
+			return dbCon.select(conn, tileSetConfig.dbTable, tileSetConfig.getTileSetDbColumns, filter);
+		})
+		.then(function (collection) {
+			dbConnection.release();
+
+			if (collection.length <= 0) {
+				throw errorHandler.elementNotFoundError(tileSetConfig.dbTable, id);
+			}
+
+			utils.sendHttpResponse(res, 200, tileSetUtils.extendTileSetObject(collection[0], req));
+		})
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
+}
+
+/**
+ * @desc CRUD function for creating new tileSets
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ * @param {Function} next
+ */
+function createTileSet(req, res, next) {
+	var reqBody = reqBodyParser(req.rawBody),
+		dbConnection;
+
+	crudUtils.validateData(reqBody, tileSetConfig.createSchema);
+
+	dbCon
+		.getConnection(dbCon.connType.master)
+		.then(function (conn) {
+			dbConnection = conn;
+			return addTileSet(conn, tileSetConfig.dbTable, reqBody);
+		})
+		.then(function (data) {
+			dbConnection.release();
+
+			utils.sendHttpResponse(
+				res,
+				data.exists ? 200 : 202,
+				tileSetUtils.setupCreateTileSetResponse(data, req)
+			);
+		})
+		.fail(function () {
+			crudUtils.releaseConnectionOnFail(dbConnection, next);
+		});
+}
+
+/**
+ * @desc Creates tileSet CRUD collection
  * @returns {object} - CRUD collection
  */
-
 module.exports = function createCRUD() {
 	return {
 		handler: {
-			GET: function (req, res, next) {
-				var dbColumns = [
-						'tile_set.id',
-						'tile_set.name',
-						'tile_set.type',
-						'tile_set.status',
-						'tile_set.width',
-						'tile_set.height',
-						'tile_set.image'
-					],
-					filter = {
-						status: utils.tileSetStatus.ok
-					},
-					limit = parseInt(req.query.limit, 10) || false,
-					offset = parseInt(req.query.offset, 10) || 0,
-					search = req.query.search || false,
-					query = dbCon.knex(dbTable).column(dbColumns).where(filter);
-
-				if (limit) {
-					query.limit(limit).offset(offset);
-				}
-
-				if (search) {
-					search = search.trim();
-					if (search.length < minSearchCharacters) {
-						next(errorHandler.badRequestError([
-							'Search string should be at least ' + minSearchCharacters + ' long.'
-						]));
-					}
-					limit = limit ? Math.min(searchLimit, limit) : searchLimit;
-					query.join('tile_set_search', 'tile_set.id', '=', 'tile_set_search.id');
-					query.whereRaw('MATCH (tile_set_search.name) AGAINST (?)', [search]);
-					query.limit(limit).offset(0);
-					query.orderBy('created_on', 'desc');
-				}
-				dbCon.getConnection(dbCon.connType.all, function (conn) {
-					query.connection(conn);
-					query.select().then(
-						function (collection) {
-							collection.forEach(function (value) {
-								value.image = utils.imageUrl(
-									config.dfsHost,
-									utils.getBucketName(
-										config.bucketPrefix + config.tileSetPrefix,
-										value.id
-									),
-									value.image
-								);
-								value.url = utils.responseUrl(req, utils.addTrailingSlash(req.route.path), value.id);
-							});
-
-							res.send(200, collection);
-							res.end();
-						},
-						next
-					);
-				}, next);
-			},
-			POST: function (req, res, next) {
-				var reqBody = reqBodyParser(req.rawBody),
-					errors = jsonValidator.validateJSON(reqBody, createSchema);
-
-				if (errors.length === 0) {
-					dbCon.getConnection(dbCon.connType.master, function (conn) {
-						addTileSet(conn, dbTable, reqBody)
-							.then(
-							function (data) {
-								var id = data.id,
-									responseCode = 201,
-									response = {
-										message: 'Tile set added to processing queue',
-										id: id,
-										url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
-									};
-								if (data.exists) {
-									response.message = 'This tile set already exists';
-									responseCode = 200;
-								}
-								res.send(responseCode, response);
-								res.end();
-							},
-							next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badRequestError(errors));
-				}
-			}
+			GET: getTileSetsCollection,
+			POST: createTileSet
 		},
 		wildcard: {
-			GET: function (req, res, next) {
-				var dbColumns = [
-						'name',
-						'type',
-						'image',
-						'width',
-						'height',
-						'min_zoom',
-						'max_zoom',
-						'status',
-						'created_by',
-						'created_on',
-						'attribution',
-						'subdomains'
-					],
-					id = parseInt(req.pathVar.id),
-					filter = {
-						id: id,
-						status: utils.tileSetStatus.ok
-					};
-
-				if (isFinite(id)) {
-					dbCon.getConnection(dbCon.connType.all, function (conn) {
-						dbCon
-							.select(conn, dbTable, dbColumns, filter)
-							.then(
-								function (collection) {
-									var obj = collection[0];
-
-									if (obj) {
-										// TODO: fix hardcoded DFS host
-										obj.image = utils.imageUrl(
-											config.dfsHost,
-											utils.getBucketName(
-												config.bucketPrefix + config.tileSetPrefix,
-												id
-											),
-											obj.image
-										);
-										obj.max_zoom = utils.binToMaxZoomLevel(obj.max_zoom);
-										res.send(200, obj);
-										res.end();
-									} else {
-										next(errorHandler.elementNotFoundError(dbTable, id));
-									}
-								},
-								next
-						);
-					}, next);
-				} else {
-					next(errorHandler.badNumberError(req.pathVar.id));
-				}
-			}
+			GET: getTileSet
 		}
 	};
 };

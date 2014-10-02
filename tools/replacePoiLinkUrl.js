@@ -14,7 +14,6 @@
  */
 
 var dbCon = require('../lib/db_connector'),
-	poiIndexer = require('../lib/poiIndexer'),
 	utils = require('../lib/utils'),
 	squidUpdate = require('../lib/squidUpdate'),
 
@@ -23,7 +22,6 @@ var dbCon = require('../lib/db_connector'),
 	mapId = parseInt(args[0], 10),
 	find = args[1],
 	replace = args[2];
-
 
 /**
  * @desc validates process arguments
@@ -83,31 +81,13 @@ function updatePoiLink(conn, poiId, newLink) {
 }
 
 /**
- * @desc Entrypoint to the script
- */
-function start() {
-	validateArgs(mapId, find, replace);
-	dbCon.getConnection(dbCon.connType.master, onConnection);
-}
-
-/**
- * @desc Callback after establishing connection with DB
- * @param conn - DB connection object
- */
-function onConnection(conn) {
-	getAllPoisOnMap(conn, mapId).then(function (pois) {
-		processPois(conn, pois);
-	});
-}
-
-/**
  * @desc Sets up new links for POIS, updates DB and purges the map
- * @param conn - DB connection object
- * @param pois - collection of POI objects from DB
+ * @param {Object} conn - DB connection object
+ * @param {Array} pois - collection of POI objects from DB
  */
 function processPois(conn, pois) {
-	var newLink,
-		callback;
+	var newLink;
+
 	pois.forEach(function (poi) {
 		newLink = poi.link.replace(find, replace);
 		if (poi.link !== newLink) {
@@ -116,7 +96,8 @@ function processPois(conn, pois) {
 					utils.surrogateKeyPrefix + mapId,
 					'mapPoiUpdated'
 				);
-				if (poi === pois[pois.length-1]) {
+
+				if (poi === pois[pois.length - 1]) {
 					//by default knex doesnt close the connection to db
 					process.exit();
 				}
@@ -124,6 +105,24 @@ function processPois(conn, pois) {
 		}
 		console.log('All requests to DB sent');
 	});
+}
+
+/**
+ * @desc Callback after establishing connection with DB
+ * @param {Object} conn - DB connection object
+ */
+function onConnection(conn) {
+	getAllPoisOnMap(conn, mapId).then(function (pois) {
+		processPois(conn, pois);
+	});
+}
+
+/**
+ * @desc Entrypoint to the script
+ */
+function start() {
+	validateArgs(mapId, find, replace);
+	dbCon.getConnection(dbCon.connType.master, onConnection);
 }
 
 start();
