@@ -7,10 +7,12 @@ var gulp = require('gulp'),
 	dependencies = gutil.env.nobuild ? [] : ['build'];
 
 gulp.task('test-front', dependencies, function () {
+	paths = paths.tests(gutil.env.nobuild).front;
+
 	return gulp
-		.src(paths.tests.front.files)
+		.src(paths.files)
 		.pipe(karma({
-			configFile: paths.tests.front.config
+			configFile: paths.config
 		}))
 		.on('error', function (error) {
 			throw error;

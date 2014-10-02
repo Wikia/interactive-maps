@@ -49,15 +49,19 @@ module.exports = {
 	server: {
 		script: dest + '/server/app.js'
 	},
-	tests: {
-		back: dest + '/specs/**',
-		front: {
-			config: dest + '/frontend_tests/karma.conf.js',
-			files: [
-				dest + '/frontend_tests/define.mock.js',
-				dest + '/assets/scripts/im.*.js',
-				dest + '/frontend_tests/specs/*-spec.js'
-			]
-		}
+	tests: function (noBuild) {
+		var prefix = noBuild ? basePath : dest;
+
+		return {
+			back: prefix + '/specs/**',
+			front: {
+				config: prefix + '/frontend_tests/karma.conf.js',
+				files: [
+					prefix + '/frontend_tests/define.mock.js',
+					prefix + '/assets/scripts/im.*.js',
+					prefix + '/frontend_tests/specs/*-spec.js'
+				]
+			}
+		};
 	}
 };
