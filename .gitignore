@@ -38,5 +38,6 @@ locales
 
 # Wikia files to ignore
 newrelic_agent.log
+newrelic.js
 cachebuster.json
 setVariables.sh
