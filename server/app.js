@@ -14,7 +14,8 @@ var logger = require('../lib/logger'),
 	jobs,
 	worker,
 	gracefulShutdown = false,
-	http = require('http');
+	http = require('http'),
+	taskQueue = require('../lib/taskQueue');
 
 config = require('../lib/config');
 config.setRoot(__dirname + '/..');
@@ -135,13 +136,16 @@ if (cluster.isMaster) {
 	//by default it happens every 5000ms
 	jobs.promote();
 
+	// connect to RabbitMQ
+	taskQueue.setupQueueConnection();
+
 	require('./apiServer');
 } else {
 	require('../lib/jobProcessors');
 }
 
 process.on('uncaughtException', function (err) {
-	logger.critical('uncaughtException:', err.message, {
+	logger.critical('uncaughtException: ' + err.message, {
 		stack: err.stack
 	});
 	process.exit(1);
