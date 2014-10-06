@@ -275,7 +275,7 @@ require(
 		 */
 		function editMarker(marker) {
 			var params = {
-				action: 'editPOI',
+				action: 'poi',
 				data: marker.point
 			};
 
