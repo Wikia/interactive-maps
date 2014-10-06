@@ -62,7 +62,7 @@ define(
 		function toggleAllPointTypesFilter() {
 			var allPointTypesFilter = doc.getElementById(config.allPointTypesFilterId),
 				enabled = 'enabled',
-				poiCategories = poiCategoryModule.poiCategoryModule.getAllPoiCategories(),
+				poiCategories = poiCategoryModule.getAllPoiCategories(),
 				filtersEnabledLength = filtersContainer.getElementsByClassName('point-type enabled').length;
 
 			if (poiCategories.length === filtersEnabledLength && !utils.hasClass(allPointTypesFilter, enabled)) {
