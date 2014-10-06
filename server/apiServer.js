@@ -35,7 +35,7 @@ var express = require('express'),
 routeBuilder(router, crudModules, apiPath);
 
 // enable CORS for all requests (possiblty apiAbsolutePath could be used insteaf of *)
-app.all('*', function(req, res, next) {
+app.all('*', function (req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Headers', 'X-Requested-With');
 	next();
@@ -63,6 +63,9 @@ app.use(errorHandler.middleware);
 // remove expressjs headers
 app.disable('etag');
 app.disable('x-powered-by');
+
+// the 404 Route (ALWAYS Keep this as the last route)
+app.use(errorHandler.serveNotFoundError);
 
 app.listen(port);
 logger.notice('Server started on port: ' + port);
