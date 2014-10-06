@@ -42,7 +42,7 @@ function createMocks() {
 		extendedMaxZoomMock: 2,
 		reqMock: {
 			route: {
-				path: 'test/'
+				path: 'test/:id'
 			}
 		},
 		dbResMock: {
@@ -89,8 +89,7 @@ describe('TileSet Utils', function () {
 
 		expect(utils.getBucketName).toHaveBeenCalledWith(config.bucketPrefix + config.tileSetPrefix, tileSet.id);
 		expect(utils.imageUrl).toHaveBeenCalledWith(config.dfsHost, mocks.bucketNameMock, mocks.imageMock);
-		expect(utils.addTrailingSlash).toHaveBeenCalledWith(mocks.reqMock.route.path);
-		expect(utils.responseUrl).toHaveBeenCalledWith(mocks.reqMock,mocks.slashMock, tileSet.id);
+		expect(utils.responseUrl).toHaveBeenCalledWith(mocks.reqMock, mocks.reqMock.route.path, tileSet.id);
 		expect(tileSet.url).toBe(mocks.urlMock);
 		expect(tileSet.hasOwnProperty('max_zoom')).toBe(false);
 	});
@@ -108,8 +107,7 @@ describe('TileSet Utils', function () {
 
 		expect(utils.getBucketName).toHaveBeenCalledWith(config.bucketPrefix + config.tileSetPrefix, tileSet.id);
 		expect(utils.imageUrl).toHaveBeenCalledWith(config.dfsHost, mocks.bucketNameMock, mocks.imageMock);
-		expect(utils.addTrailingSlash).toHaveBeenCalledWith(mocks.reqMock.route.path);
-		expect(utils.responseUrl).toHaveBeenCalledWith(mocks.reqMock,mocks.slashMock, tileSet.id);
+		expect(utils.responseUrl).toHaveBeenCalledWith(mocks.reqMock, mocks.reqMock.route.path, tileSet.id);
 		expect(tileSet.url).toBe(mocks.urlMock);
 		expect(utils.binToMaxZoomLevel).toHaveBeenCalledWith(mocks.maxZoomMock);
 		expect(tileSet.max_zoom).toBe(mocks.extendedMaxZoomMock);
@@ -181,8 +179,7 @@ describe('TileSet Utils', function () {
 		setupSpies(mocks);
 		response = tileSetUtils.setupCreateTileSetResponse(mocks.dbResMock, mocks.reqMock);
 
-		expect(utils.addTrailingSlash).toHaveBeenCalledWith(mocks.reqMock.route.path);
-		expect(utils.responseUrl).toHaveBeenCalledWith(mocks.reqMock,mocks.slashMock, mocks.dbResMock.id);
+		expect(utils.responseUrl).toHaveBeenCalledWith(mocks.reqMock, mocks.reqMock.route.path, mocks.dbResMock.id);
 		expect(response.message).toBe(tileSetConfig.responseMessages.created);
 		expect(response.id).toBe(mocks.dbResMock.id);
 		expect(response.url).toBe(mocks.urlMock);
@@ -199,8 +196,7 @@ describe('TileSet Utils', function () {
 
 		delete mocks.dbResMock.exists;
 
-		expect(utils.addTrailingSlash).toHaveBeenCalledWith(mocks.reqMock.route.path);
-		expect(utils.responseUrl).toHaveBeenCalledWith(mocks.reqMock,mocks.slashMock, mocks.dbResMock.id);
+		expect(utils.responseUrl).toHaveBeenCalledWith(mocks.reqMock, mocks.reqMock.route.path, mocks.dbResMock.id);
 		expect(response.message).toBe(tileSetConfig.responseMessages.canceled);
 		expect(response.id).toBe(mocks.dbResMock.id);
 		expect(response.url).toBe(mocks.urlMock);
