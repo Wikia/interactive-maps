@@ -6,7 +6,6 @@ var Q = require('q'),
 	errorHandler = require('./../../lib/errorHandler'),
 	tileSetConfig = require('./tile_set.config');
 
-
 /**
  * @desc extends params of tileSet object
  * @param {Object} tileSet
