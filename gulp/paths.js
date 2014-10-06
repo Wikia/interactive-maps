@@ -40,7 +40,7 @@ module.exports = {
 	locales: {
 		dest: dest + '/locales/translations.json',
 		// temporary solution, to be changed when new Messages Service is introduced
-		src: 'http://maps.wikia.com/wikia.php?controller=WikiaInteractiveMaps&method=translation'
+		src: 'http://maps.wikia.com/wikia.php?controller=WikiaMaps&method=translation'
 	},
 	nodeModules: {
 		src: basePath + '/node_modules',
