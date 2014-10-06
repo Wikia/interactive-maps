@@ -15,6 +15,7 @@ module.exports = {
 		'tile_set.image'
 	],
 	getTileSetDbColumns: [
+		'id',
 		'name',
 		'type',
 		'image',
