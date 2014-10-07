@@ -8,7 +8,6 @@ require(
 		'im.leafletWrapper',
 		'im.config',
 		'im.pontoWikiaBridge',
-		'im.renderUI',
 		'im.i18n',
 		'im.utils',
 		'im.map',
@@ -17,8 +16,21 @@ require(
 		'im.poiCollection',
 		'im.filterBox'
 	],
-	function (ponto, tracker, w, L, config, pontoWikiaBridge, renderUI, i18n, utils, mapModule, poiModule,
-		poiCategoryModule, poiCollectionModule, filterBox) {
+	function (
+		ponto,
+		tracker,
+		w,
+		L,
+		config,
+		pontoWikiaBridge,
+		i18n,
+		utils,
+		mapModule,
+		poiModule,
+		poiCategoryModule,
+		poiCollectionModule,
+		filterBox
+	) {
 
 		var doc = w.document,
 			body = doc.body,
