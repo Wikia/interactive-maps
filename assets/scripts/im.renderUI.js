@@ -80,8 +80,8 @@ define('im.renderUI', ['im.config', 'im.window', 'im.i18n'], function (config, w
 	/**
 	 * Create Point types filter container
 	 * @param {String} poiCategoriesHTML
-	 * @param {Boolean=} isExpanded - optional param for inital state of filter box if true it wil be expanded
-	 * @returns {Object}
+	 * @param {Boolean=} isExpanded - optional param for initial state of filter box if true it wil be expanded
+	 * @returns {Element}
 	 */
 	function createPointTypeFiltersContainer(poiCategoriesHTML, isExpanded) {
 		var div = doc.createElement('div'),
