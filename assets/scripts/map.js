@@ -268,7 +268,7 @@ require(
 			}
 
 			if (!options.mobile) {
-				filterBox.toggleFilterBox(document.querySelector('.filter-menu'));
+				filterBox.toggleFilterBox(document.getElementsByClassName('filter-menu')[0]);
 			}
 		}
 
