@@ -164,10 +164,10 @@ define(
 		}
 
 		/**
-		 * @desc
-		 * @param mapWrapper
-		 * @param poiCategories
-		 * @param isExpanded
+		 * @desc sets up filter box (creates HTML, adds to DOM and registers event handlers)
+		 * @param {Element} mapWrapper - map page container
+		 * @param {Array} poiCategories - poi categories
+		 * @param {Boolean=} isExpanded - flag which tells is filter box should be expended or not
 		 */
 		function setupFilterBox(mapWrapper, poiCategories, isExpanded) {
 			var poiCategoriesHTML = '';
@@ -190,6 +190,10 @@ define(
 			doc.getElementsByClassName('filter-menu-header')[0].addEventListener('click', handleBoxHeaderClick);
 		}
 
+		/**
+		 * @desc returns filter parent
+		 * @returns {Element}
+		 */
 		function getFiltersContainer() {
 			return filtersContainer;
 		}
