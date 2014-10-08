@@ -495,8 +495,8 @@ require(
 			setupPontoWikiaClient();
 			setupClickTracking();
 
-			poiCollectionModule.setupInitialPoiState(mapConfig.points);
-			poiCategoryModule.setupPoiCategories(mapConfig.types);
+			poiCollectionModule.setupInitialPoiState(mapConfig.pois);
+			poiCategoryModule.setupPoiCategories(mapConfig.poi_categories);
 			setupPoisAndFilters(poiCollectionModule.getPoiState(), poiCategoryModule.getAllPoiCategories());
 
 			markers.addTo(map);
