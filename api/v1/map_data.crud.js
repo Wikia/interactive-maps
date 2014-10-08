@@ -14,9 +14,9 @@ function loadData(conn, mapId) {
 	return mapDataLoader.getRawMapInfo(conn, mapId)
 		.then(function(mapData){
 			mapData = mapData[0];
-			return mapDataLoader.getPoints(conn, mapData, true)
+			return mapDataLoader.getPois(conn, mapData, true)
 				.then(function(mapData) {
-					return mapDataLoader.getTypes(conn, mapData, true);
+					return mapDataLoader.getPoiCategories(conn, mapData, true);
 				});
 		});
 }
