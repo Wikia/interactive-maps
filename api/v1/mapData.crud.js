@@ -28,13 +28,23 @@ function loadData(conn, mapId) {
 function getMapData(req, res) {
 	var mapId = parseInt(req.pathVar.id, 10) || 0;
 	if (mapId !== 0) {
-		dbCon.getConnection(dbCon.connType.all, function (conn) {
-			loadData(conn, mapId)
-				.then(function (mapData) {
-					utils.sendHttpResponse(res, 200, mapData);
-				});
+		dbCon.getConnection(dbCon.connType.all, function(conn) {
+			onConnection(conn, mapId, res);
 		});
 	}
+}
+
+/**
+ * @desc Callback after a connection to DB is established
+ * @param {object} conn Database connection
+ * @param {number} mapId
+ * @param {object} res Express response
+ */
+function onConnection(conn, mapId, res) {
+	loadData(conn, mapId)
+		.then(function (mapData) {
+			utils.sendHttpResponse(res, 200, mapData);
+		});
 }
 
 /**
