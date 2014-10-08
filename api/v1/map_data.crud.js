@@ -11,12 +11,13 @@ var dbCon = require('./../../lib/db_connector'),
  * @returns {object} promise
  */
 function loadData(conn, mapId) {
-	var mapData = {
-		id: mapId
-	};
-	return mapDataLoader.getPoints(conn, mapData, true)
-		.then(function(mapData) {
-			return mapDataLoader.getTypes(conn, mapData, true);
+	return mapDataLoader.getRawMapInfo(conn, mapId)
+		.then(function(mapData){
+			mapData = mapData[0];
+			return mapDataLoader.getPoints(conn, mapData, true)
+				.then(function(mapData) {
+					return mapDataLoader.getTypes(conn, mapData, true);
+				});
 		});
 }
 
@@ -43,6 +44,7 @@ function getMapData(req, res) {
 function onConnection(conn, mapId, res) {
 	loadData(conn, mapId)
 		.then(function (mapData) {
+			console.log(mapData);
 			utils.sendHttpResponse(res, 200, mapData);
 		});
 }
