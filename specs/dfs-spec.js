@@ -6,7 +6,9 @@ describe('DFS', function () {
 			'./config': {
 				swift: {
 					servers: [
-						'127.0.0.1:80'
+						'127.0.0.1:80',
+						'127.0.0.1:6000',
+						'127.0.0.1:123'
 					],
 					config: {
 						swiftAuthUrl: '',
@@ -100,5 +102,9 @@ describe('DFS', function () {
 		expect(function () {
 			dfs.getDFSHostAndPort('');
 		}).toThrow('Invalid DFS address.');
+	});
+
+	it('returns different DFS hosts', function () {
+		expect(dfs.getDFSHost()).not.toEqual(dfs.getDFSHost());
 	});
 });
