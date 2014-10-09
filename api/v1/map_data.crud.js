@@ -46,7 +46,6 @@ function getMapData(req, res) {
 function onConnection(conn, mapId, res) {
 	loadData(conn, mapId)
 		.then(function (mapData) {
-			console.log(mapData);
 			utils.sendHttpResponse(res, 200, mapData);
 		});
 }
