@@ -64,30 +64,41 @@ describe('DFS', function () {
 		var testCases = [
 			{
 				dfs: 's3.dev-dfs-p1',
-				expected: ['s3.dev-dfs-p1', 80]
+				expected: {
+					host: 's3.dev-dfs-p1',
+					hostname: 's3.dev-dfs-p1',
+					port: 80
+				}
 			},
 			{
 				dfs: 's3.dev-dfs-p1:1234',
-				expected: ['s3.dev-dfs-p1', 1234]
+				expected: {
+					host: 's3.dev-dfs-p1:1234',
+					hostname: 's3.dev-dfs-p1',
+					port: 1234
+				}
 			},
 			{
 				dfs: '10.1.2.3:1234',
-				expected: ['10.1.2.3', 1234]
+				expected: {
+					host: '10.1.2.3:1234',
+					hostname: '10.1.2.3',
+					port: 1234
+				}
 			}
 		];
 
 		testCases.forEach(function (testCase) {
-			expect(dfs.getDFSHostAndPort(testCase.dfs)).toEqual(testCase.expected);
+			var result = dfs.getDFSHostAndPort(testCase.dfs);
+			expect(result.host).toEqual(testCase.expected.host);
+			expect(result.hostname).toEqual(testCase.expected.hostname);
+			expect(result.port).toEqual(testCase.expected.port);
 		});
 	});
 
-	it('throws correct errors when invalid DFS addressed are given', function () {
+	it('throws correct error when invalid DFS addressed are given', function () {
 		expect(function () {
 			dfs.getDFSHostAndPort('');
 		}).toThrow('Invalid DFS address.');
-
-		expect(function () {
-			dfs.getDFSHostAndPort('10.1.2.3:1234:5678');
-		}).toThrow('Invalid DFS address. Most probably two many semicolons.');
 	});
 });
