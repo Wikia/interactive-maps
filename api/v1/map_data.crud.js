@@ -1,27 +1,8 @@
 'use strict';
 
 var dbCon = require('./../../lib/db_connector'),
-	mapDataLoader = require('./../../lib/mapDataLoader'),
+	mapDataUtils = require('./map_data.utils'),
 	utils = require('./../../lib/utils');
-
-/**
- * @desc Loads map data from DB
- * @param {object} conn
- * @param {number} mapId
- * @returns {object} promise
- */
-function loadData(conn, mapId) {
-	return mapDataLoader
-		.getRawMapInfo(conn, mapId)
-		.then(function(mapData) {
-			mapData = mapData[0];
-			return mapDataLoader.getPois(conn, mapData, true);
-		})
-		.then(function(mapData) {
-			return mapDataLoader.getPoiCategories(conn, mapData, true);
-		});
-}
-
 /**
  * @desc Entry point handler for extracting metadata associated with the map
  * @param {object} req
@@ -30,23 +11,15 @@ function loadData(conn, mapId) {
 function getMapData(req, res) {
 	var mapId = parseInt(req.pathVar.id, 10) || 0;
 	if (mapId !== 0) {
-		dbCon.getConnection(dbCon.connType.all, function(conn) {
-			onConnection(conn, mapId, res);
-		});
+		dbCon
+			.getConnection(dbCon.connType.all)
+			.then(function(conn){
+				return mapDataUtils.loadData(conn, mapId);
+			})
+			.then(function (mapData) {
+				utils.sendHttpResponse(res, 200, mapData);
+			});
 	}
-}
-
-/**
- * @desc Callback after a connection to DB is established
- * @param {object} conn Database connection
- * @param {number} mapId
- * @param {object} res Express response
- */
-function onConnection(conn, mapId, res) {
-	loadData(conn, mapId)
-		.then(function (mapData) {
-			utils.sendHttpResponse(res, 200, mapData);
-		});
 }
 
 /**
