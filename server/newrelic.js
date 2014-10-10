@@ -4,7 +4,18 @@
  * See lib/config.defaults.js in the agent distribution for a more complete
  * description of configuration variables and their potential values.
  */
-var config = require('../lib/config').newrelic;
+var config = require('../lib/config').newrelic,
+	logger = require('../lib/logger');
+
+logger.set({
+	console: {
+		enabled: true,
+		level: logger.level.DEBUG,
+		raw: true
+	}
+});
+
+logger.debug('New Relic module loaded (for app: ' + config.appName + ').');
 
 exports.config = {
     /**
