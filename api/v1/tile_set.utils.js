@@ -6,7 +6,6 @@ var Q = require('q'),
 	errorHandler = require('./../../lib/errorHandler'),
 	tileSetConfig = require('./tile_set.config');
 
-
 /**
  * @desc extends params of tileSet object
  * @param {Object} tileSet
@@ -24,7 +23,7 @@ function extendTileSetObject(tileSet, req) {
 		tileSet.image
 	);
 
-	tileSet.url = utils.responseUrl(req, utils.addTrailingSlash(req.route.path), tileSetId);
+	tileSet.url = utils.responseUrl(req, req.route.path, tileSetId);
 
 	if (tileSet.max_zoom) {
 		tileSet.max_zoom = utils.binToMaxZoomLevel(tileSet.max_zoom);

@@ -105,11 +105,15 @@ html,
 }
 
 .leaflet-popup h3 {
-	color: #0078A8;
+	color: #000;
 	margin: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.leaflet-popup h3 a {
+	color: #0078A8;
 }
 
 .leaflet-popup a {

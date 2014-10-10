@@ -65,7 +65,7 @@ function createPoi(req, res, next) {
 
 			utils.extendObject(response, {
 				id: poiId,
-				created_on: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), poiId)
+				url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), poiId)
 			});
 
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
@@ -206,8 +206,11 @@ function updatePoi(req, res, next) {
 			return dbCon.update(dbConnection, poiConfig.dbTable, reqBody, filter);
 		})
 		.then(function () {
-			response.id = poiId;
-			response.url = utils.responseUrl(req, '/api/v1/poi/', poiId);
+			utils.extendObject(response, {
+				id: poiId,
+				url: utils.responseUrl(req, '/api/v1/poi/', poiId)
+			});
+
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
