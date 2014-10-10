@@ -8,16 +8,29 @@ require(
 		'im.leafletWrapper',
 		'im.config',
 		'im.pontoWikiaBridge',
-		'im.renderUI',
 		'im.i18n',
 		'im.utils',
 		'im.map',
 		'im.poi',
 		'im.poiCategory',
-		'im.poiCollection'
+		'im.poiCollection',
+		'im.filterBox'
 	],
-	function (ponto, tracker, w, L, config, pontoWikiaBridge, renderUI, i18n, utils, mapModule, poiModule,
-		poiCategoryModule, poiCollectionModule) {
+	function (
+		ponto,
+		tracker,
+		w,
+		L,
+		config,
+		pontoWikiaBridge,
+		i18n,
+		utils,
+		mapModule,
+		poiModule,
+		poiCategoryModule,
+		poiCollectionModule,
+		filterBox
+	) {
 
 		var doc = w.document,
 			body = doc.body,
@@ -27,186 +40,7 @@ require(
 			map,
 		// leaflet layer for storing markers
 			markers = new L.LayerGroup(),
-			mapConfig = config.mapConfig,
-			pointTypeFiltersContainer,
-			pointTypes = {};
-
-		/**
-		 * @desc Toggles visibility of points corresponding with clicked filter
-		 * @param {Element} filterClicked - Filter element that was clicked
-		 */
-		function togglePoints(filterClicked) {
-			var pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10),
-				points = poiCollectionModule.getPoiByCategory(pointType),
-				pointsLength = points.length,
-				i;
-
-			for (i = 0; i < pointsLength; i++) {
-				utils.toggleClass(points[i], 'hidden');
-			}
-		}
-
-		/**
-		 * @desc Toggles state of point type filter
-		 * @param {Element} filterClicked - Filter element that was clicked
-		 */
-		function togglePointTypeFilter(filterClicked) {
-			tracker.track(
-				'map',
-				tracker.ACTIONS.CLICK,
-				'poi-category-filter',
-				parseInt(filterClicked.getAttribute('data-point-type'), 10)
-			);
-
-			utils.toggleClass(filterClicked, 'enabled');
-		}
-
-		/**
-		 * @desc Toggles state of "All pin types" filter
-		 */
-		function toggleAllPointTypesFilter() {
-			var allPointTypesFilter = doc.getElementById(config.allPointTypesFilterId),
-				enabled = 'enabled',
-				filtersEnabledLength = pointTypeFiltersContainer.getElementsByClassName('point-type enabled').length;
-
-			if (pointTypes.length === filtersEnabledLength && !utils.hasClass(allPointTypesFilter, enabled)){
-				utils.addClass(allPointTypesFilter, enabled);
-			} else {
-				utils.removeClass(allPointTypesFilter, enabled);
-			}
-
-		}
-
-		/**
-		 * @desc Handles click on "All pin types" filter
-		 */
-		function allPointTypesFilterClickHandler() {
-			var allPointTypesFilter = doc.getElementById(config.allPointTypesFilterId),
-				filters = pointTypeFiltersContainer.getElementsByClassName('point-type'),
-				filtersLength = filters.length,
-				points = poiCollectionModule.getPoiByCategory(0),
-				pointsLength = points.length,
-				disabled = !utils.hasClass(allPointTypesFilter, 'enabled'),
-				i;
-
-			// enable/disable all filters
-			for (i = 0; i < filtersLength; i++) {
-				if (disabled) {
-					utils.addClass(filters[i], 'enabled');
-				} else {
-					utils.removeClass(filters[i], 'enabled');
-				}
-			}
-
-			// show/hide all points
-			for (i = 0; i < pointsLength; i++) {
-				if (disabled) {
-					utils.removeClass(points[i], 'hidden');
-				} else {
-					utils.addClass(points[i], 'hidden');
-				}
-			}
-
-			toggleAllPointTypesFilter();
-
-			tracker.track('map', tracker.ACTIONS.CLICK, 'poi-category-filter', 0);
-		}
-
-		/**
-		 * @desc Handles click on point type filter
-		 * @param {Element} filterClicked - Filter element that was clicked
-		 */
-		function pointTypeFilterClickHandler(filterClicked) {
-			togglePointTypeFilter(filterClicked);
-			toggleAllPointTypesFilter();
-			togglePoints(filterClicked);
-		}
-
-		/**
-		 * @desc Handles click on point type filters container
-		 * @param {Event} event - Click event
-		 */
-		function pointTypeFiltersContainerClickHandler(event) {
-			var elementClicked = event.target,
-				filterClicked = elementClicked,
-				pointType;
-
-			if (elementClicked.parentNode.tagName === 'LI') {
-				filterClicked = elementClicked.parentNode;
-			}
-
-			map.closePopup();
-
-			pointType = parseInt(filterClicked.getAttribute('data-point-type'), 10);
-
-			if (pointType === 0) {
-				allPointTypesFilterClickHandler();
-			} else {
-				pointTypeFilterClickHandler(filterClicked);
-			}
-		}
-
-		/**
-		 * Create Point types filter container
-		 * @param {object} container
-		 * @param {boolean=} isExpanded - optional param for inital state of filter box if true it wil be expanded
-		 * @returns {object}
-		 */
-		function createPointTypeFiltersContainer(container, isExpanded) {
-			var div = doc.createElement('div'),
-				header = doc.createElement('div'),
-				headerTitle = doc.createElement('span'),
-				headerEdit = doc.createElement('span'),
-				ul = doc.createElement('ul'),
-				li = doc.createElement('li');
-
-			div.setAttribute('id', 'filterMenu');
-			div.setAttribute('class', 'filter-menu ' + (isExpanded ? 'shown' : 'hidden') + '-box');
-
-			header.setAttribute('class', 'filter-menu-header');
-
-			headerTitle.appendChild(doc.createTextNode(i18n.msg('wikia-interactive-maps-filters')));
-			header.appendChild(headerTitle);
-
-			headerEdit.setAttribute('id', config.editPointTypesButtonId);
-			headerEdit.setAttribute('class', 'edit-point-types');
-			headerEdit.appendChild(doc.createTextNode(i18n.msg('wikia-interactive-maps-edit-pin-types')));
-			header.appendChild(headerEdit);
-
-			div.appendChild(header);
-
-			ul.setAttribute('id', config.pointTypeFiltersContainerId);
-			ul.setAttribute('class', 'point-types');
-
-			li.setAttribute('id', 'allPointTypes');
-			li.setAttribute('class', 'enabled');
-			li.setAttribute('data-point-type', '0');
-			li.appendChild(doc.createTextNode(i18n.msg('wikia-interactive-maps-all-pin-types')));
-			ul.appendChild(li);
-			div.appendChild(ul);
-			container.appendChild(div);
-			return ul;
-		}
-
-		/**
-		 * @desc Expands / folds the filter box
-		 * @param {HTMLElement} filterBox
-		 */
-		function toggleFilterBox(filterBox) {
-			utils.toggleClass(filterBox, 'shown-box');
-			utils.toggleClass(filterBox, 'hidden-box');
-		}
-
-		/**
-		 * @desc Handles click event on the filterBox header
-		 * @param {event} event
-		 */
-		function handleBoxHeaderClick(event) {
-			if (event.target.id !== config.editPointTypesButtonId) {
-				var filterBox = event.currentTarget.parentElement;
-				toggleFilterBox(filterBox);
-			}
-		}
+			mapConfig = config.mapConfig;
 
 		/**
 		 * @desc Create points and filters for them
@@ -215,25 +49,13 @@ require(
 		 * @param {Boolean=} isFilterBoxExpanded - flag that indicates if filter box should be initially expanded
 		 */
 		function setupPoisAndFilters(pois, categories, isFilterBoxExpanded) {
-			var pointTypeFiltersHtml = '';
-
-			pointTypes = categories;
-
-			// create filter box
-			pointTypeFiltersContainer = createPointTypeFiltersContainer(wrapper, isFilterBoxExpanded);
-
-			// create filters
+			// setup filters icons
 			categories.forEach(function (category) {
 				poiCategoryModule.setupPoiCategoryIcon(category);
-				pointTypeFiltersHtml += renderUI.buildPointTypeFilterHtml(category);
 			});
 
-			// add filters to filter box
-			pointTypeFiltersContainer.innerHTML += pointTypeFiltersHtml;
-
-			// attach filter box event handlers
-			pointTypeFiltersContainer.addEventListener('click', pointTypeFiltersContainerClickHandler, false);
-			doc.getElementsByClassName('filter-menu-header')[0].addEventListener('click', handleBoxHeaderClick);
+			// setup filter box
+			filterBox.setupFilterBox(wrapper, categories, isFilterBoxExpanded);
 
 			// create poi markers
 			Object.keys(pois).forEach(function (id) {
@@ -241,16 +63,6 @@ require(
 
 				poiModule.addPoiToMap(poi, poiCategoryModule.getPoiCategoryIcon(poi.poi_category_id), markers);
 			});
-		}
-
-		/**
-		 * @desc adds hide button when on wikia mobile or embed code
-		 */
-		function setUpHideButton() {
-			var hide = doc.createElement('a');
-			hide.innerHTML = i18n.msg('wikia-interactive-maps-hide-filter');
-			hide.className = 'hide-button';
-			doc.getElementsByClassName('filter-menu-header')[0].appendChild(hide);
 		}
 
 		/**
@@ -301,7 +113,7 @@ require(
 					markerObject = poiModule.addPoiToMap(
 						point, poiCategoryModule.getPoiCategoryIcon(point.poi_category_id), markers);
 
-					filter = pointTypeFiltersContainer.querySelector(
+					filter = filterBox.getFiltersContainer().querySelector(
 						'[data-point-type="' +
 						point.poi_category_id +
 						'"]'
@@ -410,35 +222,13 @@ require(
 		}
 
 		/**
-		 * @desc setup map options available only when map displayed on Wikia page
-		 * @param {object} options - {cityId: int, mobile: bool, skin: string}
-		 */
-		function setupWikiaOnlyOptions(options) {
-			var mapId = parseInt(mapConfig.id, 10);
-
-			if (options.mobile) {
-				utils.addClass(body, 'wikia-mobile');
-				setUpHideButton();
-			} else if (mapConfig.city_id === options.cityId) {
-				setupContributionOptions();
-				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
-			} else {
-				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
-			}
-
-			if (!options.mobile) {
-				toggleFilterBox(document.querySelector('.filter-menu'));
-			}
-		}
-
-		/**
 		 * @desc setup edit options
 		 */
 		function setupContributionOptions() {
 			// attach event handlers
 			map
 				.on('draw:created', function (event) {
-				editMarker(poiModule.createTempPoiMarker(event));
+					editMarker(poiModule.createTempPoiMarker(event));
 				})
 				.on('embedMapCode:clicked', embedMapCode);
 
@@ -458,6 +248,28 @@ require(
 			// show / create edit UI elements
 			utils.addClass(body, 'enable-edit');
 			mapModule.createContributionControls();
+		}
+
+		/**
+		 * @desc setup map options available only when map displayed on Wikia page
+		 * @param {object} options - {cityId: int, mobile: bool, skin: string}
+		 */
+		function setupWikiaOnlyOptions(options) {
+			var mapId = parseInt(mapConfig.id, 10);
+
+			if (options.mobile) {
+				utils.addClass(body, 'wikia-mobile');
+				filterBox.setUpHideButton();
+			} else if (mapConfig.city_id === options.cityId) {
+				setupContributionOptions();
+				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
+			} else {
+				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
+			}
+
+			if (!options.mobile) {
+				filterBox.toggleFilterBox(document.getElementsByClassName('filter-menu')[0]);
+			}
 		}
 
 		/**

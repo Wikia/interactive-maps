@@ -1,5 +1,7 @@
-define('im.renderUI', ['im.config'], function (config) {
+define('im.renderUI', ['im.config', 'im.window', 'im.i18n'], function (config, w, i18n) {
 	'use strict';
+
+	var doc = w.document;
 
 	/**
 	 * @desc Build link HTML
@@ -75,8 +77,52 @@ define('im.renderUI', ['im.config'], function (config) {
 			'<span>' + pointType.name + '</span></li>';
 	}
 
+	/**
+	 * Create Point types filter container
+	 * @param {String} poiCategoriesHTML
+	 * @param {Boolean=} isExpanded - optional param for initial state of filter box if true it wil be expanded
+	 * @returns {Element}
+	 */
+	function createPointTypeFiltersContainer(poiCategoriesHTML, isExpanded) {
+		var div = doc.createElement('div'),
+			header = doc.createElement('div'),
+			headerTitle = doc.createElement('span'),
+			headerEdit = doc.createElement('span'),
+			ul = doc.createElement('ul'),
+			li = doc.createElement('li');
+
+		div.setAttribute('id', 'filterMenu');
+		div.setAttribute('class', 'filter-menu ' + (isExpanded ? 'shown' : 'hidden') + '-box');
+
+		header.setAttribute('class', 'filter-menu-header');
+
+		headerTitle.appendChild(doc.createTextNode(i18n.msg('wikia-interactive-maps-filters')));
+		header.appendChild(headerTitle);
+
+		headerEdit.setAttribute('id', config.editPointTypesButtonId);
+		headerEdit.setAttribute('class', 'edit-point-types');
+		headerEdit.appendChild(doc.createTextNode(i18n.msg('wikia-interactive-maps-edit-pin-types')));
+		header.appendChild(headerEdit);
+
+		div.appendChild(header);
+
+		ul.setAttribute('id', config.pointTypeFiltersContainerId);
+		ul.setAttribute('class', 'point-types');
+
+		li.setAttribute('id', 'allPointTypes');
+		li.setAttribute('class', 'enabled');
+		li.setAttribute('data-point-type', '0');
+		li.appendChild(doc.createTextNode(i18n.msg('wikia-interactive-maps-all-pin-types')));
+		ul.appendChild(li);
+		ul.innerHTML += poiCategoriesHTML;
+		div.appendChild(ul);
+
+		return div;
+	}
+
 	return {
 		buildPopupHtml: buildPopupHtml,
-		buildPointTypeFilterHtml: buildPointTypeFilterHtml
+		buildPointTypeFilterHtml: buildPointTypeFilterHtml,
+		createPointTypeFiltersContainer: createPointTypeFiltersContainer
 	};
 });
