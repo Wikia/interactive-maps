@@ -91,7 +91,7 @@ describe('DFS', function () {
 		];
 
 		testCases.forEach(function (testCase) {
-			var result = dfs.getDFSHostAndPort(testCase.dfs);
+			var result = dfs.getHostAndPort(testCase.dfs);
 			expect(result.host).toEqual(testCase.expected.host);
 			expect(result.hostname).toEqual(testCase.expected.hostname);
 			expect(result.port).toEqual(testCase.expected.port);
@@ -100,8 +100,8 @@ describe('DFS', function () {
 
 	it('throws correct error when invalid DFS addressed are given', function () {
 		expect(function () {
-			dfs.getDFSHostAndPort('');
-		}).toThrow('Invalid DFS address');
+			dfs.getHostAndPort('');
+		}).toThrow('Invalid address');
 	});
 
 	it('returns correct DFS hosts with different hosts lists', function () {
@@ -112,18 +112,18 @@ describe('DFS', function () {
 			first,
 			i = 0;
 
-		expect(dfs.getDFSHost(hostsListsMock[0])).toEqual(dfs.getDFSHost(hostsListsMock[0]));
-		expect(dfs.getDFSHost(hostsListsMock[1])).not.toEqual(dfs.getDFSHost(hostsListsMock[1]));
+		expect(dfs.getDFS(hostsListsMock[0])).toEqual(dfs.getDFS(hostsListsMock[0]));
+		expect(dfs.getDFS(hostsListsMock[1])).not.toEqual(dfs.getDFS(hostsListsMock[1]));
 
 		// with this calls make it go back to 127.0.0.1:80 (the dfsHostIndex will increment to 11)
 		for (i; i < 4; i++) {
-			dfs.getDFSHost(hostsListsMock[1]);
+			dfs.getDFS(hostsListsMock[1]);
 		}
-		first = dfs.getDFSHost(hostsListsMock[1]);
+		first = dfs.getDFS(hostsListsMock[1]);
 		// now loop again so we can check if it is round-robin ;)
 		for (i = 0; i < 4; i++) {
-			dfs.getDFSHost(hostsListsMock[1]);
+			dfs.getDFS(hostsListsMock[1]);
 		}
-		expect(first).toEqual(dfs.getDFSHost(hostsListsMock[1]));
+		expect(first).toEqual(dfs.getDFS(hostsListsMock[1]));
 	});
 });
