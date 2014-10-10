@@ -101,10 +101,29 @@ describe('DFS', function () {
 	it('throws correct error when invalid DFS addressed are given', function () {
 		expect(function () {
 			dfs.getDFSHostAndPort('');
-		}).toThrow('Invalid DFS address.');
+		}).toThrow('Invalid DFS address');
 	});
 
-	it('returns different DFS hosts', function () {
-		expect(dfs.getDFSHost()).not.toEqual(dfs.getDFSHost());
+	it('returns correct DFS hosts with different hosts lists', function () {
+		var hostsListsMock = [
+				['127.0.0.1:80'],
+				['127.0.0.1:80', '127.0.0.1:6000', '127.0.0.1:123', 'dfs-lb.wikia.com', '10.10.132.15']
+			],
+			first,
+			i = 0;
+
+		expect(dfs.getDFSHost(hostsListsMock[0])).toEqual(dfs.getDFSHost(hostsListsMock[0]));
+		expect(dfs.getDFSHost(hostsListsMock[1])).not.toEqual(dfs.getDFSHost(hostsListsMock[1]));
+
+		// with this calls make it go back to 127.0.0.1:80 (the dfsHostIndex will increment to 11)
+		for (i; i < 4; i++) {
+			dfs.getDFSHost(hostsListsMock[1]);
+		}
+		first = dfs.getDFSHost(hostsListsMock[1]);
+		// now loop again so we can check if it is round-robin ;)
+		for (i = 0; i < 4; i++) {
+			dfs.getDFSHost(hostsListsMock[1]);
+		}
+		expect(first).toEqual(dfs.getDFSHost(hostsListsMock[1]));
 	});
 });
