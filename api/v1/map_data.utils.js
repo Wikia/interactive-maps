@@ -149,4 +149,4 @@ module.exports = {
 	loadData: loadData,
 	getPois: getPois,
 	getPoiCategories: getPoiCategories
-}
+};
