@@ -15,7 +15,7 @@ logger.set({
 	}
 });
 
-logger.debug('New Relic module loaded (for app: ' + config.appName + ').');
+logger.debug('New Relic module loaded (' + config.appName + ')');
 
 exports.config = {
     /**
@@ -35,3 +35,5 @@ exports.config = {
         level: config.logLevel
     }
 };
+
+require('newrelic');
