@@ -35,6 +35,11 @@ var proxyquire = require('proxyquire').noCallThru(),
 			test: {}
 		}
 	},
+	envMock = {
+		WIKIA_CONFIG_ROOT: 'test',
+		WIKIA_DATACENTER: 'test',
+		NODE_ENV: 'test'
+	},
 	config = proxyquire('../lib/config', {
 		'js-yaml': {
 			safeLoad: function (yaml) {
@@ -49,6 +54,11 @@ var proxyquire = require('proxyquire').noCallThru(),
 		'./logger': {
 			debug: function () {
 
+			}
+		},
+		'./utils': {
+			getProcessEnv: function () {
+				return envMock;
 			}
 		},
 		'test/InteractiveMapsConfig.json': configuration
