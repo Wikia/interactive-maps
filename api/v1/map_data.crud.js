@@ -25,7 +25,6 @@ function getMapData(req, res) {
 					.getPois(conn, mapData, mapDataConfig.poiColumns);
 			})
 			.then(function(mapData) {
-				console.log(mapData);
 				return mapDataUtils
 					.getPoiCategories(conn, mapData, mapDataConfig.poiCategoryColumns);
 			})
