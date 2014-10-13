@@ -7,23 +7,6 @@ var mapDataConfig = require('./map_data.config'),
 	Q = require('q');
 
 /**
- * @desc Loads map data from DB
- * @param {object} conn
- * @param {number} mapId
- * @returns {object} promise
- */
-function loadData(conn, mapId) {
-	return getMapInfo(conn, mapId)
-		.then(function(mapData) {
-			mapData = mapData[0];
-			return getPois(conn, mapData, mapDataConfig.poiColumns);
-		})
-		.then(function(mapData) {
-			return getPoiCategories(conn, mapData, mapDataConfig.poiCategoryColumns);
-		});
-}
-
-/**
  * @desc Fetches basic map information from DB
  * @param {object} conn Database connection
  * @param {number} mapId
