@@ -30,11 +30,10 @@ function loadData(conn, mapId) {
  * @returns {object} promise
  */
 function getMapInfo(conn, mapId) {
-	return dbCon.knex('map')
-		.column(mapDataConfig.mapColumns)
-		.where('map.id', '=', mapId)
-		.connection(conn)
-		.select();
+	return dbCon
+		.select(conn, 'map', mapDataConfig.mapColumns, {
+			'id': mapId
+		});
 }
 
 /**
@@ -50,7 +49,7 @@ function loadPois(conn, mapId, columns) {
 		'poi', columns, {
 			map_id: mapId
 		}
-	).then(escapeHTML);
+	).then(escapeHTMLInPoiCollection);
 }
 
 /**
@@ -58,7 +57,7 @@ function loadPois(conn, mapId, columns) {
  * @param {Array} collection
  * @returns {Array}
  */
-function escapeHTML(collection) {
+function escapeHTMLInPoiCollection(collection) {
 	collection.forEach(function (item) {
 		item.name = utils.escapeHtml(item.name);
 
@@ -146,7 +145,7 @@ function getPoiCategories(conn, mapData, columns) {
 }
 
 module.exports = {
-	loadData: loadData,
 	getPois: getPois,
-	getPoiCategories: getPoiCategories
+	getPoiCategories: getPoiCategories,
+	getMapInfo: getMapInfo
 };
