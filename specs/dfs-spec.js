@@ -6,9 +6,7 @@ describe('DFS', function () {
 			'./config': {
 				swift: {
 					servers: [
-						'127.0.0.1:80',
-						'127.0.0.1:6000',
-						'127.0.0.1:123'
+						'127.0.0.1'
 					],
 					config: {
 						swiftAuthUrl: '',
@@ -86,6 +84,14 @@ describe('DFS', function () {
 					host: '10.1.2.3:1234',
 					hostname: '10.1.2.3',
 					port: 1234
+				}
+			},
+			{
+				dfs: '127.0.0.1',
+				expected: {
+					host: '127.0.0.1',
+					hostname: '127.0.0.1',
+					port: 80
 				}
 			}
 		];
