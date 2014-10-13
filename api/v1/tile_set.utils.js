@@ -56,9 +56,9 @@ function processTileSetCollection(collection, req, process) {
  * @param {String} search - search term
  */
 function addSearchToQuery(query, search) {
+	// MWEB-700 after discussion with OPS it's safe here to use LIKE until tile_set table gets 50k-200k rows
 	query
-		.join('tile_set_search', 'tile_set.id', '=', 'tile_set_search.id')
-		.whereRaw('MATCH (tile_set_search.name) AGAINST (?)', [search])
+		.where('tile_set.name', 'like', '%' + search + '%')
 		.orderBy('created_on', 'desc');
 }
 
