@@ -141,7 +141,7 @@ if (cluster.isMaster) {
 }
 
 process.on('uncaughtException', function (err) {
-	logger.critical('uncaughtException:', err.message, {
+	logger.critical('uncaughtException: ' + err.message, {
 		stack: err.stack
 	});
 	process.exit(1);

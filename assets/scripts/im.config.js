@@ -18,7 +18,7 @@ define('im.config', ['im.window'], function (w) {
 		pointTypeFiltersContainerId: 'pointTypes',
 		editPointTypesButtonId: 'editPointTypes',
 		allPointTypesFilterId: 'allPointTypes',
-		pontoBridgeModule: 'wikia.intMap.pontoBridge',
+		pontoBridgeModule: 'wikia.maps.pontoBridge',
 		uiControlsPosition: 'bottomright',
 		pontoCommunicationAPI: {
 			responseMessages: {

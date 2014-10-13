@@ -287,6 +287,11 @@ describe('utils', function () {
 				path: '/testorium/test/fest/',
 				id: '3',
 				url: 'https://lolcathost/testorium/test/fest/3'
+			}, {
+				req: newReq('http', 'lolcathost'),
+				path: '/testorium/test/fest/:id',
+				id: '3',
+				url: 'http://lolcathost/testorium/test/fest/3'
 			}];
 		testSet.forEach(function (testCase) {
 			expect(utils.responseUrl(testCase.req, testCase.path, testCase.id)).toBe(testCase.url);
