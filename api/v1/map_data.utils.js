@@ -8,9 +8,9 @@ var mapDataConfig = require('./map_data.config'),
 
 /**
  * @desc Fetches basic map information from DB
- * @param {object} conn Database connection
- * @param {number} mapId
- * @returns {object} promise
+ * @param {Object} conn Database connection
+ * @param {Number} mapId
+ * @returns {Object} promise
  */
 function getMapInfo(conn, mapId) {
 	return dbCon
@@ -21,18 +21,19 @@ function getMapInfo(conn, mapId) {
 
 /**
  * @desc Load Points for map instance
- * @param {object} conn Database connection
- * @param {number} mapId
+ * @param {Object} conn Database connection
+ * @param {Number} mapId
  * @param {Array} columns DB columns to return
- * @returns {object} - promise
+ * @returns {Object} - promise
  */
 function loadPois(conn, mapId, columns) {
-	return dbCon.select(
+	var x = dbCon.select(
 		conn,
 		'poi', columns, {
 			map_id: mapId
 		}
 	).then(escapeHTMLInPoiCollection);
+	return x;
 }
 
 /**
@@ -53,17 +54,16 @@ function escapeHTMLInPoiCollection(collection) {
 
 /**
  * @desc Load point types
- * @param {object} conn Database connection
- * @param {number} mapId
+ * @param {Object} conn Database connection
+ * @param {Number} mapId
  * @param {Array} columns DB columns to return
- * @returns {object} - promise
+ * @returns {Object} - promise
  */
 function loadPoiCategories(conn, mapId, columns) {
 	return dbCon.select(
 		conn,
 		'poi_category',
-		columns,
-		{
+		columns, {
 			'map_id': mapId
 		}
 	).then(
@@ -78,51 +78,52 @@ function loadPoiCategories(conn, mapId, columns) {
 
 /**
  * @desc Get points
- * @param {object} conn Database connection
- * @param {object} mapData
+ * @param {Object} conn Database connection
+ * @param {Object} mapData
  * @param {Array} columns DB columns to return
- * @returns {object} - promise
+ * @returns {Object} - promise
  */
 function getPois(conn, mapData, columns) {
 	var deferred = Q.defer();
 	loadPois(conn, mapData.id, columns)
 		.then(
-		function (points) {
-			mapData.pois = points;
-			deferred.resolve(mapData);
-		},
-		function (error) {
-			deferred.reject({
-				code: 500,
-				message: error
+			function (points) {
+				mapData.pois = points;
+				deferred.resolve(mapData);
+			})
+		.catch (
+			function (error) {
+				deferred.reject({
+					code: 500,
+					message: error
+				});
 			});
-		}
-	);
 	return deferred.promise;
 }
 
 /**
  * @desc Gets points types for map instance
- * @param {object} conn Database connection
- * @param {object} mapData
+ * @param {Object} conn Database connection
+ * @param {Object} mapData
  * @param {Array} columns DB columns to return
- * @returns {object} - promise
+ * @returns {Object} - promise
  */
 function getPoiCategories(conn, mapData, columns) {
 	var deferred = Q.defer();
 
-	loadPoiCategories(conn, mapData.id, columns).then(
-		function (poiCategories) {
-			mapData.poi_categories = poiCategories;
-			deferred.resolve(mapData);
-		},
-		function (error) {
-			deferred.reject({
-				code: 500,
-				message: error
+	loadPoiCategories(conn, mapData.id, columns)
+		.then(
+			function (poiCategories) {
+				mapData.poi_categories = poiCategories;
+				deferred.resolve(mapData);
+			})
+		.catch(
+			function (error) {
+				deferred.reject({
+					code: 500,
+					message: error
+				});
 			});
-		}
-	);
 
 	return deferred.promise;
 }

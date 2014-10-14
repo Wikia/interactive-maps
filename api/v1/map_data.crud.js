@@ -7,8 +7,8 @@ var dbCon = require('./../../lib/db_connector'),
 	utils = require('./../../lib/utils');
 /**
  * @desc Entry point handler for extracting metadata associated with the map
- * @param {object} req
- * @param {object} res
+ * @param {Object} req
+ * @param {Object} res
  */
 function getMapData(req, res) {
 	var mapId = parseInt(req.pathVar.id, 10) || 0,
@@ -38,7 +38,7 @@ function getMapData(req, res) {
 
 /**
  * @desc Creates CRUD collection based on configuration object passed as parameter
- * @returns {object} - CRUD collection
+ * @returns {Object} - CRUD collection
  */
 module.exports = function createCRUD() {
 	return {
