@@ -27,13 +27,14 @@ function getMapInfo(conn, mapId) {
  * @returns {Object} - promise
  */
 function loadPois(conn, mapId, columns) {
-	var x = dbCon.select(
+	return dbCon.select(
 		conn,
-		'poi', columns, {
+		'poi',
+		columns,
+		{
 			map_id: mapId
 		}
 	).then(escapeHTMLInPoiCollection);
-	return x;
 }
 
 /**
