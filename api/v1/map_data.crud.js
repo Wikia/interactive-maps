@@ -2,6 +2,7 @@
 
 var dbCon = require('./../../lib/db_connector'),
 	mapDataUtils = require('./map_data.utils'),
+	crudUtils = require('./crud.utils'),
 	mapDataConfig = require('./map_data.config'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils');
@@ -33,6 +34,9 @@ function getMapData(req, res) {
 		})
 		.then(function (mapData) {
 			utils.sendHttpResponse(res, 200, mapData);
+		})
+		.catch(function(){
+			crudUtils.releaseConnectionOnFail(conn, next);
 		});
 }
 
