@@ -18,6 +18,5 @@ module.exports = {
 	poiCategoryColumns: [
 		'id',
 		'name'
-	],
-	leafletImagesPath: '/vendor/leaflet/images'
+	]
 };
