@@ -75,5 +75,6 @@ module.exports = {
 	},
 	surrogateKeys: {
 		handler: 'tileSetHandler'
-	}
+	},
+	path: 'tile_set/'
 };
