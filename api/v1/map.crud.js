@@ -55,6 +55,8 @@ function getMapsCollection(req, res, next) {
 		})
 		.then(function (count) {
 			dbConnection.release();
+
+			res.setCacheValidity(mapConfig.cacheValidity.handler);
 			utils.sendHttpResponse(res, 200, {
 				total: count[0].cntr,
 				items: mapUtils.buildMapCollectionResult(mapsList, req)
@@ -173,6 +175,8 @@ function getMap(req, res, next) {
 			utils.extendObject(mapData, {
 				tile_set_url: utils.responseUrl(req, '/api/v1/tile_set/', mapData.tile_set_id)
 			});
+
+			res.setCacheValidity(mapConfig.cacheValidity.wildcard);
 			utils.sendHttpResponse(res, 200, mapData);
 		})
 		.fail(function () {

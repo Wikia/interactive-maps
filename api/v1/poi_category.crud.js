@@ -38,6 +38,8 @@ function getPoiCategoriesCollection(req, res, next) {
 		})
 		.then(function (collection) {
 			dbConnection.release();
+
+			res.setCacheValidity(poiCategoryConfig.cacheValidity.handler);
 			utils.sendHttpResponse(res, 200, utils.processPoiCategoriesCollection(collection, config));
 		})
 		.fail(function () {
@@ -77,6 +79,7 @@ function getPoiCategory(req, res, next) {
 				throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id);
 			}
 
+			res.setCacheValidity(poiCategoryConfig.cacheValidity.wildcard);
 			utils.sendHttpResponse(res, 200, collection[0]);
 		})
 		.fail(function () {

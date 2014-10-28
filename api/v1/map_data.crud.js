@@ -33,6 +33,7 @@ function getMapData(req, res) {
 				.getPoiCategories(conn, mapData, mapDataConfig.poiCategoryColumns);
 		})
 		.then(function (mapData) {
+			res.setCacheValidity(mapDataConfig.cacheValidity.wildcard);
 			utils.sendHttpResponse(res, 200, mapData);
 		})
 		.catch(function(){
