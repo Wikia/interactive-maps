@@ -6,6 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	mapConfig = require('./map.config'),
+	mapDataConfig = require('./map_data.config'),
 	mapUtils = require('./map.utils'),
 	crudUtils = require('./crud.utils');
 
@@ -138,7 +139,13 @@ function deleteMap(req, res, next) {
 				id: mapId
 			});
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapConfig.surrogateKeys.handler, mapConfig.purgeCallers.deleted);
-			squidUpdate.purgeUrl(utils.responseUrl(req, crudUtils.apiPath + mapConfig.path, mapId), mapConfig.purgeCallers.deleted);
+			squidUpdate.purgeUrls(
+				[
+					utils.responseUrl(req, crudUtils.apiPath + mapConfig.path, mapId),
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+				],
+				mapConfig.purgeCallers.deleted
+			);
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);
@@ -232,7 +239,13 @@ function updateMap(req, res, next) {
 			utils.sendHttpResponse(res, 303, response);
 
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapConfig.surrogateKeys.handler, mapConfig.purgeCallers.updated);
-			squidUpdate.purgeUrl(responseUrl, mapConfig.purgeCallers.updated);
+			squidUpdate.purgeUrls(
+				[
+					responseUrl,
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+				],
+				mapConfig.purgeCallers.deleted
+			);
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);
