@@ -118,10 +118,13 @@ function createPoiCategory(req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			var purgeCaller = poiCategoryConfig.purgeCallers.created;
+
 			dbConnection.release();
 
 			// purge cache for map
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, purgeCaller);
+			squidUpdate.purgeUrl(utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''), purgeCaller);
 
 			// send proper response
 			utils.sendHttpResponse(res, 201, poiCategoryUtils.setupCreatePoiCategoryResponse(poiCategoryId, req));
@@ -167,8 +170,17 @@ function deletePoiCategory(req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			var purgeCaller = poiCategoryConfig.purgeCallers.deleted;
+
 			dbConnection.release();
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, purgeCaller);
+			squidUpdate.purgeUrls(
+				[
+					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, poiCategoryId),
+					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, '')
+				],
+				purgeCaller
+			);
 			utils.sendHttpResponse(res, 200, poiCategoryUtils.getDeletedResponse());
 		})
 		.fail(function (err) {
@@ -196,7 +208,8 @@ function updatePoiCategory (req, res, next) {
 			id: poiCategoryId
 		},
 		dbConnection,
-		mapId;
+		mapId,
+		responseUrl;
 
 	crudUtils.validateData(reqBody, poiCategoryConfig.updateSchema);
 	crudUtils.validateIdParam(poiCategoryId);
@@ -221,9 +234,11 @@ function updatePoiCategory (req, res, next) {
 				throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId);
 			}
 
+			responseUrl = utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, poiCategoryId);
+
 			utils.extendObject(response, {
 				id: poiCategoryId,
-				url: utils.responseUrl(req, '/api/v1/poi_category/', poiCategoryId)
+				url: responseUrl
 			});
 
 			if (reqBody.marker) {
@@ -233,8 +248,17 @@ function updatePoiCategory (req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			var purgeCaller = poiCategoryConfig.purgeCallers.updated;
+
 			dbConnection.release();
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
+			squidUpdate.purgeUrls(
+				[
+					responseUrl,
+					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, '')
+				],
+				purgeCaller
+			);
 			utils.sendHttpResponse(res, 303, response);
 		})
 		.fail(function () {

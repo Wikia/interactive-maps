@@ -95,5 +95,6 @@ module.exports = {
 	cacheValidity: {
 		handler: cachingUtils.cacheStandard,
 		wildcard: cachingUtils.cacheStandard
-	}
+	},
+	path: 'poi_category/'
 };
