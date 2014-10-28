@@ -100,6 +100,7 @@ function createMap(req, res, next) {
 			});
 
 			utils.sendHttpResponse(res, 201, response);
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapConfig.surrogateKeys.handler);
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);
@@ -136,6 +137,8 @@ function deleteMap(req, res, next) {
 				message: mapConfig.responseMessages.deleted,
 				id: mapId
 			});
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapConfig.surrogateKeys.handler);
+			squidUpdate.purgeUrl(utils.responseUrl(req, crudUtils.apiPath + mapConfig.path, mapId));
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);
@@ -217,14 +220,19 @@ function updateMap(req, res, next) {
 			return dbCon.update(conn, mapConfig.dbTable, reqBody, filter);
 		})
 		.then(function (affectedRows) {
+			var responseUrl = utils.responseUrl(req, crudUtils.apiPath + mapConfig.path, mapId);
+
 			dbConnection.release();
 			crudUtils.throwErrorIfNoRowsAffected(affectedRows, mapConfig, mapId);
 			utils.extendObject(response, {
 				id: mapId,
-				url: utils.responseUrl(req, '/api/v1/map/', mapId)
+				url: responseUrl
 			});
 
 			utils.sendHttpResponse(res, 303, response);
+
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapConfig.surrogateKeys.handler);
+			squidUpdate.purgeUrl(responseUrl);
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);

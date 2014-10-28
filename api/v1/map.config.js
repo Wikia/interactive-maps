@@ -130,5 +130,6 @@ module.exports = {
 	},
 	surrogateKeys: {
 		handler: 'mapHandler'
-	}
+	},
+	path: 'map/'
 };
