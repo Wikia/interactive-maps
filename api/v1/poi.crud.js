@@ -73,8 +73,11 @@ function createPoi(req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			var purgeCaller = poiConfig.purgeCallers.created;
+
 			dbConnection.release();
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapPoiCreated');
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, purgeCaller);
+			squidUpdate.purgeUrl(utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''), purgeCaller);
 			poiIndexer.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.insert, poiId);
 			utils.sendHttpResponse(res, 201, response);
 		})
@@ -158,10 +161,19 @@ function deletePoi(req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			var purgeCaller = poiConfig.purgeCallers.deleted;
+
 			dbConnection.release();
 			squidUpdate.purgeKey(
 				utils.surrogateKeyPrefix + mapId,
-				'mapPoiDeleted'
+				purgeCaller
+			);
+			squidUpdate.purgeUrls(
+				[
+					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, poiId),
+					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, '')
+				],
+				purgeCaller
 			);
 			poiIndexer.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.delete, poiId);
 			utils.sendHttpResponse(res, 200, {message: poiConfig.responseMessages.deleted});
@@ -185,7 +197,8 @@ function updatePoi(req, res, next) {
 		dbConnection,
 		response = {
 			message: poiConfig.responseMessages.updated
-		};
+		},
+		responseUrl;
 
 	crudUtils.validateData(reqBody, poiConfig.updateSchema);
 	crudUtils.validateIdParam(poiId);
@@ -209,18 +222,28 @@ function updatePoi(req, res, next) {
 			return dbCon.update(dbConnection, poiConfig.dbTable, reqBody, filter);
 		})
 		.then(function () {
+			responseUrl = utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, poiId);
 			utils.extendObject(response, {
 				id: poiId,
-				url: utils.responseUrl(req, '/api/v1/poi/', poiId)
+				url: responseUrl
 			});
 
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			var purgeCaller = poiConfig.purgeCallers.updated;
+
 			dbConnection.release();
 			squidUpdate.purgeKey(
 				utils.surrogateKeyPrefix + mapId,
-				'mapPoiUpdated'
+				purgeCaller
+			);
+			squidUpdate.purgeUrls(
+				[
+					responseUrl,
+					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, '')
+				],
+				purgeCaller
 			);
 			poiIndexer.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.update, poiId);
 			utils.sendHttpResponse(res, 303, response);
