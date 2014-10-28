@@ -86,6 +86,11 @@ module.exports = {
 		},
 		additionalProperties: false
 	},
+	purgeCallers: {
+		created: 'poiCategoryCreated',
+		updated: 'poiCategoryUpdated',
+		deleted: 'poiCategoryDeleted'
+	},
 	//Cache validity for the public GET methods on / and /:id
 	cacheValidity: {
 		handler: cachingUtils.cacheStandard,

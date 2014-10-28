@@ -118,6 +118,11 @@ module.exports = {
 		updated: 'Map successfully updated',
 		deleted: 'Map successfully deleted'
 	},
+	purgeCallers: {
+		created: 'mapCreated',
+		updated: 'mapUpdated',
+		deleted: 'mapDeleted'
+	},
 	//Cache validity for the public GET methods on / and /:id
 	cacheValidity: {
 		handler: cachingUtils.cacheStandard,

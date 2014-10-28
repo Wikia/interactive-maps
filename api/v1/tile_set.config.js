@@ -65,6 +65,9 @@ module.exports = {
 	searchLimit: 50,
 	minSearchCharacters: minSearchCharacters,
 	searchErrorMsg: 'Search string should be at least ' + minSearchCharacters + ' long.',
+	purgeCallers: {
+		created: 'tileSetCreated'
+	},
 	//Cache validity for the public GET methods on / and /:id
 	cacheValidity: {
 		handler: cachingUtils.cacheStandard,

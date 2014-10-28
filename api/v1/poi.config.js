@@ -151,6 +151,11 @@ module.exports = {
 		updated: 'POI successfully updated',
 		deleted: 'POI successfully deleted'
 	},
+	purgeCallers: {
+		created: 'mapPoiCreated',
+		updated: 'mapPoiUpdated',
+		deleted: 'mapPoiDeleted'
+	},
 	//Cache validity for the public GET methods on / and /:id
 	cacheValidity: {
 		handler: cachingUtils.cacheStandard,
