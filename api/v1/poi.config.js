@@ -1,7 +1,8 @@
 'use strict';
 
 var jsonValidator = require('./../../lib/jsonValidator'),
-	urlPattern = jsonValidator.getOptionalUrlPattern();
+	urlPattern = jsonValidator.getOptionalUrlPattern(),
+	cachingUtils = require('./../../lib/cachingUtils');
 
 module.exports = {
 	dbTable: 'poi',
@@ -149,5 +150,10 @@ module.exports = {
 		created: 'POI successfully created',
 		updated: 'POI successfully updated',
 		deleted: 'POI successfully deleted'
+	},
+	//Cache validity for the public GET methods on / and /:id
+	cacheValidity: {
+		handler: cachingUtils.cacheStandard,
+		wildcard: cachingUtils.cacheStandard
 	}
 };

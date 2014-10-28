@@ -1,6 +1,7 @@
 'use strict';
 
 var jsonValidator = require('./../../lib/jsonValidator'),
+	cachingUtils = require('./../../lib/cachingUtils'),
 	urlPattern = jsonValidator.getUrlPattern();
 
 module.exports = {
@@ -116,5 +117,10 @@ module.exports = {
 		created: 'Map successfully created',
 		updated: 'Map successfully updated',
 		deleted: 'Map successfully deleted'
+	},
+	//Cache validity for the public GET methods on / and /:id
+	cacheValidity: {
+		handler: cachingUtils.cacheStandard,
+		wildcard: cachingUtils.cacheStandard
 	}
 };

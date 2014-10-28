@@ -1,6 +1,7 @@
 'use strict';
 
 var jsonValidator = require('./../../lib/jsonValidator'),
+	cachingUtils = require('./../../lib/cachingUtils'),
 	minSearchCharacters = 2;
 
 module.exports = {
@@ -63,5 +64,10 @@ module.exports = {
 	},
 	searchLimit: 50,
 	minSearchCharacters: minSearchCharacters,
-	searchErrorMsg: 'Search string should be at least ' + minSearchCharacters + ' long.'
+	searchErrorMsg: 'Search string should be at least ' + minSearchCharacters + ' long.',
+	//Cache validity for the public GET methods on / and /:id
+	cacheValidity: {
+		handler: cachingUtils.cacheStandard,
+		wildcard: cachingUtils.cacheStandard
+	}
 };
