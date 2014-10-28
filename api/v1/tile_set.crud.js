@@ -51,6 +51,7 @@ function getTileSetsCollection(req, res, next) {
 			dbConnection.release();
 
 			res.setCacheValidity(tileSetConfig.cacheValidity.handler);
+			res.setSurrogateKey(utils.surrogateKeyPrefix + tileSetConfig.surrogateKeys.handler);
 			utils.sendHttpResponse(
 				res,
 				200,

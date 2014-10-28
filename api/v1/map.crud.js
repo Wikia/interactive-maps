@@ -57,6 +57,7 @@ function getMapsCollection(req, res, next) {
 			dbConnection.release();
 
 			res.setCacheValidity(mapConfig.cacheValidity.handler);
+			res.setSurrogateKey(utils.surrogateKeyPrefix + mapConfig.surrogateKeys.handler);
 			utils.sendHttpResponse(res, 200, {
 				total: count[0].cntr,
 				items: mapUtils.buildMapCollectionResult(mapsList, req)

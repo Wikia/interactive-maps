@@ -122,5 +122,8 @@ module.exports = {
 	cacheValidity: {
 		handler: cachingUtils.cacheStandard,
 		wildcard: cachingUtils.cacheStandard
+	},
+	surrogateKeys: {
+		handler: 'mapHandler'
 	}
 };
