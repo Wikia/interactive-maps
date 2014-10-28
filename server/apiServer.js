@@ -60,8 +60,7 @@ app.use(express.static(config.root + '/assets', {maxAge: staticMaxAge}));
 
 app.use(errorHandler.middleware);
 
-// remove expressjs headers
-app.disable('etag');
+// remove expressjs header
 app.disable('x-powered-by');
 
 // the 404 Route (ALWAYS Keep this as the last route)
