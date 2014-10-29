@@ -74,7 +74,7 @@ module.exports = {
 		wildcard: cachingUtils.cacheStandard
 	},
 	surrogateKeys: {
-		handler: 'tileSetHandler'
+		forCollection: 'tileSet-collection'
 	},
 	path: 'tile_set/'
 };

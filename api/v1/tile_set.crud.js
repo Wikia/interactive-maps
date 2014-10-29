@@ -52,7 +52,7 @@ function getTileSetsCollection(req, res, next) {
 			dbConnection.release();
 
 			res.setCacheValidity(tileSetConfig.cacheValidity.handler);
-			res.setSurrogateKey(utils.surrogateKeyPrefix + tileSetConfig.surrogateKeys.handler);
+			res.setSurrogateKey(utils.surrogateKeyPrefix + tileSetConfig.surrogateKeys.forCollection);
 			utils.sendHttpResponse(
 				res,
 				200,
@@ -130,7 +130,7 @@ function createTileSet(req, res, next) {
 				tileSetUtils.setupCreateTileSetResponse(data, req)
 			);
 
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + tileSetConfig.surrogateKeys.handler,
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + tileSetConfig.surrogateKeys.forCollection,
 				tileSetConfig.purgeCallers.created);
 		})
 		.fail(function () {

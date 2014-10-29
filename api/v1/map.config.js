@@ -129,7 +129,7 @@ module.exports = {
 		wildcard: cachingUtils.cacheStandard
 	},
 	surrogateKeys: {
-		handler: 'mapHandler'
+		forCollection: 'map-collection'
 	},
 	path: 'map/'
 };
