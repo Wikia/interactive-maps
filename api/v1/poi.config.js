@@ -151,6 +151,7 @@ module.exports = {
 		updated: 'POI successfully updated',
 		deleted: 'POI successfully deleted'
 	},
+	//Unique debug strings naming actions that trigger the purge
 	purgeCallers: {
 		created: 'mapPoiCreated',
 		updated: 'mapPoiUpdated',

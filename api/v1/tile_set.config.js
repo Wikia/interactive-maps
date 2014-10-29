@@ -65,6 +65,7 @@ module.exports = {
 	searchLimit: 50,
 	minSearchCharacters: minSearchCharacters,
 	searchErrorMsg: 'Search string should be at least ' + minSearchCharacters + ' long.',
+	//Unique debug strings naming actions that trigger the purge
 	purgeCallers: {
 		created: 'tileSetCreated'
 	},

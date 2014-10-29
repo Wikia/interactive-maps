@@ -86,6 +86,7 @@ module.exports = {
 		},
 		additionalProperties: false
 	},
+	//Unique debug strings naming actions that trigger the purge
 	purgeCallers: {
 		created: 'poiCategoryCreated',
 		updated: 'poiCategoryUpdated',

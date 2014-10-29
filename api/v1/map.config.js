@@ -118,6 +118,7 @@ module.exports = {
 		updated: 'Map successfully updated',
 		deleted: 'Map successfully deleted'
 	},
+	//Unique debug strings naming actions that trigger the purge
 	purgeCallers: {
 		created: 'mapCreated',
 		updated: 'mapUpdated',
