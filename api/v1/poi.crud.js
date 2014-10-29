@@ -7,6 +7,7 @@ var dbCon = require('./../../lib/db_connector'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	poiIndexer = require('./../../lib/poiIndexer'),
 	poiConfig = require('./poi.config'),
+	mapDataConfig = require('./poi.config'),
 	poiUtils = require('./poi.utils'),
 	crudUtils = require('./crud.utils');
 
@@ -76,8 +77,16 @@ function createPoi(req, res, next) {
 			var purgeCaller = poiConfig.purgeCallers.created;
 
 			dbConnection.release();
+
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, purgeCaller);
-			squidUpdate.purgeUrl(utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''), purgeCaller);
+			squidUpdate.purgeUrls(
+				[
+					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, '')
+				],
+				purgeCaller
+			);
+
 			poiIndexer.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.insert, poiId);
 			utils.sendHttpResponse(res, 201, response);
 		})
@@ -171,7 +180,8 @@ function deletePoi(req, res, next) {
 			squidUpdate.purgeUrls(
 				[
 					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, poiId),
-					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, '')
+					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, '')
 				],
 				purgeCaller
 			);
@@ -241,7 +251,8 @@ function updatePoi(req, res, next) {
 			squidUpdate.purgeUrls(
 				[
 					responseUrl,
-					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, '')
+					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, '')
 				],
 				purgeCaller
 			);

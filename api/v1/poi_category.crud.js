@@ -8,6 +8,7 @@ var dbCon = require('./../../lib/db_connector'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	poiCategoryConfig = require('./poi_category.config'),
+	mapDataConfig = require('./poi_category.config'),
 	poiCategoryUtils = require('./poi_category.utils'),
 	crudUtils = require('./crud.utils');
 
@@ -124,7 +125,12 @@ function createPoiCategory(req, res, next) {
 
 			// purge cache for map
 			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, purgeCaller);
-			squidUpdate.purgeUrl(utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''), purgeCaller);
+			squidUpdate.purgeUrls(
+				[
+					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, ''),
+				],
+				purgeCaller);
 
 			// send proper response
 			utils.sendHttpResponse(res, 201, poiCategoryUtils.setupCreatePoiCategoryResponse(poiCategoryId, req));
@@ -177,7 +183,8 @@ function deletePoiCategory(req, res, next) {
 			squidUpdate.purgeUrls(
 				[
 					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, poiCategoryId),
-					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, '')
+					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, '')
 				],
 				purgeCaller
 			);
@@ -251,11 +258,12 @@ function updatePoiCategory (req, res, next) {
 			var purgeCaller = poiCategoryConfig.purgeCallers.updated;
 
 			dbConnection.release();
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, purgeCaller);
 			squidUpdate.purgeUrls(
 				[
 					responseUrl,
-					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, '')
+					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, '')
 				],
 				purgeCaller
 			);
