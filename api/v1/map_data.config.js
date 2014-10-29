@@ -22,7 +22,7 @@ module.exports = {
 	],
 	//Cache validity for the public GET methods on / and /:id
 	cacheValidity: {
-		wildcard: cachingUtils.cacheStandard
+		forWildcard: cachingUtils.cacheStandard
 	},
 	path: 'map_data/'
 };

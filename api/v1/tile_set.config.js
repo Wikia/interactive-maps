@@ -70,8 +70,8 @@ module.exports = {
 	},
 	//Cache validity for the public GET methods on / and /:id
 	cacheValidity: {
-		handler: cachingUtils.cacheStandard,
-		wildcard: cachingUtils.cacheStandard
+		forCollection: cachingUtils.cacheStandard,
+		forWildcard: cachingUtils.cacheStandard
 	},
 	surrogateKeys: {
 		forCollection: 'tileSet-collection'
