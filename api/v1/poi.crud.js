@@ -27,7 +27,7 @@ function getPoisCollection(req, res, next) {
 		.then(function (collection) {
 			dbConnection.release();
 
-			res.setCacheValidity(poiConfig.cacheValidity.handler);
+			res.setCacheValidity(poiConfig.cacheValidity.forCollection);
 			utils.sendHttpResponse(res, 200, collection);
 		})
 		.fail(function () {
@@ -117,7 +117,7 @@ function getPoi(req, res, next) {
 				throw errorHandler.elementNotFoundError(poiConfig.dbTable, poiId);
 			}
 
-			res.setCacheValidity(poiConfig.cacheValidity.wildcard);
+			res.setCacheValidity(poiConfig.cacheValidity.forWildcard);
 			utils.sendHttpResponse(res, 200, poiData);
 		})
 		.fail(function () {

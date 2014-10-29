@@ -51,7 +51,7 @@ function getTileSetsCollection(req, res, next) {
 		.then(function (collection) {
 			dbConnection.release();
 
-			res.setCacheValidity(tileSetConfig.cacheValidity.handler);
+			res.setCacheValidity(tileSetConfig.cacheValidity.forCollection);
 			res.setSurrogateKey(utils.surrogateKeyPrefix + tileSetConfig.surrogateKeys.forCollection);
 			utils.sendHttpResponse(
 				res,
@@ -95,7 +95,7 @@ function getTileSet(req, res, next) {
 				throw errorHandler.elementNotFoundError(tileSetConfig.dbTable, id);
 			}
 
-			res.setCacheValidity(tileSetConfig.cacheValidity.wildcard);
+			res.setCacheValidity(tileSetConfig.cacheValidity.forWildcard);
 			utils.sendHttpResponse(res, 200, tileSetUtils.extendTileSetObject(collection[0], req));
 		})
 		.fail(function () {
