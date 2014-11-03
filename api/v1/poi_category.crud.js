@@ -8,7 +8,7 @@ var dbCon = require('./../../lib/db_connector'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	poiCategoryConfig = require('./poi_category.config'),
-	mapDataConfig = require('./poi_category.config'),
+	mapDataConfig = require('./map_data.config'),
 	poiCategoryUtils = require('./poi_category.utils'),
 	crudUtils = require('./crud.utils');
 
