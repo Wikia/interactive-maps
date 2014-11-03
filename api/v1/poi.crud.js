@@ -78,12 +78,16 @@ function createPoi(req, res, next) {
 
 			dbConnection.release();
 
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, purgeCaller);
-			squidUpdate.purgeUrls(
-				[
-					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
-				],
+			squidUpdate.purgeData(
+				{
+					urls: [
+						utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapId
+					]
+				},
 				purgeCaller
 			);
 
@@ -173,16 +177,18 @@ function deletePoi(req, res, next) {
 			var purgeCaller = poiConfig.purgeCallers.deleted;
 
 			dbConnection.release();
-			squidUpdate.purgeKey(
-				utils.surrogateKeyPrefix + mapId,
-				purgeCaller
-			);
-			squidUpdate.purgeUrls(
-				[
-					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, poiId),
-					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
-				],
+
+			squidUpdate.purgeData(
+				{
+					urls: [
+						utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, poiId),
+						utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapId,
+					]
+				},
 				purgeCaller
 			);
 			poiIndexer.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.delete, poiId);
@@ -244,16 +250,18 @@ function updatePoi(req, res, next) {
 			var purgeCaller = poiConfig.purgeCallers.updated;
 
 			dbConnection.release();
-			squidUpdate.purgeKey(
-				utils.surrogateKeyPrefix + mapId,
-				purgeCaller
-			);
-			squidUpdate.purgeUrls(
-				[
-					responseUrl,
-					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
-				],
+
+			squidUpdate.purgeData(
+				{
+					urls: [
+						responseUrl,
+						utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapId
+					]
+				},
 				purgeCaller
 			);
 			poiIndexer.addPoiDataToQueue(dbConnection, poiConfig.poiOperations.update, poiId);

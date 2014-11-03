@@ -268,7 +268,7 @@ function updatePoiCategory (req, res, next) {
 
 			dbConnection.release();
 
-			squidUpdate.purgeUrls(
+			squidUpdate.purgeData(
 				{
 					urls: [
 						responseUrl,
