@@ -161,5 +161,6 @@ module.exports = {
 	cacheValidity: {
 		forCollection: cachingUtils.cacheStandard,
 		forWildcard: cachingUtils.cacheStandard
-	}
+	},
+	path: 'poi/'
 };
