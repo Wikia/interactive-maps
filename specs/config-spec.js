@@ -11,7 +11,13 @@ var proxyquire = require('proxyquire').noCallThru(),
 	configuration = {
 		tmp: '/tmp/',
 		wgFSSwiftDC: {
-			test: ''
+			test: {
+				test: {
+					servers: [
+						'127.0.0.1:80'
+					]
+				}
+			}
 		},
 		wgTaskBroker: {
 			dev: ''
