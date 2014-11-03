@@ -123,14 +123,18 @@ function createPoiCategory(req, res, next) {
 
 			dbConnection.release();
 
-			// purge cache for map
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, purgeCaller);
-			squidUpdate.purgeUrls(
-				[
-					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId),
-				],
-				purgeCaller);
+			squidUpdate.purgeData(
+				{
+					urls: [
+						utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapId
+					]
+				},
+				purgeCaller
+			);
 
 			// send proper response
 			utils.sendHttpResponse(res, 201, poiCategoryUtils.setupCreatePoiCategoryResponse(poiCategoryId, req));
@@ -179,13 +183,18 @@ function deletePoiCategory(req, res, next) {
 			var purgeCaller = poiCategoryConfig.purgeCallers.deleted;
 
 			dbConnection.release();
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, purgeCaller);
-			squidUpdate.purgeUrls(
-				[
-					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, poiCategoryId),
-					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
-				],
+
+			squidUpdate.purgeData(
+				{
+					urls: [
+						utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, poiCategoryId),
+						utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapId
+					]
+				},
 				purgeCaller
 			);
 			utils.sendHttpResponse(res, 200, poiCategoryUtils.getDeletedResponse());
@@ -258,13 +267,18 @@ function updatePoiCategory (req, res, next) {
 			var purgeCaller = poiCategoryConfig.purgeCallers.updated;
 
 			dbConnection.release();
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, purgeCaller);
+
 			squidUpdate.purgeUrls(
-				[
-					responseUrl,
-					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
-				],
+				{
+					urls: [
+						responseUrl,
+						utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapId
+					]
+				},
 				purgeCaller
 			);
 			utils.sendHttpResponse(res, 303, response);
