@@ -128,7 +128,7 @@ function createPoiCategory(req, res, next) {
 			squidUpdate.purgeUrls(
 				[
 					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, ''),
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId),
 				],
 				purgeCaller);
 
@@ -184,7 +184,7 @@ function deletePoiCategory(req, res, next) {
 				[
 					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, poiCategoryId),
 					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, '')
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
 				],
 				purgeCaller
 			);
@@ -263,7 +263,7 @@ function updatePoiCategory (req, res, next) {
 				[
 					responseUrl,
 					utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, '')
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
 				],
 				purgeCaller
 			);

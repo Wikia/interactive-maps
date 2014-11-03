@@ -82,7 +82,7 @@ function createPoi(req, res, next) {
 			squidUpdate.purgeUrls(
 				[
 					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, '')
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
 				],
 				purgeCaller
 			);
@@ -181,7 +181,7 @@ function deletePoi(req, res, next) {
 				[
 					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, poiId),
 					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, '')
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
 				],
 				purgeCaller
 			);
@@ -252,7 +252,7 @@ function updatePoi(req, res, next) {
 				[
 					responseUrl,
 					utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
-					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, '')
+					utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
 				],
 				purgeCaller
 			);
