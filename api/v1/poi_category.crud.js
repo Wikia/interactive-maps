@@ -8,6 +8,7 @@ var dbCon = require('./../../lib/db_connector'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	poiCategoryConfig = require('./poi_category.config'),
+	mapDataConfig = require('./map_data.config'),
 	poiCategoryUtils = require('./poi_category.utils'),
 	crudUtils = require('./crud.utils');
 
@@ -38,6 +39,8 @@ function getPoiCategoriesCollection(req, res, next) {
 		})
 		.then(function (collection) {
 			dbConnection.release();
+
+			res.setCacheValidity(poiCategoryConfig.cacheValidity.forCollection);
 			utils.sendHttpResponse(res, 200, utils.processPoiCategoriesCollection(collection, config));
 		})
 		.fail(function () {
@@ -77,6 +80,7 @@ function getPoiCategory(req, res, next) {
 				throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, id);
 			}
 
+			res.setCacheValidity(poiCategoryConfig.cacheValidity.forWildcard);
 			utils.sendHttpResponse(res, 200, collection[0]);
 		})
 		.fail(function () {
@@ -115,10 +119,22 @@ function createPoiCategory(req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			var purgeCaller = poiCategoryConfig.purgeCallers.created;
+
 			dbConnection.release();
 
-			// purge cache for map
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryCreated');
+			squidUpdate.purgeData(
+				{
+					urls: [
+						utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapId
+					]
+				},
+				purgeCaller
+			);
 
 			// send proper response
 			utils.sendHttpResponse(res, 201, poiCategoryUtils.setupCreatePoiCategoryResponse(poiCategoryId, req));
@@ -164,8 +180,23 @@ function deletePoiCategory(req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			var purgeCaller = poiCategoryConfig.purgeCallers.deleted;
+
 			dbConnection.release();
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryDeleted');
+
+			squidUpdate.purgeData(
+				{
+					urls: [
+						utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, poiCategoryId),
+						utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapId
+					]
+				},
+				purgeCaller
+			);
 			utils.sendHttpResponse(res, 200, poiCategoryUtils.getDeletedResponse());
 		})
 		.fail(function (err) {
@@ -193,7 +224,8 @@ function updatePoiCategory (req, res, next) {
 			id: poiCategoryId
 		},
 		dbConnection,
-		mapId;
+		mapId,
+		responseUrl;
 
 	crudUtils.validateData(reqBody, poiCategoryConfig.updateSchema);
 	crudUtils.validateIdParam(poiCategoryId);
@@ -218,9 +250,11 @@ function updatePoiCategory (req, res, next) {
 				throw errorHandler.elementNotFoundError(poiCategoryConfig.dbTable, poiCategoryId);
 			}
 
+			responseUrl = utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, poiCategoryId);
+
 			utils.extendObject(response, {
 				id: poiCategoryId,
-				url: utils.responseUrl(req, '/api/v1/poi_category/', poiCategoryId)
+				url: responseUrl
 			});
 
 			if (reqBody.marker) {
@@ -230,8 +264,23 @@ function updatePoiCategory (req, res, next) {
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);
 		})
 		.then(function () {
+			var purgeCaller = poiCategoryConfig.purgeCallers.updated;
+
 			dbConnection.release();
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'poiCategoryUpdated');
+
+			squidUpdate.purgeData(
+				{
+					urls: [
+						responseUrl,
+						utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapId
+					]
+				},
+				purgeCaller
+			);
 			utils.sendHttpResponse(res, 303, response);
 		})
 		.fail(function () {

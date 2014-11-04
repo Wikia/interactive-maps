@@ -1,6 +1,7 @@
 'use strict';
 
 var jsonValidator = require('./../../lib/jsonValidator'),
+	cachingUtils = require('./../../lib/cachingUtils'),
 	minSearchCharacters = 2;
 
 module.exports = {
@@ -63,5 +64,18 @@ module.exports = {
 	},
 	searchLimit: 50,
 	minSearchCharacters: minSearchCharacters,
-	searchErrorMsg: 'Search string should be at least ' + minSearchCharacters + ' long.'
+	searchErrorMsg: 'Search string should be at least ' + minSearchCharacters + ' long.',
+	//Unique debug strings naming actions that trigger the purge
+	purgeCallers: {
+		created: 'tileSetCreated'
+	},
+	//Cache validity for the public GET methods on / and /:id
+	cacheValidity: {
+		forCollection: cachingUtils.cacheStandard,
+		forWildcard: cachingUtils.cacheStandard
+	},
+	surrogateKeys: {
+		forCollection: 'tileSet-collection'
+	},
+	path: 'tile_set/'
 };

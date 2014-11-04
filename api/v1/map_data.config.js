@@ -1,4 +1,5 @@
 'use strict';
+var cachingUtils = require('./../../lib/cachingUtils');
 
 module.exports = {
 	mapColumns: [
@@ -18,5 +19,10 @@ module.exports = {
 	poiCategoryColumns: [
 		'id',
 		'name'
-	]
+	],
+	//Cache validity for the public GET methods on / and /:id
+	cacheValidity: {
+		forWildcard: cachingUtils.cacheStandard
+	},
+	path: 'map_data/'
 };

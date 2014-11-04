@@ -1,6 +1,7 @@
 'use strict';
 
 var jsonValidator = require('./../../lib/jsonValidator'),
+	cachingUtils = require('./../../lib/cachingUtils'),
 	urlPattern = jsonValidator.getUrlPattern();
 
 module.exports = {
@@ -116,5 +117,20 @@ module.exports = {
 		created: 'Map successfully created',
 		updated: 'Map successfully updated',
 		deleted: 'Map successfully deleted'
-	}
+	},
+	//Unique debug strings naming actions that trigger the purge
+	purgeCallers: {
+		created: 'mapCreated',
+		updated: 'mapUpdated',
+		deleted: 'mapDeleted'
+	},
+	//Cache validity for the public GET methods on / and /:id
+	cacheValidity: {
+		forCollection: cachingUtils.cacheStandard,
+		forWildcard: cachingUtils.cacheStandard
+	},
+	surrogateKeys: {
+		forCollection: 'map-collection'
+	},
+	path: 'map/'
 };
