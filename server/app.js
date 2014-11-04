@@ -1,7 +1,7 @@
 'use strict';
 
 if (process.env.NEW_RELIC_ENABLED === 'true') {
-	require('./newrelic');
+	require('newrelic');
 }
 
 var logger = require('../lib/logger'),
