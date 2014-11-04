@@ -1,8 +1,9 @@
 'use strict';
 
 if (process.env.NEW_RELIC_ENABLED === 'true') {
-	// the variable is set by Chef in runnit script; the important thing is to have
-	// our own configuration of New Relic Agent in newrelic.js in the same directory
+	// configuration is handled by Chef
+	// it sets NEW_RELIC_ENABLED and NEW_RELIC_HOME_PATH variables
+	// it also copies newrelic.js configuration file to the right place
 	require('newrelic');
 }
 
