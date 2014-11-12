@@ -1,7 +1,10 @@
 'use strict';
 
 if (process.env.NEW_RELIC_ENABLED === 'true') {
-	require('./newrelic');
+	// configuration is handled by Chef
+	// it sets NEW_RELIC_ENABLED and NEW_RELIC_HOME_PATH variables
+	// it also copies newrelic.js configuration file to the right place
+	require('newrelic');
 }
 
 var logger = require('../lib/logger'),

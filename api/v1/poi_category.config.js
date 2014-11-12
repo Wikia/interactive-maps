@@ -1,7 +1,8 @@
 'use strict';
 
 var jsonValidator = require('./../../lib/jsonValidator'),
-	urlPattern = jsonValidator.getUrlPattern();
+	urlPattern = jsonValidator.getUrlPattern(),
+	cachingUtils = require('./../../lib/cachingUtils');
 
 module.exports = {
 	dbTable: 'poi_category',
@@ -84,5 +85,17 @@ module.exports = {
 			}
 		},
 		additionalProperties: false
-	}
+	},
+	//Unique debug strings naming actions that trigger the purge
+	purgeCallers: {
+		created: 'poiCategoryCreated',
+		updated: 'poiCategoryUpdated',
+		deleted: 'poiCategoryDeleted'
+	},
+	//Cache validity for the public GET methods on / and /:id
+	cacheValidity: {
+		forCollection: cachingUtils.cacheStandard,
+		forWildcard: cachingUtils.cacheStandard
+	},
+	path: 'poi_category/'
 };

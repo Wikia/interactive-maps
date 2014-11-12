@@ -76,6 +76,7 @@ function releaseConnectionOnFail(conn, next) {
 }
 
 module.exports = {
+	apiPath: '/api/v1/',
 	validateIdParam: validateIdParam,
 	validateData: validateData,
 	addPaginationToQuery: addPaginationToQuery,

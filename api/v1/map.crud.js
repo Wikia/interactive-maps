@@ -6,6 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	errorHandler = require('./../../lib/errorHandler'),
 	squidUpdate = require('./../../lib/squidUpdate'),
 	mapConfig = require('./map.config'),
+	mapDataConfig = require('./map_data.config'),
 	mapUtils = require('./map.utils'),
 	crudUtils = require('./crud.utils');
 
@@ -55,6 +56,9 @@ function getMapsCollection(req, res, next) {
 		})
 		.then(function (count) {
 			dbConnection.release();
+
+			res.setCacheValidity(mapConfig.cacheValidity.forCollection);
+			res.setSurrogateKey(utils.surrogateKeyPrefix + mapConfig.surrogateKeys.forCollection);
 			utils.sendHttpResponse(res, 200, {
 				total: count[0].cntr,
 				items: mapUtils.buildMapCollectionResult(mapsList, req)
@@ -97,6 +101,7 @@ function createMap(req, res, next) {
 			});
 
 			utils.sendHttpResponse(res, 201, response);
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapConfig.surrogateKeys.forCollection, mapConfig.purgeCallers.created);
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);
@@ -128,11 +133,22 @@ function deleteMap(req, res, next) {
 		.then(function (affectedRows) {
 			dbConnection.release();
 			crudUtils.throwErrorIfNoRowsAffected(affectedRows, mapConfig, mapId);
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapId, 'mapDeleted');
 			utils.sendHttpResponse(res, 200, {
 				message: mapConfig.responseMessages.deleted,
 				id: mapId
 			});
+			squidUpdate.purgeData(
+				{
+					urls: [
+						utils.responseUrl(req, crudUtils.apiPath + mapConfig.path, mapId),
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapConfig.surrogateKeys.forCollection
+					]
+				},
+				mapConfig.purgeCallers.deleted
+			);
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);
@@ -173,6 +189,8 @@ function getMap(req, res, next) {
 			utils.extendObject(mapData, {
 				tile_set_url: utils.responseUrl(req, '/api/v1/tile_set/', mapData.tile_set_id)
 			});
+
+			res.setCacheValidity(mapConfig.cacheValidity.forWildcard);
 			utils.sendHttpResponse(res, 200, mapData);
 		})
 		.fail(function () {
@@ -212,14 +230,29 @@ function updateMap(req, res, next) {
 			return dbCon.update(conn, mapConfig.dbTable, reqBody, filter);
 		})
 		.then(function (affectedRows) {
+			var responseUrl = utils.responseUrl(req, crudUtils.apiPath + mapConfig.path, mapId);
+
 			dbConnection.release();
 			crudUtils.throwErrorIfNoRowsAffected(affectedRows, mapConfig, mapId);
 			utils.extendObject(response, {
 				id: mapId,
-				url: utils.responseUrl(req, '/api/v1/map/', mapId)
+				url: responseUrl
 			});
 
 			utils.sendHttpResponse(res, 303, response);
+
+			squidUpdate.purgeData(
+				{
+					urls: [
+						responseUrl,
+						utils.responseUrl(req, crudUtils.apiPath + mapDataConfig.path, mapId)
+					],
+					keys: [
+						utils.surrogateKeyPrefix + mapConfig.surrogateKeys.forCollection
+					]
+				},
+				mapConfig.purgeCallers.updated
+			);
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);
