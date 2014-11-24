@@ -71,7 +71,7 @@ function releaseConnectionOnFail(conn, next) {
 	} catch (e) {
 		logger.info('Error while releasing DB connection. Probably the connection has been already released.', e);
 	}
-	if(typeof next === 'function'){
+	if (typeof next === 'function') {
 		next();
 	}
 }
