@@ -71,11 +71,13 @@ function releaseConnectionOnFail(conn, next) {
 	} catch (e) {
 		logger.info('Error while releasing DB connection. Probably the connection has been already released.', e);
 	}
-
-	next();
+	if (typeof next === 'function') {
+		next();
+	}
 }
 
 module.exports = {
+	apiPath: '/api/v1/',
 	validateIdParam: validateIdParam,
 	validateData: validateData,
 	addPaginationToQuery: addPaginationToQuery,

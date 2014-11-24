@@ -3,6 +3,7 @@
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	utils = require('./../../lib/utils'),
+	squidUpdate = require('./../../lib/squidUpdate'),
 	errorHandler = require('./../../lib/errorHandler'),
 	tileSetConfig = require('./tile_set.config'),
 	tileSetUtils = require('./tile_set.utils'),
@@ -50,6 +51,8 @@ function getTileSetsCollection(req, res, next) {
 		.then(function (collection) {
 			dbConnection.release();
 
+			res.setCacheValidity(tileSetConfig.cacheValidity.forCollection);
+			res.setSurrogateKey(utils.surrogateKeyPrefix + tileSetConfig.surrogateKeys.forCollection);
 			utils.sendHttpResponse(
 				res,
 				200,
@@ -92,6 +95,7 @@ function getTileSet(req, res, next) {
 				throw errorHandler.elementNotFoundError(tileSetConfig.dbTable, id);
 			}
 
+			res.setCacheValidity(tileSetConfig.cacheValidity.forWildcard);
 			utils.sendHttpResponse(res, 200, tileSetUtils.extendTileSetObject(collection[0], req));
 		})
 		.fail(function () {
@@ -125,6 +129,9 @@ function createTileSet(req, res, next) {
 				data.exists ? 200 : 202,
 				tileSetUtils.setupCreateTileSetResponse(data, req)
 			);
+
+			squidUpdate.purgeKey(utils.surrogateKeyPrefix + tileSetConfig.surrogateKeys.forCollection,
+				tileSetConfig.purgeCallers.created);
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);
