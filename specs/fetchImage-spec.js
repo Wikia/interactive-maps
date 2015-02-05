@@ -47,34 +47,15 @@ describe('Fetch image', function () {
 
 
 	it('creates write stream to save image in fs', function () {
-		fetchImage.getFile(data);
+		fetchImage(data);
 
 		expect(fsStub.createWriteStream).toHaveBeenCalled();
-	});
-
-	it('correctly gets filename from url', function () {
-		var testCases = [
-			{
-				url: '/mediawiki116/images/8/81/20150205100502%21phpVtvygX.png' +
-				'/revision/latest?cb=20150205100502&zone=temp',
-				filename: '20150205100502%21phpVtvygX.png'
-			},
-			{
-				url: '/__cb1422890817/candy-crush-saga/images/temp/1/10/' +
-				'20150203044502%21phpPNBeRu.png',
-				filename: '20150203044502%21phpPNBeRu.png'
-			}
-		];
-
-		testCases.forEach(function (testCase) {
-			expect(fetchImage.getFilenameFromUrl(testCase.url)).toEqual(testCase.filename);
-		});
 	});
 
 	it('creates write stream with proper path', function () {
 		var fileName = 'image.jpg';
 
-		fetchImage.getFile(data);
+		fetchImage(data);
 
 		expect(fsStub.createWriteStream).toHaveBeenCalledWith(data.dir + fileName);
 	});
@@ -82,7 +63,7 @@ describe('Fetch image', function () {
 	it('calls http.get to fetch image', function () {
 		spyOn(http, 'get').andCallThrough();
 
-		fetchImage.getFile(data);
+		fetchImage(data);
 
 		expect(http.get).toHaveBeenCalled();
 	});
@@ -93,7 +74,7 @@ describe('Fetch image', function () {
 		};
 
 		res.statusCode = 0;
-		fetchImage.getFile(data);
+		fetchImage(data);
 
 		expect(qStub.defer.reject).toHaveBeenCalled();
 		expect(qStub.defer.reject).toHaveBeenCalledWith(response);
