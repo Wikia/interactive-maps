@@ -55,12 +55,12 @@ describe('Fetch image', function () {
 	it('correctly gets filename from url', function () {
 		var testCases = [
 			{
-				url: 'http://vignette2.wikia.nocookie.net/mediawiki116/images/8/81/20150205100502%21phpVtvygX.png' +
+				url: '/mediawiki116/images/8/81/20150205100502%21phpVtvygX.png' +
 				'/revision/latest?cb=20150205100502&zone=temp',
 				filename: '20150205100502%21phpVtvygX.png'
 			},
 			{
-				url: 'http://img3.wikia.nocookie.net/__cb1422890817/candy-crush-saga/images/temp/1/10/' +
+				url: '/__cb1422890817/candy-crush-saga/images/temp/1/10/' +
 				'20150203044502%21phpPNBeRu.png',
 				filename: '20150203044502%21phpPNBeRu.png'
 			}
