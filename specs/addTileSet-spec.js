@@ -54,7 +54,7 @@ var proxyquire = require('proxyquire').noCallThru(),
 			return q.defer().promise;
 		}
 	},
-	addMap = proxyquire('../lib/addTileSet', {
+	addTileSet = proxyquire('../lib/addTileSet', {
 		'q': q,
 		'./db_connector': dbconnector,
 		'kue': kue,
@@ -65,7 +65,7 @@ var proxyquire = require('proxyquire').noCallThru(),
 describe('addTileSet', function () {
 
 	it('should return promise', function () {
-		var promise = addMap(conn, 'test', {
+		var promise = addTileSet(conn, 'test', {
 			url: 'http://test.url',
 			name: 'test name',
 			created_by: 'user'
@@ -74,13 +74,13 @@ describe('addTileSet', function () {
 		expect(promise.then).toBeDefined();
 	});
 
-	it('should add map to DB', function () {
+	it('should add tile set to DB', function () {
 		var data = {
-			url: 'http://test.url',
+			url: 'http://test.url/image.jpg',
 			name: 'test name',
 			created_by: 'user'
 		},
-			shouldAddMap = proxyquire('../lib/addTileSet', {
+			shouldAddTileSet = proxyquire('../lib/addTileSet', {
 				'q': q,
 				'./db_connector': {
 					insert: function (conn, table, object) {
@@ -88,8 +88,8 @@ describe('addTileSet', function () {
 						expect(object).toEqual({
 							name: 'test name',
 							type: 'custom',
-							url: 'http://test.url',
-							image: '',
+							url: 'http://test.url/image.jpg',
+							image: 'image.jpg',
 							width: 0,
 							height: 0,
 							min_zoom: 1,
@@ -118,16 +118,16 @@ describe('addTileSet', function () {
 				}
 			});
 
-		shouldAddMap(conn, 'test', data);
+		shouldAddTileSet(conn, 'test', data);
 	});
 
-	it('should add map to processing', function () {
+	it('should add tile set to processing', function () {
 		var data = {
-			url: 'http://test.url',
+			url: 'http://test.url/image.jpg',
 			name: 'test name',
 			created_by: 'user'
 		},
-			shouldProcessMap = proxyquire('../lib/addTileSet', {
+			shouldProcessTileSet = proxyquire('../lib/addTileSet', {
 				'q': q,
 				'./db_connector': dbconnector,
 				'kue': {
@@ -160,6 +160,6 @@ describe('addTileSet', function () {
 				'./config': {}
 			});
 
-		shouldProcessMap(conn, 'test', data);
+		shouldProcessTileSet(conn, 'test', data);
 	});
 });
