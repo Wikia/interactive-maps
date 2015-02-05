@@ -46,24 +46,43 @@ describe('Fetch image', function () {
 		});
 
 
-	it('creates creates write stream to save image in fs', function () {
-		fetchImage(data);
+	it('creates write stream to save image in fs', function () {
+		fetchImage.getFile(data);
 
 		expect(fsStub.createWriteStream).toHaveBeenCalled();
 	});
 
-	it('creates proper file name from image url', function () {
+	it('correctly gets filename from url', function () {
+		var testCases = [
+			{
+				url: 'http://vignette2.wikia.nocookie.net/mediawiki116/images/8/81/20150205100502%21phpVtvygX.png' +
+				'/revision/latest?cb=20150205100502&zone=temp',
+				filename: '20150205100502%21phpVtvygX.png'
+			},
+			{
+				url: 'http://img3.wikia.nocookie.net/__cb1422890817/candy-crush-saga/images/temp/1/10/' +
+				'20150203044502%21phpPNBeRu.png',
+				filename: '20150203044502%21phpPNBeRu.png'
+			}
+		];
+
+		testCases.forEach(function (testCase) {
+			expect(fetchImage.getFilenameFromUrl(testCase.url)).toEqual(testCase.filename);
+		});
+	});
+
+	it('creates write stream with proper path', function () {
 		var fileName = 'image.jpg';
 
-		fetchImage(data);
+		fetchImage.getFile(data);
 
 		expect(fsStub.createWriteStream).toHaveBeenCalledWith(data.dir + fileName);
 	});
 
-	it('calls calls http.get to fetch image', function () {
+	it('calls http.get to fetch image', function () {
 		spyOn(http, 'get').andCallThrough();
 
-		fetchImage(data);
+		fetchImage.getFile(data);
 
 		expect(http.get).toHaveBeenCalled();
 	});
@@ -74,7 +93,7 @@ describe('Fetch image', function () {
 		};
 
 		res.statusCode = 0;
-		fetchImage(data);
+		fetchImage.getFile(data);
 
 		expect(qStub.defer.reject).toHaveBeenCalled();
 		expect(qStub.defer.reject).toHaveBeenCalledWith(response);

@@ -75,7 +75,7 @@ function updateTileset(row, conn) {
 			dir: tmpDir
 		};
 
-	fetchImage(data)
+	fetchImage.getFile(data)
 		.then(imageBackground.getBgColorForImage)
 		.then(function (data) {
 			return updateBackgroundColor(data, conn);
