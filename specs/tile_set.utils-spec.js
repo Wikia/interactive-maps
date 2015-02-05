@@ -1,7 +1,9 @@
 'use strict';
 
 var proxyquire = require('proxyquire').noCallThru(),
-	tileSetConfig = require('../api/v1/tile_set.config'),
+	tileSetConfig = proxyquire('../api/v1/tile_set.config', {
+		'./../../lib/cachingUtils': {}
+	}),
 	deferMock = {
 		resolve: jasmine.createSpy('resolve'),
 		promise: {}
@@ -234,16 +236,14 @@ describe('TileSet Utils', function () {
 	});
 
 	it('adds search to query', function () {
-		var queryMock = jasmine.createSpyObj('queryMock', ['join', 'whereRaw', 'orderBy']),
+		var queryMock = jasmine.createSpyObj('queryMock', ['where', 'orderBy']),
 			search = 'test';
 
-		queryMock.join.andReturn(queryMock);
-		queryMock.whereRaw.andReturn(queryMock);
+		queryMock.where.andReturn(queryMock);
 
 		tileSetUtils.addSearchToQuery(queryMock, search);
 
-		expect(queryMock.join).toHaveBeenCalledWith('tile_set_search', 'tile_set.id', '=', 'tile_set_search.id');
-		expect(queryMock.whereRaw).toHaveBeenCalledWith('MATCH (tile_set_search.name) AGAINST (?)', [search]);
+		expect(queryMock.where).toHaveBeenCalledWith('tile_set.name', 'like', '%' + search + '%');
 		expect(queryMock.orderBy).toHaveBeenCalledWith('created_on', 'desc');
 	});
 });
