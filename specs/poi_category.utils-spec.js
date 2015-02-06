@@ -11,9 +11,14 @@ var proxyquire = require('proxyquire').noCallThru(),
 	},
 	qStub = {},
 	configStub = {},
-	poiConfigStub = {},
+	poiConfigStub = {
+		cachingUtils: {}
+	},
 	crudUtilsStub = {},
-	poiCategoryConfig = require('../api/v1/poi_category.config');
+	poiCategoryConfig = proxyquire('../api/v1/poi_category.config', {
+		'./../../lib/config': {},
+		'./../../lib/cachingUtils': {}
+	});
 
 function getPoiCategoryUtilsMock(
 	dbConStub,
@@ -31,7 +36,8 @@ function getPoiCategoryUtilsMock(
 			'q': qStub,
 			'./../../lib/config': configStub,
 			'./poi.config': poiConfigStub,
-			'./crud.utils': crudUtilsStub
+			'./crud.utils': crudUtilsStub,
+			'./poi_category.config': poiCategoryConfig
 		});
 }
 
