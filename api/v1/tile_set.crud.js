@@ -34,7 +34,6 @@ function getTileSetsCollection(req, res, next) {
 		crudUtils.addPaginationToQuery(query, limit, offset);
 	}
 
-
 	dbCon
 		.getConnection(dbCon.connType.all)
 		.then(function (conn) {

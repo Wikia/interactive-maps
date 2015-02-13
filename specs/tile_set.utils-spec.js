@@ -246,4 +246,18 @@ describe('TileSet Utils', function () {
 		expect(queryMock.where).toHaveBeenCalledWith('tile_set.name', 'like', '%' + search + '%');
 		expect(queryMock.orderBy).toHaveBeenCalledWith('created_on', 'desc');
 	});
+
+	it('buildSort() returns existing sorting option object', function () {
+		expect(tileSetUtils.buildSort('desc')).toEqual({
+			column: 'created_on',
+			direction: 'desc'
+		});
+	});
+
+	it('buildSort() fall-backs to default sorting option', function () {
+		expect(tileSetUtils.buildSort('no_existing_option')).toEqual({
+			column: 'created_on',
+			direction: 'asc'
+		});
+	});
 });
