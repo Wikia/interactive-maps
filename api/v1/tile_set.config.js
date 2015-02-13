@@ -62,6 +62,16 @@ module.exports = {
 		},
 		additionalProperties: false
 	},
+	sortingOptions: {
+		desc: {
+			column: 'created_on',
+			direction: 'desc'
+		},
+		asc: {
+			column: 'created_on',
+			direction: 'asc'
+		}
+	},
 	searchLimit: 50,
 	minSearchCharacters: minSearchCharacters,
 	searchErrorMsg: 'Search string should be at least ' + minSearchCharacters + ' long.',
