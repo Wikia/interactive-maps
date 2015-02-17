@@ -22,8 +22,12 @@ function getTileSetsCollection(req, res, next) {
 		},
 		limit = parseInt(req.query.limit, 10) || false,
 		offset = parseInt(req.query.offset, 10) || 0,
+		sort = tileSetUtils.buildSort(req.query.sort),
 		search = req.query.search || false,
-		query = dbCon.knex(tileSetConfig.dbTable).column(tileSetConfig.getCollectionDbColumns).where(filter),
+		query = dbCon.knex(tileSetConfig.dbTable)
+			.column(tileSetConfig.getCollectionDbColumns)
+			.where(filter)
+			.orderBy(sort.column, sort.direction),
 		dbConnection;
 
 	if (limit) {

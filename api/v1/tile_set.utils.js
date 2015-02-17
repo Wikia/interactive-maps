@@ -127,6 +127,18 @@ function changeOptionsIfSearchIsValid(query, search, limit) {
 	return deferred.promise;
 }
 
+/**
+ * @desc Builds object which is later used in knex.orderBy()
+ *       Default value is { column: 'created_on', direction: 'desc' }
+ * @param {String} sort description of sorting passed as GET parameter i.e. asc
+ * @returns {object}
+ */
+function buildSort(sort) {
+	var sortType = tileSetConfig.sortingOptions[sort];
+
+	return sortType ? sortType : tileSetConfig.sortingOptions.asc;
+}
+
 module.exports = {
 	addSearchToQuery: addSearchToQuery,
 	validateSearchTerm: validateSearchTerm,
@@ -134,5 +146,6 @@ module.exports = {
 	processTileSetCollection: processTileSetCollection,
 	extendTileSetObject: extendTileSetObject,
 	setupCreateTileSetResponse: setupCreateTileSetResponse,
-	changeOptionsIfSearchIsValid: changeOptionsIfSearchIsValid
+	changeOptionsIfSearchIsValid: changeOptionsIfSearchIsValid,
+	buildSort: buildSort
 };
