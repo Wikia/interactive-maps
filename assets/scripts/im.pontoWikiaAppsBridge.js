@@ -53,12 +53,13 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 		body.addEventListener('click', function (event) {
 			var target = event.target;
 
-			if (target.tagName === 'A' && target.className.indexOf(poiArticleLinkClass) !== -1) {
+			if(
+				target.tagName === 'A' &&
+				target.className.indexOf(poiArticleLinkClass) !== -1 &&
+				target.className.indexOf(disabledLinkClass) === -1
+			) {
 				event.preventDefault();
-
-				if (target.className.indexOf(disabledLinkClass) === -1) {
-					sendLinkUrl(target.href);
-				}
+				sendLinkUrl(target.href);
 			}
 		});
 	}
