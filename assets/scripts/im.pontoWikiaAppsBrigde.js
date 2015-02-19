@@ -5,7 +5,6 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 		poiArticleLinkClass = 'poi-article-link',
 		disabledLinkClass = 'disabled';
 
-
 	/**
 	 * @desc checks if map is embeded in native wikia app
 	 * @param {function} success
@@ -25,7 +24,6 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 		});
 	}
 
-
 	/**
 	 * @desc setup POI article links for native wikia app
 	 */
@@ -36,7 +34,7 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 			link,
 			path;
 
-		while(i--) {
+		while (i--) {
 			link = links[i];
 			path = link.pathname || link.href;
 
@@ -55,7 +53,7 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 		body.addEventListener('click', function (event) {
 			var target = event.target;
 
-			if(target.tagName === 'A' && target.className.indexOf(poiArticleLinkClass) !== -1) {
+			if (target.tagName === 'A' && target.className.indexOf(poiArticleLinkClass) !== -1) {
 				event.preventDefault();
 
 				if (target.className.indexOf(disabledLinkClass) === -1) {
@@ -72,4 +70,3 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 		bindLinkEvents: bindLinkEvents
 	};
 });
-
