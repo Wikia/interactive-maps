@@ -1,7 +1,7 @@
 define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function (ponto, w, tracker, config) {
 	'use strict';
 
-	var pontoWikiaAppClass = 'PONTO_APP_CLASS_NAME',
+	var pontoWikiaAppClass = 'Linker',
 		poiArticleLinkClass = 'poi-article-link',
 		disabledLinkClass = 'disabled';
 
@@ -16,11 +16,12 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 
 	/**
 	 * @desc sends link URL to native wikia app
-	 * @param {String} url
+	 * @param {Element} link
 	 */
-	function sendLinkUrl(url) {
+	function sendLinkUrl(link) {
 		ponto.invoke(pontoWikiaAppClass, 'goTo', {
-			url: url
+			url: link.href,
+			title: link.dataset.articleTitle
 		});
 	}
 
@@ -59,7 +60,7 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 				target.className.indexOf(disabledLinkClass) === -1
 			) {
 				event.preventDefault();
-				sendLinkUrl(target.href);
+				sendLinkUrl(target);
 			}
 		});
 	}
