@@ -226,8 +226,6 @@ require(
 					pontoWikiaAppsBridge.setupPoiLinks();
 					pontoWikiaAppsBridge.bindLinkEvents();
 				}, pontoWikiaBridge.showPontoError);
-
-
 			}
 		}
 
