@@ -1,4 +1,4 @@
-define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function (ponto, w, tracker, config) {
+define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function (ponto, w, config) {
 	'use strict';
 
 	var pontoWikiaAppClass = 'Linker',
