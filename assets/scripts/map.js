@@ -222,10 +222,10 @@ require(
 				);
 
 				// special poi article link handling for Wikia Native Apps
-				pontoWikiaAppsBridge.isEmbededInWikiaApp(function () {
+				//pontoWikiaAppsBridge.isEmbededInWikiaApp(function () {
 					pontoWikiaAppsBridge.setupPoiLinks();
 					pontoWikiaAppsBridge.bindLinkEvents();
-				}, pontoWikiaBridge.showPontoError);
+				//}, pontoWikiaBridge.showPontoError);
 			}
 		}
 
