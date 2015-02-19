@@ -11,7 +11,11 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 	 * @param {function} error
 	 */
 	function isEmbededInWikiaApp(success, error) {
-		ponto.invoke(pontoWikiaAppClass, 'isEmbeded', {}, success, error);
+		w.alert('isEmbedded Called');
+		ponto.invoke(pontoWikiaAppClass, 'isEmbeded', {}, function () {
+			w.alert('response from Native');
+			success();
+		}, error);
 	}
 
 	/**
