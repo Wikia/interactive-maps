@@ -8,6 +8,7 @@ require(
 		'im.leafletWrapper',
 		'im.config',
 		'im.pontoWikiaBridge',
+		'im.pontoWikiaAppsBridge',
 		'im.i18n',
 		'im.utils',
 		'im.map',
@@ -23,6 +24,7 @@ require(
 		L,
 		config,
 		pontoWikiaBridge,
+		pontoWikiaAppsBridge,
 		i18n,
 		utils,
 		mapModule,
@@ -218,6 +220,14 @@ require(
 					'map', tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 					parseInt(mapConfig.id, 10)
 				);
+
+				// special poi article link handling for Wikia Native Apps
+				pontoWikiaAppsBridge.isEmbededInWikiaApp(function () {
+					pontoWikiaAppsBridge.setupPoiLinks();
+					pontoWikiaAppsBridge.bindLinkEvents();
+				}, pontoWikiaBridge.showPontoError);
+
+
 			}
 		}
 
