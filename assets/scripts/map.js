@@ -221,11 +221,10 @@ require(
 					parseInt(mapConfig.id, 10)
 				);
 
-				// special poi article link handling for Wikia Native Apps
-				//pontoWikiaAppsBridge.isEmbededInWikiaApp(function () {
-					pontoWikiaAppsBridge.setupPoiLinks();
-					pontoWikiaAppsBridge.bindLinkEvents();
-				//}, pontoWikiaBridge.showPontoError);
+				// set special article link behavior for map embedded in wikia mobile apps
+				if (config.mapConfig.isEmbeddedInWikiaApp) {
+					pontoWikiaAppsBridge.setupArticleLinks();
+				}
 			}
 		}
 
