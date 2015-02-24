@@ -9,9 +9,11 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window'], function (ponto, w) {
 	 * @param {Element} link
 	 */
 	function sendLinkUrl(link) {
+		var title = link.dataset.articleTitle;
+
 		ponto.invoke(pontoWikiaAppClass, 'goTo', {
 			url: link.href,
-			title: link.dataset.articleTitle.replace(/ /g, '_')
+			title: title ? title.replace(/ /g, '_') : ''
 		});
 	}
 
