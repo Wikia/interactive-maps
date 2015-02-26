@@ -8,6 +8,7 @@ require(
 		'im.leafletWrapper',
 		'im.config',
 		'im.pontoWikiaBridge',
+		'im.pontoWikiaAppsBridge',
 		'im.i18n',
 		'im.utils',
 		'im.map',
@@ -23,6 +24,7 @@ require(
 		L,
 		config,
 		pontoWikiaBridge,
+		pontoWikiaAppsBridge,
 		i18n,
 		utils,
 		mapModule,
@@ -218,6 +220,11 @@ require(
 					'map', tracker.ACTIONS.IMPRESSION, 'embedded-map-displayed',
 					parseInt(mapConfig.id, 10)
 				);
+
+				// set special article link behavior for map embedded in wikia mobile apps
+				if (config.mapConfig.isEmbeddedInWikiaApp) {
+					pontoWikiaAppsBridge.setupArticleLinks();
+				}
 			}
 		}
 

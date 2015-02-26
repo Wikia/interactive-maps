@@ -13,7 +13,7 @@ define('im.renderUI', ['im.config', 'im.window', 'im.i18n'], function (config, w
 	function buildLinkHTML(point, innerHtml, className) {
 		var classString = (className) ? ' class="' + className + '"' : '';
 
-		return '<a href="' + point.link + '" title="' + point.name + '"' + classString + ' target="_blank">' +
+		return '<a href="' + point.link + '" title="' + point.name + '" data-article-title="' + point.link_title + '"' + classString + ' target="_blank">' +
 			innerHtml + '</a>';
 	}
 
