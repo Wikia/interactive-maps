@@ -359,6 +359,25 @@ describe('utils', function () {
 		});
 	});
 
+	it('correctly gets file name from path name', function () {
+		var testCases = [
+			{
+				pathname: '/mediawiki116/images/8/81/20150205100502%21phpVtvygX.png' +
+				'/revision/latest?cb=20150205100502&zone=temp',
+				filename: '20150205100502%21phpVtvygX.png'
+			},
+			{
+				pathname: '/__cb1422890817/candy-crush-saga/images/temp/1/10/' +
+				'20150203044502%21phpPNBeRu.png',
+				filename: '20150203044502%21phpPNBeRu.png'
+			}
+		];
+
+		testCases.forEach(function (testCase) {
+			expect(utils.getFileNameFromPathName(testCase.pathname)).toEqual(testCase.filename);
+		});
+	});
+
 	it('generates correct map boundaries', function () {
 		// @TODO Add more real cases when the north calculation logic is fixed
 		var testSet = [

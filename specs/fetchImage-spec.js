@@ -46,13 +46,13 @@ describe('Fetch image', function () {
 		});
 
 
-	it('creates creates write stream to save image in fs', function () {
+	it('creates write stream to save image in fs', function () {
 		fetchImage(data);
 
 		expect(fsStub.createWriteStream).toHaveBeenCalled();
 	});
 
-	it('creates proper file name from image url', function () {
+	it('creates write stream with proper path', function () {
 		var fileName = 'image.jpg';
 
 		fetchImage(data);
@@ -60,7 +60,7 @@ describe('Fetch image', function () {
 		expect(fsStub.createWriteStream).toHaveBeenCalledWith(data.dir + fileName);
 	});
 
-	it('calls calls http.get to fetch image', function () {
+	it('calls http.get to fetch image', function () {
 		spyOn(http, 'get').andCallThrough();
 
 		fetchImage(data);
