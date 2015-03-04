@@ -8,6 +8,7 @@ if (process.env.NEW_RELIC_ENABLED === 'true') {
 }
 
 var logger = require('../lib/logger'),
+	utils = require('../lib/utils'),
 	cluster = require('cluster'),
 	coresCount = require('os').cpus().length,
 	workersCount = process.env.WIKIA_IM_WORKERS,
@@ -50,17 +51,6 @@ logger.set({
 });
 
 /**
- * @desc Called on exit to cleanup kue and close it
- */
-function shutdown() {
-	jobs.shutdown(function () {
-		logger.debug('Jobs cleaned up and set to delayed states');
-		logger.close();
-		process.exit(0);
-	}, 1000);
-}
-
-/**
  * @desc Get number of workers depending on number of cores
  * @param {number} coresCount Number of CPU cores
  * @returns {number}
@@ -74,34 +64,11 @@ function getWorkersCount(coresCount) {
  */
 function onDie() {
 	gracefulShutdown = true;
-	//when terminating: mark all active jobs as delayed
-	//so kue can pick them up after restart
-	jobs.active(function (err, ids) {
-		var length = ids.length,
-			count = 0,
-			i = 0,
-			delayJob = function (err, job) {
-				job.delayed().save();
-				count++;
-
-				if (count === length) {
-					shutdown();
-				}
-			};
-
-		if (length) {
-			for (; i < length; i++) {
-				kue.Job.get(ids[i], delayJob);
-			}
-		} else {
-			shutdown();
-		}
-	});
+	utils.markJobsAsDelayed(jobs);
 }
 
 if (typeof workersCount === 'undefined') {
-	//workersCount = getWorkersCount(coresCount);
-	workersCount = 2;
+	workersCount = getWorkersCount(coresCount);
 }
 
 if (cluster.isMaster) {
