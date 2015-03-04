@@ -22,8 +22,6 @@ var logger = require('../lib/logger'),
 config = require('../lib/config');
 config.setRoot(__dirname + '/..');
 
-jobs = kue.createQueue(config);
-
 /**
  * This value controls the number of simultaneous HTTP connections in the application.
  * Node's default is 5, which leads to slow DFS uploads. Adjust the value if any DFS issues are spotted.
@@ -111,6 +109,7 @@ if (cluster.isMaster) {
 	}
 
 	logger.debug('Started master process, pid: ' + process.pid);
+
 	// Fork workers
 	for (var i = 0; i < workersCount; i++) {
 		worker = cluster.fork().process;
@@ -133,6 +132,7 @@ if (cluster.isMaster) {
 	process.on('SIGINT', onDie);
 	process.on('SIGTERM', onDie);
 
+	jobs = kue.createQueue(config);
 	//jobs are added with delayed status
 	// we need to check if something should get promoted
 	//by default it happens every 5000ms
