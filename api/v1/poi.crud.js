@@ -68,7 +68,7 @@ function createPoi(req, res, next) {
 
 			utils.extendObject(response, {
 				id: poiId,
-				url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), poiId)
+				url: utils.responseUrl(req, req.route.path, poiId)
 			});
 
 			return utils.changeMapUpdatedOn(dbConnection, dbCon, mapId);

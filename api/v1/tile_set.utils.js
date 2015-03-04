@@ -93,7 +93,7 @@ function setupCreateTileSetResponse(dbRes, req) {
 	return {
 		message: message,
 		id: id,
-		url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), id)
+		url: utils.responseUrl(req, req.route.path, id)
 	};
 }
 

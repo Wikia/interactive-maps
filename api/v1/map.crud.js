@@ -97,7 +97,7 @@ function createMap(req, res, next) {
 
 			utils.extendObject(response, {
 				id: mapId,
-				url: utils.responseUrl(req, utils.addTrailingSlash(req.route.path), mapId)
+				url: utils.responseUrl(req, req.route.path, mapId)
 			});
 
 			utils.sendHttpResponse(res, 201, response);
