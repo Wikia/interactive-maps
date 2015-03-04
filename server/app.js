@@ -100,7 +100,8 @@ function onDie() {
 }
 
 if (typeof workersCount === 'undefined') {
-	workersCount = getWorkersCount(coresCount);
+	//workersCount = getWorkersCount(coresCount);
+	workersCount = 2;
 }
 
 if (cluster.isMaster) {
