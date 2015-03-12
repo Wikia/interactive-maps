@@ -1,4 +1,7 @@
-define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function (ponto, w, config) {
+define(
+	'im.pontoWikiaAppsBridge',
+	['ponto', 'im.window', 'im.pontoWikiaAppsBridge.utils'],
+	function (ponto, w, utils) {
 	'use strict';
 
 	var pontoWikiaAppClass = 'Linker';
@@ -17,35 +20,13 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 	}
 
 	/**
-	 * @desc checks if target is valid link to article
-	 * @param {Element} target - HTML node element
-	 * @returns {Element|Boolean} - if no valid article link element exist returns false
-	 */
-	function getArticleLinkEl(target) {
-		var link;
-
-		if (target.tagName === 'A' && target.className.indexOf(config.articleLinkClassName) !== -1) {
-			link = target;
-		} else if (
-			target.tagName === 'IMG' &&
-			target.parentNode.className.indexOf(config.articleLinkClassName) !== -1
-		) {
-			link = target.parentNode;
-		} else {
-			link = false;
-		}
-
-		return link;
-	}
-
-	/**
 	 * @desc prevents default link behavior and sends supported links to native wikia app for processing
 	 */
 	function setupArticleLinks() {
 		var body = w.document.getElementsByTagName('body')[0];
 
 		body.addEventListener('click', function (event) {
-			var link = getArticleLinkEl(event.target);
+			var link = utils.getArticleLinkEl(event.target);
 
 			if (link) {
 				event.preventDefault();
