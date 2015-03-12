@@ -19,11 +19,23 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 	/**
 	 * @desc checks if target is valid link to article
 	 * @param {Element} target - HTML node element
-	 * @returns {boolean}
+	 * @returns {Element|Boolean} - if no valid article link element exist returns false
 	 */
-	function isLinkToArticle(target) {
-		return (target.tagName === 'A' && target.className.indexOf(config.articleLinkClassName) !== -1) ||
-			(target.tagName === 'IMG' && target.parentNode.className.indexOf(config.articleLinkClassName) !== -1);
+	function getArticleLinkEl(target) {
+		var link;
+
+		if (target.tagName === 'A' && target.className.indexOf(config.articleLinkClassName) !== -1) {
+			link = target;
+		} else if (
+			target.tagName === 'IMG' &&
+			target.parentNode.className.indexOf(config.articleLinkClassName) !== -1
+		) {
+			link = target.parentNode;
+		} else {
+			link = false;
+		}
+
+		return link;
 	}
 
 	/**
@@ -33,11 +45,11 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 		var body = w.document.getElementsByTagName('body')[0];
 
 		body.addEventListener('click', function (event) {
-			var target = event.target;
+			var link = getArticleLinkEl(event.target);
 
-			if (isLinkToArticle(target)) {
+			if (link) {
 				event.preventDefault();
-				sendLinkUrl(target);
+				sendLinkUrl(link);
 			}
 		});
 	}
