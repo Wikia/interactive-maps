@@ -1,8 +1,7 @@
-define('im.pontoWikiaAppsBridge', ['ponto', 'im.window'], function (ponto, w) {
+define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function (ponto, w, config) {
 	'use strict';
 
-	var pontoWikiaAppClass = 'Linker',
-		poiArticleLinkClass = 'poi-article-link';
+	var pontoWikiaAppClass = 'Linker';
 
 	/**
 	 * @desc sends link URL to native wikia app
@@ -28,7 +27,7 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window'], function (ponto, w) {
 
 			if (
 				target.tagName === 'A' &&
-				target.className.indexOf(poiArticleLinkClass) !== -1
+				target.className.indexOf(config.pontoLinkerClassName) !== -1
 			) {
 
 				event.preventDefault();

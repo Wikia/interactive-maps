@@ -35,6 +35,7 @@ define('im.config', ['im.window'], function (w) {
 			},
 			defaultMarkerSize: 70,
 			defaultPlayerIcon: '/assets/' + w.mapSetup.cacheBuster + '/images/player_location_marker.png'
-		}
+		},
+		pontoLinkerClassName: 'poi-article-link'
 	};
 });

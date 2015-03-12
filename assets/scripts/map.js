@@ -288,7 +288,7 @@ require(
 			});
 
 			doc.addEventListener('click', function (event) {
-				if (utils.hasClass(event.target, 'poi-article-link')) {
+				if (utils.hasClass(event.target, config.pontoLinkerClassName)) {
 					tracker.track('map', tracker.ACTIONS.CLICK_LINK_TEXT, 'poi-article');
 				}
 			});
