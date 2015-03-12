@@ -49,7 +49,7 @@ define('im.renderUI', ['im.config', 'im.window', 'im.i18n'], function (config, w
 		var
 			photoHtml = '',
 			titleHtml = '<h3>' + (point.link ?
-					buildLinkHTML(point, point.name, config.pontoLinkerClassName) :
+					buildLinkHTML(point, point.name, config.articleLinkClassName) :
 					point.name) + '</h3>',
 			descriptionHtml = (point.description ? '<p>' + point.description + '</p>' : ''),
 			editLink = '<a title="' + editLinkMsg + '" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
@@ -59,7 +59,7 @@ define('im.renderUI', ['im.config', 'im.window', 'im.i18n'], function (config, w
 			photoHtml = buildLinkHTML(
 				point,
 				buildImageHTML(point.photo, point.name, config.photoWidth, config.photoHeight),
-				'photo ' + config.pontoLinkerClassName
+				'photo ' + config.articleLinkClassName
 			);
 		} else if (point.photo) {
 			photoHtml = buildImageHTML(point.photo, point.name, config.photoWidth, config.photoHeight);

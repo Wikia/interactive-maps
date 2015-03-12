@@ -26,8 +26,9 @@ define('im.pontoWikiaAppsBridge', ['ponto', 'im.window', 'im.config'], function 
 			var target = event.target;
 
 			if (
-				target.tagName === 'A' &&
-				target.className.indexOf(config.pontoLinkerClassName) !== -1
+				target.tagName === 'A' || target.tagName === 'IMG' &&
+				target.className.indexOf(config.articleLinkClassName) !== -1 ||
+				target.parentNode.className.indexOf(config.articleLinkClassName) !== -1
 			) {
 
 				event.preventDefault();
