@@ -46,9 +46,11 @@ define('im.renderUI', ['im.config', 'im.window', 'im.i18n'], function (config, w
 	 * @returns {string} - HTML markup for popup
 	 */
 	function buildPopupHtml(point, editLinkMsg) {
-		var photoHtml = '',
-			titleHtml = '<h3>' + (point.link ? buildLinkHTML(point, point.name, 'poi-article-link') : point.name) +
-				'</h3>',
+		var
+			photoHtml = '',
+			titleHtml = '<h3>' + (point.link ?
+					buildLinkHTML(point, point.name, config.articleLinkClassName) :
+					point.name) + '</h3>',
 			descriptionHtml = (point.description ? '<p>' + point.description + '</p>' : ''),
 			editLink = '<a title="' + editLinkMsg + '" class="edit-poi-link" data-marker-id="' + point.leafletId + '">' +
 				editLinkMsg + '</a>';
@@ -57,7 +59,7 @@ define('im.renderUI', ['im.config', 'im.window', 'im.i18n'], function (config, w
 			photoHtml = buildLinkHTML(
 				point,
 				buildImageHTML(point.photo, point.name, config.photoWidth, config.photoHeight),
-				'photo'
+				'photo ' + config.articleLinkClassName
 			);
 		} else if (point.photo) {
 			photoHtml = buildImageHTML(point.photo, point.name, config.photoWidth, config.photoHeight);
