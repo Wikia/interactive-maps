@@ -34,7 +34,7 @@ describe('jobProcessors', function () {
 			'./uploadTiles': {},
 			'./optimizeTiles': {},
 			'./imageBackground': {},
-			'./squidUpdate': {}
+			'./celeryUpdate': {}
 		});
 	});
 });
