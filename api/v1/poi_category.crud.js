@@ -6,7 +6,7 @@ var dbCon = require('./../../lib/db_connector'),
 	config = require('./../../lib/config'),
 	utils = require('./../../lib/utils'),
 	poiCategoryMarker = require('./../../lib/poiCategoryMarker'),
-	squidUpdate = require('./../../lib/squidUpdate'),
+	celeryUpdate = require('./../../lib/celeryUpdate'),
 	poiCategoryConfig = require('./poi_category.config'),
 	mapDataConfig = require('./map_data.config'),
 	poiCategoryUtils = require('./poi_category.utils'),
@@ -123,7 +123,7 @@ function createPoiCategory(req, res, next) {
 
 			dbConnection.release();
 
-			squidUpdate.purgeData(
+			celeryUpdate.purgeData(
 				{
 					urls: [
 						utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, ''),
@@ -184,7 +184,7 @@ function deletePoiCategory(req, res, next) {
 
 			dbConnection.release();
 
-			squidUpdate.purgeData(
+			celeryUpdate.purgeData(
 				{
 					urls: [
 						utils.responseUrl(req, crudUtils.apiPath + poiCategoryConfig.path, poiCategoryId),
@@ -268,7 +268,7 @@ function updatePoiCategory (req, res, next) {
 
 			dbConnection.release();
 
-			squidUpdate.purgeData(
+			celeryUpdate.purgeData(
 				{
 					urls: [
 						responseUrl,

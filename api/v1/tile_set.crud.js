@@ -3,7 +3,7 @@
 var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	utils = require('./../../lib/utils'),
-	squidUpdate = require('./../../lib/squidUpdate'),
+	celeryUpdate = require('./../../lib/celeryUpdate'),
 	errorHandler = require('./../../lib/errorHandler'),
 	tileSetConfig = require('./tile_set.config'),
 	tileSetUtils = require('./tile_set.utils'),
@@ -134,7 +134,7 @@ function createTileSet(req, res, next) {
 				tileSetUtils.setupCreateTileSetResponse(data, req)
 			);
 
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + tileSetConfig.surrogateKeys.forCollection,
+			celeryUpdate.purgeKey(utils.surrogateKeyPrefix + tileSetConfig.surrogateKeys.forCollection,
 				tileSetConfig.purgeCallers.created);
 		})
 		.fail(function () {

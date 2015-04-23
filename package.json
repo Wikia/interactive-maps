@@ -25,6 +25,7 @@
     "kue": "0.7.x",
     "mysql": "~2.3.2",
     "newrelic": "1.5.x",
+    "node-celery": "0.2.2",
     "node-syslog": "1.1.x",
     "node-uuid": "~1.4.1",
     "q": "1.0.x",

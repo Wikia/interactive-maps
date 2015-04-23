@@ -4,7 +4,7 @@ var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	utils = require('./../../lib/utils'),
 	errorHandler = require('./../../lib/errorHandler'),
-	squidUpdate = require('./../../lib/squidUpdate'),
+	celeryUpdate = require('./../../lib/celeryUpdate'),
 	mapConfig = require('./map.config'),
 	mapDataConfig = require('./map_data.config'),
 	mapUtils = require('./map.utils'),
@@ -101,7 +101,7 @@ function createMap(req, res, next) {
 			});
 
 			utils.sendHttpResponse(res, 201, response);
-			squidUpdate.purgeKey(utils.surrogateKeyPrefix + mapConfig.surrogateKeys.forCollection, mapConfig.purgeCallers.created);
+			celeryUpdate.purgeKey(utils.surrogateKeyPrefix + mapConfig.surrogateKeys.forCollection, mapConfig.purgeCallers.created);
 		})
 		.fail(function () {
 			crudUtils.releaseConnectionOnFail(dbConnection, next);
@@ -137,7 +137,7 @@ function deleteMap(req, res, next) {
 				message: mapConfig.responseMessages.deleted,
 				id: mapId
 			});
-			squidUpdate.purgeData(
+			celeryUpdate.purgeData(
 				{
 					urls: [
 						utils.responseUrl(req, crudUtils.apiPath + mapConfig.path, mapId),
@@ -241,7 +241,7 @@ function updateMap(req, res, next) {
 
 			utils.sendHttpResponse(res, 303, response);
 
-			squidUpdate.purgeData(
+			celeryUpdate.purgeData(
 				{
 					urls: [
 						responseUrl,
