@@ -15,7 +15,7 @@
 
 var dbCon = require('../lib/db_connector'),
 	utils = require('../lib/utils'),
-	squidUpdate = require('../lib/squidUpdate'),
+	celeryUpdate = require('../lib/celeryUpdate'),
 
 	table = 'poi',
 	args = process.argv.slice(2),
@@ -92,7 +92,7 @@ function processPois(conn, pois) {
 		newLink = poi.link.replace(find, replace);
 		if (poi.link !== newLink) {
 			updatePoiLink(conn, poi.id, newLink).then(function () {
-				squidUpdate.purgeKey(
+				celeryUpdate.purgeKey(
 					utils.surrogateKeyPrefix + mapId,
 					'mapPoiUpdated'
 				);

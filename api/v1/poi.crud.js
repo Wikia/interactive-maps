@@ -4,7 +4,7 @@ var dbCon = require('./../../lib/db_connector'),
 	reqBodyParser = require('./../../lib/requestBodyParser'),
 	errorHandler = require('./../../lib/errorHandler'),
 	utils = require('./../../lib/utils'),
-	squidUpdate = require('./../../lib/squidUpdate'),
+	celeryUpdate = require('./../../lib/celeryUpdate'),
 	poiIndexer = require('./../../lib/poiIndexer'),
 	poiConfig = require('./poi.config'),
 	mapDataConfig = require('./map_data.config'),
@@ -78,7 +78,7 @@ function createPoi(req, res, next) {
 
 			dbConnection.release();
 
-			squidUpdate.purgeData(
+			celeryUpdate.purgeData(
 				{
 					urls: [
 						utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, ''),
@@ -178,7 +178,7 @@ function deletePoi(req, res, next) {
 
 			dbConnection.release();
 
-			squidUpdate.purgeData(
+			celeryUpdate.purgeData(
 				{
 					urls: [
 						utils.responseUrl(req, crudUtils.apiPath + poiConfig.path, poiId),
@@ -251,7 +251,7 @@ function updatePoi(req, res, next) {
 
 			dbConnection.release();
 
-			squidUpdate.purgeData(
+			celeryUpdate.purgeData(
 				{
 					urls: [
 						responseUrl,
