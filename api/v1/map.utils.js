@@ -35,7 +35,7 @@ function buildMapCollectionResult(collection, req) {
 		);
 		value.url = utils.responseUrl(
 			req,
-			utils.addTrailingSlash(req.route.path),
+			req.route.path,
 			value.id
 		);
 
