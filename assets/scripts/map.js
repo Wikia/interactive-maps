@@ -272,7 +272,7 @@ require(
 				// We need to limit contribution options on protected maps related to the ad campaign only to stuff
 				// users.
 				// TODO: remove this as a part of https://wikia-inc.atlassian.net/browse/DAT-4055
-				if (config.protectedMaps.indexOf(mapId) === -1 || options.isUserStuff) {
+				if (mapConfig.isProtected !== true || options.isUserStuff) {
 					setupContributionOptions();
 				}
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
