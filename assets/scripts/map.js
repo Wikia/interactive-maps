@@ -268,7 +268,13 @@ require(
 				utils.addClass(body, 'wikia-mobile');
 				filterBox.setUpHideButton();
 			} else if (mapConfig.city_id === options.cityId) {
-				setupContributionOptions();
+				// Temporary change required for ad purpose - https://wikia-inc.atlassian.net/browse/DAT-4051
+				// We need to limit contribution options on protected maps related to the ad campaign only to stuff
+				// users.
+				// TODO: remove this as a part of https://wikia-inc.atlassian.net/browse/DAT-4055
+				if (mapConfig.isProtected === false || options.isUserStaff) {
+					setupContributionOptions();
+				}
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-map-displayed', mapId);
 			} else {
 				tracker.track('map', tracker.ACTIONS.IMPRESSION, 'wikia-foreign-map-displayed', mapId);
