@@ -70,18 +70,6 @@ define('im.poi', ['im.leafletWrapper', 'im.config', 'im.renderUI', 'im.i18n'], f
 		popup = createPoiPopup(poi, popupWidth);
 		marker.bindPopup(popup);
 
-		// Temporary change required for ad purpose - https://wikia-inc.atlassian.net/browse/DAT-4051
-		// Open popups on hover on maps related to the ad campaign
-		// TODO: remove this as a part of https://wikia-inc.atlassian.net/browse/DAT-4055
-		if (config.mapConfig.isProtected) {
-			marker.on('mouseover', function () {
-				this.openPopup();
-			});
-			marker.on('mouseout', function () {
-				this.closePopup();
-			});
-		}
-
 		// extend marker object with point data;
 		marker.point = poi;
 
