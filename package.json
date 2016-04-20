@@ -13,7 +13,7 @@
   "dependencies": {
     "JSV": "4.0.x",
     "amqplib": "~0.2.0",
-    "bluebird": ".0.0",
+    "bluebird": "1.0.0",
     "cluster": "0.7.x",
     "colors": "0.6.x",
     "detour": "1.0.x",
