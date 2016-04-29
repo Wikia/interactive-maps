@@ -5,9 +5,7 @@ describe('DFS', function () {
 		dfs = proxyquire('../lib/dfs', {
 			'./config': {
 				swift: {
-					servers: [
-						'127.0.0.1'
-					],
+					server: '127.0.0.1',
 					config: {
 						swiftAuthUrl: '',
 						swiftUser: '',
@@ -108,28 +106,5 @@ describe('DFS', function () {
 		expect(function () {
 			dfs.getHostAndPort('');
 		}).toThrow('Invalid address');
-	});
-
-	it('returns correct DFS hosts with different hosts lists', function () {
-		var hostsListsMock = [
-				['127.0.0.1:80'],
-				['127.0.0.1:80', '127.0.0.1:6000', '127.0.0.1:123', 'dfs-lb.wikia.com', '10.10.132.15']
-			],
-			first,
-			i = 0;
-
-		expect(dfs.getDFS(hostsListsMock[0])).toEqual(dfs.getDFS(hostsListsMock[0]));
-		expect(dfs.getDFS(hostsListsMock[1])).not.toEqual(dfs.getDFS(hostsListsMock[1]));
-
-		// with this calls make it go back to 127.0.0.1:80 (the dfsHostIndex will increment to 11)
-		for (i; i < 4; i++) {
-			dfs.getDFS(hostsListsMock[1]);
-		}
-		first = dfs.getDFS(hostsListsMock[1]);
-		// now loop again so we can check if it is round-robin ;)
-		for (i = 0; i < 4; i++) {
-			dfs.getDFS(hostsListsMock[1]);
-		}
-		expect(first).toEqual(dfs.getDFS(hostsListsMock[1]));
 	});
 });
