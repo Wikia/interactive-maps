@@ -1,6 +1,8 @@
 Interactive Maps
 ================
 
+> Since July 2017 **this service no longer runs on production**. See https://wikia-inc.atlassian.net/browse/SUS-2428 for more information.
+
 Service that allows creating, storing and serving interactive maps
 
 
