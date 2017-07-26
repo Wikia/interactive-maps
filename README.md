@@ -3,6 +3,8 @@ Interactive Maps
 
 > Since July 2017 **this service no longer runs on production**. See https://wikia-inc.atlassian.net/browse/SUS-2428 for more information.
 
+> **Dumps** are available on Amazon's S3 under `http://s3.amazonaws.com/interactive_maps_dumps/<DB name>_maps.tar.gz` URL ([an example](http://s3.amazonaws.com/interactive_maps_dumps/fallout_maps.tar.gz))
+
 Service that allows creating, storing and serving interactive maps
 
 
